@@ -114,6 +114,24 @@ def validate_record():
     
     return jsonify({'success': True})
 
+@app.route('/get_validation/<int:record_index>')
+def get_validation(record_index):
+    global validation_results
+    
+    # Find validation for this record
+    validation = next((v for v in validation_results 
+                      if v['record_index'] == record_index), None)
+    
+    if validation:
+        return jsonify({
+            'exists': True,
+            'is_valid': validation.get('is_valid'),
+            'notes': validation.get('notes', ''),
+            'timestamp': validation.get('timestamp')
+        })
+    else:
+        return jsonify({'exists': False})
+
 @app.route('/summary')
 def get_summary():
     global validation_results, data

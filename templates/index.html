@@ -213,6 +213,7 @@
             gap: 15px;
             align-items: center;
             margin-bottom: 15px;
+            justify-content: center;
         }
 
         .validation-buttons {
@@ -343,6 +344,9 @@
                 <div class="product-site">
                     <div class="section-title">Product Website</div>
                     <div class="product-url" id="productUrl"></div>
+                    <div style="margin-bottom: 10px;">
+                        <button class="btn btn-secondary" onclick="openInNewTab()">Open in New Tab</button>
+                    </div>
                     <iframe id="productFrame" style="width: 100%; height: 500px; border: 1px solid #ddd; border-radius: 6px;"></iframe>
                 </div>
 
@@ -361,7 +365,6 @@
                         <button class="btn btn-success" onclick="validateRecord('valid')">✓ Valid</button>
                         <button class="btn btn-danger" onclick="validateRecord('invalid')">✗ Invalid</button>
                     </div>
-                    <button class="btn btn-primary" onclick="saveValidation()">Save Validation</button>
                 </div>
                 <div class="notes-section">
                     <label for="notes">Notes:</label>
@@ -435,6 +438,9 @@
                 // Update extracted data
                 updateExtractedData(data.extracted_data);
                 
+                // Load existing validation data if available
+                await loadExistingValidation(data.current_index);
+                
             } catch (error) {
                 showMessage('Error loading record: ' + error.message, 'error');
             }
@@ -499,7 +505,7 @@
 
         let currentValidation = null;
 
-        function validateRecord(isValid) {
+        async function validateRecord(isValid) {
             currentValidation = {
                 is_valid: isValid,
                 notes: document.getElementById('notes').value
@@ -514,11 +520,16 @@
             } else {
                 event.target.classList.add('btn-danger');
             }
+            
+            // Auto-save the validation
+            await saveValidation();
+            
+            // Auto-move to next record
+            await nextRecord();
         }
 
         async function saveValidation() {
             if (!currentValidation) {
-                showMessage('Please select Valid or Invalid first', 'error');
                 return;
             }
 
@@ -536,7 +547,6 @@
                 if (result.success) {
                     showMessage('Validation saved successfully', 'success');
                     currentValidation = null;
-                    document.getElementById('notes').value = '';
                     
                     // Reset button styles
                     const buttons = document.querySelectorAll('.validation-buttons .btn');
@@ -546,6 +556,38 @@
                 }
             } catch (error) {
                 showMessage('Error saving validation: ' + error.message, 'error');
+            }
+        }
+
+        async function loadExistingValidation(recordIndex) {
+            try {
+                const response = await fetch('/get_validation/' + recordIndex);
+                const validation = await response.json();
+                
+                if (validation.exists) {
+                    // Restore notes
+                    document.getElementById('notes').value = validation.notes || '';
+                    
+                    // Restore button state
+                    const buttons = document.querySelectorAll('.validation-buttons .btn');
+                    buttons.forEach(btn => btn.classList.remove('btn-success', 'btn-danger'));
+                    
+                    if (validation.is_valid === 'valid') {
+                        buttons[0].classList.add('btn-success'); // Valid button
+                    } else if (validation.is_valid === 'invalid') {
+                        buttons[1].classList.add('btn-danger'); // Invalid button
+                    }
+                } else {
+                    // Clear notes and button states for new records
+                    document.getElementById('notes').value = '';
+                    const buttons = document.querySelectorAll('.validation-buttons .btn');
+                    buttons.forEach(btn => btn.classList.remove('btn-success', 'btn-danger'));
+                }
+            } catch (error) {
+                // If there's an error, just clear the fields
+                document.getElementById('notes').value = '';
+                const buttons = document.querySelectorAll('.validation-buttons .btn');
+                buttons.forEach(btn => btn.classList.remove('btn-success', 'btn-danger'));
             }
         }
 
@@ -622,8 +664,20 @@
             }, 5000);
         }
 
+        function openInNewTab() {
+            const url = document.getElementById('productUrl').textContent;
+            if (url) {
+                window.open(url, '_blank');
+            }
+        }
+
         // Keyboard shortcuts
         document.addEventListener('keydown', function(event) {
+            // Don't trigger shortcuts when typing in input fields
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+                return;
+            }
+            
             if (event.key === 'ArrowLeft') {
                 previousRecord();
             } else if (event.key === 'ArrowRight') {
@@ -632,11 +686,6 @@
                 validateRecord('valid');
             } else if (event.key === 'i' || event.key === 'I') {
                 validateRecord('invalid');
-            } else if (event.key === 's' || event.key === 'S') {
-                if (event.ctrlKey || event.metaKey) {
-                    event.preventDefault();
-                    saveValidation();
-                }
             }
         });
     </script>
