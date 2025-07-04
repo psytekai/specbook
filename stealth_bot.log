@@ -1,0 +1,41 @@
+2025-07-03 22:15:10,903 - undetected_chromedriver.patcher - INFO - [patcher.py:346] - patching driver executable /Users/roark/Library/Application Support/undetected_chromedriver/undetected_chromedriver
+2025-07-03 22:15:13,384 - AntiDetectionScraper - INFO - [stealth_bot.py:337] - Successfully initialized undetected Chrome
+2025-07-03 22:15:13,395 - AntiDetectionScraper - INFO - [stealth_bot.py:586] - Rotated stealth configuration
+2025-07-03 22:15:13,858 - AntiDetectionScraper - WARNING - [stealth_bot.py:607] - CAPTCHA detected: recaptcha
+2025-07-03 22:15:13,858 - AntiDetectionScraper - INFO - [stealth_bot.py:629] - Falling back to Selenium for CAPTCHA handling...
+2025-07-03 22:15:13,858 - AntiDetectionScraper - INFO - [stealth_bot.py:687] - Navigating to https://www.deltafaucet.com/kitchen/product/9659-DST.html with Selenium
+2025-07-03 22:15:28,561 - AntiDetectionScraper - WARNING - [stealth_bot.py:708] - CAPTCHA detected: recaptcha
+2025-07-03 22:15:28,561 - AntiDetectionScraper - INFO - [stealth_bot.py:736] - Successfully scraped URL with Selenium (693708 chars)
+2025-07-03 22:15:28,570 - AntiDetectionScraper - INFO - [stealth_bot.py:687] - Navigating to https://www.deltafaucet.com/kitchen/product/9659-DST.html with Selenium
+2025-07-03 22:15:41,132 - AntiDetectionScraper - WARNING - [stealth_bot.py:708] - CAPTCHA detected: recaptcha
+2025-07-03 22:15:41,133 - AntiDetectionScraper - INFO - [stealth_bot.py:736] - Successfully scraped URL with Selenium (1103507 chars)
+2025-07-03 22:15:42,582 - AntiDetectionScraper - INFO - [stealth_bot.py:564] - Successfully initialized Playwright with enhanced stealth
+2025-07-03 22:15:42,582 - AntiDetectionScraper - INFO - [stealth_bot.py:828] - Navigating to https://www.deltafaucet.com/kitchen/product/9659-DST.html with Playwright
+2025-07-03 22:16:02,476 - AntiDetectionScraper - WARNING - [stealth_bot.py:852] - CAPTCHA detected: recaptcha
+2025-07-03 22:16:02,477 - AntiDetectionScraper - INFO - [stealth_bot.py:883] - Successfully scraped URL with Playwright (693014 chars)
+2025-07-03 22:16:02,890 - AntiDetectionScraper - WARNING - [stealth_bot.py:607] - CAPTCHA detected: recaptcha
+2025-07-03 22:16:02,890 - AntiDetectionScraper - INFO - [stealth_bot.py:629] - Falling back to Selenium for CAPTCHA handling...
+2025-07-03 22:16:02,890 - AntiDetectionScraper - INFO - [stealth_bot.py:687] - Navigating to https://www.deltafaucet.com/kitchen/product/1165LF-AR.html with Selenium
+2025-07-03 22:16:16,295 - AntiDetectionScraper - WARNING - [stealth_bot.py:708] - CAPTCHA detected: recaptcha
+2025-07-03 22:16:16,295 - AntiDetectionScraper - INFO - [stealth_bot.py:736] - Successfully scraped URL with Selenium (931317 chars)
+2025-07-03 22:16:16,308 - AntiDetectionScraper - INFO - [stealth_bot.py:687] - Navigating to https://www.deltafaucet.com/kitchen/product/1165LF-AR.html with Selenium
+2025-07-03 22:16:27,818 - AntiDetectionScraper - WARNING - [stealth_bot.py:708] - CAPTCHA detected: recaptcha
+2025-07-03 22:16:27,819 - AntiDetectionScraper - INFO - [stealth_bot.py:736] - Successfully scraped URL with Selenium (980535 chars)
+2025-07-03 22:16:27,833 - AntiDetectionScraper - INFO - [stealth_bot.py:828] - Navigating to https://www.deltafaucet.com/kitchen/product/1165LF-AR.html with Playwright
+2025-07-03 22:16:57,836 - AntiDetectionScraper - ERROR - [stealth_bot.py:891] - Playwright scraping failed: Page.goto: Timeout 30000ms exceeded.
+Call log:
+  - navigating to "https://www.deltafaucet.com/kitchen/product/1165LF-AR.html", waiting until "networkidle"
+
+2025-07-03 22:16:58,495 - AntiDetectionScraper - WARNING - [stealth_bot.py:607] - CAPTCHA detected: recaptcha
+2025-07-03 22:16:58,496 - AntiDetectionScraper - INFO - [stealth_bot.py:629] - Falling back to Selenium for CAPTCHA handling...
+2025-07-03 22:16:58,496 - AntiDetectionScraper - INFO - [stealth_bot.py:687] - Navigating to https://www.deltafaucet.com/kitchen/product/9159-BL-DST with Selenium
+2025-07-03 22:17:13,285 - AntiDetectionScraper - WARNING - [stealth_bot.py:708] - CAPTCHA detected: recaptcha
+2025-07-03 22:17:13,285 - AntiDetectionScraper - INFO - [stealth_bot.py:736] - Successfully scraped URL with Selenium (1089348 chars)
+2025-07-03 22:17:13,306 - AntiDetectionScraper - INFO - [stealth_bot.py:687] - Navigating to https://www.deltafaucet.com/kitchen/product/9159-BL-DST with Selenium
+2025-07-03 22:17:28,177 - AntiDetectionScraper - WARNING - [stealth_bot.py:708] - CAPTCHA detected: recaptcha
+2025-07-03 22:17:28,177 - AntiDetectionScraper - INFO - [stealth_bot.py:736] - Successfully scraped URL with Selenium (1048478 chars)
+2025-07-03 22:17:28,191 - AntiDetectionScraper - INFO - [stealth_bot.py:828] - Navigating to https://www.deltafaucet.com/kitchen/product/9159-BL-DST with Playwright
+2025-07-03 22:17:58,192 - AntiDetectionScraper - ERROR - [stealth_bot.py:891] - Playwright scraping failed: Page.goto: Timeout 30000ms exceeded.
+Call log:
+  - navigating to "https://www.deltafaucet.com/kitchen/product/9159-BL-DST", waiting until "networkidle"
+
