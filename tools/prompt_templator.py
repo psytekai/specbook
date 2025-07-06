@@ -1,8 +1,19 @@
 from typing import Dict, Any
+from pydantic import BaseModel, Field
 
 class PromptTemplator:
     """Service for creating prompts for various use cases"""
     
+    class ProductExtractionOutput(BaseModel):
+        """Pydantic model for product extraction output"""
+        image_url: str = Field(description="Direct URL to the product image")
+        type: str = Field(description="The product category (e.g. range hood, grill, fireplace, etc.)")
+        description: str = Field(description="Short product description, including brand, size, material, color, and notable features")
+        model_no: str = Field(description="Manufacturer model number, item no, or sku no.")
+        product_link: str = Field(description="Original product page URL")
+        qty: str = Field(description="Quantity if specified; otherwise 'unspecified'")
+        key: str = Field(description="A unique reference key (if available)")
+
     @staticmethod
     def product_extraction(product_url: str, product_data: str) -> str:
         """

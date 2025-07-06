@@ -4,14 +4,4 @@ python3 -m pip install  undetected-chromedriver
 python3 -m pip install  selenium
 python3 -m pip install playwright
 python3 -m playwright install chromium  # Download browser
-
-python3 -m pip install langchain
-python3 -m pip install langchain-openai
-python3 -m pip install langgraph
 python3 -m pip install python-dotenv
-python3 -m pip install langchain-community
-python3 -m pip install pypdf
-python3 -m pip install langchain-anthropic
-python3 -m pip install tavily-python
-python3 -m pip install langgraph-checkpoint-sqlite
-python3 -m pip install langchain-tavily

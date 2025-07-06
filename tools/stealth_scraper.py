@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from datetime import datetime
 from enum import Enum
+import threading
 
 # Load environment variables
 load_dotenv()
@@ -27,7 +28,7 @@ load_dotenv()
 os.makedirs('logs', exist_ok=True)
 
 # Generate timestamped log filename
-log_filename = os.path.join('logs', f'stealth_scraper_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log')
+log_filename = os.path.join('logs', f'stealth_scraper.log')
 
 # Configure logging with detailed format, but only to file
 logging.basicConfig(
@@ -35,7 +36,8 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
     handlers=[
-        logging.FileHandler(log_filename)
+        logging.FileHandler(log_filename),
+        logging.StreamHandler()
     ]
 )
 
@@ -161,6 +163,14 @@ class StealthScraper:
     logger = logging.getLogger('StealthScraper')
     
     def __init__(self):
+        # Concurrency control
+        self._semaphore = threading.Semaphore(2)
+        
+        # Rate limiting - single lock for atomic operations
+        self._rate_lock = threading.Lock()
+        self._request_count = 0
+        self._window_start = time.time()
+
         self.session = requests.Session()
 
         # Get Firecrawl API key from environment variable
@@ -177,6 +187,28 @@ class StealthScraper:
         
         # Setup requests session with realistic headers
         self.setup_session()
+
+    def _acquire_rate_limit(self):
+        """Handle rate limiting logic"""
+        with self._rate_lock:
+            current_time = time.time()
+            
+            # Reset window if 60 seconds have passed
+            if current_time - self._window_start >= 60:
+                self._window_start = current_time
+                self._request_count = 0
+            
+            # If we've hit the limit, wait
+            if self._request_count >= 10:
+                wait_time = 60 - (current_time - self._window_start)
+                if wait_time > 0:
+                    time.sleep(wait_time)
+                # Reset after waiting
+                self._window_start = time.time()
+                self._request_count = 0
+            
+            # Increment count
+            self._request_count += 1
         
     def setup_session(self):
         """Configure requests session with realistic headers"""
@@ -550,15 +582,19 @@ class StealthScraper:
         Returns:
             ScrapeResult: Standardized result object containing success status, content, and metadata
         """
-        return ScrapeResult(
-            url=url,
-            success=False,
-            status_code=500,
-            error_reason="Firecrawl is not supported",
-            methods_tried={ScrapingMethod.FIRECRAWL},
-            final_method=ScrapingMethod.FIRECRAWL,
-            final_url=url,
-        )
+        with self._semaphore:
+            self.logger.info(f"Scraping {url} with Firecrawl")
+            self._acquire_rate_limit()
+            self.logger.info(f"Acquired rate limit for {url}")
+            return ScrapeResult(
+                url=url,
+                success=False,
+                status_code=500,
+                error_reason="Firecrawl is not supported",
+                methods_tried={ScrapingMethod.FIRECRAWL},
+                final_method=ScrapingMethod.FIRECRAWL,
+                final_url=url,
+            )
 
         # if not self.firecrawl_api_key:
         #     self.logger.error("Firecrawl API key not provided")
