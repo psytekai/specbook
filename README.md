@@ -1,6 +1,35 @@
 # Product Data Verification Tool
 
-A web-based tool for manually verifying product data extracted from web scraping. This tool provides a side-by-side interface to compare the original product website with the extracted data, allowing you to validate the accuracy of your scraping pipeline.
+ This is a web scraping and data verification project focused on extracting product information from websites. Here's a summary:
+
+  Primary Purpose
+
+  A tool pipeline for scraping product data from websites (primarily paint/wall finish products) and validating the extracted information through a web-based verification interface.
+
+  Key Components
+
+  Data Pipeline:
+  - tools/stealth_scraper.py - Web scraper using Selenium and FireCrawl
+  - tools/llm_invocator.py - LLM integration for data extraction
+  - tools/html_processor.py - HTML parsing utilities
+  - agent/therma_pydantic.py - Pydantic models for data validation
+
+  Verification UI:
+  - verification_ui.py - Flask web app for manual data verification
+  - Side-by-side comparison of original websites vs extracted data
+  - Validation tracking and CSV export functionality
+
+  Data Storage:
+  - 01_llmpipeline/ - Contains CSV files with scraped product data
+  - specbook.csv - Product URLs categorized by type (paint, trim details, etc.)
+
+  Features
+
+  - Stealth web scraping with undetected Chrome driver
+  - LLM-powered data extraction from product pages
+  - Manual verification interface with keyboard shortcuts
+  - Export validated results to CSV
+  - Handles product images, descriptions, model numbers, and pricing
 
 ## Features
 
