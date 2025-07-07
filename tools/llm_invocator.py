@@ -66,18 +66,18 @@ class LLMInvocator:
             )
             
             # Update with actual token usage
-            actual_tokens = response.usage.total_tokens
+            actual_tokens = response.usage.total_tokens if response.usage else 0
             self.rate_limiter.update_actual_tokens(llm_model_name, actual_tokens, estimated_total_tokens)
             
             logger.info(f"OpenAI API call successful. Used {actual_tokens} tokens")
-            return response.choices[0].message.content
+            return response.choices[0].message.content if response.choices[0].message.content else ""
             
         except Exception as e:
             logger.error(f"OpenAI API call failed: {str(e)}")
             raise
 
 
-    def get_usage_stats(self, model: str = None) -> dict:
+    def get_usage_stats(self, model: str = '') -> dict:
         """
         Get current rate limit usage statistics
         
