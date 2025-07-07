@@ -3,7 +3,6 @@ import re
 from typing import Dict, List, Any, Callable, Optional, Union
 from pydantic import BaseModel, Field, validator
 from enum import Enum
-from datetime import datetime
 
 
 class MessageRole(str, Enum):
@@ -15,13 +14,9 @@ class MessageRole(str, Enum):
 class Message(BaseModel):
     role: MessageRole
     content: str = Field(..., min_length=1, description="Message content")
-    timestamp: datetime = Field(default_factory=datetime.now)
     
     class Config:
         use_enum_values = True
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
 
 
 class ToolParameter(BaseModel):
@@ -82,7 +77,6 @@ class ToolResult(BaseModel):
     success: bool
     result: Any = None
     error: Optional[str] = None
-    execution_time: float = 0.0
     
     def __str__(self) -> str:
         if self.success:

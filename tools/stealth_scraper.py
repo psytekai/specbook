@@ -582,76 +582,100 @@ class StealthScraper:
         Returns:
             ScrapeResult: Standardized result object containing success status, content, and metadata
         """
+        start_time = time.time()
+        
         with self._semaphore:
-            self.logger.info(f"Scraping {url} with Firecrawl")
+            self.logger.info(f"Starting Firecrawl scrape for {url}")
             self._acquire_rate_limit()
             self.logger.info(f"Acquired rate limit for {url}")
-            return ScrapeResult(
-                url=url,
-                success=False,
-                status_code=500,
-                error_reason="Firecrawl is not supported",
-                methods_tried={ScrapingMethod.FIRECRAWL},
-                final_method=ScrapingMethod.FIRECRAWL,
-                final_url=url,
-            )
 
-        # if not self.firecrawl_api_key:
-        #     self.logger.error("Firecrawl API key not provided")
-        #     return ScrapeResult(
-        #         success=False,
-        #         errorCode=500,
-        #         errorReason="No Firecrawl API key provided",
-        #         metadata=metadata
-        #     )
+            if not self.firecrawl_api_key:
+                self.logger.error("Firecrawl API key not provided")
+                return ScrapeResult(
+                    url=url,
+                    success=False,
+                    status_code=500,
+                    error_reason="Firecrawl API key not provided",
+                    methods_tried={ScrapingMethod.FIRECRAWL},
+                    final_method=ScrapingMethod.FIRECRAWL,
+                    final_url=url,
+                    scrape_time=time.time() - start_time
+                )
 
-        # try:
-        #     firecrawl_result = self.firecrawl.scrape_url(
-        #         url,
-        #         formats=['rawHtml'],
-        #         only_main_content=False,
-        #         timeout=10000,
-        #         parse_pdf=False,
-        #         max_age=14400000
-        #     )
+            try:
+                self.logger.info(f"Calling Firecrawl API with timeout=30000ms for {url}")
+                firecrawl_result = self.firecrawl.scrape_url(
+                    url,
+                    formats=['rawHtml'],
+                    only_main_content=False,
+                    timeout=60000,  # Increased timeout to 60 seconds
+                    parse_pdf=False,
+                    max_age=14400000
+                )
+                
+                elapsed_time = time.time() - start_time
+                self.logger.info(f"Firecrawl API call completed in {elapsed_time:.2f}s")
+                self.logger.debug(f"Firecrawl result structure: success={getattr(firecrawl_result, 'success', None)}, error={getattr(firecrawl_result, 'error', None)}")
 
-        #     if firecrawl_result.warning:
-        #         self.logger.warning(f"Firecrawl warning: {firecrawl_result.warning}")
-        #         metadata.warning = firecrawl_result.warning
+                if hasattr(firecrawl_result, 'success') and firecrawl_result.success:
+                    content_length = len(firecrawl_result.rawHtml) if hasattr(firecrawl_result, 'rawHtml') else 0
+                    self.logger.info(f"Firecrawl success for {url}: {content_length} characters scraped")
+                    
+                    return ScrapeResult(
+                        url=url,
+                        success=True,
+                        status_code=200,
+                        content=firecrawl_result.rawHtml,
+                        methods_tried={ScrapingMethod.FIRECRAWL},
+                        final_method=ScrapingMethod.FIRECRAWL,
+                        final_url=url,
+                        scrape_time=elapsed_time
+                    )
 
-        #     if firecrawl_result.success:
-        #         self.logger.info(f"Firecrawl success: {firecrawl_result.success}")
-        #         metadata.status_code = 200
-        #         return ScrapeResult(
-        #             success=True,
-        #             content=firecrawl_result.rawHtml,
-        #             metadata=metadata
-        #         )
+                if hasattr(firecrawl_result, 'error') and firecrawl_result.error:
+                    self.logger.error(f"Firecrawl API error for {url}: {firecrawl_result.error}")
+                    return ScrapeResult(
+                        url=url,
+                        success=False,
+                        status_code=500,
+                        error_reason=firecrawl_result.error,
+                        methods_tried={ScrapingMethod.FIRECRAWL},
+                        final_method=ScrapingMethod.FIRECRAWL,
+                        final_url=url,
+                        scrape_time=elapsed_time
+                    )
 
-        #     if firecrawl_result.error:
-        #         self.logger.error(f"Firecrawl error: {firecrawl_result.error}")
-        #         return ScrapeResult(
-        #             success=False,
-        #             errorCode=500,
-        #             errorReason=firecrawl_result.error,
-        #             metadata=metadata
-        #         )
+                self.logger.warning(f"Firecrawl returned unexpected result format for {url}")
+                return ScrapeResult(
+                    url=url,
+                    success=False,
+                    status_code=500,
+                    error_reason="Unexpected Firecrawl response format",
+                    methods_tried={ScrapingMethod.FIRECRAWL},
+                    final_method=ScrapingMethod.FIRECRAWL,
+                    final_url=url,
+                    scrape_time=elapsed_time
+                )
 
-        #     return ScrapeResult(
-        #         success=False,
-        #         errorCode=500,
-        #         errorReason="Unknown error",
-        #         metadata=metadata
-        #     )
-
-        # except Exception as e:
-        #     self.logger.error(f"Firecrawl error: {e}")
-        #     return ScrapeResult(
-        #         success=False,
-        #         errorCode=500,
-        #         errorReason=str(e),
-        #         metadata=metadata
-        #     )
+            except Exception as e:
+                elapsed_time = time.time() - start_time
+                error_type = type(e).__name__
+                self.logger.error(f"Firecrawl exception ({error_type}) for {url} after {elapsed_time:.2f}s: {str(e)}")
+                
+                # Add specific handling for timeout errors
+                if "timeout" in str(e).lower() or "timed out" in str(e).lower():
+                    self.logger.error(f"Firecrawl timeout detected for {url} - consider increasing timeout or checking target site responsiveness")
+                
+                return ScrapeResult(
+                    url=url,
+                    success=False,
+                    status_code=500,
+                    error_reason=f"{error_type}: {str(e)}",
+                    methods_tried={ScrapingMethod.FIRECRAWL},
+                    final_method=ScrapingMethod.FIRECRAWL,
+                    final_url=url,
+                    scrape_time=elapsed_time
+                )
 
 
 # Example usage
