@@ -10,6 +10,7 @@ import json
 from datetime import datetime
 import os
 from io import StringIO
+import numpy as np
 
 app = Flask(__name__)
 
@@ -117,18 +118,21 @@ def get_product(index):
         llm_row = llm_results_df.iloc[index]
         spec_row = product_specs_df.iloc[index]
         
-        # Parse LLM response if it's JSON string
-        llm_result = spec_row.to_dict()
+        # Convert pandas Series to dict and handle numpy types
+        llm_dict = _convert_numpy_types(llm_row.to_dict())
+        spec_dict = _convert_numpy_types(spec_row.to_dict())
         
-        return jsonify({
+        response_data = {
             'index': index,
             'total': len(product_specs_df),
-            'raw_html': llm_row.get('html_content', 'No HTML content available'),
-            'prompt': llm_row.get('prompt', 'No prompt available'),
-            'llm_result': llm_result,
-            'url': llm_row.get('product_url', 'No URL available'),
-            'success': llm_row.get('success', False)
-        })
+            'raw_html': llm_dict.get('html_content', 'No HTML content available'),
+            'prompt': llm_dict.get('prompt', 'No prompt available'),
+            'llm_result': spec_dict,
+            'url': llm_dict.get('product_url', 'No URL available'),
+            'success': llm_dict.get('success', False)
+        }
+        
+        return jsonify(response_data)
         
     except Exception as e:
         return jsonify({'error': f'Error retrieving product: {str(e)}'}), 500
@@ -270,6 +274,25 @@ def export_validation():
         f.write(output.getvalue())
     
     return send_file(file_path, as_attachment=True, download_name=filename, mimetype='text/csv')
+
+def _convert_numpy_types(obj):
+    """Convert numpy/pandas types to Python native types for JSON serialization"""
+    if isinstance(obj, np.bool_):
+        return bool(obj)
+    elif isinstance(obj, (np.int64, np.int32, np.int16, np.int8)):
+        return int(obj)
+    elif isinstance(obj, (np.float64, np.float32, np.float16)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {key: _convert_numpy_types(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [_convert_numpy_types(item) for item in obj]
+    elif pd.isna(obj):
+        return None
+    else:
+        return obj
 
 def _update_validation_stats():
     """Update validation statistics"""
