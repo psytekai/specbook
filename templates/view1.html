@@ -67,7 +67,7 @@
     }
 
     #validation-table {
-        min-width: 1000px;
+        min-width: 1100px;
     }
 
     #validation-table th {
@@ -118,6 +118,40 @@
     .row-rejected .row-header {
         background-color: #f44336 !important;
         color: white;
+    }
+
+    .action-cell {
+        text-align: center;
+        width: 40px;
+        min-width: 40px;
+        max-width: 40px;
+        padding: 0.5rem 0.25rem;
+    }
+
+    .open-btn {
+        background-color: #3498db;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        padding: 0.25rem;
+        cursor: pointer;
+        font-size: 0.8rem;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+    }
+
+    .open-btn:hover {
+        background-color: #2980b9;
+    }
+
+    .open-btn svg {
+        width: 14px;
+        height: 14px;
+        fill: white;
     }
 
     .export-btn {
@@ -257,10 +291,19 @@ function buildTable(columns, data) {
     thead.find('th:not(:first)').remove();
     tbody.empty();
     
-    // Build header row
+    // Build header row with action columns
     columns.forEach(function(col) {
         if (col !== 'key') {  // Skip 'key' column
             thead.append(`<th>${col}</th>`);
+            
+            // Add action button column after image_url
+            if (col === 'image_url') {
+                thead.append(`<th class="action-cell">📷</th>`);
+            }
+            // Add action button column after product_link
+            if (col === 'product_link') {
+                thead.append(`<th class="action-cell">🔗</th>`);
+            }
         }
     });
     
@@ -285,6 +328,34 @@ function buildTable(columns, data) {
                            title="${cellValue}">
                            ${cellValue}
                            </td>`;
+                
+                // Add action button after image_url
+                if (col === 'image_url') {
+                    const imageUrl = cellValue;
+                    const buttonHtml = imageUrl ? 
+                        `<button class="open-btn" onclick="openUrl(this.dataset.url, event)" data-url="${imageUrl.replace(/"/g, '&quot;')}" title="Open image in new tab">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+                            </svg>
+                         </button>` : 
+                        `<span style="width: 28px; height: 28px; display: inline-block;"></span>`;
+                    
+                    rowHtml += `<td class="action-cell">${buttonHtml}</td>`;
+                }
+                
+                // Add action button after product_link
+                if (col === 'product_link') {
+                    const productUrl = cellValue;
+                    const buttonHtml = productUrl ? 
+                        `<button class="open-btn" onclick="openUrl(this.dataset.url, event)" data-url="${productUrl.replace(/"/g, '&quot;')}" title="Open product in new tab">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+                            </svg>
+                         </button>` : 
+                        `<span style="width: 28px; height: 28px; display: inline-block;"></span>`;
+                    
+                    rowHtml += `<td class="action-cell">${buttonHtml}</td>`;
+                }
             }
         });
         
@@ -402,6 +473,17 @@ function updateValidationStats() {
         .fail(function(xhr) {
             console.error('Failed to update stats:', xhr);
         });
+}
+
+function openUrl(url, event) {
+    // Prevent event from bubbling up to cell/row click handlers
+    event.stopPropagation();
+    event.preventDefault();
+    
+    // Validate URL and open in new tab
+    if (url && url.trim() !== '') {
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }
 }
 
 function exportValidation() {
