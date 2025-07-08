@@ -1,7 +1,7 @@
-from tools.html_processor import HTMLProcessor
-from tools.prompt_templator import PromptTemplator
-from tools.llm_invocator import LLMInvocator
-from tools.stealth_scraper import StealthScraper
+from lib.core.html_processor import HTMLProcessor
+from lib.core.llm import PromptTemplator
+from lib.core.llm import LLMInvocator
+from lib.core.scraping import StealthScraper
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 

@@ -32,17 +32,14 @@ class OpenAIRateLimiter:
         "gpt-3.5-turbo-16k": RateLimit(500, 200000, 10000, 2000000),
         "gpt-3.5-turbo-instruct": RateLimit(3500, 90000, 10000, 200000),
         "gpt-3.5-turbo-instruct-0914": RateLimit(3500, 90000, 10000, 200000),
-        
+            
         # GPT-4 models
-        "gpt-4": RateLimit(500, 10000, 10000, 100000),
-        "gpt-4-0613": RateLimit(500, 10000, 10000, 100000),
-        "gpt-4-turbo": RateLimit(500, 30000, 10000, 90000),
-        "gpt-4-turbo-2024-04-09": RateLimit(500, 30000, 10000, 90000),
-        "gpt-4-turbo-preview": RateLimit(500, 30000, 10000, 90000),
-        "gpt-4-0125-preview": RateLimit(500, 30000, 10000, 90000),
-        "gpt-4-1106-preview": RateLimit(500, 30000, 10000, 90000),
         "gpt-4.1": RateLimit(500, 30000, 10000, 900000),
-        "gpt-4.1-2025-04-14": RateLimit(500, 30000, 10000, 900000),
+        "gpt-4.1-mini": RateLimit(500, 200000, 10000, 2000000),
+        "gpt-4.1-nano": RateLimit(500, 200000, 10000, 2000000),
+        "o4-mini": RateLimit(500, 200000, 10000, 2000000),
+        "gpt-4o": RateLimit(500, 30000, 10000, 90000),
+        "gpt-4o-mini": RateLimit(500, 200000, 10000, 100000),
         
         # Default fallback
         "default": RateLimit(500, 10000, 10000, 100000)

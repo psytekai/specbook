@@ -28,9 +28,11 @@ class ExperimentRunner:
     """Runs experiments to compare different models and prompts"""
     
     def __init__(self, cache_manager: Optional[CacheManager] = None, 
-                 monitor: Optional[PipelineMonitor] = None):
+                 monitor: Optional[PipelineMonitor] = None,
+                 output_dir: str = "workspace/output/benchmarks"):
         self.cache_manager = cache_manager or CacheManager()
         self.monitor = monitor or PipelineMonitor()
+        self.output_dir = Path(output_dir)
         self.llm_invocator = LLMInvocator()
         self.html_processor = HTMLProcessor()
         self.prompt_templator = PromptTemplator()
@@ -332,7 +334,7 @@ class ExperimentRunner:
     
     def _save_experiment_results(self, summary: ExperimentSummary):
         """Save experiment results to disk"""
-        output_dir = Path("data/benchmarks")
+        output_dir = self.output_dir
         output_dir.mkdir(exist_ok=True, parents=True)
         
         # Save summary

@@ -127,7 +127,7 @@ scraper = StealthScraper()
 llm = LLMInvocator()
 
 # Run benchmarking
-runner = ExperimentRunner()
+runner = ExperimentRunner(output_dir="workspace/output/benchmarks")
 results = runner.run_model_comparison(urls, models)
 ```
 

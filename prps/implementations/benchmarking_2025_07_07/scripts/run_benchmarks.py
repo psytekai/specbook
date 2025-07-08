@@ -136,7 +136,7 @@ Examples:
             llm_results_path="shared/data/reference_data/llm_results.csv"
         )
         monitor = PipelineMonitor(metrics_dir="workspace/output/metrics")
-        runner = ExperimentRunner(cache_manager, monitor)
+        runner = ExperimentRunner(cache_manager, monitor, output_dir=args.output_dir)
         report_generator = ReportGenerator(args.output_dir + "/reports")
         
         # Load URLs
