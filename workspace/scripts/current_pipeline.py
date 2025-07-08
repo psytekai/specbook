@@ -13,7 +13,7 @@ llm_invocator = LLMInvocator()
 
 
 def main():
-    df = pd.read_csv("01_llmpipeline/specbook.csv")
+    df = pd.read_csv("workspace/input/specbook.csv")
     df['id'] = range(1, len(df) + 1)
 
     # STEP 1: Scrape product sites
@@ -91,7 +91,7 @@ def main():
 
     # STEP 4: Save results
     print(llm_results_df.count())
-    llm_results_df.to_csv("01_llmpipeline/llm_results.csv", index=False)
+    llm_results_df.to_csv("workspace/output/llm_results.csv", index=False)
 
     total_prompt_len = llm_results_df['prompt_len'].sum()
     print(f"Total prompt length: {total_prompt_len:,}")
@@ -100,7 +100,7 @@ def main():
     llm_result_dicts = [dict(PromptTemplator.ProductExtractionOutput.model_validate_json(response)) for response in llm_results_df['llm_response'].to_list()]
     product_specs_df = pd.DataFrame(llm_result_dicts)
 
-    product_specs_df.to_csv("01_llmpipeline/product_specs.csv", index=False)
+    product_specs_df.to_csv("workspace/output/product_specs.csv", index=False)
 
 
 if __name__ == "__main__":

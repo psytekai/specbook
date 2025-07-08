@@ -48,7 +48,7 @@ tail -f logs/stealth_scraper.log
 ### Data Pipeline Flow
 The project implements a comprehensive web scraping and verification pipeline:
 
-1. **Input**: Product URLs from `01_llmpipeline/specbook.csv`
+1. **Input**: Product URLs from `workspace/input/specbook.csv`
 2. **Scraping**: Multi-method scraping via `tools/stealth_scraper.py` (requests → Selenium → Firecrawl fallback)
 3. **Processing**: HTML cleaning and structuring via `tools/html_processor.py`
 4. **Extraction**: LLM-powered data extraction using `tools/llm_invocator.py` with prompts from `tools/prompt_templator.py`
@@ -112,7 +112,7 @@ Use Jupyter notebooks for iterative development and testing:
 - `notebooks/openapi.ipynb`: LLM API testing and prompt development
 
 ### Data Pipeline Development
-1. Start with small test datasets in `01_llmpipeline/specbook.csv`
+1. Start with small test datasets in `workspace/input/specbook.csv`
 2. Test scraping methods individually using the notebook
 3. Validate HTML processing and prompt generation
 4. Test LLM extraction with sample data

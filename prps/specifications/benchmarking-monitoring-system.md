@@ -85,7 +85,7 @@ User-visible features:
 ### Current Codebase tree
 ```bash
 phase1-specbook/
-├── 01_llmpipeline/          # Data files
+├── workspace/input/         # Input data files
 ├── tools/                   # Core pipeline tools
 │   ├── stealth_scraper.py   # Web scraping with fallbacks
 │   ├── html_processor.py    # HTML cleaning
@@ -355,7 +355,7 @@ MONITORING:
   - timing: After each scraping attempt, LLM call
   
 CACHING:
-  - check first: 01_llmpipeline/llm_results.csv
+  - check first: shared/data/reference_data/llm_results.csv
   - store in: shared/cache/{url_hash}.html
   - metadata: SQLite DB with url, hash, timestamp, size
   

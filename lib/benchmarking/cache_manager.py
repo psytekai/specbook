@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class CacheManager:
     """Manages cached HTML content for benchmarking"""
     
-    def __init__(self, cache_dir: str = "data/cache", llm_results_path: str = "01_llmpipeline/llm_results.csv"):
+    def __init__(self, cache_dir: str = "shared/cache", llm_results_path: str = "shared/data/reference_data/llm_results.csv"):
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(exist_ok=True, parents=True)
         self.llm_results_path = Path(llm_results_path)

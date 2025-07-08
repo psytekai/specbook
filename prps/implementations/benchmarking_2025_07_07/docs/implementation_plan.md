@@ -50,7 +50,7 @@ Phase 5: Execute Plans
 
 - Prioritize simple and readable code
 - There's only one developer revieing the plans and code, so do not over-engineer, stick to simple, manageable solutions that be easily understand and followed by one developer
-- **IMPORTANT**: When running the specbook.py script multiple times as we start to iterate on different prompts, we want to make sure we don't re-fetch the same html and potentially use up firecrawl tokenss. So we need to implement a solution that checks if we already fetched the html and skip the scraping part. This could mean, instead of reading the `01_llmpipeline/specbook.csv` each time, we read `01_llmpipeline/llm_results.csv` (which is the final output of the script) if it exists, use that as our starting point, check if the html alraedy exists, and if it does, continue to cleaning the html and generating the prompt. Thank you.
+- **IMPORTANT**: When running the specbook.py script multiple times as we start to iterate on different prompts, we want to make sure we don't re-fetch the same html and potentially use up firecrawl tokenss. So we need to implement a solution that checks if we already fetched the html and skip the scraping part. This could mean, instead of reading the `workspace/input/specbook.csv` each time, we read `shared/data/reference_data/llm_results.csv` (which is the final output of the script) if it exists, use that as our starting point, check if the html alraedy exists, and if it does, continue to cleaning the html and generating the prompt. Thank you.
 
 
   

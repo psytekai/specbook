@@ -27,7 +27,7 @@ from .models import ExperimentSummary, BenchmarkComparison
 class ReportGenerator:
     """Generates comprehensive reports from benchmarking experiments"""
     
-    def __init__(self, output_dir: str = "data/benchmarks/reports"):
+    def __init__(self, output_dir: str = "workspace/output/benchmarks/reports"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True, parents=True)
     

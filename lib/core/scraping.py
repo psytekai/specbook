@@ -682,7 +682,7 @@ class StealthScraper:
 if __name__ == "__main__":
     import pandas as pd
     
-    df = pd.read_csv('../01_llmpipeline/specbook.csv')
+    df = pd.read_csv('../workspace/input/specbook.csv')
 
     product_urls = df["product_url"].to_list()
     scraper = StealthScraper()
