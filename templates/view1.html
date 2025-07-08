@@ -243,6 +243,7 @@ function loadTableData() {
         })
         .fail(function(xhr) {
             const error = xhr.responseJSON ? xhr.responseJSON.error : 'Failed to load table data';
+            console.error('Table data loading error:', xhr);
             showError(error);
         });
 }

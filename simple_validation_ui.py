@@ -45,6 +45,10 @@ def load_data():
         llm_results_df = pd.read_csv(llm_results_path)
         product_specs_df = pd.read_csv(product_specs_path)
         
+        # Fill NaN values to avoid JSON serialization issues
+        llm_results_df = llm_results_df.fillna('')
+        product_specs_df = product_specs_df.fillna('')
+        
         # Initialize validation state
         validation_state = {
             'failed_cells': {},

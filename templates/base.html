@@ -204,6 +204,7 @@
                     }
                 })
                 .fail(function(xhr) {
+                    console.error('Data loading error:', xhr);
                     const error = xhr.responseJSON ? xhr.responseJSON.error : 'Failed to load data';
                     showError(error);
                 });
