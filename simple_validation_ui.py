@@ -149,8 +149,12 @@ def reject_cell():
         validation_state['failed_cells'][row_idx] = {}
     
     if rejected:
-        validation_state['failed_cells'][row_idx][column] = True
-        validation_state['stats']['field_failures'][column] += 1
+        # Only increment if cell wasn't already failed
+        if column not in validation_state['failed_cells'][row_idx]:
+            validation_state['failed_cells'][row_idx][column] = True
+            validation_state['stats']['field_failures'][column] += 1
+        else:
+            validation_state['failed_cells'][row_idx][column] = True
     else:
         if column in validation_state['failed_cells'][row_idx]:
             del validation_state['failed_cells'][row_idx][column]
@@ -269,7 +273,11 @@ def export_validation():
 
 def _update_validation_stats():
     """Update validation statistics"""
-    validation_state['stats']['failed_rows'] = len(validation_state['failed_rows'])
+    # Count rows that are either explicitly failed OR have any failed cells
+    failed_row_indices = set(validation_state['failed_rows'])  # Explicitly failed rows
+    failed_row_indices.update(validation_state['failed_cells'].keys())  # Rows with failed cells
+    
+    validation_state['stats']['failed_rows'] = len(failed_row_indices)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
