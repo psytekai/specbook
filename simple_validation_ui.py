@@ -11,6 +11,26 @@ from datetime import datetime
 import os
 from io import StringIO
 import numpy as np
+import sys
+import traceback
+
+# Add lib directory to path for imports
+lib_path = os.path.join(os.path.dirname(__file__), 'lib')
+sys.path.insert(0, lib_path)
+
+try:
+    import core.llm as llm_module
+    import utils.openai_rate_limiter as rate_limiter_module
+    
+    LLMInvocator = llm_module.LLMInvocator
+    PromptTemplator = llm_module.PromptTemplator
+    OpenAIRateLimiter = rate_limiter_module.OpenAIRateLimiter
+    print("✓ LLM components imported successfully")
+except ImportError as e:
+    print(f"Warning: Could not import LLM modules: {e}")
+    LLMInvocator = None
+    PromptTemplator = None
+    OpenAIRateLimiter = None
 
 app = Flask(__name__)
 
@@ -22,6 +42,26 @@ validation_state = {
     'failed_rows': set(),
     'stats': {'total_rows': 0, 'failed_rows': 0, 'field_failures': {}}
 }
+
+# LLM integration storage and instances
+llm_invocator = None
+llm_results_history = {}  # {product_index: [{"timestamp": "", "model": "", "result": {}, "error": ""}]}
+
+# Initialize LLM components
+def init_llm_components():
+    global llm_invocator
+    if LLMInvocator is not None:
+        try:
+            llm_invocator = LLMInvocator()
+            print("LLM components initialized successfully")
+        except Exception as e:
+            print(f"Failed to initialize LLM components: {e}")
+            llm_invocator = None
+    else:
+        print("LLM components not available")
+
+# Initialize on startup
+init_llm_components()
 
 @app.route('/')
 def index():
@@ -129,13 +169,104 @@ def get_product(index):
             'prompt': llm_dict.get('prompt', 'No prompt available'),
             'llm_result': spec_dict,
             'url': llm_dict.get('product_url', 'No URL available'),
-            'success': llm_dict.get('success', False)
+            'success': llm_dict.get('success', False),
+            'llm_history': llm_results_history.get(index, [])
         }
         
         return jsonify(response_data)
         
     except Exception as e:
         return jsonify({'error': f'Error retrieving product: {str(e)}'}), 500
+
+@app.route('/get_models')
+def get_models():
+    """Return available OpenAI models from rate limiter"""
+    if OpenAIRateLimiter is None:
+        return jsonify({'error': 'LLM functionality not available'}), 503
+    
+    try:
+        # Get available models from rate limiter
+        available_models = list(OpenAIRateLimiter.RATE_LIMITS.keys())
+        # Remove 'default' as it's not a real model
+        available_models = [model for model in available_models if model != 'default']
+        
+        return jsonify({
+            'success': True,
+            'models': available_models,
+            'llm_available': llm_invocator is not None
+        })
+    except Exception as e:
+        return jsonify({'error': f'Error getting models: {str(e)}'}), 500
+
+@app.route('/invoke_llm', methods=['POST'])
+def invoke_llm():
+    """Invoke LLM with selected model and prompt"""
+    if llm_invocator is None:
+        return jsonify({'error': 'LLM functionality not available'}), 503
+    
+    try:
+        data = request.json
+        model = data.get('model')
+        prompt = data.get('prompt')
+        product_index = data.get('product_index')
+        
+        if not model or not prompt:
+            return jsonify({'error': 'Model and prompt are required'}), 400
+        
+        if product_index is None:
+            return jsonify({'error': 'Product index is required'}), 400
+        
+        # Validate model
+        available_models = list(OpenAIRateLimiter.RATE_LIMITS.keys())
+        if model not in available_models:
+            return jsonify({'error': f'Invalid model: {model}'}), 400
+        
+        # Invoke LLM
+        response_text = llm_invocator.invoke_llm(
+            model_provider="openai",
+            llm_model_name=model,
+            prompt=prompt,
+            temperature=0.7,
+            max_tokens=1000
+        )
+        
+        # Parse JSON response
+        try:
+            result_data = json.loads(response_text)
+        except json.JSONDecodeError:
+            # If not valid JSON, treat as error
+            result_data = None
+            error_msg = "LLM response was not valid JSON"
+        
+        # Create result entry
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        result_entry = {
+            'timestamp': timestamp,
+            'model': model,
+            'success': result_data is not None,
+            'result': result_data,
+            'raw_response': response_text,
+            'error': error_msg if result_data is None else None
+        }
+        
+        # Store in history
+        if product_index not in llm_results_history:
+            llm_results_history[product_index] = []
+        
+        # Insert at beginning (latest first)
+        llm_results_history[product_index].insert(0, result_entry)
+        
+        return jsonify({
+            'success': True,
+            'result': result_entry,
+            'history': llm_results_history[product_index]
+        })
+        
+    except Exception as e:
+        error_msg = f'LLM invocation failed: {str(e)}'
+        print(f"LLM Error: {error_msg}")
+        print(f"Traceback: {traceback.format_exc()}")
+        return jsonify({'error': error_msg}), 500
 
 @app.route('/reject_cell', methods=['POST'])
 def reject_cell():

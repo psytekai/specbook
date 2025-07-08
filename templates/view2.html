@@ -15,11 +15,22 @@
         padding: 1rem;
         margin-bottom: 2rem;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
         align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
+        gap: 2rem;
+    }
+
+    .left-section {
+        justify-self: start;
+    }
+
+    .center-section {
+        justify-self: center;
+    }
+
+    .right-section {
+        justify-self: end;
     }
 
     .nav-controls {
@@ -43,16 +54,54 @@
         font-size: 1.1rem;
     }
 
-    .product-info {
-        flex: 1;
+    .llm-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
         min-width: 300px;
     }
 
-    .product-url {
-        font-size: 0.9rem;
-        color: #3498db;
-        word-break: break-all;
-        margin-top: 0.25rem;
+    .model-selection {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .model-selection label {
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .model-selection select {
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: white;
+        min-width: 150px;
+    }
+
+    .invoke-section {
+        display: flex;
+        align-items: center;
+    }
+
+    #invoke-llm-btn {
+        background-color: #27ae60;
+        padding: 0.5rem 1rem;
+        min-width: 120px;
+    }
+
+    #invoke-llm-btn:hover:not(:disabled) {
+        background-color: #219a52;
+    }
+
+    #invoke-llm-btn:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+    }
+
+    #invoke-spinner {
+        margin-left: 0.5rem;
     }
 
     .content-panels {
@@ -132,6 +181,127 @@
         background-color: #f8f9fa;
     }
 
+    .results-container {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .no-results {
+        padding: 2rem;
+        text-align: center;
+        color: #666;
+        font-style: italic;
+    }
+
+    .result-entry {
+        border-bottom: 1px solid #eee;
+        margin-bottom: 0;
+    }
+
+    .result-entry:last-child {
+        border-bottom: none;
+    }
+
+    .result-entry.original-result {
+        border: 2px solid #3498db;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+    }
+
+    .result-entry.original-result .result-header {
+        background: #f0f8ff;
+        border-left: 4px solid #3498db;
+    }
+
+    .result-header {
+        background: #f8f9fa;
+        padding: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        user-select: none;
+    }
+
+    .result-header:hover {
+        background: #e9ecef;
+    }
+
+    .result-header.error {
+        background: #fff5f5;
+        border-left: 4px solid #e74c3c;
+    }
+
+    .result-header.success {
+        background: #f0f8f0;
+        border-left: 4px solid #27ae60;
+    }
+
+    .result-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .result-timestamp {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .result-model {
+        background: #3498db;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+
+    .result-status {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    .result-status.success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .result-status.error {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .expand-icon {
+        transition: transform 0.2s;
+    }
+
+    .expand-icon.expanded {
+        transform: rotate(180deg);
+    }
+
+    .result-content {
+        display: none;
+        padding: 0;
+    }
+
+    .result-content.expanded {
+        display: block;
+    }
+
+    .result-table-wrapper {
+        padding: 1rem;
+    }
+
+    .result-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
     .success-indicator {
         display: inline-block;
         padding: 0.25rem 0.5rem;
@@ -181,6 +351,16 @@
     }
 
     @media (max-width: 1200px) {
+        .navigation-panel {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 1rem;
+        }
+        
+        .left-section, .center-section, .right-section {
+            justify-self: center;
+        }
+        
         .content-panels {
             grid-template-columns: 1fr;
             grid-template-rows: auto auto auto;
@@ -212,32 +392,41 @@
 <div class="content" style="display: none;">
     <div class="inspection-container">
         <div class="navigation-panel">
-            <div>
+            <div class="left-section">
                 <h3>Product Inspector</h3>
                 <div class="keyboard-shortcuts">
                     Use ← → arrow keys to navigate | Enter to go to specific product
                 </div>
             </div>
             
-            <div class="nav-controls">
-                <button id="prev-btn" onclick="navigateProduct(-1)">← Previous</button>
-                <span class="current-position" id="current-position">- / -</span>
-                <button id="next-btn" onclick="navigateProduct(1)">Next →</button>
-                
-                <div class="goto-controls">
-                    <span>Go to:</span>
-                    <input type="number" id="goto-input" min="1" placeholder="1">
-                    <button onclick="gotoProduct()">Go</button>
+            <div class="center-section">
+                <div class="nav-controls">
+                    <button id="prev-btn" onclick="navigateProduct(-1)">← Previous</button>
+                    <span class="current-position" id="current-position">- / -</span>
+                    <button id="next-btn" onclick="navigateProduct(1)">Next →</button>
+                    
+                    <div class="goto-controls">
+                        <span>Go to:</span>
+                        <input type="number" id="goto-input" min="1" placeholder="1">
+                        <button onclick="gotoProduct()">Go</button>
+                    </div>
                 </div>
             </div>
             
-            <div class="product-info">
-                <div>
-                    <strong>Status:</strong> 
-                    <span id="success-indicator" class="success-indicator">-</span>
-                </div>
-                <div class="product-url">
-                    <strong>URL:</strong> <span id="current-url">-</span>
+            <div class="right-section">
+                <div class="llm-controls">
+                    <div class="model-selection">
+                        <label for="model-select">Model:</label>
+                        <select id="model-select">
+                            <option value="">Loading models...</option>
+                        </select>
+                    </div>
+                    <div class="invoke-section">
+                        <button id="invoke-llm-btn" onclick="invokeLLM()" disabled>
+                            <span id="invoke-btn-text">Invoke LLM</span>
+                            <span id="invoke-spinner" style="display: none;">⏳</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -260,15 +449,12 @@
             </div>
             
             <div class="panel result-panel">
-                <h4>LLM Extraction Result</h4>
-                <table class="result-table" id="result-table">
-                    <tr><td>Image URL:</td><td id="result-image-url">-</td></tr>
-                    <tr><td>Type:</td><td id="result-type">-</td></tr>
-                    <tr><td>Description:</td><td id="result-description">-</td></tr>
-                    <tr><td>Model No:</td><td id="result-model-no">-</td></tr>
-                    <tr><td>Product Link:</td><td id="result-product-link">-</td></tr>
-                    <tr><td>Quantity:</td><td id="result-qty">-</td></tr>
-                </table>
+                <h4>LLM Extraction Results</h4>
+                <div class="results-container" id="results-container">
+                    <div class="no-results" id="no-results">
+                        No LLM results yet. Use "Invoke LLM" to generate new results.
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -283,6 +469,7 @@ let totalProducts = 0;
 function onDataLoaded(response) {
     totalProducts = response.total_products;
     $('#goto-input').attr('max', totalProducts);
+    loadModels();
     loadProduct(0);
 }
 
@@ -310,36 +497,35 @@ function loadProduct(index) {
 function displayProduct(data) {
     // Update navigation info
     $('#current-position').text(`${data.index + 1} / ${data.total}`);
-    $('#current-url').text(data.url);
-    
-    // Update success indicator
-    const indicator = $('#success-indicator');
-    if (data.success) {
-        indicator.text('SUCCESS').removeClass('failed').addClass('success');
-    } else {
-        indicator.text('FAILED').removeClass('success').addClass('failed');
-    }
     
     // Update content areas
     $('#raw-html').val(data.raw_html);
     $('#llm-prompt').val(data.prompt);
     
-    // Update result table
-    const result = data.llm_result;
-    $('#result-image-url').text(result.image_url || '-');
-    $('#result-type').text(result.type || '-');
-    $('#result-description').text(result.description || '-');
-    $('#result-model-no').text(result.model_no || '-');
-    $('#result-product-link').text(result.product_link || '-');
-    $('#result-qty').text(result.qty || '-');
+    // Combine original LLM result with history
+    const allResults = [];
     
-    // Make URLs clickable
-    if (result.image_url) {
-        $('#result-image-url').html(`<a href="${result.image_url}" target="_blank">${result.image_url}</a>`);
+    // Add original result as first entry if it exists
+    if (data.llm_result && Object.keys(data.llm_result).length > 0) {
+        const originalResult = {
+            timestamp: 'Original Extraction',
+            model: 'Initial Processing',
+            success: true,
+            result: data.llm_result,
+            raw_response: '',
+            error: null,
+            isOriginal: true
+        };
+        allResults.push(originalResult);
     }
-    if (result.product_link) {
-        $('#result-product-link').html(`<a href="${result.product_link}" target="_blank">${result.product_link}</a>`);
+    
+    // Add history results
+    if (data.llm_history && data.llm_history.length > 0) {
+        allResults.push(...data.llm_history);
     }
+    
+    // Display all results
+    displayLLMResults(allResults);
     
     // Update goto input
     $('#goto-input').val(currentIndex + 1);
@@ -384,6 +570,199 @@ function copyToClipboard(elementId) {
         button.textContent = originalText;
         button.style.backgroundColor = '';
     }, 1000);
+}
+
+function loadModels() {
+    $.get('/get_models')
+        .done(function(response) {
+            if (response.success) {
+                const select = $('#model-select');
+                select.empty();
+                
+                if (response.llm_available) {
+                    select.append('<option value="">Select a model...</option>');
+                    response.models.forEach(function(model) {
+                        select.append(`<option value="${model}">${model}</option>`);
+                    });
+                    
+                    // Enable the invoke button when model is selected
+                    select.on('change', function() {
+                        const invokeBtn = $('#invoke-llm-btn');
+                        if ($(this).val()) {
+                            invokeBtn.prop('disabled', false);
+                        } else {
+                            invokeBtn.prop('disabled', true);
+                        }
+                    });
+                } else {
+                    select.append('<option value="">LLM not available</option>');
+                    $('#invoke-llm-btn').prop('disabled', true);
+                }
+            } else {
+                $('#model-select').html('<option value="">Error loading models</option>');
+                $('#invoke-llm-btn').prop('disabled', true);
+            }
+        })
+        .fail(function(xhr) {
+            $('#model-select').html('<option value="">Failed to load models</option>');
+            $('#invoke-llm-btn').prop('disabled', true);
+            console.error('Failed to load models:', xhr);
+        });
+}
+
+function invokeLLM() {
+    const model = $('#model-select').val();
+    const prompt = $('#llm-prompt').val();
+    
+    if (!model) {
+        showError('Please select a model first');
+        return;
+    }
+    
+    if (!prompt.trim()) {
+        showError('Prompt is empty');
+        return;
+    }
+    
+    // Update UI for loading state
+    const invokeBtn = $('#invoke-llm-btn');
+    const btnText = $('#invoke-btn-text');
+    const spinner = $('#invoke-spinner');
+    
+    invokeBtn.prop('disabled', true);
+    btnText.text('Invoking...');
+    spinner.show();
+    
+    // Clear any existing errors
+    $('.error').fadeOut();
+    
+    $.ajax({
+        url: '/invoke_llm',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            model: model,
+            prompt: prompt,
+            product_index: currentIndex
+        }),
+        success: function(response) {
+            if (response.success) {
+                // Update results display
+                displayLLMResults(response.history);
+                showSuccess('LLM invocation successful!');
+            } else {
+                showError('LLM invocation failed: ' + (response.error || 'Unknown error'));
+            }
+        },
+        error: function(xhr) {
+            const error = xhr.responseJSON ? xhr.responseJSON.error : 'Failed to invoke LLM';
+            showError(error);
+        },
+        complete: function() {
+            // Reset UI
+            invokeBtn.prop('disabled', false);
+            btnText.text('Invoke LLM');
+            spinner.hide();
+        }
+    });
+}
+
+function displayLLMResults(results) {
+    const container = $('#results-container');
+    const noResults = $('#no-results');
+    
+    if (!results || results.length === 0) {
+        noResults.show();
+        container.find('.result-entry').remove();
+        return;
+    }
+    
+    noResults.hide();
+    container.find('.result-entry').remove();
+    
+    results.forEach(function(result, index) {
+        const resultHtml = createResultEntry(result, index);
+        container.append(resultHtml);
+    });
+    
+    // Expand the first (latest) result by default
+    if (results.length > 0) {
+        const firstEntry = container.find('.result-entry:first');
+        toggleResultExpansion(firstEntry.find('.result-header')[0]);
+    }
+}
+
+function createResultEntry(result, index) {
+    const statusClass = result.success ? 'success' : 'error';
+    const headerClass = result.success ? 'success' : 'error';
+    const isOriginal = result.isOriginal || false;
+    
+    let resultTableHtml = '';
+    if (result.success && result.result) {
+        const data = result.result;
+        resultTableHtml = `
+            <div class="result-table-wrapper">
+                <table class="result-table">
+                    <tr><td>Image URL:</td><td>${makeClickable(data.image_url) || '-'}</td></tr>
+                    <tr><td>Type:</td><td>${data.type || '-'}</td></tr>
+                    <tr><td>Description:</td><td>${data.description || '-'}</td></tr>
+                    <tr><td>Model No:</td><td>${data.model_no || '-'}</td></tr>
+                    <tr><td>Product Link:</td><td>${makeClickable(data.product_link) || '-'}</td></tr>
+                </table>
+            </div>
+        `;
+    } else {
+        resultTableHtml = `
+            <div class="result-table-wrapper">
+                <div style="color: #e74c3c; padding: 1rem;">
+                    <strong>Error:</strong> ${result.error || 'Unknown error'}
+                    <br><br>
+                    <strong>Raw Response:</strong><br>
+                    <pre style="background: #f8f9fa; padding: 0.5rem; border-radius: 4px; max-height: 200px; overflow-y: auto;">${result.raw_response || 'No response'}</pre>
+                </div>
+            </div>
+        `;
+    }
+    
+    const originalClass = isOriginal ? ' original-result' : '';
+    const modelBadgeStyle = isOriginal ? 'background: #2c3e50;' : '';
+    
+    return `
+        <div class="result-entry${originalClass}">
+            <div class="result-header ${headerClass}" onclick="toggleResultExpansion(this)">
+                <div class="result-info">
+                    <span class="result-timestamp">${result.timestamp}</span>
+                    <span class="result-model" style="${modelBadgeStyle}">${result.model}</span>
+                    <span class="result-status ${statusClass}">${result.success ? 'SUCCESS' : 'ERROR'}</span>
+                </div>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="result-content">
+                ${resultTableHtml}
+            </div>
+        </div>
+    `;
+}
+
+function toggleResultExpansion(header) {
+    const entry = $(header).closest('.result-entry');
+    const content = entry.find('.result-content');
+    const icon = entry.find('.expand-icon');
+    
+    if (content.hasClass('expanded')) {
+        content.removeClass('expanded');
+        icon.removeClass('expanded');
+    } else {
+        content.addClass('expanded');
+        icon.addClass('expanded');
+    }
+}
+
+function makeClickable(url) {
+    if (url && url.trim() && url.startsWith('http')) {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    }
+    return url;
 }
 
 // Keyboard navigation
