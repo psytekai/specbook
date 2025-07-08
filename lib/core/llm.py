@@ -20,8 +20,6 @@ class PromptTemplator:
         description: str = Field(description="Short product description, including brand, size, material, color, and notable features")
         model_no: str = Field(description="Manufacturer model number, item no, or sku no.")
         product_link: str = Field(description="Original product page URL")
-        qty: str = Field(description="Quantity if specified; otherwise 'unspecified'")
-        key: str = Field(description="A unique reference key (if available)")
 
     @staticmethod
     def product_extraction(product_url: str, product_data: str) -> str:
@@ -64,8 +62,6 @@ class PromptTemplator:
         - description: Short product description, including brand, size, material, color, and any notable features
         - model_no: Manufacturer model number, item no, or sku no.
         - product_link: Original product page URL.
-        - qty: Quantity if specified; otherwise return "unspecified".
-        - key: A unique reference key (if available).
 
         Return your output in this JSON format without the json tag and codeblocks.
         You **don't add extra formatting instructions yourself**:
@@ -76,9 +72,7 @@ class PromptTemplator:
         "type": "",
         "description": "",
         "model_no": "",
-        "product_link": "",
-        "qty": "",
-        "key": ""
+        "product_link": ""
         }}
         ```
 

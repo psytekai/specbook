@@ -49,6 +49,7 @@ class ScrapingMethod(str, Enum):
     REQUESTS = "requests"
     FIRECRAWL = "firecrawl"
     AUTO = "auto"
+    CACHED = "cached"
 
 class PageIssue(str, Enum):
     """Enumeration of possible page issues"""

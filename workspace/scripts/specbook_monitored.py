@@ -8,6 +8,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 from lib.core import HTMLProcessor, PromptTemplator, LLMInvocator, StealthScraper
 from lib.monitoring import PipelineMonitor
 from lib.monitoring.models import PipelineStage, MetricType, ErrorCategory
+from lib.benchmarking import CacheManager
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 import logging
@@ -28,6 +29,7 @@ html_processor = HTMLProcessor()
 prompt_templator = PromptTemplator()
 llm_invocator = LLMInvocator()
 monitor = PipelineMonitor()
+cache_manager = CacheManager()
 
 
 def estimate_llm_cost(model: str, prompt_len: int, response_len: int = 1000) -> float:
@@ -55,7 +57,8 @@ def estimate_llm_cost(model: str, prompt_len: int, response_len: int = 1000) -> 
 
 def main(input_file: str = "workspace/input/specbook.csv", 
          output_dir: str = "workspace/output",
-         model_name: str = "gpt-4o-mini"):
+         model_name: str = "gpt-4o-mini",
+         use_cache: bool = True):
     """Main pipeline execution with monitoring"""
     
     # Load input data
@@ -68,12 +71,52 @@ def main(input_file: str = "workspace/input/specbook.csv",
     logger.info(f"Started pipeline execution: {execution_id}")
     
     try:
-        # STEP 1: Scrape product sites
-        logger.info("Starting web scraping phase...")
+        # STEP 1: Scrape product sites with caching
+        logger.info(f"Starting web scraping phase... (cache {'enabled' if use_cache else 'disabled'})")
         product_scrape_results = []
         
+        def scrape_with_cache(url: str):
+            """Scrape URL with cache fallback"""
+            # Check cache first
+            if use_cache:
+                cached_html = cache_manager.get_cached_html(url)
+                if cached_html:
+                    logger.info(f"Cache hit for {url}")
+                    # Create a mock ScrapeResult for cached content
+                    from lib.core.scraping import ScrapeResult, ScrapingMethod
+                    return ScrapeResult(
+                        url=url,
+                        final_url=url,
+                        success=True,
+                        content=cached_html,
+                        status_code=200,
+                        final_method=ScrapingMethod.CACHED,
+                        methods_tried={ScrapingMethod.CACHED},
+                        error_reason="",
+                        page_issues=[],
+                        scrape_time=0.0,
+                        attempts=1,
+                        warnings=[]
+                    )
+            
+            # Cache miss - perform actual scraping
+            logger.info(f"{'Cache miss for ' + url + ', scraping...' if use_cache else 'Scraping ' + url + '...'}")
+            scrape_result = stealth_scraper.scrape_url(url)
+            
+            # Store successful results in cache
+            if scrape_result.success and scrape_result.content and use_cache:
+                cache_manager.store_html(url, scrape_result.content, {
+                    'scrape_method': scrape_result.final_method.value,
+                    'status_code': scrape_result.status_code,
+                    'scrape_time': scrape_result.scrape_time
+                })
+                logger.info(f"Cached result for {url}")
+            
+            return scrape_result
+        
+        # Use cache-aware scraping
         with ThreadPoolExecutor(max_workers=10) as executor:
-            for id, product_search_result in zip(df['id'], executor.map(stealth_scraper.scrape_url, df['product_url'].to_list())):
+            for id, product_search_result in zip(df['id'], executor.map(scrape_with_cache, df['product_url'].to_list())):
                 # Record scraping metrics
                 monitor.record_scrape_result(product_search_result, stage=PipelineStage.SCRAPING)
                 
@@ -155,8 +198,6 @@ def main(input_file: str = "workspace/input/specbook.csv",
                     description="",
                     model_no="",
                     product_link="",
-                    qty="",
-                    key="",
                 )
 
             if success == True and pd.notna(prompt):
@@ -198,6 +239,12 @@ def main(input_file: str = "workspace/input/specbook.csv",
                         model=model_name,
                         error=str(e)
                     )
+            else:
+                # For failed scrapes, populate description with error details
+                row_data = llm_results_df[llm_results_df['id'] == id].iloc[0]
+                status_code = row_data.get('status_code', 'Unknown')
+                error_reason = row_data.get('error_reason', 'Unknown error')
+                default_response.description = f"FETCH_FAILED: Status {status_code} - {error_reason}"
 
             llm_results_df.loc[llm_results_df['id'] == id, 'llm_response'] = default_response.model_dump_json()
 
@@ -209,10 +256,29 @@ def main(input_file: str = "workspace/input/specbook.csv",
         total_prompt_len = llm_results_df['prompt_len'].sum()
         print(f"Total prompt length: {total_prompt_len:,}")
 
-        # Extract product specs
-        llm_result_dicts = [dict(PromptTemplator.ProductExtractionOutput.model_validate_json(response)) 
-                           for response in llm_results_df['llm_response'].to_list()]
-        product_specs_df = pd.DataFrame(llm_result_dicts)
+        # Extract product specs - filter based on scraping success
+        successful_results = []
+        failed_results = []
+
+        for i, (response, success) in enumerate(zip(llm_results_df['llm_response'], llm_results_df['success'])):
+            result_dict = dict(PromptTemplator.ProductExtractionOutput.model_validate_json(response))
+            
+            if success:
+                # Include all fields for successful extractions
+                successful_results.append(result_dict)
+            else:
+                # Only include description field for failed fetches (contains error info)
+                failed_results.append({
+                    'image_url': '',
+                    'type': '',
+                    'description': result_dict['description'],  # Contains error info
+                    'model_no': '',
+                    'product_link': ''
+                })
+
+        # Combine results and save
+        all_results = successful_results + failed_results
+        product_specs_df = pd.DataFrame(all_results)
         product_specs_df.to_csv(f"{output_dir}/product_specs_monitored.csv", index=False)
 
         # End monitoring and print summary
@@ -252,6 +318,10 @@ if __name__ == "__main__":
     parser.add_argument("--model", default="gpt-4o-mini",
                        choices=["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"],
                        help="OpenAI model to use")
+    parser.add_argument("--use-cache", action="store_true", default=True,
+                       help="Use cached HTML content when available (default: enabled)")
+    parser.add_argument("--no-cache", dest="use_cache", action="store_false",
+                       help="Disable cache usage and always scrape fresh")
     
     args = parser.parse_args()
-    main(input_file=args.input, output_dir=args.output_dir, model_name=args.model)
+    main(input_file=args.input, output_dir=args.output_dir, model_name=args.model, use_cache=args.use_cache)
