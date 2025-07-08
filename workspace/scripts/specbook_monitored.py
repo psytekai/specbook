@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 # Add project root to path
-sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent.parent))
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
 from lib.core import HTMLProcessor, PromptTemplator, LLMInvocator, StealthScraper
 from lib.monitoring import PipelineMonitor

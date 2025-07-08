@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import List
 
 # Add project root to path
-sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent.parent))
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
 from lib.benchmarking import ExperimentRunner, CacheManager, ReportGenerator
 from lib.benchmarking.models import ExperimentConfig

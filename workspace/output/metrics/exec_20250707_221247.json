@@ -1,0 +1,1560 @@
+{
+  "execution_id": "exec_20250707_221247",
+  "start_time": "2025-07-07T22:12:47.435652",
+  "end_time": "2025-07-07T22:13:58.846357",
+  "total_urls": 50,
+  "successful_scrapes": 0,
+  "failed_scrapes": 0,
+  "successful_llm_calls": 50,
+  "failed_llm_calls": 0,
+  "bot_detections": 0,
+  "rate_limit_errors": 0,
+  "network_errors": 0,
+  "validation_errors": 0,
+  "total_cost": 0.024879899999999996,
+  "openai_cost": 0.024879899999999996,
+  "firecrawl_cost": 0.0,
+  "metrics": [
+    {
+      "name": "pipeline.started",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "execution_id": "exec_20250707_221247"
+      },
+      "timestamp": "2025-07-07T22:12:47.435807",
+      "stage": null
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:51.276280",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 2032.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:51.276307",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00035654999999999997,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:51.276335",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:51.716569",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 3148.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:51.716582",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0005252999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:51.716591",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:51.771161",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 2045.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:51.771183",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00036434999999999994,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:51.771194",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:51.944336",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 2033.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:51.944389",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00035715,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:51.944408",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:53.303249",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 3855.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:53.303262",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00064935,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:53.303272",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:55.457077",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 2888.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:55.457089",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0004925999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:55.457098",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:55.880967",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 2839.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:55.880982",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00048344999999999996,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:55.880991",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:55.909838",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 3203.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:55.909851",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00055875,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:55.909861",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:56.434074",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 3365.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:56.434088",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0005704499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:56.434097",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:56.540553",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 4621.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:56.540567",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0007674,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:56.540577",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:58.835435",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 4237.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:58.835447",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0006999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:12:58.835456",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:04.776605",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1594.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:04.776618",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00035114999999999994,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:04.776626",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:07.938401",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1598.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:07.938417",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00035174999999999996,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:07.938426",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:08.975491",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1585.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:08.975503",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0003457499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:08.975512",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:08.987708",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1605.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:08.987720",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00035729999999999996,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:08.987729",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:13.991929",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1599.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:13.991942",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0003528,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:13.991950",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:17.379699",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 734.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:17.379710",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00014565,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:17.379717",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:19.316405",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1596.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:19.316419",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00035099999999999997,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:19.316429",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:20.751002",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1596.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:20.751015",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0003501,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:20.751023",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:22.060329",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1613.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:22.060349",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00035894999999999997,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:22.060382",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:23.130449",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 695.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:23.130462",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00014294999999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:23.130470",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:23.280269",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 6479.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:23.280299",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0010370999999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:23.280339",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:24.034528",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1592.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:24.034543",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00035039999999999995,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:24.034553",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:24.439628",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 5488.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:24.439644",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0008960999999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:24.439654",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:26.282448",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 685.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:26.282468",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00013785,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:26.282478",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:27.729911",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 699.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:27.729925",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0001458,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:27.729934",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:28.438465",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 5417.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:28.438478",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0008782499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:28.438488",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:30.883949",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 687.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:30.883963",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00014624999999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:30.883972",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:30.954905",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 2011.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:30.954919",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00036195,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:30.954928",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:31.795683",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 704.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:31.795700",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0001479,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:31.795712",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:32.148796",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1608.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:32.148808",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00029385,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:32.148818",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:33.082834",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 5466.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:33.082866",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0008828999999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:33.082883",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:35.426473",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1026.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:35.426488",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00021329999999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:35.426499",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:35.512212",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1092.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:35.512227",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00019844999999999997,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:35.512238",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:35.578247",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 971.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:35.578260",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00020324999999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:35.578270",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:36.626594",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 968.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:36.626608",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00019424999999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:36.626618",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:38.545686",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 997.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:38.545701",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00020534999999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:38.545712",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:39.183744",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 992.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:39.183758",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00020999999999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:39.183769",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:40.596245",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1027.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:40.596260",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00021525,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:40.596270",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:40.741466",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 999.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:40.741480",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.000207,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:40.741489",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:42.020863",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 708.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:42.020876",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00014714999999999997,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:42.020885",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:43.702803",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 952.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:43.702815",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00019499999999999997,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:43.702823",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:45.553899",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1036.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:45.553912",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0002184,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:45.553922",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:46.980427",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 2281.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:46.980445",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00039524999999999993,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:46.980456",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:49.126197",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 2314.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:49.126211",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0004038,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:49.126221",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:51.949466",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 13476.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:51.949479",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0020889,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:51.949489",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:52.994206",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 1596.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:52.994220",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00030959999999999994,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:52.994230",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:54.308343",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 17822.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:54.308356",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0027354,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:54.308365",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:54.759432",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 4191.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:54.759445",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0006956999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:54.759455",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:58.845787",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.tokens_used",
+      "value": 11811.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:58.845801",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00183285,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T22:13:58.845811",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "pipeline.completed",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "execution_id": "exec_20250707_221247"
+      },
+      "timestamp": "2025-07-07T22:13:58.846387",
+      "stage": null
+    },
+    {
+      "name": "pipeline.duration_seconds",
+      "value": 71.410705,
+      "type": "gauge",
+      "labels": {
+        "execution_id": "exec_20250707_221247"
+      },
+      "timestamp": "2025-07-07T22:13:58.846406",
+      "stage": null
+    },
+    {
+      "name": "pipeline.success_rate",
+      "value": 0.0,
+      "type": "gauge",
+      "labels": {
+        "execution_id": "exec_20250707_221247"
+      },
+      "timestamp": "2025-07-07T22:13:58.846415",
+      "stage": null
+    }
+  ],
+  "errors": []
+}

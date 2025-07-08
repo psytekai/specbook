@@ -56,13 +56,13 @@ class WorkspaceManager:
             
         print(f"📋 Setting up workspace for PRP: {matching_prp.name}")
         
-        # Copy scripts to workspace
+        # Copy scripts to workspace and fix import paths
         scripts_dir = matching_prp / "scripts"
         if scripts_dir.exists():
             for script in scripts_dir.glob("*.py"):
                 target = self.workspace_dir / "scripts" / script.name
-                shutil.copy2(script, target)
-                print(f"  Copied {script.name} to workspace/scripts/")
+                self._copy_and_fix_imports(script, target)
+                print(f"  Copied {script.name} to workspace/scripts/ (imports fixed)")
                 
         # Copy notebooks if they exist
         notebooks_dir = matching_prp / "notebooks"
@@ -71,6 +71,23 @@ class WorkspaceManager:
                 target = self.workspace_dir / "notebooks" / notebook.name
                 shutil.copy2(notebook, target)
                 print(f"  Copied {notebook.name} to workspace/notebooks/")
+    
+    def _copy_and_fix_imports(self, source: Path, target: Path) -> None:
+        """Copy script and fix import paths for workspace location"""
+        # Read the source file
+        with open(source, 'r') as f:
+            content = f.read()
+        
+        # Fix the sys.path.append line for workspace location
+        # PRP scripts use 5 parent directories, workspace scripts need 3
+        content = content.replace(
+            'sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent.parent))',
+            'sys.path.append(str(Path(__file__).resolve().parent.parent.parent))'
+        )
+        
+        # Write the fixed content to target
+        with open(target, 'w') as f:
+            f.write(content)
     
     def clean_workspace(self) -> None:
         """Clean temporary files from workspace"""
