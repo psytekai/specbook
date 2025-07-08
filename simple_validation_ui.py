@@ -243,6 +243,7 @@ def invoke_llm():
         result_entry = {
             'timestamp': timestamp,
             'model': model,
+            'prompt': prompt,
             'success': result_data is not None,
             'result': result_data,
             'raw_response': response_text,

@@ -449,7 +449,10 @@
             </div>
             
             <div class="panel result-panel">
-                <h4>LLM Extraction Results</h4>
+                <h4>
+                    LLM Extraction Results
+                    <button class="copy-btn" onclick="exportLLMResults()" title="Export results as CSV">Export CSV</button>
+                </h4>
                 <div class="results-container" id="results-container">
                     <div class="no-results" id="no-results">
                         No LLM results yet. Use "Invoke LLM" to generate new results.
@@ -510,6 +513,7 @@ function displayProduct(data) {
         const originalResult = {
             timestamp: 'Original Extraction',
             model: 'Initial Processing',
+            prompt: data.prompt,
             success: true,
             result: data.llm_result,
             raw_response: '',
@@ -647,8 +651,8 @@ function invokeLLM() {
         }),
         success: function(response) {
             if (response.success) {
-                // Update results display
-                displayLLMResults(response.history);
+                // Reload the product to get updated results with original result preserved
+                loadProduct(currentIndex);
                 showSuccess('LLM invocation successful!');
             } else {
                 showError('LLM invocation failed: ' + (response.error || 'Unknown error'));
@@ -698,10 +702,20 @@ function createResultEntry(result, index) {
     const isOriginal = result.isOriginal || false;
     
     let resultTableHtml = '';
+    
+    // Create prompt section if available
+    const promptSection = result.prompt ? `
+        <div style="margin-bottom: 1rem; padding: 0.75rem; background: #f8f9fa; border-radius: 4px; border-left: 4px solid #3498db;">
+            <strong style="color: #2c3e50;">Prompt Used:</strong>
+            <div style="margin-top: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.85rem; max-height: 150px; overflow-y: auto; white-space: pre-wrap;">${result.prompt}</div>
+        </div>
+    ` : '';
+    
     if (result.success && result.result) {
         const data = result.result;
         resultTableHtml = `
             <div class="result-table-wrapper">
+                ${promptSection}
                 <table class="result-table">
                     <tr><td>Image URL:</td><td>${makeClickable(data.image_url) || '-'}</td></tr>
                     <tr><td>Type:</td><td>${data.type || '-'}</td></tr>
@@ -714,6 +728,7 @@ function createResultEntry(result, index) {
     } else {
         resultTableHtml = `
             <div class="result-table-wrapper">
+                ${promptSection}
                 <div style="color: #e74c3c; padding: 1rem;">
                     <strong>Error:</strong> ${result.error || 'Unknown error'}
                     <br><br>
@@ -763,6 +778,121 @@ function makeClickable(url) {
         return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
     }
     return url;
+}
+
+function exportLLMResults() {
+    // Get current product data
+    if (currentIndex < 0 || currentIndex >= totalProducts) {
+        showError('No product selected for export');
+        return;
+    }
+
+    // Get all results from the current display
+    const resultsContainer = $('#results-container');
+    const resultEntries = resultsContainer.find('.result-entry');
+    
+    if (resultEntries.length === 0) {
+        showError('No results to export');
+        return;
+    }
+
+    // Create CSV data
+    const csvData = [];
+    const headers = [
+        'Product_Index',
+        'Product_URL', 
+        'Timestamp',
+        'Model',
+        'Success',
+        'Image_URL',
+        'Type',
+        'Description',
+        'Model_No',
+        'Product_Link',
+        'Prompt_Preview',
+        'Error',
+        'Raw_Response_Preview'
+    ];
+    
+    csvData.push(headers);
+    
+    // Get current product URL from the get_product response
+    $.get(`/get_product/${currentIndex}`)
+        .done(function(productData) {
+            const productUrl = productData.url || '';
+            
+            // Collect all results data
+            const allResults = [];
+            
+            // Add original result
+            if (productData.llm_result && Object.keys(productData.llm_result).length > 0) {
+                allResults.push({
+                    timestamp: 'Original Extraction',
+                    model: 'Initial Processing',
+                    prompt: productData.prompt || '',
+                    success: true,
+                    result: productData.llm_result,
+                    raw_response: '',
+                    error: null
+                });
+            }
+            
+            // Add history results
+            if (productData.llm_history) {
+                allResults.push(...productData.llm_history);
+            }
+            
+            // Convert results to CSV rows
+            allResults.forEach(function(result) {
+                const data = result.result || {};
+                const promptPreview = (result.prompt || '').substring(0, 100).replace(/[\r\n]+/g, ' ') + '...';
+                const rawResponsePreview = (result.raw_response || '').substring(0, 100).replace(/[\r\n]+/g, ' ') + '...';
+                
+                const row = [
+                    currentIndex,
+                    `"${productUrl.replace(/"/g, '""')}"`,
+                    result.timestamp || '',
+                    result.model || '',
+                    result.success ? 'TRUE' : 'FALSE',
+                    `"${(data.image_url || '').replace(/"/g, '""')}"`,
+                    `"${(data.type || '').replace(/"/g, '""')}"`,
+                    `"${(data.description || '').replace(/"/g, '""')}"`,
+                    `"${(data.model_no || '').replace(/"/g, '""')}"`,
+                    `"${(data.product_link || '').replace(/"/g, '""')}"`,
+                    `"${promptPreview.replace(/"/g, '""')}"`,
+                    `"${(result.error || '').replace(/"/g, '""')}"`,
+                    `"${rawResponsePreview.replace(/"/g, '""')}"`
+                ];
+                
+                csvData.push(row);
+            });
+            
+            // Generate CSV content
+            const csvContent = csvData.map(row => row.join(',')).join('\n');
+            
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            const filename = `llm_extraction_results_product_${currentIndex}_${timestamp}.csv`;
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showSuccess('Results exported successfully!');
+            } else {
+                showError('Export not supported in this browser');
+            }
+        })
+        .fail(function() {
+            showError('Failed to get product data for export');
+        });
 }
 
 // Keyboard navigation
