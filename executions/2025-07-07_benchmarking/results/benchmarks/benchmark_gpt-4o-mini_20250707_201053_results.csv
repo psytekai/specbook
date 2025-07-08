@@ -1,0 +1,11 @@
+url,success,quality_score,execution_time,tokens,cost,error,issues
+https://www.coloratelierpaint.com/product-page/tadelakt-shower-plaster,True,0.88,60.36165904998779,3184,0.0005468999999999999,,
+https://www.strongarhardware.com/extra-length-ladder-style-back-to-back-push-pull-door-handle-matte-black-powder-coated-stainless-steel-finish/,True,0.855,60.362581968307495,3857,0.00065055,,
+https://www.dunnedwards.com/colors/browser/dew340,True,0.865,120.36786603927612,2040,0.00036135,,
+https://www.dunnedwards.com/colors/browser/dew340,True,0.865,120.3682050704956,2033,0.00035715,,
+https://www.dunnedwards.com/colors/browser/dew340,True,0.865,120.36917209625244,2026,0.00035295,,
+https://www.kwikset.com/products/detail/milan-lever-round-hall-closet?variant=154mil-rdt-514,True,0.85,180.04553508758545,2839,0.00048344999999999996,,
+https://www.kwikset.com/products/detail/milan-lever-round-bed-bath?variant=155mil-rdt-514,True,0.85,180.04757380485535,2877,0.0004859999999999999,,
+"https://www.msisurfaces.com/marble/calacatta-marble/#:~:text=Calacatta%20Gold%20marble%20is%20a,islands%2C%20marble%20floors%20and%20backsplashes.",True,0.85,120.04138422012329,3177,0.00054315,,
+https://emtek.com/door-hinges/4x4squarebarrelheavydutyhinges,True,0.865,120.04216814041138,4592,0.0007490999999999999,,
+https://www.cosentino.com/colors/silestone/charcoal-soapstone/,True,0.85,122.78507423400879,3371,0.00057405,,

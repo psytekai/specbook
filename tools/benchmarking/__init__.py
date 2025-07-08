@@ -1,1 +1,0 @@
-# Benchmarking module for specbook pipeline

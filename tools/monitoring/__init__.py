@@ -1,1 +1,0 @@
-# Monitoring module for specbook pipeline
