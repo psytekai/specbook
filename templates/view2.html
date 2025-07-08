@@ -195,6 +195,220 @@
         font-style: italic;
     }
 
+    .results-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .results-table thead th {
+        background-color: #2c3e50;
+        color: white;
+        padding: 0.75rem;
+        text-align: left;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .results-table tbody td {
+        padding: 0.5rem;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+    }
+
+    .results-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .results-table .original-row {
+        background-color: #f0f8ff;
+        border-left: 4px solid #3498db;
+    }
+
+    .model-badge {
+        background: #3498db;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .original-row .model-badge {
+        background: #2c3e50;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    .status-badge.success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-badge.error {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .description-cell {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .url-cell {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .error-cell {
+        color: #e74c3c;
+        font-style: italic;
+    }
+
+    .actions-cell {
+        text-align: center;
+    }
+
+    .view-details-btn {
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .view-details-btn:hover {
+        background: #5a6268;
+    }
+
+    /* Modal styles */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-header {
+        background: #2c3e50;
+        color: white;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+    }
+
+    .modal-close:hover {
+        opacity: 0.8;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .detail-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .detail-section h4 {
+        margin-bottom: 0.75rem;
+        color: #2c3e50;
+    }
+
+    .detail-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .detail-table td {
+        padding: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .detail-table td:first-child {
+        font-weight: bold;
+        width: 150px;
+        background: #f8f9fa;
+    }
+
+    .prompt-display, .raw-response {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 4px;
+        border-left: 4px solid #3498db;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .error-details {
+        background: #fff5f5;
+        padding: 1rem;
+        border-radius: 4px;
+        border-left: 4px solid #e74c3c;
+    }
+
     .result-entry {
         border-bottom: 1px solid #eee;
         margin-bottom: 0;
@@ -442,10 +656,10 @@
             
             <div class="panel prompt-panel">
                 <h4>
-                    LLM Prompt
+                    LLM Prompt <span style="font-size: 0.8rem; font-weight: normal; color: #666;">(Editable - modify before invoking)</span>
                     <button class="copy-btn" onclick="copyToClipboard('llm-prompt')">Copy</button>
                 </h4>
-                <textarea id="llm-prompt" readonly placeholder="LLM prompt will appear here..."></textarea>
+                <textarea id="llm-prompt" placeholder="LLM prompt will appear here. You can edit this prompt before invoking the LLM."></textarea>
             </div>
             
             <div class="panel result-panel">
@@ -677,23 +891,88 @@ function displayLLMResults(results) {
     
     if (!results || results.length === 0) {
         noResults.show();
-        container.find('.result-entry').remove();
+        container.find('.results-table-wrapper').remove();
         return;
     }
     
     noResults.hide();
-    container.find('.result-entry').remove();
+    container.find('.results-table-wrapper').remove();
+    
+    // Create table HTML
+    let tableHtml = `
+        <div class="results-table-wrapper">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Model</th>
+                        <th>Status</th>
+                        <th>Image URL</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Model No</th>
+                        <th>Product Link</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
     
     results.forEach(function(result, index) {
-        const resultHtml = createResultEntry(result, index);
-        container.append(resultHtml);
+        const rowClass = result.isOriginal ? 'original-row' : '';
+        const statusClass = result.success ? 'success' : 'error';
+        const statusText = result.success ? 'Success' : 'Error';
+        const data = result.result || {};
+        
+        tableHtml += `
+            <tr class="${rowClass}">
+                <td class="timestamp-cell">${result.timestamp}</td>
+                <td class="model-cell">
+                    <span class="model-badge">${result.model}</span>
+                </td>
+                <td class="status-cell">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </td>
+        `;
+        
+        if (result.success) {
+            tableHtml += `
+                <td class="url-cell">${makeClickableShort(data.image_url) || '-'}</td>
+                <td>${data.type || '-'}</td>
+                <td class="description-cell" title="${escapeHtml(data.description || '')}">${truncateText(data.description, 50) || '-'}</td>
+                <td>${data.model_no || '-'}</td>
+                <td class="url-cell">${makeClickableShort(data.product_link) || '-'}</td>
+            `;
+        } else {
+            tableHtml += `
+                <td colspan="5" class="error-cell">
+                    <span class="error-text">${result.error || 'Unknown error'}</span>
+                </td>
+            `;
+        }
+        
+        tableHtml += `
+                <td class="actions-cell">
+                    <button class="view-details-btn" onclick="viewResultDetails(${index})" title="View full details">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+        `;
     });
     
-    // Expand the first (latest) result by default
-    if (results.length > 0) {
-        const firstEntry = container.find('.result-entry:first');
-        toggleResultExpansion(firstEntry.find('.result-header')[0]);
-    }
+    tableHtml += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.append(tableHtml);
+    
+    // Store results for detail viewing
+    container.data('results', results);
 }
 
 function createResultEntry(result, index) {
@@ -778,6 +1057,111 @@ function makeClickable(url) {
         return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
     }
     return url;
+}
+
+function makeClickableShort(url) {
+    if (url && url.trim() && url.startsWith('http')) {
+        const displayText = url.length > 30 ? url.substring(0, 30) + '...' : url;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(url)}">${displayText}</a>`;
+    }
+    return url;
+}
+
+function truncateText(text, maxLength) {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+function viewResultDetails(index) {
+    const results = $('#results-container').data('results');
+    const result = results[index];
+    
+    if (!result) return;
+    
+    // Create modal content
+    let modalContent = `
+        <div class="modal-backdrop" onclick="closeDetailsModal()">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3>Result Details - ${result.timestamp}</h3>
+                    <button class="modal-close" onclick="closeDetailsModal()">×</button>
+                </div>
+                <div class="modal-body">
+    `;
+    
+    // Add model and status info
+    modalContent += `
+        <div class="detail-section">
+            <h4>Execution Info</h4>
+            <table class="detail-table">
+                <tr><td>Model:</td><td>${result.model}</td></tr>
+                <tr><td>Status:</td><td>${result.success ? 'Success' : 'Error'}</td></tr>
+                <tr><td>Timestamp:</td><td>${result.timestamp}</td></tr>
+            </table>
+        </div>
+    `;
+    
+    // Add prompt if available
+    if (result.prompt) {
+        modalContent += `
+            <div class="detail-section">
+                <h4>Prompt Used</h4>
+                <pre class="prompt-display">${escapeHtml(result.prompt)}</pre>
+            </div>
+        `;
+    }
+    
+    // Add extraction results or error
+    if (result.success && result.result) {
+        const data = result.result;
+        modalContent += `
+            <div class="detail-section">
+                <h4>Extraction Results</h4>
+                <table class="detail-table">
+                    <tr><td>Image URL:</td><td>${makeClickable(data.image_url) || '-'}</td></tr>
+                    <tr><td>Type:</td><td>${data.type || '-'}</td></tr>
+                    <tr><td>Description:</td><td>${data.description || '-'}</td></tr>
+                    <tr><td>Model No:</td><td>${data.model_no || '-'}</td></tr>
+                    <tr><td>Product Link:</td><td>${makeClickable(data.product_link) || '-'}</td></tr>
+                </table>
+            </div>
+        `;
+    } else {
+        modalContent += `
+            <div class="detail-section">
+                <h4>Error Details</h4>
+                <div class="error-details">
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    ${result.raw_response ? `<pre class="raw-response">${escapeHtml(result.raw_response)}</pre>` : ''}
+                </div>
+            </div>
+        `;
+    }
+    
+    modalContent += `
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to page
+    $('body').append(modalContent);
+}
+
+function closeDetailsModal() {
+    $('.modal-backdrop').remove();
 }
 
 function exportLLMResults() {
