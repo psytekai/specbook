@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+
+{% block title %}Product Inspector - Simple Validation UI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .inspection-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .navigation-panel {
+        background: white;
+        border-radius: 4px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .nav-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .nav-controls button {
+        min-width: 100px;
+    }
+
+    .nav-controls button:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+    }
+
+    .current-position {
+        font-weight: bold;
+        color: #2c3e50;
+        font-size: 1.1rem;
+    }
+
+    .product-info {
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .product-url {
+        font-size: 0.9rem;
+        color: #3498db;
+        word-break: break-all;
+        margin-top: 0.25rem;
+    }
+
+    .content-panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 400px auto;
+        gap: 1rem;
+    }
+
+    .panel {
+        background: white;
+        border-radius: 4px;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .raw-html-panel {
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
+    }
+
+    .prompt-panel {
+        grid-column: 2 / 2;
+        grid-row: 1 / 2;
+    }
+
+    .result-panel {
+        grid-column: 1 / 3;
+        grid-row: 2 / 3;
+    }
+
+    .panel h4 {
+        margin-bottom: 1rem;
+        color: #2c3e50;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .panel textarea {
+        flex: 1;
+        height: 100%;
+        min-height: 300px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.8rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 0.5rem;
+        resize: none;
+    }
+
+    .result-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .result-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #eee;
+        vertical-align: top;
+    }
+
+    .result-table td:first-child {
+        font-weight: bold;
+        background-color: #f8f9fa;
+        width: 120px;
+        color: #2c3e50;
+    }
+
+    .result-table td:last-child {
+        word-break: break-word;
+    }
+
+    .result-table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .success-indicator {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    .success-indicator.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .success-indicator.failed {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .copy-btn {
+        background-color: #6c757d;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .copy-btn:hover {
+        background-color: #5a6268;
+    }
+
+    .goto-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .goto-controls input {
+        width: 80px;
+        padding: 0.25rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .keyboard-shortcuts {
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+
+    @media (max-width: 1200px) {
+        .content-panels {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto auto;
+        }
+        
+        .raw-html-panel {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        .prompt-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        .result-panel {
+            grid-column: 1;
+            grid-row: 3;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="loading">
+    <h2>Loading product inspector...</h2>
+</div>
+
+<div class="content" style="display: none;">
+    <div class="inspection-container">
+        <div class="navigation-panel">
+            <div>
+                <h3>Product Inspector</h3>
+                <div class="keyboard-shortcuts">
+                    Use ← → arrow keys to navigate | Enter to go to specific product
+                </div>
+            </div>
+            
+            <div class="nav-controls">
+                <button id="prev-btn" onclick="navigateProduct(-1)">← Previous</button>
+                <span class="current-position" id="current-position">- / -</span>
+                <button id="next-btn" onclick="navigateProduct(1)">Next →</button>
+                
+                <div class="goto-controls">
+                    <span>Go to:</span>
+                    <input type="number" id="goto-input" min="1" placeholder="1">
+                    <button onclick="gotoProduct()">Go</button>
+                </div>
+            </div>
+            
+            <div class="product-info">
+                <div>
+                    <strong>Status:</strong> 
+                    <span id="success-indicator" class="success-indicator">-</span>
+                </div>
+                <div class="product-url">
+                    <strong>URL:</strong> <span id="current-url">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-panels">
+            <div class="panel raw-html-panel">
+                <h4>
+                    Raw HTML Content
+                    <button class="copy-btn" onclick="copyToClipboard('raw-html')">Copy</button>
+                </h4>
+                <textarea id="raw-html" readonly placeholder="Raw HTML content will appear here..."></textarea>
+            </div>
+            
+            <div class="panel prompt-panel">
+                <h4>
+                    LLM Prompt
+                    <button class="copy-btn" onclick="copyToClipboard('llm-prompt')">Copy</button>
+                </h4>
+                <textarea id="llm-prompt" readonly placeholder="LLM prompt will appear here..."></textarea>
+            </div>
+            
+            <div class="panel result-panel">
+                <h4>LLM Extraction Result</h4>
+                <table class="result-table" id="result-table">
+                    <tr><td>Image URL:</td><td id="result-image-url">-</td></tr>
+                    <tr><td>Type:</td><td id="result-type">-</td></tr>
+                    <tr><td>Description:</td><td id="result-description">-</td></tr>
+                    <tr><td>Model No:</td><td id="result-model-no">-</td></tr>
+                    <tr><td>Product Link:</td><td id="result-product-link">-</td></tr>
+                    <tr><td>Quantity:</td><td id="result-qty">-</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentIndex = 0;
+let totalProducts = 0;
+
+function onDataLoaded(response) {
+    totalProducts = response.total_products;
+    $('#goto-input').attr('max', totalProducts);
+    loadProduct(0);
+}
+
+function loadProduct(index) {
+    if (index < 0 || index >= totalProducts) {
+        return;
+    }
+    
+    currentIndex = index;
+    
+    // Update navigation state
+    updateNavigationState();
+    
+    // Load product data
+    $.get(`/get_product/${index}`)
+        .done(function(data) {
+            displayProduct(data);
+        })
+        .fail(function(xhr) {
+            const error = xhr.responseJSON ? xhr.responseJSON.error : 'Failed to load product';
+            showError(error);
+        });
+}
+
+function displayProduct(data) {
+    // Update navigation info
+    $('#current-position').text(`${data.index + 1} / ${data.total}`);
+    $('#current-url').text(data.url);
+    
+    // Update success indicator
+    const indicator = $('#success-indicator');
+    if (data.success) {
+        indicator.text('SUCCESS').removeClass('failed').addClass('success');
+    } else {
+        indicator.text('FAILED').removeClass('success').addClass('failed');
+    }
+    
+    // Update content areas
+    $('#raw-html').val(data.raw_html);
+    $('#llm-prompt').val(data.prompt);
+    
+    // Update result table
+    const result = data.llm_result;
+    $('#result-image-url').text(result.image_url || '-');
+    $('#result-type').text(result.type || '-');
+    $('#result-description').text(result.description || '-');
+    $('#result-model-no').text(result.model_no || '-');
+    $('#result-product-link').text(result.product_link || '-');
+    $('#result-qty').text(result.qty || '-');
+    
+    // Make URLs clickable
+    if (result.image_url) {
+        $('#result-image-url').html(`<a href="${result.image_url}" target="_blank">${result.image_url}</a>`);
+    }
+    if (result.product_link) {
+        $('#result-product-link').html(`<a href="${result.product_link}" target="_blank">${result.product_link}</a>`);
+    }
+    
+    // Update goto input
+    $('#goto-input').val(currentIndex + 1);
+}
+
+function updateNavigationState() {
+    $('#prev-btn').prop('disabled', currentIndex <= 0);
+    $('#next-btn').prop('disabled', currentIndex >= totalProducts - 1);
+}
+
+function navigateProduct(direction) {
+    const newIndex = currentIndex + direction;
+    if (newIndex >= 0 && newIndex < totalProducts) {
+        loadProduct(newIndex);
+    }
+}
+
+function gotoProduct() {
+    const input = $('#goto-input').val();
+    const targetIndex = parseInt(input) - 1; // Convert to 0-based index
+    
+    if (isNaN(targetIndex) || targetIndex < 0 || targetIndex >= totalProducts) {
+        showError(`Invalid product number. Please enter a number between 1 and ${totalProducts}.`);
+        return;
+    }
+    
+    loadProduct(targetIndex);
+}
+
+function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    element.select();
+    document.execCommand('copy');
+    
+    // Show feedback
+    const button = event.target;
+    const originalText = button.textContent;
+    button.textContent = 'Copied!';
+    button.style.backgroundColor = '#27ae60';
+    
+    setTimeout(function() {
+        button.textContent = originalText;
+        button.style.backgroundColor = '';
+    }, 1000);
+}
+
+// Keyboard navigation
+$(document).keydown(function(e) {
+    // Only handle keys when not in an input field
+    if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') {
+        if (e.key === 'Enter' && e.target.id === 'goto-input') {
+            gotoProduct();
+        }
+        return;
+    }
+    
+    switch(e.key) {
+        case 'ArrowLeft':
+            e.preventDefault();
+            navigateProduct(-1);
+            break;
+        case 'ArrowRight':
+            e.preventDefault();
+            navigateProduct(1);
+            break;
+        case 'Home':
+            e.preventDefault();
+            loadProduct(0);
+            break;
+        case 'End':
+            e.preventDefault();
+            loadProduct(totalProducts - 1);
+            break;
+    }
+});
+</script>
+{% endblock %}

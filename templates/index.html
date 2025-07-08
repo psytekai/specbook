@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Simple Validation UI{% endblock %}
+
+{% block content %}
+<div class="loading">
+    <h2>Loading data...</h2>
+    <p>Please wait while we load the CSV files.</p>
+</div>
+
+<div class="content" style="display: none;">
+    <h2>Welcome to Simple Validation UI</h2>
+    
+    <div class="panel">
+        <h3>Data Overview</h3>
+        <p><strong>Total Products:</strong> <span id="total-products">-</span></p>
+        <p><strong>Data Source:</strong> LLM Results & Product Specs</p>
+        <p><strong>Last Updated:</strong> <span id="last-updated">-</span></p>
+    </div>
+
+    <div class="panel">
+        <h3>Available Views</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+            <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 4px;">
+                <h4>Row Validation</h4>
+                <p>Interactive table view for validating extracted product data. Click cells to mark as rejected and track validation statistics.</p>
+                <br>
+                <a href="/view1"><button>Open Row Validation</button></a>
+            </div>
+            <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 4px;">
+                <h4>Product Inspector</h4>
+                <p>Detailed view of individual products showing raw HTML, prompts, and LLM results for thorough inspection.</p>
+                <br>
+                <a href="/view2"><button>Open Product Inspector</button></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h3>Quick Actions</h3>
+        <button onclick="refreshData()">Refresh Data</button>
+        <button onclick="exportValidation()">Export Current Validation</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function onDataLoaded(response) {
+    $('#total-products').text(response.total_products);
+    $('#last-updated').text(new Date().toLocaleString());
+}
+
+function refreshData() {
+    $('.content').hide();
+    $('.loading').show();
+    loadData();
+}
+
+function exportValidation() {
+    window.location.href = '/export_validation';
+}
+</script>
+{% endblock %}
