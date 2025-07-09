@@ -1,0 +1,216 @@
+{
+  "execution_id": "exec_20250707_233631",
+  "start_time": "2025-07-07T23:36:31.845267",
+  "end_time": "2025-07-07T23:36:45.798926",
+  "total_urls": 4,
+  "successful_scrapes": 4,
+  "failed_scrapes": 0,
+  "successful_llm_calls": 4,
+  "failed_llm_calls": 0,
+  "bot_detections": 0,
+  "rate_limit_errors": 0,
+  "network_errors": 0,
+  "validation_errors": 0,
+  "total_cost": 0.0018926999999999998,
+  "openai_cost": 0.0018926999999999998,
+  "firecrawl_cost": 0.0,
+  "metrics": [
+    {
+      "name": "pipeline.started",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "execution_id": "exec_20250707_233631"
+      },
+      "timestamp": "2025-07-07T23:36:31.845742",
+      "stage": null
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-07T23:36:31.857093",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-07T23:36:31.866276",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-07T23:36:31.868535",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-07T23:36:31.878556",
+      "stage": "scraping"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.12356400489807129,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-07T23:36:32.013708",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.15872621536254883,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-07T23:36:32.175570",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.11345314979553223,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-07T23:36:32.290498",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.10987210273742676,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-07T23:36:32.401560",
+      "stage": "html_processing"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T23:36:38.062278",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00043139999999999997,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T23:36:38.062323",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T23:36:41.155730",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0005985,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T23:36:41.155753",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T23:36:43.724815",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00043139999999999997,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T23:36:43.724835",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T23:36:45.719348",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00043139999999999997,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-07T23:36:45.719368",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "pipeline.completed",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "execution_id": "exec_20250707_233631"
+      },
+      "timestamp": "2025-07-07T23:36:45.799034",
+      "stage": null
+    },
+    {
+      "name": "pipeline.duration_seconds",
+      "value": 13.953659,
+      "type": "gauge",
+      "labels": {
+        "execution_id": "exec_20250707_233631"
+      },
+      "timestamp": "2025-07-07T23:36:45.799076",
+      "stage": null
+    },
+    {
+      "name": "pipeline.success_rate",
+      "value": 1.0,
+      "type": "gauge",
+      "labels": {
+        "execution_id": "exec_20250707_233631"
+      },
+      "timestamp": "2025-07-07T23:36:45.799089",
+      "stage": null
+    }
+  ],
+  "errors": []
+}
