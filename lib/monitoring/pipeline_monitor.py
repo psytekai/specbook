@@ -96,6 +96,15 @@ class PipelineMonitor:
             return
             
         # Update counters
+        # Always record scraping method count
+        self.record_metric(
+            name="scrape.method",
+            value=1,
+            metric_type=MetricType.COUNTER,
+            stage=stage,
+            labels={"method": result.final_method.value}
+        )
+        
         if result.success:
             self.current_execution.successful_scrapes += 1
             self.record_metric(
@@ -127,7 +136,8 @@ class PipelineMonitor:
                 category=error_category,
                 stage=stage,
                 url=result.url,
-                error_message=result.error_reason or "Unknown error"
+                error_message=result.error_reason or "Unknown error",
+                additional_info={"scraping_method": result.final_method.value}
             )
             
             # Update specific error counters

@@ -98,8 +98,31 @@ class MetricsCollector:
         total_openai_cost = sum(e.openai_cost for e in executions)
         total_firecrawl_cost = sum(e.firecrawl_cost for e in executions)
         
+        # OpenAI call stats
+        total_openai_calls = sum(e.successful_llm_calls + e.failed_llm_calls for e in executions)
+        total_successful_llm = sum(e.successful_llm_calls for e in executions)
+        total_failed_llm = sum(e.failed_llm_calls for e in executions)
+        
+        # Scraping method breakdown
+        scrape_methods = defaultdict(int)
+        error_by_method = defaultdict(lambda: defaultdict(int))
+        
+        # Analyze metrics to extract scraping method counts and errors
+        for execution in executions:
+            for metric in execution.metrics:
+                if metric.name == "scrape.method" and "method" in metric.labels:
+                    method = metric.labels["method"]
+                    scrape_methods[method] += int(metric.value)
+            
+            # Analyze errors by scraping method
+            for error in execution.errors:
+                if "scraping_method" in error.additional_info:
+                    method = error.additional_info["scraping_method"]
+                    error_by_method[method][error.category.value] += 1
+        
         # Calculate rates
         overall_success_rate = total_successful / total_scraped if total_scraped > 0 else 0
+        llm_success_rate = total_successful_llm / total_openai_calls if total_openai_calls > 0 else 0
         
         # Duration stats
         durations = [e.duration for e in executions if e.duration]
@@ -112,11 +135,19 @@ class MetricsCollector:
             "total_successful": total_successful,
             "total_failed": total_failed,
             "overall_success_rate": overall_success_rate,
+            "scraping_methods": dict(scrape_methods),
+            "openai_calls": {
+                "total": total_openai_calls,
+                "successful": total_successful_llm,
+                "failed": total_failed_llm,
+                "success_rate": llm_success_rate
+            },
             "errors": {
                 "bot_detections": total_bot_detections,
                 "rate_limits": total_rate_limits,
                 "network_errors": total_network_errors
             },
+            "errors_by_method": dict(error_by_method),
             "cost": {
                 "total": total_cost,
                 "openai": total_openai_cost,
@@ -147,12 +178,49 @@ class MetricsCollector:
         report.append(f"- Processing Speed: {stats['performance']['urls_per_second']:.2f} URLs/second")
         report.append("")
         
+        # Scraping Method Breakdown
+        report.append("## Scraping Method Breakdown")
+        if stats['scraping_methods']:
+            for method, count in stats['scraping_methods'].items():
+                if method == "requests":
+                    report.append(f"- Requests Library: {count}")
+                elif method == "firecrawl":
+                    report.append(f"- Firecrawl API: {count}")
+                elif method == "cached":
+                    report.append(f"- Cached Content: {count}")
+                else:
+                    report.append(f"- {method.title()}: {count}")
+        else:
+            report.append("- No scraping method data available")
+        report.append("")
+        
+        # OpenAI API Calls
+        report.append("## OpenAI API Usage")
+        report.append(f"- Total API Calls: {stats['openai_calls']['total']}")
+        report.append(f"- Successful Calls: {stats['openai_calls']['successful']}")
+        report.append(f"- Failed Calls: {stats['openai_calls']['failed']}")
+        report.append(f"- Success Rate: {stats['openai_calls']['success_rate']:.2%}")
+        report.append("")
+        
         # Error Breakdown
         report.append("## Error Breakdown")
         report.append(f"- Bot Detections: {stats['errors']['bot_detections']}")
         report.append(f"- Rate Limit Errors: {stats['errors']['rate_limits']}")
         report.append(f"- Network Errors: {stats['errors']['network_errors']}")
         report.append("")
+        
+        # Error Breakdown by Scraping Method
+        if stats['errors_by_method']:
+            report.append("## Errors by Scraping Method")
+            for method, errors in stats['errors_by_method'].items():
+                method_name = "Requests Library" if method == "requests" else "Firecrawl API" if method == "firecrawl" else method.title()
+                report.append(f"### {method_name}")
+                total_errors = sum(errors.values())
+                report.append(f"- Total Errors: {total_errors}")
+                for error_type, count in errors.items():
+                    error_name = error_type.replace('_', ' ').title()
+                    report.append(f"- {error_name}: {count}")
+                report.append("")
         
         # Cost Analysis
         report.append("## Cost Analysis")

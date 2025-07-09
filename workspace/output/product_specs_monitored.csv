@@ -1,88 +1,261 @@
-image_url,type,description,model_no,product_link,qty,key
-https://h6a8m2f3.delivery.rocketcdn.me/wp-content/uploads/2023/06/DEW340.jpg,paint color,"Whisper is a popular bright, warm white paint color from Dunn-Edwards. It is part of the Whites collection and can be used as a wall, trim, or accent color. The color has a hex code of FDFAF1 and a light reflectance value (LRV) of 87.",DEW340 RL#003,https://www.dunnedwards.com/colors/browser/dew340,unspecified,
-https://www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Stone_White_ea0d9bed-e633-4968-a159-7001007f1e9c.jpg?v=1747186065,plaster,"Color Atelier Tadelakt Shower Plaster, 5 Gallon, Stone White, designed for wet areas like showers, tub surrounds, and backsplashes. Features a burnished smooth, waxed, and water-repellent finish. Made with high-quality natural ingredients.",Tadelakt,https://www.coloratelierpaint.com/product-page/tadelakt-shower-plaster,unspecified,
-https://h6a8m2f3.delivery.rocketcdn.me/wp-content/uploads/2023/06/DEW340.jpg,paint color,"Whisper color DEW340 is a bright, warm white from Dunn-Edwards' Whites collection, suitable for walls, trim, or accent colors, with a hex code of FDFAF1.",DEW340 RL#003,https://www.dunnedwards.com/colors/browser/dew340,unspecified,
-https://h6a8m2f3.delivery.rocketcdn.me/wp-content/uploads/2023/06/DEW340.jpg,paint color,"Whisper is a popular bright, warm white paint color from Dunn-Edwards, part of their Whites collection, suitable for walls, trim, or accents both indoors and outdoors.",DEW340 RL#003,https://www.dunnedwards.com/colors/browser/dew340,unspecified,
-https://cdn11.bigcommerce.com/s-4t2li/products/911/images/8409/1__26922.1746741771.500.750.jpg?c=2,door handle,"Pro-Line Extra Length Series: Ladder Pull Handle - Back-to-Back, Matte Black Powder Coated Finish, 304 Grade Stainless Steel Alloy. Suitable for wood, glass, fiberglass, and metal doors.",SH-PRO-304-LPH-EXL-B-24-1250,https://www.strongarhardware.com/extra-length-ladder-style-back-to-back-push-pull-door-handle-matte-black-powder-coated-stainless-steel-finish/,One pair (Two handles for a back to back installation),
-https://images.kwikset.com/is/image/Kwikset/kw_mi-v1-rdt-lv-priv-15-ex?wid=600&qlt=90&resMode=sharp,Lever,"Satin Nickel Milan Lever (Round) - Bed/Bath | Kwikset. A round contemporary lever with a playful yet elegant aesthetic. For interior doors requiring privacy, features include a reversible lever, adjustable latch backset, and certified highest residential security.",883351640527,https://www.kwikset.com/products/detail/milan-lever-round-bed-bath?variant=155mil-rdt-514,unspecified,
-https://images.kwikset.com/is/image/Kwikset/kw_mi-v1-rdt-lv-pass-15-ex?$kwsProductThumb$,Lever,"Satin Nickel Milan Lever (Round) - Hall/Closet by Kwikset. Features a contemporary design, suitable for interior doors requiring no locking functionality.",883351640466,https://www.kwikset.com/products/detail/milan-lever-round-hall-closet?variant=154mil-rdt-514,unspecified,
-https://www.emtek.com/media/salsify/images/iy/iyscir9ixg-2024-02-28T144120Z-Square-Barrel-Heavy-Duty-Hinge_EM_KO.jpg,door hinge,"Emtek's Heavy Duty Square Barrel Hinge, Solid Brass, Square Corners, 4-1/2 inch x 4-1/2 inch, Satin Brass US4. Features a thinner leaf option with a thickness of 0.125"" and no exposed screws.",US4,https://emtek.com/door-hinges/4x4squarebarrelheavydutyhinges,unspecified,454190
-https://cdn.msisurfaces.com/images/colornames/fullslab/calacatta-marble.jpg,Marble,"Calacatta Gold marble is a distinctive white Italian marble with intricate gray and gold veining. Available in honed and polished finishes, it is ideal for countertops, kitchen islands, floors, and backsplashes.",RSL-CALACATTA,"https://www.msisurfaces.com/marble/calacatta-marble/#:~:text=Calacatta%20Gold%20marble%20is%20a,islands%2C%20marble%20floors%20and%20backsplashes.",unspecified,RSL-CALACATTA
-https://assetstools.cosentino.com/api/v1/bynder/color/CHD/tablahd/CHD-fullslab.jpg?w=2200&h=2200&q=75&auto=format,surface,"Silestone Charcoal Soapstone - Cosentino, a hybrid surface made of minerals and recycled materials, featuring a blue-grey finish with grey highlights. Available in polished and suede finishes, thicknesses of 2.0 cm and 3.0 cm, and dimensions of 128.74 x 62.60 in.",unspecified,https://www.cosentino.com/colors/silestone/charcoal-soapstone/,unspecified,unspecified
-https://www.caesarstoneus.com/wp-content/uploads/2021/01/1141_Pure-White_1141_CU_50x70cm_1920x890px.jpg,Quartz Countertop,"Caesarstone 1141 Pure White, a polished quartz countertop, features an immaculate white surface with a thickness of 30 mm/3 cm and a size of 130″ x 64.6″. It offers a lifetime warranty.",1141,https://www.caesarstoneus.com/countertops/1141-pure-white/,unspecified,1141_Pure_White
-https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,tile,"Eco-friendly handmade ceramic tile in a 2x2 size, known for its sustainability and aesthetic appeal.",unspecified,https://www.fireclaytile.com/tile/colors/detail/daisy/tile-field-2-x-2,unspecified,unspecified
-https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,tile,"Eco-friendly handmade ceramic tile, 2x2 size, available in Basalt color.",unspecified,https://www.fireclaytile.com/tile/colors/detail/basalt/tile-field-2-x-2#specs-content,unspecified,unspecified
-https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,tile,"Eco-friendly handmade tile, 2x2 size, ceramic material, color not specified, notable features include sustainable manufacturing.",unspecified,https://www.fireclaytile.com/tile/colors/detail/daisy/tile-field-2-x-2,unspecified,unspecified
-https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,ceramic tile,"Eco-friendly handmade ceramic tile in a 2x2 size, color Carbon. Sustainable material with custom mosaic tile designs and trade discounts.",unspecified,https://www.fireclaytile.com/tile/colors/detail/carbon/tile-field-2-x-2,unspecified,unspecified
-https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,ceramic tile,"Eco-friendly handmade ceramic tile, size 2x6, color Caribbean, suitable for various applications including kitchen backsplashes and bathrooms.",unspecified,https://www.fireclaytile.com/tile/colors/detail/caribbean/tile-field-2-x-6,unspecified,unspecified
-https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,ceramic tile,"Eco-friendly handmade ceramic tile in a 2"" x 6"" size, featuring a sea glass color, ideal for various applications such as kitchen backsplashes and bathroom designs.",unspecified,https://www.fireclaytile.com/tile/colors/detail/sea-glass/tile-field-2-x-6,unspecified,unspecified
-https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0==?mtime=1629995879,tile,"Eco-friendly handmade ceramic tile, size 2x6, available in various colors.",unspecified,https://www.fireclaytile.com/tile/colors/detail/mesa/tile-field-2-x-6,unspecified,unspecified
-https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,ceramic tile,"Eco-friendly handmade ceramic tile, size 2x6, color Bryce Canyon, ideal for various applications.",,https://www.fireclaytile.com/tile/colors/detail/bryce-canyon/tile-field-2-x-6,unspecified,
-https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,ceramic tile,"Eco-friendly handmade ceramic tile, size 2 x 6, suitable for various applications with a sustainable design.",unspecified,https://www.fireclaytile.com/tile/colors/detail/tuolumne-meadows/tile-field-2-x-6,unspecified,unspecified
-https://d2tlxrxhajaxb8.cloudfront.net/4032-8897/BloqsColorLogoWhite-png-1726865873-webp-1726866570.webp,unspecified,unspecified,unspecified,http://www.bellmontcabinets.com/error404,unspecified,unspecified
-https://www.kraususa.com/media/catalog/product/cache/3615f91175a1203b2367a86b4df90644/k/w/kwu120-45-main-image-alt_dmt13i8konzc03qa.jpg,kitchen sink,"Kraus® Kore™ 45-Inch Undermount Workstation Single Bowl Kitchen Sink made of 16-gauge stainless steel, featuring a 2-tier ledge system and 10 accessories for enhanced functionality.",KWU120-45,https://www.kraususa.com/kraus-kwu120-45-workstation-45-undermount-2-tier-16-gauge-stainless-steel-single-bowl-kitchen-sink.html,unspecified,KWU120-45
-https://www.kraususa.com/media/catalog/product/cache/5fffaf341b180599be66977e19e089a1/k/h/khu100-32_1_1.jpg,kitchen sink,"KRAUS Standart PRO™ 32-inch 16 Gauge Undermount Single Bowl Stainless Steel Kitchen Sink, made with heavy-duty TRU16™ gauge stainless steel, features a sleek modern design with easy-to-clean rounded corners.",KHU100-32,https://www.kraususa.com/kraus-khu100-32-32-undermount-16-gauge-stainless-steel-single-bowl-kitchen-sink.html,unspecified,KHU10032
-https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dwf444fa46/images/large/9659-DST-B1.png?sw=1800&sh=1800&sm=fit,kitchen faucet,"Single-Handle Pull-Down Spring Kitchen Faucet in Chrome, Model# 9659-DST, featuring MagnaTite Docking and Diamond Seal Technology.",9659-DST,https://www.deltafaucet.com/kitchen/product/9659-DST.html,unspecified,
-https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dw2a0b8286/images/large/1165LF-AR-B1.png?sw=1800&sh=1800&sm=fit,Pot Filler,"Contemporary Wall Mount Pot Filler in Arctic Stainless, Model# 1165LF-AR, features a wall-mount design, dual swing joint, ADA compliant, and a flow rate of 4 gpm.",1165LF-AR,https://www.deltafaucet.com/kitchen/product/1165LF-AR.html,unspecified,1165LF-AR
-https://www.kraususa.com/media/catalog/product/cache/d88db8e261b6f388c4668ce42fcd4be2/k/w/kwu110-32_17.jpg,kitchen sink,"Kraus 32"" Undermount Workstation 16 Gauge Single Bowl Stainless Steel Kitchen Sink with Accessories",KWU110-32,https://www.kraususa.com/kitchen/kitchen-sinks/undermount-sinks/kraus-kwu110-32-workstation-32-undermount-16-gauge-stainless-steel-single-bowl-kitchen-sink-3.html,unspecified,
-https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dwadc83fae/images/large/9159-BL-DST-B1.png?sw=1800&sh=1800&sm=fit,kitchen faucet,"Delta Faucet Single Handle Pull-Down Kitchen Faucet in Matte Black, Model# 9159-BL-DST, featuring DIAMOND Seal Technology and MagnaTite Docking.",9159-BL-DST,https://www.deltafaucet.com/kitchen/product/9159-BL-DST,unspecified,9159-BL-DST
-https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dw6aa7e20a/images/large/9159-AR-DST-B1.png?sw=1800&sh=1800&sm=fit,kitchen faucet,"Delta Trinsic® Single Handle Pull-Down Kitchen Faucet in Arctic Stainless. Features a high-arc design, MagnaTite® Docking, DIAMOND™ Seal Technology, and Touch-Clean® Spray Holes.",9159-AR-DST,https://www.deltafaucet.com/kitchen/product/9159-AR-DST,unspecified,9159-AR-DST
-https://www.kraususa.com/media/catalog/product/cache/3615f91175a1203b2367a86b4df90644/k/h/khu100-26-main-image_63w8ycuv7vpq7cem.jpg,kitchen sink,"KRAUS Standart PRO™ 26-inch 16 Gauge Undermount Single Bowl Stainless Steel Kitchen Sink featuring a modern design with straight walls and rounded corners, made of durable TRU16™ gauge stainless steel.",KHU100-26,https://www.kraususa.com/kraus-khu100-26-26-undermount-16-gauge-stainless-steel-single-bowl-kitchen-sink.html,unspecified,KHU100-26
-https://www.kraususa.com/media/catalog/product/cache/5fffaf341b180599be66977e19e089a1/k/h/khu100-32_1_1.jpg,kitchen sink,KRAUS Standart PRO™ 32-inch 16 Gauge Undermount Single Bowl Stainless Steel Kitchen Sink with protective bottom grid and drain assembly.,KHU100-32,https://www.kraususa.com/kraus-khu100-32-32-undermount-16-gauge-stainless-steel-single-bowl-kitchen-sink.html,unspecified,KHU100-32
-https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dw504b8f93/images/large/1959LF-B1.png?sw=1800&sh=1800&sm=fit,kitchen faucet,"True Bar Limited Swivel in Chrome, Model# 1959LF, featuring a single hole installation, ADA compliant, and standard spout that swivels 120 degrees.",1959LF,https://www.deltafaucet.com/kitchen/product/1959LF.html,unspecified,
-https://images.squarespace-cdn.com/content/v1/5ed8a7a18f11346fbae67e2b/1595948616120-S4NIZFOHO37OH56TIDHF/RH.A1.jpg,washbasin,Oval concrete countertop vessel sink with ample inner depth. Minimal and contemporary in design with slim edge detail and refined contours. Available in 28 colours.,Rho,https://kastconcretebasins.com/products/p/rho,unspecified,
-https://kohler.scene7.com/is/image/PAWEB/T14413-3-BL_ISO_d2c0000661_rgb,sink faucet,"Purist® Wall-mount bathroom sink faucet trim with Cross handles, 1.2 gpm, KOHLER",K-T14413-3,https://www.us.kohler.com/us/purist-widespread-wall-mount-bathroom-sink-faucet-trim-with-6-1-4-spout-and-cross-handles-requires-valve/productDetail/sink-faucets/421576.htm?skuId=1298133&brandId=1152540,unspecified,
-https://kohler.scene7.com/is/image/PAWEB/T97328-4-BL_ISO_d2c0014850_rgb,bath filler trim,"Purist Floor-mount bath filler trim with handshower by KOHLER, model K-T97328-4, featuring a sleek design.",K-T97328-4,https://www.us.kohler.com/us/purist-floor-mount-bath-filler-trim-with-handshower/productDetail/bathtub-faucets-fillers/1095363.htm?skuId=1363332,unspecified,
-https://kohler.scene7.com/is/image/PAWEB/2882-0_ISO_d2c0047345_rgb,bathroom sink,"Verticyl 19-3/4"" rectangular undermount bathroom sink featuring vertical sides and a deep basin.",K-2882,https://www.us.kohler.com/us/verticyl-rectangular-undermount-bathroom-sink/productDetail/bathroom-sinks/427425.htm,unspecified,
-https://kohler.scene7.com/is/image/PAWEB/aag09702_rgb,bathroom sink faucet,"KOHLER Purist Single-Control Sink Faucet with Lever Handle, 1.2 gpm, minimalist design, ADA-compliant straight lever handle.",K-14402-4A,https://www.kohler.com/en/products/bathroom-faucets/shop-bathroom-sink-faucets/purist-single-handle-bathroom-sink-faucet-with-straight-lever-handle-14402-4a,unspecified,
-,service parts,"KOHLER genuine service parts for toilets and faucets, designed by Kohler engineers to maintain original product performance.",,https://www.us.kohler.com/us/catalog/productDetails.jsp?productId=425614&skuId=1284581,unspecified,
-https://kohler.scene7.com/is/image/PAWEB/GBH_SQTemplate?$product_src=is{PAWEB/22170-G-CP_ISO_d2c0018062_rgb}&$PDPDesktopSQ$&fmt=webp,showerhead,"Purist Multifunction Showerhead, 1.75 GPM, K-22170-G, KOHLER. Features three distinct sprays enhanced with Katalyst air-induction technology for a luxurious showering experience and water savings.",K-22170-G,https://www.us.kohler.com/us/purist-1.75-gpm-multifunction-showerhead-with-katalyst-air-induction-technology/productDetail/showerheads/1476691.htm?skuId=1566064&brandId=1148925,unspecified,
-https://kohler.scene7.com/is/image/PAWEB/GBH_SQTemplate?$product_src=is{PAWEB/13696-G-CP_ISO_d2c0017211_rgb}&$PDPDesktopSQ$&fmt=webp,showerhead,"Kohler 10"" Rainhead, 2.5 GPM, contemporary square design, single-function, model K-13696-CP.",K-13696-CP,https://www.us.kohler.com/us/10-rainhead-with-katalyst-air-induction-technology-2.5-gpm/productDetail/rainheads/427973.htm?skuId=408748&brandId=784535,unspecified,
-https://kohler.scene7.com/is/image/PAWEB/zac39499_rgb,valve trim,"KOHLER Purist Rite-Temp Pressure-Balancing Valve Trim, model K-T14501-3, includes a cross handle and convenient push-button diverter.",K-T14501-3,https://www.us.kohler.com/us/purist-rite-temp-pressure-balancing-valve-trim-with-cross-handles-valve-not-included/productDetail/handle-trim/427500.htm?skuId=1476483&brandId=1002105,unspecified,
-https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dw52ef92c8/images/large/559LF-SSLPU-B1.png?sw=1800&sh=1800&sm=fit,Bathroom Faucet,"Single Handle Bathroom Faucet in Stainless. Inspired by the sleek elegance of modern European design, featuring DIAMOND Seal Technology and WaterSense certification.",559LF-SSLPU,https://www.deltafaucet.com/bathroom/product/559LF-SSLPU,unspecified,559LF-SSLPU
-https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dw15ad0bf3/images/large/T14259-SS-B1.png?sw=1800&sh=1800&sm=fit,shower trim,"Monitor® 14 Series H2Okinetic® Shower Trim in Stainless, Model# T14259-SS. Features advanced technology for enhanced water coverage and warmth.",T14259-SS,https://www.deltafaucet.com/bathroom/product/T14259-SS,unspecified,
-https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dwdf0af329/images/large/T14459-SS-B1.png?sw=1800&sh=1800&sm=fit,tub & shower trim,"Monitor® 14 Series H2Okinetic® Tub & Shower Trim in Stainless, Model# T14459-SS, featuring H2Okinetic Technology for enhanced water flow, WaterSense certification, single function operation, and ADA compliance.",T14459-SS,https://www.deltafaucet.com/bathroom/product/T14459-SS.html,unspecified,
-https://kohler.scene7.com/is/image/PAWEB/zac85870_rgb,bath,"Kohler Elmbrook 60"" x 30-1/4"" alcove bath, right drain, features sleek lines and an integral apron, suitable for traditional or contemporary bathroom decor.",K-R23217-RA-0,https://www.kohler.com/en/products/bathtubs/shop-bathtubs/elmbrook-60-x-30-1-4-alcove-bath-right-drain-r23217-ra-r23217-ra,unspecified,
-https://kohler.scene7.com/is/image/PAWEB/6355-0_ISO_d2c0041381_rgb,toilet,"The K-6355 dual-flush toilet offers the choice of 1.0 or 1.6 gallons per flush for water savings, and a skirted trapway for easier cleaning and sleek style.",K-6355,https://www.us.kohler.com/us/persuade-curv-comfort-height-two-piece-elongated-dual-flush-toilet-w-top-mount-actuator-and-skirted-trapway/productDetail/toilets/1330460.htm?skuId=1330426&brandId=1165230,unspecified,
-https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dw6b1c3a35/images/large/55085-SS-B1.png?sw=1800&sh=1800&sm=fit,hand shower,"Premium Single-Setting Adjustable Wall Mount Hand Shower in Stainless, featuring a 60-82 inch stretchable metal hose and certified dual check valves for backflow protection.",55085-SS,https://www.deltafaucet.com/bathroom/product/55085-SS,unspecified,
-https://www.hinkley.com/media/catalog/product/9/5/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg,wall lantern,"Hinkley Silo Small Up/Down Wall Mount Lantern, Black finish, 4.5"" width, 12"" height, made of composite material, featuring an etched lens.",13594BK-LL,https://www.hinkley.com/13594bk-ll.html,unspecified,13594BK-LL
-https://www.hinkley.com/media/catalog/product/4/1/41b2de08de1136fa6f1cbf64ff126a0b28c474ad499b23531586673987912b77.jpeg,wall mount lantern,"Silo Small Down Light Wall Mount Lantern by Hinkley. Compact design in Black finish, made of composite material. Dimensions: Width 4.5"", Height 8"", Length 5.75"". Features etched lens glass and suitable for wet locations.",13590BK-LL,https://www.hinkley.com/13590bk-ll.html,unspecified,13590BK-LL
-https://lambertetfils.com/wp-content/uploads/2017/11/products_collection_dot-grid11a-1560x2079.jpg,suspension light,"Dot Line Suspension by Lambert & Fils features a brass or powder coated aluminium body with brass chains and hardware or stainless steel chains, complemented by milk glass globes. Dimensions: L 72 x W 2 x H 5 in / L 1829 x W 51 x H 127 mm. Weight: 1.8 lbs / 0.8 kg.",Dot Line Suspension,https://lambertetfils.com/product/dot-line-suspension/,unspecified,
-https://images.hermanmiller.group/m/a806b6fd84502b7e/W-DWR_6987_100154753_white_f.png?trim=auto&trim-sd=1&blend-mode=darken&blend=f0f0f0&bg=f0f0f0&auto=format&w=90&h=90&fit=fill,Ceiling + Pendant Lamps,"Random Light by Moooi, available in Small (20⅛"" H x 20⅛"" W), Medium (34¼"" H x 34¼"" W), and Large (43"" H x 43"" W) sizes, made from epoxy-coated fiberglass, color options include White and Black.",100154753,https://www.dwr.com/lighting-ceiling/random-light/6987.html?lang=en_US&gclid=Cj0KCQiA09eQBhCxARIsAAYRiylJimpRfBktaUYGFdIfJCUF_JakDmBpF0mMUREipTplrxMRECzTU5AaAr7YEALw_wcB&gclsrc=aw.ds,unspecified,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,https://www.nuvolightinglights.com/product/nuvo-lighting-blink-plus-flush-mount-62-1377.html,unspecified,
-https://www.lightology.com/img/prod/original/880984.jpg,Wall Lighting,"Enna Reading Wall Sconce by Astro Lighting, Matte Gold finish, 4.33""W x 7.28""H x 10.63""D, made of Steel, features a cylindrical shade with a smooth swing arm. Head tilts 90 degrees and rotates 330 degrees. ETL listed.",1058040,https://www.lightology.com/index.php?module=prod_detail&prod_id=880984&cat_id=146,unspecified,AST880984
-https://lightingnewyork.com/dw/image/v2/BHCF_PRD/on/demandware.static/-/Sites-lny_us-Library/default/dw57bdd7b9/merch/storefront/main/seasonal/inspirational-card/2024/inspirational-card-one-stop-fan-shop-1.jpg?sw=582&sh=780&sm=fit,ceiling fan,"Emerson Fans Loft Indoor Ceiling Fan, a high-quality ceiling fan designed for indoor use.",CF765BQ,https://www.emerson.lightingnewyork.com/product/emerson-fans-loft-indoor-ceiling-fans-cf765bq.html,unspecified,
-"https://www.environmentallights.com/media/catalog/product/_/l/_ln-pf-2700k-comp.jpg?quality=80&bg-color=255,255,255&fit=bounds&height=700&width=700&canvas=700:700",LED Neon,"Eluxtra™ ProFlex LED Neon is a rugged and versatile option for achieving the creative potential of neon lighting. It features a 2700K color temperature, flexible silicone housing, IP68 rating for indoor and outdoor use, and is UL Listed.",LN-PF-2700K-5m,https://www.environmentallights.com/18942-ln-pf-2700k-5m.html,unspecified,
-,,,,,,
-https://kohler.scene7.com/is/image/PAWEB/GBH_SQTemplate?$product_src=is{PAWEB/zaa80028_rgb}&$PDPDesktopSQ$&fmt=webp,towel ring,"The K-14441 towel ring brings the contemporary look of the Purist Collection to your bathroom in a simple, functional design.",K-14441,https://www.us.kohler.com/us/purist-towel-ring/productDetail/towel-rings/421803.htm?skuId=381661&brandId=1152540,unspecified,
-https://kohler.scene7.com/is/image/PAWEB/GBH_SQTemplate?$product_src=is{PAWEB/zaa82116_rgb}&$PDPDesktopSQ$&fmt=webp,towel bar,"KOHLER Purist 30-Inch Towel Bar, model K-14437-CP, made of brass, featuring a round bar held with circular plates against the wall.",K-14437-CP,https://www.kohler.com/en/products/bathroom-accessories/shop-bathroom-accessories/purist-30-towel-bar-14437,unspecified,
-https://kohler.scene7.com/is/image/PAWEB/GBH_SQTemplate?$product_src=is{PAWEB/zaa77491_rgb}&$PDPDesktopSQ$&fmt=webp,toilet tissue holder,"Purist Pivoting Toilet Paper Holder, K-14377, KOHLER, features a distinctive design, adds style and functionality to the bathroom.",K-14377,https://www.us.kohler.com/us/purist-pivoting-toilet-paper-holder/productDetail/toilet-tissue-holders/428367.htm?skuId=410302&brandId=1152540,unspecified,
-https://kohler.scene7.com/is/image/PAWEB/GBH_SQTemplate?$product_src=is{PAWEB/zaa81761_rgb}&$PDPDesktopSQ$&fmt=webp,robe hook,"KOHLER Purist Robe Hook, model K-14443-CP, features a modern round profile, suitable for hanging robes or towels.",K-14443-CP,https://www.us.kohler.com/us/purist-robe-hook/productDetail/robe-hooks/421804.htm?skuId=381666&brandId=1152540,unspecified,
-,,,,,,
-,,,,,,
-https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dwbe50b63c/images/large/75950-SS-B1.png?sw=1800&sh=1800&sm=fit,Tissue Holder,"Delta Faucet Trinsic Tissue Holder in Stainless, model number 75950-SS, featuring a sleek design and includes mounting hardware.",75950-SS,https://www.deltafaucet.com/bathroom/product/75950-SS,unspecified,
-https://assets.pbimgs.com/pbimgs/rk/images/dp/wcm/202511/0036/moritz-round-mirror-m.jpg,mirror,"Moritz Round Mirror by Pottery Barn, crafted of metal with a glass mirror and MDF backing. Notable for its structural integrity and stylish design.",5705623,https://www.potterybarn.com/products/moritz-round-mirror/?catalogId=84&sku=5705623&cm_ven=PLA&cm_cat=Google&cm_pla=Bath%20%3E%20Mirrors&region_id=792000&cm_ite=5705623&gclid=CjwKCAjw1uiEBhBzEiwAO9B_HZ2_K_j4vByLB9LG5R7Wzjl5-7CvVK2uO_EUyZ14R4qGoFl7nelQ-hoCCDcQAvD_BwE,unspecified,
-https://images.hermanmiller.group/m/c1d1f1dc5f75de92/W-DWR_1458_100089464_matte_black_f.png?trim=auto&trim-sd=1&blend-mode=darken&blend=f8f8f8&bg=f8f8f8&auto=format&w=90&h=90&fit=fill,Wall Mirror,"Mondrian Wall Mirror, 22""x44"" by Design Within Reach. Made with a lightweight extruded aluminum frame and polished mirror glass. Features a metal cleat hanging system and can be used in damp areas.",100089464,https://www.dwr.com/accessories-entryway/mondrian-mirrors/1458.html?lang=en_US,unspecified,
-"https://media.us.lg.com/transform/ecomm-PDPGallery-1100x730/ddcc8908-bd16-415f-8028-e2af37fb2ac7/Washer_WM3900HBA_reliable_gallery_01_5000x5000?io=transform:fill,width=596",Front Load Washer,"4.5 cu. ft. Smart wi-fi Enabled Front Load Washer with TurboWash™ 360 Technology, featuring 6Motion™ Technology and AAFA certified with the Allergiene® Cycle.",WM3900HBA,https://www.lg.com/us/washers/lg-WM3900HBA-front-load-washer,unspecified,WM3900HBA
-"https://media.us.lg.com/transform/ecomm-PDPGallery-1100x730/f626254f-f57f-429b-a93b-53f4f4ad01aa/Dryer_DLGX3901B_reliable_gallery_01_5000x5000?io=transform:fill,width:596",Gas Dryer,"7.4 cu. ft. Smart Wi-Fi Enabled Gas Dryer with TurboSteam™ by LG, featuring a sleek Black Steel finish and advanced technology for optimal drying efficiency.",DLGX3901B,https://www.lg.com/us/dryers/lg-DLGX3901B-gas-dryer,unspecified,
-"https://media.us.lg.com/transform/ecomm-PDPGallery-1100x730/2b5b4d21-239e-4580-aa3b-a60284c62017/md07521222-large13-jpg?io=transform:fill,width=596",Steam Closet,"LG STUDIO Mirror Finish Styler Steam Closet - S5MSB, Large Capacity, Smart wi-fi Enabled, Mirror finish color, designed for refreshing garments quickly.",S5MSB,https://www.lg.com/us/styler/lg-s5msb-styler,unspecified,
-"https://www.subzero-wolf.com/-/media/images/united-states/widen/product-heroes/lg_-rmd_2027_071218_frajni.jpg?h=875&width=2000&udi=1&cropregion=0,875,4000,2625",freezer,"Sub-Zero 36 Inch Freezer Column with Ice Maker (DEC3650FI), Panel Ready, Wi-Fi Enabled, 19.4 cubic feet capacity, Energy Star Certified.",DEC3650FI,https://www.subzero-wolf.com/sub-zero/full-size-refrigeration/integrated-fridges/36-inch-integrated-column-freezer-ice-maker-panel-ready,unspecified,
-https://www.subzero-wolf.com/-/media/images/united-states/dynamic-images/dec3650rid/dec3650rid.png,refrigerator,"Sub-Zero 36 Inch Refrigerator Column with Internal Dispenser (DEC3650RID), Wi-Fi Enabled, Panel Ready, 21.7 cubic feet capacity, Energy Star Certified, sleek design with stainless accents.",DEC3650RID,https://www.subzero-wolf.com/sub-zero/full-size-refrigeration/integrated-fridges/36-inch-integrated-column-refrigerator-internal-dispenser-panel-ready,unspecified,
-"https://www.subzero-wolf.com/-/media/images/united-states/widen/product-heroes/med_tc_121018_6.jpg?h=875&width=2000&udi=1&cropregion=0,970,5000,3155",induction cooktop,"Wolf 36"" Contemporary Induction Cooktop (CI36560C/B) featuring a sleek black ceramic glass surface, intuitive LCD touchscreen controls, and Boost Mode for rapid heating.",CI36560C/B,https://www.subzero-wolf.com/wolf/cooktops-and-rangetops/induction-cooktops/36-inch-contemporary-induction-cooktop,unspecified,
-https://www.subzero-wolf.com/-/media/images/united-states/dynamic-images/dw2451/dw2451.png,Dishwasher,"Cove 24"" Dishwasher - Panel Ready (Model DW2451). Wi-Fi enabled, stainless-steel interior, whisper-quiet operation, Energy Star Certified.",DW2451,https://www.subzero-wolf.com/cove/dishwashers/24-inch-dishwasher-panel-ready,unspecified,
-https://www.subzero-wolf.com/-/media/images/united-states/dynamic-images/ms24/ms24.png,microwave oven,"Wolf 24"" Standard Microwave Oven (MS24) features a sleek black glass design, 1200 watts of power, and a capacity of 2 cubic feet, suitable for freestanding or built-in installation.",MS24,https://www.subzero-wolf.com/wolf/microwave-ovens/24-inch-standard-microwave-oven,unspecified,
-https://www.subzero-wolf.com/-/media/images/united-states/dynamic-images/pw482418/pw482418.png,range hood,"Wolf 48"" Pro Wall Hood - 24"" Depth (PW482418) with stainless-steel construction, hand-finished hemmed edges, and welded seams. Features LED lighting, heat sentry, and available blower options.",PW482418,https://www.subzero-wolf.com/wolf/range-hood/46-inch-pro-hood-liner-22-inch-depth,unspecified,PW482418
-https://www.subzero-wolf.com/-/media/images/united-states/dynamically-generated-product-images/do30cm-b/dynamic_do30cm-b.png,oven,"Wolf 30"" M Series Contemporary Built-In Double Oven (DO3050CM/B) featuring advanced Dual VertiFlow™ convection system, Wi-Fi enabled with a sleek black glass design.",DO3050CM/B,https://www.subzero-wolf.com/wolf/ovens/m-series/30-inch-m-series-contemporary-built-in-double-oven,unspecified,
-"https://www.subzero-wolf.com/-/media/images/united-states/widen/product-heroes/it-30c_pair_iw-30r.jpg?h=875&width=2000&udi=1&cropregion=0,950,5000,3140",refrigerator/freezer,"Sub-Zero 30 Inch Combo with Ice Maker and Internal Dispenser (DET3050CIID) - Panel Ready, Wi-Fi Enabled, stainless steel accents",DET3050CIID,https://www.subzero-wolf.com/sub-zero/full-size-refrigeration/integrated-fridges/30-inch-integrated-over-under-refrigerator-freezer-ice-maker-internal-dispenser-panel-ready,unspecified,DET3050CIID
-https://true-residential.com/wp-content/uploads/2019/12/24_Wine_Dual_Undercounter_Overlay_Glass_Right_2021-1.png,wine cabinet,"True Residential 24″ Dual Zone Wine Cabinet Overlay Glass, undercounter wine storage, capacity 5.28 cu. ft., dual zones with temperature range from 40˚F to 65˚F, equipped with vibration-dampening racks for up to 45 bottles.",TWC-24DZ-R-OG-C,https://true-residential.com/products/24-dual-zone-wine-cabinet-overlay-glass/,unspecified,
-https://true-residential.com/wp-content/uploads/2019/11/24_BC_Undercounter_Overlay_Glass_Right_2021.png,beverage center,"The 24″ Beverage Center in Overlay Glass from True Residential features a 5.8 cu. ft. capacity, stainless steel interior and exterior, low-E double pane glass, and adjustable/removable shelves. It includes a Right Hinge and offers precise temperature control, making it perfect for keeping drinks icy cold.",TBC-24-R-OG-C,https://true-residential.com/products/beverage-center/,unspecified,
-https://true-residential.com/wp-content/uploads/2019/12/15_Undercounter_Overlay_Panel_2021.png,ice machine,"15″ Clear Ice Machine Overlay Panel by True Residential, solid stainless with a right hinge, capable of producing up to 85 lbs. of clear ice per day and storing 28 lbs.",TUI-15-R-OP-D,https://true-residential.com/products/15-clear-ice-machine-overlay-panel/,unspecified,
-"https://www.subzero-wolf.com/-/media/images/united-states/widen/web-2/003_lg_slg_92817.jpg?h=875&width=2000&udi=1&cropregion=435,600,4435,2350",refrigerator/freezer,"Sub-Zero 36 Inch Combo with Ice Maker Internal Dispenser (DET3650CIID), panel ready, Wi-Fi enabled, features Split Climate® cooling system, ClearSight™ LED lighting, stainless accents, adjustable settings, and an internal water dispenser.",DET3650CIID,https://www.subzero-wolf.com/sub-zero/full-size-refrigeration/integrated-fridges/36-inch-integrated-over-under-refrigerator-freezer-internal-dispenser-ice-maker-panel-ready,unspecified,DET3650CIID
-https://www.subzero-wolf.com/-/media/images/united-states/dynamically-generated-product-images/vw45b/dynamic_vw45b.png,range hood,"Wolf 45"" Cooktop Wall Hood - Black (VW45B) features a contemporary, low-profile black glass design, heavy-duty stainless-steel construction, and includes adjustable blower control, LED lights, and a telescoping chimney.",VW45B,https://www.subzero-wolf.com/wolf/range-hood/45-inch-cooktop-wall-hood-black,unspecified,
-https://www.subzero-wolf.com/-/media/images/united-states/dynamic-images/pw482418/pw482418.png,range hood,"Wolf 48"" Pro Wall Hood - 24"" Depth (PW482418) - stainless steel construction, professional look, includes LED lighting, heat sentry for safety, dimensions: 48"" W x 18"" H x 24"" D.",PW482418,https://www.subzero-wolf.com/wolf/range-hood/46-inch-pro-hood-liner-22-inch-depth,unspecified,PW482418
-https://www.subzero-wolf.com/media/images/united-states/dynamically-generated-product-images/og42/dynamic_og42.png,grill,"Wolf 42"" Outdoor Gas Grill (OG42) features a stainless-steel construction, two individually contained 25,000 Btu grill burners, LED-lit control knobs, and a powerful infrared sear zone.",OG42,https://www.subzero-wolf.com/wolf/grill/42-inch-outdoor-gas-grill,unspecified,
-https://biggreenegg.com/cdn/shop/files/topimage-2019-19061-eggs-800x800-large_151c0f12-8893-4cf1-9ab3-2a6d85f8c05f.png?crop=center&height=800&v=1743004250&width=800,grill,"Large Big Green Egg grill, designed for versatility and high-performance grilling. Ideal for families and large gatherings. Includes essential accessories for grilling, smoking, and baking.",unspecified,https://biggreenegg.com/product/large-big-green-egg/,unspecified,unspecified
-https://fireorb.net/wp-content/uploads/2024/10/image1-80x80.png,photos,"FIREORB – Cool Warmth, various images showcasing the product.",unspecified,https://fireorb.net/photos/,unspecified,unspecified
+image_url,type,description,model_no,product_link
+https://h6a8m2f3.delivery.rocketcdn.me/wp-content/uploads/2023/06/DEW340.jpg,paint,"Dunn Edwards
+Whisper
+DEW340 FDFAF1",DEW340 RL#003,https://www.dunnedwards.com/colors/browser/dew340
+https://www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Stone_White_ea0d9bed-e633-4968-a159-7001007f1e9c.jpg?v=1747186065,plaster,"Color Atelier
+Tadelakt Shower Plaster
+Stone White",,https://www.coloratelierpaint.com/products/tadelakt-shower-plaster
+https://h6a8m2f3.delivery.rocketcdn.me/wp-content/uploads/2023/06/DEW340.jpg,paint,"Dunn Edwards
+Whisper
+Color: DEW340 FDFAF1
+Sheen: Flat",DEW340 RL#003,https://www.dunnedwards.com/colors/browser/dew340
+https://h6a8m2f3.delivery.rocketcdn.me/wp-content/uploads/2023/06/DEW340.jpg,paint,"Dunn Edwards
+Whisper
+Color: DEW340 Whisper
+Sheen: Flat",DEW340 RL#003,https://www.dunnedwards.com/colors/browser/dew340
+https://cdn11.bigcommerce.com/s-4t2li/products/911/images/8409/1__26922.1746741771.500.750.jpg?c=2,door handle,"Strongar Hardware
+Pro-Line Extra Length Series
+Matte Black Powder Coated Finish",SH-PRO-304-LPH-EXL-B-24-1250,https://www.strongarhardware.com/extra-length-ladder-style-back-to-back-push-pull-door-handle-matte-black-powder-coated-stainless-steel-finish/
+https://images.kwikset.com/is/image/Kwikset/kw_mi-v1-rdt-lv-priv-15-ex?wid=600&qlt=90&resMode=sharp,lever,"Kwikset
+Milan Round
+Satin Nickel",155mil-rdt-514,https://www.kwikset.com/products/detail/milan-lever-round-bed-bath?variant=155mil-rdt-514
+https://images.kwikset.com/is/image/Kwikset/kw_mi-v1-rdt-lv-pass-15-ex?wid=600&qlt=90&resMode=sharp,lever,"Kwikset
+Milan Round
+Satin Nickel",883351640466,https://www.kwikset.com/products/detail/milan-lever-round-hall-closet?variant=satin-nickel
+https://www.emtek.com/media/salsify/images/iy/iyscir9ixg-2024-02-28T144120Z-Square-Barrel-Heavy-Duty-Hinge_EM_KO.jpg,door hinge,"Emtek
+Square Barrel Heavy Duty Hinge
+Solid Brass, Square Corners, 4-1/2 inch x 4-1/2 inch, Satin Brass US4",,https://emtek.com/door-hinges/4x4squarebarrelheavydutyhinges
+https://cdn.msisurfaces.com/images/colornames/fullslab/calacatta-marble.jpg,marble,"MSI Surfaces
+Calacatta Gold Marble
+White Italian marble with gray and gold veining",RSL-CALACATTA,"https://www.msisurfaces.com/marble/calacatta-marble/#:~:text=Calacatta%20Gold%20marble%20is%20a,islands%2C%20marble%20floors%20and%20backsplashes."
+https://assetstools.cosentino.com/api/v1/bynder/color/CHD/tablahd/CHD-fullslab.jpg?w=2200&h=2200&q=75&auto=format,countertop,"Cosentino
+Silestone Charcoal Soapstone
+Blue-grey finish with grey highlights",,https://www.cosentino.com/colors/silestone/charcoal-soapstone/
+https://www.caesarstoneus.com/wp-content/uploads/2021/01/1141_Pure-White_1141_CU_50x70cm_1920x890px.jpg,quartz countertop,"Caesarstone
+Premium Collection
+Pure White
+Polished Finish",1141,https://www.caesarstoneus.com/catalog/1141-pure-white/
+https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,tile,"Fireclay
+Tile Field 2 x 2
+Daisy",,https://www.fireclaytile.com/tile/colors/detail/daisy/tile-field-2-x-2
+https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,tile,"Fireclay
+Tile Field 2x2
+Basalt",,https://www.fireclaytile.com/tile/colors/detail/basalt/tile-field-2-x-2#specs-content
+https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,,,,https://www.fireclaytile.com/tile/colors/detail/daisy/tile-field-2-x-2
+https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,tile,"Fireclay Tile
+Tile Field 2 x 2
+Carbon",,https://www.fireclaytile.com/tile/colors/detail/carbon/tile-field-2-x-2
+https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,tile,"Fireclay Tile
+Tile Field 2x6
+Caribbean",,https://www.fireclaytile.com/tile/colors/detail/caribbean/tile-field-2-x-6
+https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,tile,"Fireclay Tile
+Sea Glass
+Ceramic Tile",,https://www.fireclaytile.com/tile/colors/detail/sea-glass/tile-field-2-x-6
+https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,tile,"Fireclay
+Tile Field 2x6
+Mesa",,https://www.fireclaytile.com/tile/colors/detail/mesa/tile-field-2-x-6
+https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,tile,"Fireclay
+Tile Field 2x6
+Bryce Canyon",,https://www.fireclaytile.com/tile/colors/detail/bryce-canyon/tile-field-2-x-6
+https://d46lux9bf6tj0.cloudfront.net/eyJidWNrZXQiOiJhc3NldHMuZmlyZWNsYXl0aWxlLmNvbSIsImtleSI6IjIwMjFfSU1HX0hJX1JFU19JbmZsdWVuY2VyX3JpZ2h0c19yZXNpZGVudGlhbF9MYXVyZW5fQnJhZHNoYXdfRGVzaWduX3Bob3RvX0pvc2VwaF9CcmFkc2hhd19iYXRocm9vbV9zaG93ZXJfbmljaGVfYmFja3NwbGFzaF80eDRfMng2X3JvdW5kX2xpbmVyXzF4Nl9saW5lcl90cmltX3NhbmRfZHVuZV9mbG9vcl9vbHltcGljX2JyaWNrX0ZDNDAxOTY1XzYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJoZWlnaHQiOjYzMCwicG9zaXRpb24iOiJjZW50ZXIiLCJmaXQiOiJjb3ZlciJ9LCJ0b0Zvcm1hdCI6ImpwZWciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJwcm9ncmVzc2l2ZSI6ZmFsc2UsIm9wdGltaXNlQ29kaW5nIjp0cnVlLCJ0cmVsbGlzUXVhbnRpc2F0aW9uIjp0cnVlLCJvdmVyc2hvb3REZXJpbmdpbmciOnRydWV9fX0=?mtime=1629995879,tile,"Fireclay Tile
+Tuolumne Meadows
+2x6 Ceramic Tile",,https://www.fireclaytile.com/tile/colors/detail/tuolumne-meadows/tile-field-2-x-6
+,,,,
+https://www.kraususa.com/media/catalog/product/cache/5fffaf341b180599be66977e19e089a1/k/w/kwu120-45-main-image-alt_dmt13i8konzc03qa.jpg,sink,"Kraus
+Kore™ 2-Tier Workstation
+45-Inch Undermount 16 Gauge Stainless Steel Single Bowl",KWU120-45,https://www.kraususa.com/kraus-kwu120-45-workstation-45-undermount-2-tier-16-gauge-stainless-steel-single-bowl-kitchen-sink.html
+https://www.kraususa.com/media/catalog/product/cache/5fffaf341b180599be66977e19e089a1/k/h/khu100-32_1_1.jpg,kitchen sink,"Kraus
+Standart PRO
+32-inch 16 Gauge Undermount Single Bowl Stainless Steel Kitchen Sink",KHU100-32,https://www.kraususa.com/kraus-khu100-32-32-undermount-16-gauge-stainless-steel-single-bowl-kitchen-sink.html
+,faucet,"Delta
+Single-Handle Pull-Down Spring Kitchen Faucet
+Chrome",9659-DST,https://www.deltafaucet.com/kitchen/product/9659-DST.html
+,pot filler,"Delta
+Contemporary Wall Mount Pot Filler
+Arctic Stainless",1165LF-AR,https://www.deltafaucet.com/kitchen/product/1165LF-AR.html
+https://www.kraususa.com/media/catalog/product/cache/d88db8e261b6f388c4668ce42fcd4be2/k/w/kwu110-32_17.jpg,kitchen sink,"Kraus
+Kore
+32"" Undermount 16 Gauge Single Bowl Stainless Steel Kitchen Sink with Accessories",KWU110-32,https://www.kraususa.com/kitchen/kitchen-sinks/undermount-sinks/kraus-kwu110-32-workstation-32-undermount-16-gauge-stainless-steel-single-bowl-kitchen-sink-3.html
+,faucet,"Delta
+Single Handle Pull-Down Kitchen Faucet
+Matte Black",9159-BL-DST,https://www.deltafaucet.com/kitchen/product/9159-BL-DST
+,faucet,"Delta
+Single Handle Pull-Down Kitchen Faucet
+Arctic Stainless",9159-AR-DST,https://www.deltafaucet.com/kitchen/product/9159-AR-DST
+https://www.kraususa.com/media/catalog/product/cache/5fffaf341b180599be66977e19e089a1/k/h/khu100-26-main-image_63w8ycuv7vpq7cem.jpg,kitchen sink,"Kraus
+Standart PRO™ 26-inch 16 Gauge Undermount Single Bowl Stainless Steel Kitchen Sink
+Stainless Steel",KHU100-26,https://www.kraususa.com/kraus-khu100-26-26-undermount-16-gauge-stainless-steel-single-bowl-kitchen-sink.html
+https://www.kraususa.com/media/catalog/product/cache/5fffaf341b180599be66977e19e089a1/k/h/khu100-32_1_1.jpg,kitchen sink,"Kraus
+Standart PRO™ 32-inch 16 Gauge Undermount Single Bowl Stainless Steel Kitchen Sink
+Satin Finish",KHU100-32,https://www.kraususa.com/kraus-khu100-32-32-undermount-16-gauge-stainless-steel-single-bowl-kitchen-sink.html
+,,,1959LF,https://www.deltafaucet.com/kitchen/product/1959LF.html
+http://static1.squarespace.com/static/5ed8a7a18f11346fbae67e2b/5ed8a80211c9095175b4ed96/5eeb42a629570314407c6ae2/1739800621913/Kast+Concrete+Basins+-+Rho.A1+-+Ivory.jpg?format=1500w,countertop washbasin,"Kast Concrete Basins
+Rho
+Ivory",,https://kastconcretebasins.com/products/p/rho
+https://kohler.scene7.com/is/image/PAWEB/T14413-3-BL_ISO_d2c0000661_rgb,faucet,"Kohler
+Purist
+Wall-Mount Bathroom Sink Faucet Trim with Cross Handles",K-T14413-3,https://www.us.kohler.com/us/purist-widespread-wall-mount-bathroom-sink-faucet-trim-with-6-1-4-spout-and-cross-handles-requires-valve/productDetail/sink-faucets/421576.htm?skuId=1298133&brandId=1152540
+https://kohler.scene7.com/is/image/PAWEB/T97328-4-BL_ISO_d2c0014850_rgb,bathtub faucet,"Kohler
+Purist
+Floor-mount bath filler trim with handshower",K-T97328-4-CP,https://www.us.kohler.com/us/purist-floor-mount-bath-filler-trim-with-handshower/productDetail/bathtub-faucets-fillers/1095363.htm?skuId=1363332
+https://kohler.scene7.com/is/image/PAWEB/2882-0_ISO_d2c0047345_rgb,bathroom sink,"Kohler
+Verticyl
+19-3/4"" Rectangular Undermount Bathroom Sink",K-2882-0,https://www.us.kohler.com/us/verticyl-rectangular-undermount-bathroom-sink/productDetail/bathroom-sinks/427425.htm
+https://kohler.scene7.com/is/image/PAWEB/aag09702_rgb,sink faucet,"Kohler
+Purist
+Single-handle bathroom sink faucet with straight lever handle, 1.2 gpm",K-14402-4A,https://www.us.kohler.com/us/purist-single-handle-bathroom-sink-faucet-with-straight-lever-handle/productDetail/sink-faucets/422314.htm?skuId=1294825&brandId=1152540
+,,,,https://www.us.kohler.com/us/catalog/productDetails.jsp?productId=425614&skuId=1284581
+https://kohler.scene7.com/is/image/PAWEB/22170-G-CP_ISO_d2c0018062_rgb,showerhead,"Kohler
+Purist
+Three-function showerhead, 1.75 gpm",K-22170-G-CP,https://www.us.kohler.com/us/purist-1.75-gpm-multifunction-showerhead-with-katalyst-air-induction-technology/productDetail/showerheads/1476691.htm?skuId=1566064&brandId=1148925
+https://kohler.scene7.com/is/image/PAWEB/13696-G-CP_ISO_d2c0017211_rgb,showerhead,"Kohler
+K-13696
+Contemporary Square 10"" Single-Function Rainhead, 2.5 GPM",K-13696-CP,https://www.kohler.com/en/products/showers/shop-shower-heads/contemporary-round-10-single-function-rainhead-2-5-gpm-13696
+https://kohler.scene7.com/is/image/PAWEB/zac39499_rgb,valve trim,"Kohler
+Purist
+Rite-Temp® valve trim with push-button diverter and cross handle",K-T14501-3,https://www.kohler.com/en/products/showers/shop-shower-trims-valves/purist-rite-temp-valve-trim-wit-push-button-diverter-and-cross-handle-t14501-3
+https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dw52ef92c8/images/large/559LF-SSLPU-B1.png?sw=1800&sh=1800&sm=fit,bathroom faucet,"Delta
+Trinsic - Single handle bathroom faucet
+Stainless",559LF-SSLPU,https://www.deltafaucet.com/bathroom/product/559LF-SSLPU
+https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dw15ad0bf3/images/large/T14259-SS-B1.png?sw=1800&sh=1800&sm=fit,shower trim,"Delta
+Monitor® 14 Series H2Okinetic® Shower Trim
+Stainless",T14259-SS,https://www.deltafaucet.com/bathroom/product/T14259-SS
+,tub & shower trim,"Delta
+Monitor 14 Series H2Okinetic Tub & Shower Trim
+Stainless",T14459-SS,https://www.deltafaucet.com/bathroom/product/T14459-SS.html
+https://kohler.scene7.com/is/image/PAWEB/zac85870_rgb,bathtub,"Kohler
+Elmbrook
+60"" x 30-1/4"" alcove bath, right drain",K-R23217-RA-0,https://www.us.kohler.com/us/elmbrook-60-x-30-alcove-bath-w-integral-apron-and-right-drain/productDetail/product:1787371/1787371.htm?skuId=1787340
+https://kohler.scene7.com/is/image/PAWEB/6355-0_ISO_d2c0041381_rgb,toilet,"Kohler
+Persuade Curv
+Two-piece elongated toilet with skirted trapway, dual-flush",K-6355-0,https://www.us.kohler.com/us/persuade-curv-comfort-height-two-piece-elongated-dual-flush-toilet-w-top-mount-actuator-and-skirted-trapway/productDetail/toilets/1330460.htm?skuId=1330426&brandId=1165230
+https://www.deltafaucet.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-delta-master-catalog/default/dw6b1c3a35/images/large/55085-SS-B1.png?sw=1800&sh=1800&sm=fit,hand shower,"Delta
+Compel®
+Stainless
+Single-setting full body spray hand shower with wall mounting bracket",55085-SS,https://www.deltafaucet.com/bathroom/product/55085-SS
+https://www.hinkley.com/media/catalog/product/9/5/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg,wall mount lantern,"Hinkley
+Silo
+Black",13594BK-LL,https://www.hinkley.com/13594bk-ll.html
+https://www.hinkley.com/media/catalog/product/4/1/41b2de08de1136fa6f1cbf64ff126a0b28c474ad499b23531586673987912b77.jpeg,wall mount lantern,"Hinkley
+Silo Small Down Light Wall Mount Lantern
+Black",13590BK-LL,https://www.hinkley.com/13590bk-ll.html
+https://lambertetfils.com/wp-content/uploads/2017/11/products_collection_dot-grid11a-1560x2079.jpg,suspension light,"Lambert & Fils
+Dot Line Suspension
+Brass or powder coated aluminium body",,https://lambertetfils.com/product/dot-line-suspension/
+https://images.hermanmiller.group/m/a806b6fd84502b7e/W-DWR_6987_100154753_white_f.png?trim=auto&trim-sd=1&blend-mode=darken&blend=f8f8f8&bg=f8f8f8&auto=format&w=1000&q=70&h=1000&viewtype=hero,ceiling + pendant lamps,"Moooi
+Random Light
+White",100154753,https://www.dwr.com/lighting-ceiling/random-light/6987.html?lang=en_US&gclid=Cj0KCQiA09eQBhCxARIsAAYRiylJimpRfBktaUYGFdIfJCUF_JakDmBpF0mMUREipTplrxMRECzTU5AaAr7YEALw_wcB&gclsrc=aw.ds
+,,,,
+https://www.lightology.com/img/prod/original/880984.jpg,wall sconce,"Astro Lighting
+Enna Reading Wall Sconce
+Matte Gold",1058040,https://www.lightology.com/index.php?module=prod_detail&prod_id=880984&cat_id=146
+,ceiling fan,"Emerson
+Loft
+Black
+Note: Indoor use only",CF765BQ,https://www.emerson.lightingnewyork.com/product/emerson-fans-loft-indoor-ceiling-fans-cf765bq.html
+"https://www.environmentallights.com/media/catalog/product/_/l/_ln-pf-2700k-comp.jpg?quality=80&bg-color=255,255,255&fit=bounds&height=700&width=700&canvas=700:700",LED lighting,"Environmental Lights
+Eluxtra™ ProFlex LED Neon
+2700K - 5m reel",LN-PF-2700K-5m,https://www.environmentallights.com/18942-ln-pf-2700k-5m.html
+https://kohler.scene7.com/is/image/PAWEB/zaa80028_rgb,towel ring,"Kohler
+Purist
+Polished Chrome",K-14441-CP,https://www.kohler.com/en/products/bathroom-accessories/shop-bathroom-accessories/purist-towel-ring-14441
+https://kohler.scene7.com/is/image/PAWEB/zaa82116_rgb,towel bar,"Kohler
+Purist
+30"" towel bar",K-14437,https://www.kohler.com/en/products/bathroom-accessories/shop-bathroom-accessories/purist-30-towel-bar-14437
+https://kohler.scene7.com/is/image/PAWEB/zaa77491_rgb,toilet paper holder,"Kohler
+Purist
+Pivoting toilet paper holder
+K-14377-CP",K-14377-CP,https://www.kohler.com/en/products/bathroom-accessories/shop-bathroom-accessories/purist-pivoting-toilet-paper-holder-14377
+https://kohler.scene7.com/is/image/PAWEB/zaa81761_rgb,robe hook,"Kohler
+Purist
+Robe Hook
+Chrome",K-14443-CP,https://www.us.kohler.com/us/purist-robe-hook/productDetail/robe-hooks/421804.htm?skuId=381666&brandId=1152540
+,towel bar,"Delta
+12"" Towel Bar
+Stainless",75912-SS,https://www.deltafaucet.com/bathroom/product/75912-SS
+,towel bar,"Delta
+24"" Double Towel Bar
+Stainless",75925-SS,https://www.deltafaucet.com/bathroom/product/75925-SS
+,tissue holder,"Delta
+Tissue Holder
+Stainless",75950-SS,https://www.deltafaucet.com/bathroom/product/75950-SS
+https://assets.pbimgs.com/pbimgs/ab/images/dp/wcm/202511/0036/moritz-round-mirror-m.jpg,mirror,"Pottery Barn
+Moritz Round
+Gold",,https://www.potterybarn.com/products/moritz-round-mirror/?catalogId=84&sku=5705623&cm_ven=PLA&cm_cat=Google&cm_pla=Bath%20%3E%20Mirrors&region_id=792000&cm_ite=5705623&gclid=CjwKCAjw1uiEBhBzEiwAO9B_HZ2_K_j4vByLB9LG5R7Wzjl5-7CvVK2uO_EUyZ14R4qGoFl7nelQ-hoCCDcQAvD_BwE
+https://images.hermanmiller.group/m/c1d1f1dc5f75de92/W-DWR_1458_100089464_matte_black_f.png?trim=auto&trim-sd=1&blend-mode=darken&blend=f8f8f8&bg=f8f8f8&auto=format&w=1000&q=70&h=1000&viewtype=hero,mirror,"Design Within Reach
+Mondrian Mirror
+22"" x 44""
+Lightweight extruded aluminum frame",100089464,https://www.dwr.com/accessories-entryway/mondrian-mirrors/1458.html?lang=en_US
+https://www.lg.com/us/images/washers-dryers/md06065096/4502.jpg,front load washer,"LG
+WM3900HBA
+Black Steel
+4.5 cu.ft. Smart Wi-Fi Enabled with TurboWash™ 360 Technology",WM3900HBA,https://www.lg.com/us/washers/lg-WM3900HBA-front-load-washer
+https://www.lg.com/us/images/washers-dryers/MD06076996/450_v1.jpg,gas dryer,"LG
+DLGX3901B
+Black Steel
+7.4 cu. ft. Smart wi-fi Enabled Gas Dryer with TurboSteam™",DLGX3901B,https://www.lg.com/us/dryers/lg-DLGX3901B-gas-dryer
+https://www.lg.com/us/images/styler-steam-closet/md07521222/Basic_450.jpg,steam closet,"LG STUDIO
+Mirror Finish Styler
+Large Capacity
+ThinQ® Technology",S5MSB,https://www.lg.com/us/styler/lg-s5msb-styler
+"https://www.subzero-wolf.com/media/images/united-states/widen/product-heroes/lg_-rmd_2027_071218_frajni.jpg?h=875&width=2000&udi=1&cropregion=0,875,4000,2625",freezer,"Sub-Zero
+36 Inch Freezer Column with Ice Maker
+Panel Ready
+Wi-Fi Enabled",DEC3650FI,https://www.subzero-wolf.com/sub-zero/full-size-refrigeration/integrated-fridges/36-inch-integrated-column-freezer-ice-maker-panel-ready
+https://www.subzero-wolf.com/-/media/images/united-states/dynamic-images/dec3650rid/dec3650rid.png,refrigerator,"Sub-Zero
+36"" Designer Column Refrigerator with Internal Dispenser - Panel Ready
+Wi-Fi Enabled",DEC3650RID,https://www.subzero-wolf.com/sub-zero/full-size-refrigeration/integrated-fridges/36-inch-integrated-column-refrigerator-internal-dispenser-panel-ready
+"https://www.subzero-wolf.com/-/media/images/united-states/widen/product-heroes/med_tc_121018_6.jpg?h=875&width=2000&udi=1&cropregion=0,970,5000,3155",induction cooktop,"Wolf
+36"" Contemporary Induction Cooktop
+Black ceramic glass surface",CI36560C/B,https://www.subzero-wolf.com/wolf/cooktops-and-rangetops/induction-cooktops/36-inch-contemporary-induction-cooktop
+https://www.subzero-wolf.com/-/media/images/united-states/dynamic-images/dw2451/dw2451.png,dishwasher,"Cove
+24"" Dishwasher - Panel Ready
+Panel Ready Design
+Wi-Fi Enabled",DW2451,https://www.subzero-wolf.com/cove/dishwashers/24-inch-dishwasher-panel-ready
+"https://www.subzero-wolf.com/-/media/images/united-states/widen/web-2/2027_wolf_kitchen03_final_cmyk.jpg?h=875&width=2000&udi=1&cropregion=0,780,5000,2970",microwave oven,"Wolf
+24"" Standard Microwave Oven
+Black Glass Design",MS24,https://www.subzero-wolf.com/wolf/microwave-ovens/24-inch-standard-microwave-oven
+"https://www.subzero-wolf.com/-/media/images/united-states/widen/web-2/md_cso30pm_mdd30pm_wwd30_gr486c_pw482418_lt_slg_frajni_080218.jpg?h=875&width=2000&udi=1&cropregion=1000,0,5000,1750",range hood,"Wolf
+48"" Pro Wall Hood - 24"" Depth
+Stainless Steel",PW482418,https://www.subzero-wolf.com/wolf/range-hood/46-inch-pro-hood-liner-22-inch-depth
+"https://www.subzero-wolf.com/-/media/images/united-states/widen/frames/it-36ciid_do30cm_ci304c_vi45g.jpg?h=875&width=2000&udi=1&cropregion=300,787,4582,2660",oven,"Wolf
+M Series Contemporary Built-In Double Oven
+Black Glass
+Wi-Fi Enabled",DO3050CM/B,https://www.subzero-wolf.com/wolf/ovens/m-series/30-inch-m-series-contemporary-built-in-double-oven
+"https://www.subzero-wolf.com/-/media/images/united-states/widen/product-heroes/it-30c_pair_iw-30r.jpg?h=875&width=2000&udi=1&cropregion=0,950,5000,3140",refrigerator,"Sub-Zero
+30"" Designer Over-and-Under Refrigerator/Freezer with Ice Maker and Internal Dispenser - Panel Ready
+Wi-Fi Enabled",DET3050CIID,https://www.subzero-wolf.com/sub-zero/full-size-refrigeration/integrated-fridges/30-inch-integrated-over-under-refrigerator-freezer-ice-maker-internal-dispenser-panel-ready
+https://true-residential.com/wp-content/uploads/2019/12/24_Wine_Dual_Undercounter_Overlay_Glass_Right_2021-1.png,wine cabinet,"True Residential
+24″ Dual Zone Wine Cabinet
+Overlay Glass",TWC-24DZ-R-OG-C,https://true-residential.com/products/24-dual-zone-wine-cabinet-overlay-glass/
+https://true-residential.com/wp-content/uploads/2019/11/24_BC_Undercounter_Overlay_Glass_Right_2021.png,beverage center,"True Residential
+24″ Beverage Center Overlay Glass
+Overlay Glass
+5.8 cu. ft. capacity",TBC-24-R-OG-C,https://true-residential.com/products/beverage-center/
+https://true-residential.com/wp-content/uploads/2019/12/15_Undercounter_Overlay_Panel_2021.png,ice machine,"True Residential
+15″ Clear Ice Machine Overlay Panel
+Solid Stainless
+Right Hinge",TUI-15-R-OP-D,https://true-residential.com/products/15-clear-ice-machine-overlay-panel/
+"https://www.subzero-wolf.com/-/media/images/united-states/widen/web-2/003_lg_slg_92817.jpg?h=875&width=2000&udi=1&cropregion=435,600,4435,2350",refrigerator/freezer,"Sub-Zero
+36"" Designer Over-and-Under Refrigerator/Freezer with Ice Maker and Internal Dispenser - Panel Ready
+Wi-Fi Enabled",DET3650CIID,https://www.subzero-wolf.com/sub-zero/full-size-refrigeration/integrated-fridges/36-inch-integrated-over-under-refrigerator-freezer-internal-dispenser-ice-maker-panel-ready
+"https://www.subzero-wolf.com/-/media/images/united-states/widen/web-2/lg_tc_071816_3_frajni.jpg?h=614&width=1006&udi=1&cropregion=1005,655,3020,1885",range hood,"Wolf
+45"" Cooktop Wall Hood
+Black",VW45B,https://www.subzero-wolf.com/wolf/range-hood/45-inch-cooktop-wall-hood-black
+"https://www.subzero-wolf.com/-/media/images/united-states/widen/web-2/md_cso30pm_mdd30pm_wwd30_gr486c_pw482418_lt_slg_frajni_080218.jpg?h=875&width=2000&udi=1&cropregion=1000,0,5000,1750",range hood,"Wolf
+48"" Pro Wall Hood - 24"" Depth
+Stainless Steel",PW482418,https://www.subzero-wolf.com/wolf/range-hood/46-inch-pro-hood-liner-22-inch-depth
+"https://www.subzero-wolf.com/-/media/images/united-states/widen/kdc-kitchens/approved_install_gjesdahl_lg_kdc_15-16_81717_2_primary.jpg?h=875&width=2000&udi=1&cropregion=473,1719,4471,3469",grill,"Wolf
+42"" Outdoor Gas Grill
+Stainless Steel
+Powerful 25,000 Btu infrared sear zone",OG42,https://www.subzero-wolf.com/wolf/grill/42-inch-outdoor-gas-grill
+https://biggreenegg.com/cdn/shop/files/topimage-2019-19061-eggs-800x800-large_151c0f12-8893-4cf1-9ab3-2a6d85f8c05f.png?crop=center&height=800&v=1743004250&width=800,grill,"Big Green Egg
+Large
+Versatile and high-performance grilling",,https://biggreenegg.com/product/large-big-green-egg/
+https://fireorb.net/wp-content/uploads/2024/09/logo.png,fireplace,"Fireorb
+Fireorb
+Black",,https://fireorb.net/photos/
+,,FETCH_FAILED: Status 404 - Page not found,,
+,,FETCH_FAILED: Status 404 - Page not found,,
+,,FETCH_FAILED: Status 404 - Page not found,,
+,,FETCH_FAILED: Status 404 - Page not found,,

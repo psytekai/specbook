@@ -1,0 +1,4292 @@
+{
+  "execution_id": "exec_20250708_230624",
+  "start_time": "2025-07-08T23:06:24.032450",
+  "end_time": "2025-07-08T23:11:15.904054",
+  "total_urls": 87,
+  "successful_scrapes": 83,
+  "failed_scrapes": 4,
+  "successful_llm_calls": 83,
+  "failed_llm_calls": 0,
+  "bot_detections": 0,
+  "rate_limit_errors": 0,
+  "network_errors": 0,
+  "validation_errors": 0,
+  "total_cost": 0.052271249999999984,
+  "openai_cost": 0.052271249999999984,
+  "firecrawl_cost": 0.0,
+  "metrics": [
+    {
+      "name": "pipeline.started",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "execution_id": "exec_20250708_230624"
+      },
+      "timestamp": "2025-07-08T23:06:24.033084",
+      "stage": null
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.050974",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.051029",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.053933",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.053979",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.519442",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.519522",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.521345",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.521393",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.522745",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.522780",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.524645",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.524677",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.525041",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.525055",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.525469",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.525505",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.527055",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.527104",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.527705",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.527725",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.530331",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.530419",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.534833",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.534865",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.534957",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.534969",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.535033",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.535066",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.535187",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.535229",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.535348",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.535385",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.535461",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.535477",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.535529",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.535538",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.535583",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.535621",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.535761",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.535781",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.535893",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.535927",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.537112",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.537138",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.541997",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.542126",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.547268",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.547312",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.549407",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.549442",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.550870",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.550901",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.554472",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.554577",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.559375",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.559413",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.562435",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.562503",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.567235",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.567263",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.569692",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.569719",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.571885",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.571965",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.573154",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.573195",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.584115",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.584140",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.589703",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.589776",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.597380",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.597421",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.602052",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.602101",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.605868",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.605900",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.615250",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.615291",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.620585",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.620656",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.624239",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.624268",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.630834",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.630868",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.636107",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.636139",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.638486",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.638532",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.641138",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.641164",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.644850",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.644914",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.648604",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.648639",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.649286",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.649308",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.650198",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.650220",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.650604",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.650615",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "requests"
+      },
+      "timestamp": "2025-07-08T23:06:24.661356",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.failure",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "requests",
+        "error_reason": "Page not found"
+      },
+      "timestamp": "2025-07-08T23:06:24.661476",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.duration_seconds",
+      "value": 0.37016916275024414,
+      "type": "histogram",
+      "labels": {
+        "method": "requests"
+      },
+      "timestamp": "2025-07-08T23:06:24.662089",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "requests"
+      },
+      "timestamp": "2025-07-08T23:06:24.669628",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.failure",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "requests",
+        "error_reason": "Page not found"
+      },
+      "timestamp": "2025-07-08T23:06:24.669650",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.duration_seconds",
+      "value": 0.3746449947357178,
+      "type": "histogram",
+      "labels": {
+        "method": "requests"
+      },
+      "timestamp": "2025-07-08T23:06:24.669804",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "requests"
+      },
+      "timestamp": "2025-07-08T23:06:24.669851",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.failure",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "requests",
+        "error_reason": "Page not found"
+      },
+      "timestamp": "2025-07-08T23:06:24.669862",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.duration_seconds",
+      "value": 0.32159996032714844,
+      "type": "histogram",
+      "labels": {
+        "method": "requests"
+      },
+      "timestamp": "2025-07-08T23:06:24.670010",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.670041",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.670054",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.670713",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.670733",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.671437",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.671456",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.672361",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.672376",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "requests"
+      },
+      "timestamp": "2025-07-08T23:06:24.799586",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.failure",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "requests",
+        "error_reason": "Page not found"
+      },
+      "timestamp": "2025-07-08T23:06:24.799606",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.duration_seconds",
+      "value": 0.48290395736694336,
+      "type": "histogram",
+      "labels": {
+        "method": "requests"
+      },
+      "timestamp": "2025-07-08T23:06:24.799760",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.799802",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.799813",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.803864",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.803969",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.807438",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.807478",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.811304",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.811346",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.814743",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.814774",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.816087",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.816102",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.817739",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.817759",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.819829",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.819873",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.821967",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.822007",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.825107",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.825138",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.832696",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.832745",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.842367",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.842442",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.855190",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.855250",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.856603",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.856620",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.857633",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.857651",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.859315",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.859385",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.861485",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.861548",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.863036",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.863090",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.864324",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.864391",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.865900",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.865932",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.867148",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.867165",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.867707",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.867717",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.868190",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.868203",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.868963",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.868988",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.870391",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.870405",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.871704",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.871731",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.872722",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.872763",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.873787",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.873803",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.method",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached"
+      },
+      "timestamp": "2025-07-08T23:06:24.878382",
+      "stage": "scraping"
+    },
+    {
+      "name": "scrape.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "method": "cached",
+        "status_code": "200"
+      },
+      "timestamp": "2025-07-08T23:06:24.878454",
+      "stage": "scraping"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.11162018775939941,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:24.999409",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.15150094032287598,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:25.153741",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.10542798042297363,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:25.260836",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.10950112342834473,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:25.371936",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.20305418968200684,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:25.576155",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06662201881408691,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:25.644623",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06326913833618164,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:25.709118",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.026646852493286133,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:25.736819",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.05359601974487305,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:25.791825",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.07512021064758301,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:25.868100",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.26131582260131836,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.130502",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0020580291748046875,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.133592",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0021071434020996094,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.136484",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0027341842651367188,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.140122",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0020422935485839844,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.143162",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.003720998764038086,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.147789",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0025222301483154297,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.152560",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0024869441986083984,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.155967",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0021371841430664062,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.159152",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.003509044647216797,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.163680",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.02670001983642578,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.192256",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.1385669708251953,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.332131",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.1362171173095703,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.469285",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.16514921188354492,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.635590",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.11808395385742188,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.754869",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.20449113845825195,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:26.960469",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.16062092781066895,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:27.123315",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.2022559642791748,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:27.327042",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.16232013702392578,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:27.490579",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.14097285270690918,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:27.633322",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.22501564025878906,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:27.859470",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.04656791687011719,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:27.907157",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06174802780151367,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:27.969846",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06270480155944824,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:28.033658",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06796002388000488,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:28.102861",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06331396102905273,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:28.167206",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0703420639038086,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:28.238496",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06664800643920898,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:28.306258",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06293892860412598,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:28.370265",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06390619277954102,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:28.435296",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.26712489128112793,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:28.703601",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.41250014305114746,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:29.117116",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.18557524681091309,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:29.303740",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06556987762451172,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:29.370331",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06336712837219238,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:29.434747",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.3224461078643799,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:29.758333",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0534510612487793,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:29.812818",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0532689094543457,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:29.866999",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.055383920669555664,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:29.923330",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.18112492561340332,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:30.105483",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0357670783996582,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:30.142314",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.128554105758667,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:30.271865",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.09595417976379395,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:30.369071",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.24581289291381836,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:30.615966",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06342792510986328,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:30.680429",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.05998706817626953,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:30.741671",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06612801551818848,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:30.808774",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.06474089622497559,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:30.874597",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.1153860092163086,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:30.991330",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.11250877380371094,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:31.104971",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.12442898750305176,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:31.230454",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.07754707336425781,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:31.309187",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.28128790855407715,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:31.591423",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.18134284019470215,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:31.773833",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.17377495765686035,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:31.948583",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.2014150619506836,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:32.150945",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.19002485275268555,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:32.341911",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.07712411880493164,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:32.419986",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.07951998710632324,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:32.500645",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.08341598510742188,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:32.585066",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.07516813278198242,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:32.661438",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.07651400566101074,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:32.739091",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.08567595481872559,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:32.825734",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0828709602355957,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:32.909573",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.058448076248168945,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:32.968954",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.16951489448547363,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:33.139418",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.05885910987854004,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:33.199234",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.08033514022827148,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:33.280565",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0755608081817627,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:33.357794",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.07712197303771973,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:33.435876",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.0835120677947998,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:33.520524",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.08355998992919922,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:33.605421",
+      "stage": "html_processing"
+    },
+    {
+      "name": "html_processing.duration_seconds",
+      "value": 0.010697126388549805,
+      "type": "histogram",
+      "labels": {},
+      "timestamp": "2025-07-08T23:06:33.617786",
+      "stage": "html_processing"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:37.954136",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0005078999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:37.954373",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:40.975124",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0006749999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:40.975140",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:42.394881",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0005078999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:42.394915",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:45.434722",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0005078999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:45.434738",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:48.026043",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0007750499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:48.026085",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:51.010830",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00063375,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:51.010848",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:53.201810",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.000627,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:53.201826",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:57.770317",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0008888999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:06:57.770349",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:02.250408",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0006747,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:02.250431",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:05.756601",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0007032,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:05.756620",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:07.905682",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0008344499999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:07.905702",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:17.440596",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0004221,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:17.440617",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:26.313811",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00042285,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:26.313827",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:33.301182",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0004221,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:33.301196",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:40.734686",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00042225,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:40.734701",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:49.276773",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00042254999999999994,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:49.276794",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:58.186804",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00042254999999999994,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:07:58.186823",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:06.171542",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0004221,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:06.171576",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:13.468389",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.000423,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:13.468407",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:24.018948",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0004234499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:24.018962",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:24.809921",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0003186,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:24.809939",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:28.420108",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0011706,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:28.420158",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:35.348006",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00101925,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:35.348034",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:36.719036",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00031184999999999996,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:36.719053",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:38.122229",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0003114,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:38.122246",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:42.729518",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0005019,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:42.729537",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:44.638457",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00031154999999999996,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:44.638481",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:46.417917",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00031184999999999996,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:46.417934",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:49.819967",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.001011,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:49.819999",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:52.445281",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00101925,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:52.445303",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:53.731122",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00030914999999999995,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:53.731201",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:56.861867",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00044399999999999995,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:56.861883",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:59.663545",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00035444999999999997,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:08:59.663575",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:02.070806",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00034679999999999997,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:02.070822",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:04.337693",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00034934999999999995,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:04.337714",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:06.899511",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0003513,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:06.899547",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:08.739236",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00037259999999999995,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:08.739254",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:11.934481",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.000354,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:11.934536",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:15.719893",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00034875,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:15.719908",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:18.376296",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00035114999999999994,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:18.376310",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:22.281432",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00221925,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:22.281463",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:25.349794",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0028729499999999995,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:25.349826",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:27.088463",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00031289999999999996,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:27.088492",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:30.341268",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0003457499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:30.341284",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:32.934968",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00035475,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:32.934983",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:39.889184",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0019716,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:39.889247",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:42.309714",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0005448,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:42.309729",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:44.753919",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0005487,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:44.753936",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:46.521897",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00043634999999999995,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:46.521913",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:50.743631",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0008267999999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:50.743658",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:51.566388",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00032684999999999995,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:51.566411",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:53.269829",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0008420999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:53.269846",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:55.204699",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0006689999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:55.204715",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:57.418238",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0012127499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:57.418254",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:59.701291",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00034139999999999995,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:09:59.701306",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:01.400448",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00034455,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:01.400516",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:03.287524",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0003486,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:03.287543",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:05.182834",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00034214999999999994,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:05.182872",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:07.127584",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0003084,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:07.127620",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:08.553777",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00030914999999999995,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:08.553830",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:11.222680",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00030824999999999993,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:11.222703",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:14.667253",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00038415,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:14.667286",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:18.083303",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0007958999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:18.083319",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:20.415625",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0008461499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:20.415663",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:21.973581",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0007968,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:21.973620",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:23.945246",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0009199499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:23.945294",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:26.557335",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0007385999999999998,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:26.557353",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:28.524264",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0008122499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:28.524284",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:31.103066",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0007147499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:31.103080",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:33.134304",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00086745,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:33.134319",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:37.493432",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0006604499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:37.493460",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:40.673962",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00062565,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:40.673979",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:43.993852",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0008862,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:43.993873",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:46.958268",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0008357999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:46.958367",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:49.053158",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0005901,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:49.053173",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:51.357249",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0005865,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:51.357263",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:52.999264",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00056835,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:52.999279",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:56.432731",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00088815,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:56.432746",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:58.591493",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0006635999999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:10:58.591528",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:11:04.980991",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.00062565,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:11:04.981006",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:11:08.680710",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.0007312499999999999,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:11:08.680754",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:11:11.628506",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.000552,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:11:11.628553",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.success",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:11:13.438266",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "llm.cost_usd",
+      "value": 0.000387,
+      "type": "counter",
+      "labels": {
+        "model": "gpt-4o-mini"
+      },
+      "timestamp": "2025-07-08T23:11:13.438285",
+      "stage": "llm_extraction"
+    },
+    {
+      "name": "pipeline.completed",
+      "value": 1.0,
+      "type": "counter",
+      "labels": {
+        "execution_id": "exec_20250708_230624"
+      },
+      "timestamp": "2025-07-08T23:11:15.904119",
+      "stage": null
+    },
+    {
+      "name": "pipeline.duration_seconds",
+      "value": 291.871604,
+      "type": "gauge",
+      "labels": {
+        "execution_id": "exec_20250708_230624"
+      },
+      "timestamp": "2025-07-08T23:11:15.904148",
+      "stage": null
+    },
+    {
+      "name": "pipeline.success_rate",
+      "value": 0.9540229885057471,
+      "type": "gauge",
+      "labels": {
+        "execution_id": "exec_20250708_230624"
+      },
+      "timestamp": "2025-07-08T23:11:15.904158",
+      "stage": null
+    }
+  ],
+  "errors": [
+    {
+      "category": "unknown_error",
+      "stage": "scraping",
+      "url": "https://rbw.com/products/pastille-3-vanity/ddd-pc30-27-120_tr_line-ip20",
+      "error_message": "Page not found",
+      "timestamp": "2025-07-08T23:06:24.661649",
+      "additional_info": {
+        "scraping_method": "requests"
+      }
+    },
+    {
+      "category": "unknown_error",
+      "stage": "scraping",
+      "url": "https://rbw.com/products/pastille-1-disc/d-pc30-27-120_tr_line-ip20",
+      "error_message": "Page not found",
+      "timestamp": "2025-07-08T23:06:24.669664",
+      "additional_info": {
+        "scraping_method": "requests"
+      }
+    },
+    {
+      "category": "unknown_error",
+      "stage": "scraping",
+      "url": "https://currentcollection.com/strike/",
+      "error_message": "Page not found",
+      "timestamp": "2025-07-08T23:06:24.669881",
+      "additional_info": {
+        "scraping_method": "requests"
+      }
+    },
+    {
+      "category": "unknown_error",
+      "stage": "scraping",
+      "url": "https://www.philips-hue.com/en-us/p/hue-white-and-color-ambiance-lightstrip-plus-base-v4-80-inch/046677555337#faq",
+      "error_message": "Page not found",
+      "timestamp": "2025-07-08T23:06:24.799620",
+      "additional_info": {
+        "scraping_method": "requests"
+      }
+    }
+  ]
+}
