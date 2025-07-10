@@ -237,6 +237,42 @@
     .description-cell {
         position: relative;
     }
+
+    /* Column resizing styles */
+    .resizable-table th {
+        position: relative;
+        border-right: 1px solid #ddd;
+    }
+
+    .column-resizer {
+        position: absolute;
+        top: 0;
+        right: -2px;
+        width: 4px;
+        height: 100%;
+        cursor: col-resize;
+        background: transparent;
+        z-index: 20;
+    }
+
+    .column-resizer:hover {
+        background: rgba(52, 73, 94, 0.3);
+    }
+
+    .column-resizer.resizing {
+        background: #3498db;
+    }
+
+    .resizing-indicator {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #3498db;
+        z-index: 1000;
+        pointer-events: none;
+        display: none;
+    }
 </style>
 {% endblock %}
 
@@ -293,7 +329,7 @@
     <div class="validation-container">
         <div class="table-container">
             <div class="table-wrapper">
-                <table id="validation-table">
+                <table id="validation-table" class="resizable-table">
                     <thead>
                         <tr>
                             <th>Row</th>
@@ -311,6 +347,9 @@
 
 <!-- Description tooltip -->
 <div id="description-tooltip" class="description-tooltip"></div>
+
+<!-- Column resizing indicator -->
+<div id="resizing-indicator" class="resizing-indicator"></div>
 {% endblock %}
 
 {% block extra_js %}
@@ -320,6 +359,13 @@ let validationState = {
     failed_cells: {},
     failed_rows: []
 };
+
+// Column resizing variables
+let isResizing = false;
+let currentResizer = null;
+let startX = 0;
+let startWidth = 0;
+let currentColumn = null;
 
 function onDataLoaded(response) {
     loadTableData();
@@ -351,21 +397,33 @@ function buildTable(columns, data) {
     thead.find('th:not(:first)').remove();
     tbody.empty();
     
+    // Add resizer to the first "Row" column
+    const firstHeader = thead.find('th:first');
+    if (!firstHeader.find('.column-resizer').length) {
+        firstHeader.append('<div class="column-resizer" data-column="row"></div>');
+    }
+    
     // Build header row with action columns
     columns.forEach(function(col) {
         if (col !== 'key') {  // Skip 'key' column
-            thead.append(`<th>${col}</th>`);
+            thead.append(`<th data-column="${col}">${col}<div class="column-resizer" data-column="${col}"></div></th>`);
             
             // Add action button column after image_url
             if (col === 'image_url') {
-                thead.append(`<th class="action-cell"></th>`);
+                thead.append(`<th class="action-cell"><div class="column-resizer"></div></th>`);
             }
             // Add action button column after product_link
             if (col === 'product_link') {
-                thead.append(`<th class="action-cell"></th>`);
+                thead.append(`<th class="action-cell"><div class="column-resizer"></div></th>`);
             }
         }
     });
+    
+    // Initialize column resizing after building the table
+    initializeColumnResizing();
+    
+    // Load saved column widths
+    loadColumnWidths();
     
     // Build data rows
     data.forEach(function(rowData, index) {
@@ -585,6 +643,156 @@ function hideDescriptionTooltip() {
 
 function exportValidation() {
     window.location.href = '/export_validation';
+}
+
+// Column resizing functionality
+function initializeColumnResizing() {
+    const table = document.getElementById('validation-table');
+    const resizers = table.querySelectorAll('.column-resizer');
+    
+    resizers.forEach(function(resizer) {
+        resizer.addEventListener('mousedown', initResize);
+    });
+    
+    // Add global mouse events
+    document.addEventListener('mousemove', doResize);
+    document.addEventListener('mouseup', stopResize);
+}
+
+function initResize(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    isResizing = true;
+    currentResizer = event.target;
+    startX = event.clientX;
+    
+    // Find the header cell
+    currentColumn = currentResizer.closest('th');
+    if (!currentColumn) return;
+    
+    // Get current width
+    const rect = currentColumn.getBoundingClientRect();
+    startWidth = rect.width;
+    
+    // Add resizing class
+    currentResizer.classList.add('resizing');
+    
+    // Show resizing indicator
+    const indicator = document.getElementById('resizing-indicator');
+    indicator.style.left = event.clientX + 'px';
+    indicator.style.display = 'block';
+    
+    // Prevent text selection during resize
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'col-resize';
+}
+
+function doResize(event) {
+    if (!isResizing || !currentColumn) return;
+    
+    event.preventDefault();
+    
+    // Calculate new width
+    const deltaX = event.clientX - startX;
+    const newWidth = Math.max(50, startWidth + deltaX); // Minimum width of 50px
+    
+    // Apply new width
+    currentColumn.style.width = newWidth + 'px';
+    currentColumn.style.minWidth = newWidth + 'px';
+    
+    // Update resizing indicator position
+    const indicator = document.getElementById('resizing-indicator');
+    indicator.style.left = event.clientX + 'px';
+    
+    // Find corresponding cells in all rows and update their width
+    const columnIndex = Array.from(currentColumn.parentNode.children).indexOf(currentColumn);
+    const table = document.getElementById('validation-table');
+    const rows = table.querySelectorAll('tbody tr');
+    
+    rows.forEach(function(row) {
+        const cell = row.children[columnIndex];
+        if (cell) {
+            cell.style.width = newWidth + 'px';
+            cell.style.minWidth = newWidth + 'px';
+        }
+    });
+}
+
+function stopResize(event) {
+    if (!isResizing) return;
+    
+    isResizing = false;
+    
+    // Remove resizing class
+    if (currentResizer) {
+        currentResizer.classList.remove('resizing');
+    }
+    
+    // Hide resizing indicator
+    const indicator = document.getElementById('resizing-indicator');
+    indicator.style.display = 'none';
+    
+    // Restore normal cursor and text selection
+    document.body.style.userSelect = '';
+    document.body.style.cursor = '';
+    
+    // Save column widths to localStorage for persistence
+    saveColumnWidths();
+    
+    // Reset variables
+    currentResizer = null;
+    currentColumn = null;
+}
+
+function saveColumnWidths() {
+    const table = document.getElementById('validation-table');
+    const headers = table.querySelectorAll('thead th');
+    const widths = {};
+    
+    headers.forEach(function(header, index) {
+        const columnName = header.dataset.column || `column_${index}`;
+        const width = header.style.width;
+        if (width) {
+            widths[columnName] = width;
+        }
+    });
+    
+    localStorage.setItem('validationTableColumnWidths', JSON.stringify(widths));
+}
+
+function loadColumnWidths() {
+    const savedWidths = localStorage.getItem('validationTableColumnWidths');
+    if (!savedWidths) return;
+    
+    try {
+        const widths = JSON.parse(savedWidths);
+        const table = document.getElementById('validation-table');
+        const headers = table.querySelectorAll('thead th');
+        
+        headers.forEach(function(header) {
+            const columnName = header.dataset.column;
+            if (columnName && widths[columnName]) {
+                const width = widths[columnName];
+                header.style.width = width;
+                header.style.minWidth = width;
+                
+                // Apply to corresponding cells in rows
+                const columnIndex = Array.from(header.parentNode.children).indexOf(header);
+                const rows = table.querySelectorAll('tbody tr');
+                
+                rows.forEach(function(row) {
+                    const cell = row.children[columnIndex];
+                    if (cell) {
+                        cell.style.width = width;
+                        cell.style.minWidth = width;
+                    }
+                });
+            }
+        });
+    } catch (e) {
+        console.warn('Failed to load saved column widths:', e);
+    }
 }
 </script>
 {% endblock %}
