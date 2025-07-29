@@ -12,6 +12,7 @@ const ProjectPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 
   const project = projects.find(p => p.id === projectId);
 
@@ -80,6 +81,34 @@ const ProjectPage: React.FC = () => {
           </div>
         </div>
 
+        {!loading && !error && products.length > 0 && (
+          <div className="view-toggle">
+            <button
+              className={`toggle-button ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+              title="Grid view"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                <rect x="3" y="3" width="6" height="6" strokeWidth="2"/>
+                <rect x="11" y="3" width="6" height="6" strokeWidth="2"/>
+                <rect x="3" y="11" width="6" height="6" strokeWidth="2"/>
+                <rect x="11" y="11" width="6" height="6" strokeWidth="2"/>
+              </svg>
+            </button>
+            <button
+              className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+              title="List view"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                <rect x="3" y="4" width="14" height="2" strokeWidth="2"/>
+                <rect x="3" y="9" width="14" height="2" strokeWidth="2"/>
+                <rect x="3" y="14" width="14" height="2" strokeWidth="2"/>
+              </svg>
+            </button>
+          </div>
+        )}
+
         {loading ? (
           <div className="loading-state">
             <p>Loading products...</p>
@@ -98,7 +127,7 @@ const ProjectPage: React.FC = () => {
               Add First Product
             </button>
           </div>
-        ) : (
+        ) : viewMode === 'grid' ? (
           <div className="products-grid">
             {products.map(product => (
               <div key={product.id} className="product-card">
@@ -124,6 +153,50 @@ const ProjectPage: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+        ) : (
+          <div className="products-list">
+            <table>
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Location</th>
+                  <th>Tag ID</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map(product => (
+                  <tr key={product.id}>
+                    <td>
+                      <div className="list-product-image">
+                        {product.image ? (
+                          <img src={product.image} alt={product.description} />
+                        ) : (
+                          <div className="no-image-small">No Image</div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="product-description">{product.description}</td>
+                    <td>{product.category}</td>
+                    <td>{product.location}</td>
+                    <td>{product.tagId}</td>
+                    <td>
+                      <a 
+                        href={product.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="product-link"
+                      >
+                        View →
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
