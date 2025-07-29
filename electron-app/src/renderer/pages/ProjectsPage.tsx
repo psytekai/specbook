@@ -5,11 +5,13 @@ import { useToast } from '../hooks/useToast';
 import './ProjectsPage.css';
 
 const ProjectsPage: React.FC = () => {
-  const { projects, updateProject } = useProjects();
+  const { projects, updateProject, createProject } = useProjects();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [isCreatingProject, setIsCreatingProject] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
 
   const handleEdit = (projectId: string, currentName: string) => {
     setEditingId(projectId);
@@ -38,24 +40,68 @@ const ProjectsPage: React.FC = () => {
     }
   };
 
+  const handleCreateProject = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newProjectName.trim()) {
+      createProject(newProjectName.trim());
+      setNewProjectName('');
+      setIsCreatingProject(false);
+      showToast('Project created successfully', 'success');
+    }
+  };
+
   return (
     <div className="page-container">
       <div className="projects-page">
         <div className="page-header">
           <h1>Projects</h1>
           <button 
-            className="button button-secondary"
-            onClick={() => navigate('/')}
+            className="button button-primary"
+            onClick={() => setIsCreatingProject(true)}
           >
-            Back to Home
+            Add Project
           </button>
         </div>
 
-        {projects.length === 0 ? (
+        {isCreatingProject && (
+          <form onSubmit={handleCreateProject} className="create-project-form">
+            <div className="form-group">
+              <label htmlFor="project-name" className="label">
+                Project Name
+              </label>
+              <input
+                id="project-name"
+                type="text"
+                className="input"
+                value={newProjectName}
+                onChange={(e) => setNewProjectName(e.target.value)}
+                placeholder="Enter project name"
+                autoFocus
+              />
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="button button-primary">
+                Create Project
+              </button>
+              <button 
+                type="button" 
+                className="button button-secondary"
+                onClick={() => {
+                  setIsCreatingProject(false);
+                  setNewProjectName('');
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+
+        {projects.length === 0 && !isCreatingProject ? (
           <div className="empty-state">
-            <p>No projects yet. Go back to create your first project.</p>
+            <p>No projects yet. Click "Add Project" to create your first project.</p>
           </div>
-        ) : (
+        ) : !isCreatingProject && projects.length > 0 ? (
           <div className="projects-table">
             <table>
               <thead>
@@ -123,7 +169,7 @@ const ProjectsPage: React.FC = () => {
               </tbody>
             </table>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

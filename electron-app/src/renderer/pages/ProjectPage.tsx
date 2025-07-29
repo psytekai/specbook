@@ -67,7 +67,7 @@ const ProjectPage: React.FC = () => {
           <div className="header-actions">
             <button 
               className="button button-primary"
-              onClick={() => navigate('/products/new')}
+              onClick={() => navigate(`/projects/${projectId}/products/new`)}
             >
               Add Product
             </button>
@@ -93,7 +93,7 @@ const ProjectPage: React.FC = () => {
             <p>No products in this project yet.</p>
             <button 
               className="button button-primary"
-              onClick={() => navigate('/products/new')}
+              onClick={() => navigate(`/projects/${projectId}/products/new`)}
             >
               Add First Product
             </button>

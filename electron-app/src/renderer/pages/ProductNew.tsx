@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
 import { useToast } from '../hooks/useToast';
 import { fetchProductDetails, saveProduct, handleApiError } from '../services/api';
@@ -7,7 +7,8 @@ import './ProductNew.css';
 
 const ProductNew: React.FC = () => {
   const navigate = useNavigate();
-  const { currentProject, addProduct } = useProjects();
+  const { projectId } = useParams<{ projectId: string }>();
+  const { projects, addProduct } = useProjects();
   const { showToast } = useToast();
   
   const [formData, setFormData] = useState({
@@ -25,8 +26,16 @@ const ProductNew: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [hasDetails, setHasDetails] = useState(false);
 
+  const currentProject = projects.find(p => p.id === projectId);
+
+  useEffect(() => {
+    if (!projectId || !currentProject) {
+      showToast('No project selected', 'error');
+      navigate('/projects');
+    }
+  }, [projectId, currentProject, navigate, showToast]);
+
   if (!currentProject) {
-    navigate('/');
     return null;
   }
 
@@ -101,7 +110,7 @@ const ProductNew: React.FC = () => {
       });
       
       showToast('Product saved successfully', 'success');
-      navigate('/');
+      navigate(`/projects/${projectId}`);
     } catch (error) {
       const apiError = handleApiError(error);
       showToast(apiError.message, 'error');
@@ -117,7 +126,7 @@ const ProductNew: React.FC = () => {
           <h1>Add New Product</h1>
           <button 
             className="button button-secondary"
-            onClick={() => navigate('/')}
+            onClick={() => navigate(`/projects/${projectId}`)}
           >
             Back
           </button>

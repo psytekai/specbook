@@ -14,7 +14,7 @@ const Router: React.FC = () => {
         <Route index element={<HomePage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="projects/:projectId" element={<ProjectPage />} />
-        <Route path="products/new" element={<ProductNew />} />
+        <Route path="projects/:projectId/products/new" element={<ProductNew />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
     </Routes>
