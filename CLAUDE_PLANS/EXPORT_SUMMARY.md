@@ -116,6 +116,7 @@ python prps/implementations/benchmarking_2025_07_07/scripts/run_benchmarks.py \
 4. **`prps/implementations/benchmarking_2025_07_07/docs/usage_guide.md`** - Usage instructions
 
 ### **🧪 Library Usage:**
+
 ```python
 # Clean API for all components
 from lib import StealthScraper, PipelineMonitor, ExperimentRunner
@@ -127,7 +128,7 @@ scraper = StealthScraper()
 llm = LLMInvocator()
 
 # Run benchmarking
-runner = ExperimentRunner(output_dir="workspace/output/benchmarks")
+runner = ExperimentRunner(output_dir="../workspace/output/benchmarks")
 results = runner.run_model_comparison(urls, models)
 ```
 
