@@ -110,6 +110,18 @@
   color: var(--text-secondary);
 }
 
+.product-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.list-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .product-link {
   color: var(--primary-color);
   text-decoration: none;
@@ -122,6 +134,28 @@
 
 .product-link:hover {
   text-decoration: underline;
+}
+
+.button-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+
+.button-link:hover {
+  text-decoration: underline;
+}
+
+.external-link {
+  opacity: 0.7;
+}
+
+.external-link:hover {
+  opacity: 1;
 }
 
 /* View Toggle Styles */

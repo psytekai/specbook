@@ -142,14 +142,22 @@ const ProjectPage: React.FC = () => {
                   <h3 className="product-title">{product.description}</h3>
                   <p className="product-category">{product.category}</p>
                   <p className="product-location">{product.location}</p>
-                  <a 
-                    href={product.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="product-link"
-                  >
-                    View Product →
-                  </a>
+                  <div className="product-actions">
+                    <button
+                      className="product-link button-link"
+                      onClick={() => navigate(`/projects/${projectId}/products/${product.id}`)}
+                    >
+                      View Details →
+                    </button>
+                    <a 
+                      href={product.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="product-link external-link"
+                    >
+                      Source →
+                    </a>
+                  </div>
                 </div>
               </div>
             ))}
@@ -184,14 +192,22 @@ const ProjectPage: React.FC = () => {
                     <td>{product.location}</td>
                     <td>{product.tagId}</td>
                     <td>
-                      <a 
-                        href={product.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="product-link"
-                      >
-                        View →
-                      </a>
+                      <div className="list-actions">
+                        <button
+                          className="product-link button-link"
+                          onClick={() => navigate(`/projects/${projectId}/products/${product.id}`)}
+                        >
+                          View
+                        </button>
+                        <a 
+                          href={product.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="product-link external-link"
+                        >
+                          Source
+                        </a>
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -4,6 +4,7 @@ import Layout from './components/Layout/Layout';
 import HomePage from './pages/HomePage';
 import ProjectsPage from './pages/ProjectsPage';
 import ProjectPage from './pages/ProjectPage';
+import ProductPage from './pages/ProductPage';
 import ProductNew from './pages/ProductNew';
 import SettingsPage from './pages/SettingsPage';
 
@@ -14,6 +15,7 @@ const Router: React.FC = () => {
         <Route index element={<HomePage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="projects/:projectId" element={<ProjectPage />} />
+        <Route path="projects/:projectId/products/:productId" element={<ProductPage />} />
         <Route path="projects/:projectId/products/new" element={<ProductNew />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
