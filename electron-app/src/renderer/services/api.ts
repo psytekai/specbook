@@ -2,10 +2,14 @@ import {
   FetchProductDetailsRequest,
   FetchProductDetailsResponse,
   SaveProductRequest,
-  ApiError
+  ApiError,
+  Product
 } from '../types';
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Mock storage for products
+const mockProducts: Product[] = [];
 
 export const fetchProductDetails = async (
   request: FetchProductDetailsRequest
@@ -47,9 +51,28 @@ export const saveProduct = async (
   // Mock successful save
   console.log('Saving product:', request);
   
+  const productId = Date.now().toString();
+  
+  // Add to mock storage
+  const newProduct: Product = {
+    id: productId,
+    projectId: request.project_id,
+    url: request.product_url,
+    tagId: request.tag_id,
+    location: request.product_location,
+    image: request.product_image,
+    images: request.product_images,
+    description: request.product_description,
+    specificationDescription: request.specification_description,
+    category: request.category,
+    createdAt: new Date()
+  };
+  
+  mockProducts.push(newProduct);
+  
   return {
     success: true,
-    productId: Date.now().toString(),
+    productId,
   };
 };
 
@@ -65,4 +88,21 @@ export const handleApiError = (error: unknown): ApiError => {
     message: 'An unexpected error occurred',
     code: 'UNKNOWN_ERROR'
   };
+};
+
+// API object for organized endpoints
+export const api = {
+  get: async <T>(endpoint: string): Promise<{ data: T }> => {
+    // Simulate network delay
+    await delay(500);
+    
+    // Handle different endpoints
+    if (endpoint.includes('/projects/') && endpoint.includes('/products')) {
+      const projectId = endpoint.split('/')[2];
+      const products = mockProducts.filter(p => p.projectId === projectId);
+      return { data: products as T };
+    }
+    
+    throw new Error(`Unknown endpoint: ${endpoint}`);
+  }
 };

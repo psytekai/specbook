@@ -1,127 +1,129 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
-import { useToast } from '../hooks/useToast';
+import { Product } from '../types';
+import { api } from '../services/api';
 import './ProjectPage.css';
 
 const ProjectPage: React.FC = () => {
-  const { projects, updateProject } = useProjects();
-  const { showToast } = useToast();
+  const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState('');
+  const { projects } = useProjects();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleEdit = (projectId: string, currentName: string) => {
-    setEditingId(projectId);
-    setEditName(currentName);
-  };
+  const project = projects.find(p => p.id === projectId);
 
-  const handleSave = () => {
-    if (editingId && editName.trim()) {
-      updateProject(editingId, editName.trim());
-      showToast('Project updated successfully', 'success');
-      setEditingId(null);
-      setEditName('');
-    }
-  };
+  useEffect(() => {
+    if (!projectId) return;
 
-  const handleCancel = () => {
-    setEditingId(null);
-    setEditName('');
-  };
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await api.get<Product[]>(`/projects/${projectId}/products`);
+        setProducts(response.data);
+      } catch (err) {
+        setError('Failed to load products');
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSave();
-    } else if (e.key === 'Escape') {
-      handleCancel();
-    }
-  };
+    fetchProducts();
+  }, [projectId]);
+
+  if (!project) {
+    return (
+      <div className="page-container">
+        <div className="project-page">
+          <div className="error-state">
+            <p>Project not found</p>
+            <button 
+              className="button button-secondary"
+              onClick={() => navigate('/projects')}
+            >
+              Back to Projects
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">
       <div className="project-page">
         <div className="page-header">
-          <h1>Projects</h1>
-          <button 
-            className="button button-secondary"
-            onClick={() => navigate('/')}
-          >
-            Back to Home
-          </button>
+          <div>
+            <h1>{project.name}</h1>
+            <p className="project-meta">
+              Created: {new Date(project.createdAt).toLocaleDateString()} | 
+              Updated: {new Date(project.updatedAt).toLocaleDateString()}
+            </p>
+          </div>
+          <div className="header-actions">
+            <button 
+              className="button button-primary"
+              onClick={() => navigate('/products/new')}
+            >
+              Add Product
+            </button>
+            <button 
+              className="button button-secondary"
+              onClick={() => navigate('/projects')}
+            >
+              Back to Projects
+            </button>
+          </div>
         </div>
 
-        {projects.length === 0 ? (
+        {loading ? (
+          <div className="loading-state">
+            <p>Loading products...</p>
+          </div>
+        ) : error ? (
+          <div className="error-state">
+            <p>{error}</p>
+          </div>
+        ) : products.length === 0 ? (
           <div className="empty-state">
-            <p>No projects yet. Go back to create your first project.</p>
+            <p>No products in this project yet.</p>
+            <button 
+              className="button button-primary"
+              onClick={() => navigate('/products/new')}
+            >
+              Add First Product
+            </button>
           </div>
         ) : (
-          <div className="projects-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Project Name</th>
-                  <th>Products</th>
-                  <th>Created</th>
-                  <th>Updated</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {projects.map(project => (
-                  <tr key={project.id}>
-                    <td>
-                      {editingId === project.id ? (
-                        <input
-                          type="text"
-                          className="input inline-edit"
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          onKeyDown={handleKeyDown}
-                          onBlur={handleSave}
-                          autoFocus
-                        />
-                      ) : (
-                        <span 
-                          className="project-name"
-                          onClick={() => handleEdit(project.id, project.name)}
-                        >
-                          {project.name}
-                        </span>
-                      )}
-                    </td>
-                    <td>{project.productCount}</td>
-                    <td>{new Date(project.createdAt).toLocaleDateString()}</td>
-                    <td>{new Date(project.updatedAt).toLocaleDateString()}</td>
-                    <td>
-                      {editingId === project.id ? (
-                        <div className="edit-actions">
-                          <button 
-                            className="button button-small button-primary"
-                            onClick={handleSave}
-                          >
-                            Save
-                          </button>
-                          <button 
-                            className="button button-small button-secondary"
-                            onClick={handleCancel}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <button 
-                          className="button button-small button-secondary"
-                          onClick={() => handleEdit(project.id, project.name)}
-                        >
-                          Edit
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="products-grid">
+            {products.map(product => (
+              <div key={product.id} className="product-card">
+                <div className="product-image">
+                  {product.image ? (
+                    <img src={product.image} alt={product.description} />
+                  ) : (
+                    <div className="no-image">No Image</div>
+                  )}
+                </div>
+                <div className="product-info">
+                  <h3 className="product-title">{product.description}</h3>
+                  <p className="product-category">{product.category}</p>
+                  <p className="product-location">{product.location}</p>
+                  <a 
+                    href={product.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="product-link"
+                  >
+                    View Product →
+                  </a>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
