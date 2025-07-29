@@ -11,6 +11,19 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 // Mock storage for products
 const mockProducts: Product[] = [];
 
+// Mock storage for locations
+const mockLocations: string[] = [
+  'Living Room',
+  'Kitchen',
+  'Bedroom',
+  'Bathroom',
+  'Office',
+  'Garage',
+  'Outdoor',
+  'Basement',
+  'Attic'
+];
+
 export const fetchProductDetails = async (
   request: FetchProductDetailsRequest
 ): Promise<FetchProductDetailsResponse> => {
@@ -88,6 +101,26 @@ export const handleApiError = (error: unknown): ApiError => {
     message: 'An unexpected error occurred',
     code: 'UNKNOWN_ERROR'
   };
+};
+
+export const fetchProductLocations = async (): Promise<string[]> => {
+  // Simulate network delay
+  await delay(300);
+  
+  // Return mock locations
+  return [...mockLocations];
+};
+
+export const addProductLocation = async (location: string): Promise<{ success: boolean }> => {
+  // Simulate network delay
+  await delay(200);
+  
+  // Add to mock storage if not already exists
+  if (!mockLocations.includes(location)) {
+    mockLocations.push(location);
+  }
+  
+  return { success: true };
 };
 
 // API object for organized endpoints

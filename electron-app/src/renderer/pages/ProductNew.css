@@ -46,3 +46,29 @@
 .form-group + .button {
   margin-top: 1rem;
 }
+
+.location-dropdown-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.location-dropdown-wrapper select {
+  flex: 1;
+}
+
+.add-location-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.add-location-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.button-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}

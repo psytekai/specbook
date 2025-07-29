@@ -87,3 +87,46 @@ electron-app/
 - **Vite**: Fast build tool
 - **React Router**: Navigation
 - **Context API**: State management
+
+## API Implementation Notes
+
+### Product Locations API
+**TODO**: The following API endpoints need to be implemented on the backend:
+
+1. **GET /api/locations**
+   - Returns a list of available product locations
+   - Currently returns mock data from `src/renderer/services/api.ts`
+   - Expected response format:
+   ```json
+   {
+     "locations": ["Living Room", "Kitchen", "Bedroom", ...]
+   }
+   ```
+
+2. **POST /api/locations**
+   - Creates a new product location
+   - Request body:
+   ```json
+   {
+     "location": "New Location Name"
+   }
+   ```
+   - Expected response:
+   ```json
+   {
+     "success": true,
+     "location": "New Location Name"
+   }
+   ```
+
+The mock implementation can be found in:
+- `fetchProductLocations()` in `src/renderer/services/api.ts`
+- `addProductLocation()` in `src/renderer/services/api.ts`
+
+### Products API
+**TODO**: Implement proper backend endpoints for:
+- GET /api/projects/:projectId/products
+- POST /api/products
+- GET /api/products/:productId
+
+Currently using in-memory mock storage.

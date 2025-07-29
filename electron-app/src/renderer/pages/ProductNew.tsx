@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
 import { useToast } from '../hooks/useToast';
-import { fetchProductDetails, saveProduct, handleApiError } from '../services/api';
+import { 
+  fetchProductDetails, 
+  saveProduct, 
+  handleApiError,
+  fetchProductLocations,
+  addProductLocation 
+} from '../services/api';
 import './ProductNew.css';
 
 const ProductNew: React.FC = () => {
@@ -25,6 +31,9 @@ const ProductNew: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasDetails, setHasDetails] = useState(false);
+  const [locations, setLocations] = useState<string[]>([]);
+  const [showAddLocation, setShowAddLocation] = useState(false);
+  const [newLocation, setNewLocation] = useState('');
 
   const currentProject = projects.find(p => p.id === projectId);
 
@@ -35,15 +44,46 @@ const ProductNew: React.FC = () => {
     }
   }, [projectId, currentProject, navigate, showToast]);
 
+  useEffect(() => {
+    // Fetch available locations when component mounts
+    const loadLocations = async () => {
+      try {
+        const availableLocations = await fetchProductLocations();
+        setLocations(availableLocations);
+      } catch (error) {
+        console.error('Failed to fetch locations:', error);
+      }
+    };
+    loadLocations();
+  }, []);
+
   if (!currentProject) {
     return null;
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }));
+  };
+
+  const handleAddLocation = async () => {
+    if (!newLocation.trim()) {
+      showToast('Please enter a location name', 'error');
+      return;
+    }
+
+    try {
+      await addProductLocation(newLocation.trim());
+      setLocations(prev => [...prev, newLocation.trim()]);
+      setFormData(prev => ({ ...prev, product_location: newLocation.trim() }));
+      setNewLocation('');
+      setShowAddLocation(false);
+      showToast('Location added successfully', 'success');
+    } catch (error) {
+      showToast('Failed to add location', 'error');
+    }
   };
 
   const handleFetchDetails = async (e: React.FormEvent) => {
@@ -174,16 +214,62 @@ const ProductNew: React.FC = () => {
               <label htmlFor="product_location" className="label">
                 Product Location *
               </label>
-              <input
-                id="product_location"
-                name="product_location"
-                type="text"
-                className="input"
-                value={formData.product_location}
-                onChange={handleInputChange}
-                placeholder="e.g., Living Room, Kitchen, etc."
-                required
-              />
+              {!showAddLocation ? (
+                <div className="location-dropdown-wrapper">
+                  <select
+                    id="product_location"
+                    name="product_location"
+                    className="input"
+                    value={formData.product_location}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">-- Select a location --</option>
+                    {locations.map(location => (
+                      <option key={location} value={location}>
+                        {location}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    className="button button-secondary button-small"
+                    onClick={() => setShowAddLocation(true)}
+                  >
+                    Add New
+                  </button>
+                </div>
+              ) : (
+                <div className="add-location-wrapper">
+                  <input
+                    type="text"
+                    className="input"
+                    value={newLocation}
+                    onChange={(e) => setNewLocation(e.target.value)}
+                    placeholder="Enter new location"
+                    autoFocus
+                  />
+                  <div className="add-location-actions">
+                    <button
+                      type="button"
+                      className="button button-primary button-small"
+                      onClick={handleAddLocation}
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      className="button button-secondary button-small"
+                      onClick={() => {
+                        setShowAddLocation(false);
+                        setNewLocation('');
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             
             <button 
