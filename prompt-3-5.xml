@@ -21,6 +21,16 @@
         - instructions 
             - If the url is a relative url, append to the base_url **without modifying the url as found in the html <img> tag**. 
             - Prioritize <img> tag urls that have attributes such as `id`, `product_id`, `product-image`, etc
+        - prioritization_rules:
+            - Open Graph image (og:image meta tag)
+            - Images with IDs containing: product, main, hero, primary
+            - First image in a product gallery
+            - Largest image by dimensions in content area
+            - Image referenced in structured data
+        - validation:
+            - Must be absolute URL or properly resolved relative URL
+            - Prefer high-resolution versions when available
+            - Avoid thumbnails (check for "thumb", "small" in URL)
     - type
         - description: The product category
         - examples
@@ -28,7 +38,15 @@
             - "grill"
             - "fireplace"
     - description
-        - description: Short product description capturing the simple essence of the product
+        - formatting_rules:
+            - Line 1: Manufacturer/Brand name
+            - Line 2: Product line or model name
+            - Line 3: Distinguishing features (color, size, finish)
+            - Line 4+: Additional specifications if critical
+        - length: Maximum 4 lines, prefer 2-3
+        - style: Use title case for proper nouns, no periods
+        - paint_specific_template:
+            "Paint\nMFR: {manufacturer}\nColor: {color_code} {color_name}\nSheen: {sheen_type}"
         - examples
             - "Kwikset\nMilan Round\nMatte Black"
             - "Drywall Finish Level 4 Smooth\nMFR: Dunn Edwards\nColor:DEW340 Whisper\nSheen: Flat\nNote: Ceiling Finish"
@@ -43,7 +61,11 @@
     - model_no
         - description: Manufacturer model number, item no, or sku no.
         - instructions
-            - If the model number is not found, return empty string
+            - If the model number is not found, return ""
+        - validation:
+            - Remove extra whitespace
+            - Preserve original formatting (hyphens, spaces)
+            - Include full code (prefix + number)
     - product_link
         - description: Original product page URL defined in the `**Product Url**` section.
     

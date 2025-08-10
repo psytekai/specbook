@@ -21,6 +21,16 @@
         - instructions 
             - If the url is a relative url, append to the base_url **without modifying the url as found in the html <img> tag**. 
             - Prioritize <img> tag urls that have attributes such as `id`, `product_id`, `product-image`, etc
+        - prioritization_rules:
+            - Open Graph image (og:image meta tag)
+            - Images with IDs containing: product, main, hero, primary
+            - First image in a product gallery
+            - Largest image by dimensions in content area
+            - Image referenced in structured data
+        - validation:
+            - Must be absolute URL or properly resolved relative URL
+            - Prefer high-resolution versions when available
+            - Avoid thumbnails (check for "thumb", "small" in URL)
     - type
         - description: The product category
         - examples
@@ -28,7 +38,7 @@
             - "grill"
             - "fireplace"
     - description
-        - description: Short product description capturing the simple essence of the product
+        - description: Short product description what the product is
         - examples
             - "Kwikset\nMilan Round\nMatte Black"
             - "Drywall Finish Level 4 Smooth\nMFR: Dunn Edwards\nColor:DEW340 Whisper\nSheen: Flat\nNote: Ceiling Finish"
@@ -42,8 +52,16 @@
             - "Fireorb\nFireorb\nBlack"
     - model_no
         - description: Manufacturer model number, item no, or sku no.
-        - instructions
-            - If the model number is not found, return empty string
+        - extraction_patterns:
+            - Look for labels: "Model:", "Item #:", "SKU:", "Product Code:"
+            - Check structured data/microdata
+            - Search specification tables
+            - Extract from URL parameters (e.g., ?sku=, /product/)
+            - For paint: color codes (e.g., "DEW340")
+        - validation:
+            - Remove extra whitespace
+            - Preserve original formatting (hyphens, spaces)
+            - Include full code (prefix + number)
     - product_link
         - description: Original product page URL defined in the `**Product Url**` section.
     

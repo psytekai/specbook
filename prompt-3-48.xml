@@ -6,7 +6,7 @@
     Clients will be reviewing the specification book, so it is important that you extract the data accurately and completely.
     
     **Product Url**
-    https://kastconcretebasins.com/products/p/rho
+    https://lambertetfils.com/product/dot-line-suspension/?v=0b3b97fa6688
 
     **Input Data Format**
     The input data is a dictionary with the following keys:
@@ -21,6 +21,16 @@
         - instructions 
             - If the url is a relative url, append to the base_url **without modifying the url as found in the html <img> tag**. 
             - Prioritize <img> tag urls that have attributes such as `id`, `product_id`, `product-image`, etc
+        - prioritization_rules:
+            - Open Graph image (og:image meta tag)
+            - Images with IDs containing: product, main, hero, primary
+            - First image in a product gallery
+            - Largest image by dimensions in content area
+            - Image referenced in structured data
+        - validation:
+            - Must be absolute URL or properly resolved relative URL
+            - Prefer high-resolution versions when available
+            - Avoid thumbnails (check for "thumb", "small" in URL)
     - type
         - description: The product category
         - examples
@@ -28,7 +38,15 @@
             - "grill"
             - "fireplace"
     - description
-        - description: Short product description capturing the simple essence of the product
+        - formatting_rules:
+            - Line 1: Manufacturer/Brand name
+            - Line 2: Product line or model name
+            - Line 3: Distinguishing features (color, size, finish)
+            - Line 4+: Additional specifications if critical
+        - length: Maximum 4 lines, prefer 2-3
+        - style: Use title case for proper nouns, no periods
+        - paint_specific_template:
+            "Paint\nMFR: {manufacturer}\nColor: {color_code} {color_name}\nSheen: {sheen_type}"
         - examples
             - "Kwikset\nMilan Round\nMatte Black"
             - "Drywall Finish Level 4 Smooth\nMFR: Dunn Edwards\nColor:DEW340 Whisper\nSheen: Flat\nNote: Ceiling Finish"
@@ -43,7 +61,11 @@
     - model_no
         - description: Manufacturer model number, item no, or sku no.
         - instructions
-            - If the model number is not found, return empty string
+            - If the model number is not found, return ""
+        - validation:
+            - Remove extra whitespace
+            - Preserve original formatting (hyphens, spaces)
+            - Include full code (prefix + number)
     - product_link
         - description: Original product page URL defined in the `**Product Url**` section.
     
@@ -68,5 +90,5 @@
 </system>
 
 <product_data>
-{"title":"Rho - Countertop Washbasin | Kast Concrete Basins","metadata":{"unknown":"http://static1.squarespace.com/static/5ed8a7a18f11346fbae67e2b/5ed8a80211c9095175b4ed96/5eeb42a629570314407c6ae2/1739800621913/Kast+Concrete+Basins+-+Rho.A1+-+Ivory.jpg?format=1500w","viewport":"width=device-width, initial-scale=1","og:site_name":"Kast Concrete Basins","og:title":"Rho - Countertop Washbasin | Kast Concrete Basins","og:url":"https://kastconcretebasins.com/products/p/rho","og:type":"product","og:description":"Oval concrete countertop vessel sink with ample inner depth. Minimal and contemporary in design with slim edge detail and refined contours. Available in 28 colours.","og:image":"http://static1.squarespace.com/static/5ed8a7a18f11346fbae67e2b/5ed8a80211c9095175b4ed96/5eeb42a629570314407c6ae2/1739800621913/Kast+Concrete+Basins+-+Rho.A1+-+Ivory.jpg?format=1500w","og:image:width":"1500","og:image:height":"1500","product:price:amount":"0.00","product:price:currency":"GBP","product:availability":"oos","twitter:title":"Rho - Countertop Washbasin | Kast Concrete Basins","twitter:image":"http://static1.squarespace.com/static/5ed8a7a18f11346fbae67e2b/5ed8a80211c9095175b4ed96/5eeb42a629570314407c6ae2/1739800621913/Kast+Concrete+Basins+-+Rho.A1+-+Ivory.jpg?format=1500w","twitter:url":"https://kastconcretebasins.com/products/p/rho","twitter:card":"summary","twitter:description":"Oval concrete countertop vessel sink with ample inner depth. Minimal and contemporary in design with slim edge detail and refined contours. Available in 28 colours.","description":"Oval concrete countertop vessel sink with ample inner depth. Minimal and \ncontemporary in design with slim edge detail and refined contours. \nAvailable in 28 colours.","p:domain_verify":"ea5b94282a0dca32446333736fa72663"},"text":"Rho - Countertop Washbasin | Kast Concrete Basins\n0\nImage 1 of 5\nImage 2 of 5\nImage 3 of 5\nImage 4 of 5\nImage 5 of 5\nRho\n£0.00\nsold out\nA practical and elegantly curved countertop basin with ample inner depth.\nSuitable for surface mounting\nDesigned for use with a wall-mounted tap\nCompatible with all standard unslotted wastes\nTaps, trap and waste not included\nAvailable in\n28 colours\nConcrete is a unique material that combines the organic characteristics of natural stone with the ability to be cast into any shape. Read more about concrete characteristics\nhere\n.\nDue to the semi-bespoke nature of our products, all basins are made to order and lead times will vary. An approximate lead time can be given upon enquiry.\nMade in the UK and delivered worldwide.\nAdd To Cart\nA practical and elegantly curved countertop basin with ample inner depth.\nSuitable for surface mounting\nDesigned for use with a wall-mounted tap\nCompatible with all standard unslotted wastes\nTaps, trap and waste not included\nAvailable in\n28 colours\nConcrete is a unique material that combines the organic characteristics of natural stone with the ability to be cast into any shape. Read more about concrete characteristics\nhere\n.\nDue to the semi-bespoke nature of our products, all basins are made to order and lead times will vary. An approximate lead time can be given upon enquiry.\nMade in the UK and delivered worldwide.\nA practical and elegantly curved countertop basin with ample inner depth.\nSuitable for surface mounting\nDesigned for use with a wall-mounted tap\nCompatible with all standard unslotted wastes\nTaps, trap and waste not included\nAvailable in\n28 colours\nConcrete is a unique material that combines the organic characteristics of natural stone with the ability to be cast into any shape. Read more about concrete characteristics\nhere\n.\nDue to the semi-bespoke nature of our products, all basins are made to order and lead times will vary. An approximate lead time can be given upon enquiry.\nMade in the UK and delivered worldwide.\nSize Variations\nClick to view technical sheet","images":[{"src":"https://images.squarespace-cdn.com/content/v1/5ed8a7a18f11346fbae67e2b/1595948616120-S4NIZFOHO37OH56TIDHF/RH.A1.jpg","alt":""}]}
+{"title":"Dot Line Suspension - Lambert & Fils","metadata":{"unknown":"ie=edge","viewport":"width=device-width, initial-scale=1","theme-color":"#ffffff","robots":"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1","og:locale":"en_US","og:type":"og:product","og:title":"Dot Line Suspension","og:description":"The Dot Line Suspension combines the luminosity of exposed bulbs with the richness of brass in a geometrical distribution. The result is a collection of lamps inspired by a graceful balance of lines and incandescent points.\n\n ","og:url":"https://lambertetfils.com/product/dot-line-suspension/","og:site_name":"Lambert & Fils","article:publisher":"https://www.facebook.com/lambertetfils/","article:modified_time":"2025-01-16T18:13:19+00:00","og:image":"https://lambertetfils.com/wp-content/uploads/2017/11/products_collection_dot-grid11a-1560x2079.jpg","og:image:width":"1920","og:image:height":"2560","og:image:type":"image/jpeg","twitter:card":"summary_large_image","twitter:site":"@lambertetfils","twitter:label1":"Est. reading time","twitter:data1":"1 minute","generator":"WPML ver:4.7.6 stt:1,4;","product:price:currency":"USD","product:price:amount":"1855","og:availability":"instock"},"text":"Dot Line Suspension - Lambert & Fils\nDot Line Suspension\nThe Dot Line Suspension combines the luminosity of exposed bulbs with the richness of brass in a geometrical distribution. The result is a collection of lamps inspired by a graceful balance of lines and incandescent points.\n$\n1,855.00 USD\nShipping included\nGet a Quote\nDetails\nMaterials:\nbrass or powder coated aluminium body\nbrass chains and hardware (BR model) or\nstainless steel chains and powder coated aluminium hardware (BK or WH models)\nmilk glass globes\npolyester cord\nDimensions and Weight:\nL 72 x W 2 x H 5 in / L 1829 x W 51 x H 127 mm\n96 in / 2438 mm cord length\n90 in / 2286 mm cable length\n1.8 lbs / 0.8 kg\nLighting Specifications:\nsource : G9 LED bulbs (included)\npower consumption : 5x 3.5W\ncolour temperature : 2700K\nSee product sheet for more details\nControl:\nrefer to product sheet for recommended dimmer models\nCertifications:\nUL\nCE\nSAA\nLead Times\nStandard time\n7-9 weeks\nFast shipping\n4 weeks – Brass only\nMore info\nDownloads\nProduct Sheet\nInstallation Manual\n3D Files\nIES Files\nMaintenance\nTerms & conditions\nLead Times\nCustomization\nMost Lambert & Fils designs can be customized to your needs. For variations, custom pricing or information, please get in touch with\norder@lambertetfils.com\n.\nRelated products\nParc 04\nLaurent 09\nDorval 01\nLaurent 07\nClose\nJoin our newsletter and get occasional updates on new designs, events, and other musings.\nYou can unsubscribe at any time","images":[{"src":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1300 1948'%3E%3C/svg%3E","alt":""},{"src":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1300 867'%3E%3C/svg%3E","alt":""},{"src":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1300 1625'%3E%3C/svg%3E","alt":""},{"src":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1300 1734'%3E%3C/svg%3E","alt":""},{"src":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1300 1300'%3E%3C/svg%3E","alt":""},{"src":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 650 867'%3E%3C/svg%3E","alt":"Parc 04"},{"src":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 650 867'%3E%3C/svg%3E","alt":"Laurent 09"},{"src":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 650 867'%3E%3C/svg%3E","alt":"Dorval 01"},{"src":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 650 867'%3E%3C/svg%3E","alt":"Laurent 07"}]}
 </product_data>
