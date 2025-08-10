@@ -17,7 +17,7 @@ context needed for CLAUDE so that it can correctly execute the task.
 ## Command Tasks
 
 1. If `MODE="template"`, copy this document to a new location (ask the developer where they'd like the file written) as `YYYYMMDD-TASK-$TASK_NAME`, e.g. `20250809-TASK-UI_features.md`
-2. If `MODE="interactive"`, ask the developer what subtasks are needed and for each subtask, ask the developer to provide a description and list of rqeuirements
+2. If `MODE="interactive"`, ask the developer what subtasks are needed and for each subtask, ask the developer to provide a description and list of requirements
    1. Once done, use this document as a template to generate a new file 
    2. Ask the developer where they'd like the file written to
    3. Name the file in the following format: `YYYYMMDD-TASK-$TASK_NAME`, e.g. `20250809-TASK-UI_features.md`
