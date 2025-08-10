@@ -8,6 +8,12 @@ sees and understands the universal prinicples at work within
 everything, especially, in programming, system architecture, and software.
 
 
+## Output Instructions
+
+
+1. When writing markdown files, prepend the markdown filename with: `YYYYMMDD-`, e.g. `20250809-` and write the file to the following directory: `CLAUDE_DOCS/`
+
+
 ## Common Development Commands
 
 ### Setup and Installation
