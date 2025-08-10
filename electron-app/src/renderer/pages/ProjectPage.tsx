@@ -5,6 +5,55 @@ import { Product } from '../types';
 import { api } from '../services/api';
 import './ProjectPage.css';
 
+// Types for persisted state
+interface ProjectPageState {
+  viewMode: 'grid' | 'list';
+  groupBy: 'none' | 'location';
+  sortBy: 'name' | 'date' | 'location';
+}
+
+// Local storage utilities
+const STORAGE_KEY = 'projectPage_preferences';
+
+const getStoredState = (): Partial<ProjectPageState> => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) return {};
+    
+    const parsed = JSON.parse(stored);
+    
+    // Validate the stored data
+    const validatedState: Partial<ProjectPageState> = {};
+    
+    if (parsed.viewMode === 'grid' || parsed.viewMode === 'list') {
+      validatedState.viewMode = parsed.viewMode;
+    }
+    
+    if (parsed.groupBy === 'none' || parsed.groupBy === 'location') {
+      validatedState.groupBy = parsed.groupBy;
+    }
+    
+    if (parsed.sortBy === 'name' || parsed.sortBy === 'date' || parsed.sortBy === 'location') {
+      validatedState.sortBy = parsed.sortBy;
+    }
+    
+    return validatedState;
+  } catch (error) {
+    console.warn('Failed to load project page preferences:', error);
+    return {};
+  }
+};
+
+const saveState = (state: Partial<ProjectPageState>) => {
+  try {
+    const current = getStoredState();
+    const updated = { ...current, ...state };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  } catch (error) {
+    console.warn('Failed to save project page preferences:', error);
+  }
+};
+
 const ProjectPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
@@ -12,11 +61,37 @@ const ProjectPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
-  const [groupBy, setGroupBy] = useState<'none' | 'location'>('none');
-  const [sortBy, setSortBy] = useState<'name' | 'date' | 'location'>('date');
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Initialize state from localStorage with fallback defaults
+  const storedState = getStoredState();
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(storedState.viewMode || 'list');
+  const [groupBy, setGroupBy] = useState<'none' | 'location'>(storedState.groupBy || 'none');
+  const [sortBy, setSortBy] = useState<'name' | 'date' | 'location'>(storedState.sortBy || 'date');
 
   const project = projects.find(p => p.id === projectId);
+
+  // State update functions that persist to localStorage
+  const updateViewMode = (mode: 'grid' | 'list') => {
+    setViewMode(mode);
+    if (isInitialized) {
+      saveState({ viewMode: mode });
+    }
+  };
+
+  const updateGroupBy = (group: 'none' | 'location') => {
+    setGroupBy(group);
+    if (isInitialized) {
+      saveState({ groupBy: group });
+    }
+  };
+
+  const updateSortBy = (sort: 'name' | 'date' | 'location') => {
+    setSortBy(sort);
+    if (isInitialized) {
+      saveState({ sortBy: sort });
+    }
+  };
 
   // Helper function to sort products
   const sortProducts = (products: Product[]) => {
@@ -59,6 +134,18 @@ const ProjectPage: React.FC = () => {
   const organizedProducts = groupBy === 'location' 
     ? groupProductsByLocation(products)
     : { 'All Products': sortProducts(products) };
+
+  // Mark component as initialized after first render
+  useEffect(() => {
+    setIsInitialized(true);
+  }, []);
+
+  // Log preference changes for debugging (optional)
+  useEffect(() => {
+    if (isInitialized) {
+      console.log('ProjectPage preferences updated:', { viewMode, groupBy, sortBy });
+    }
+  }, [viewMode, groupBy, sortBy, isInitialized]);
 
   useEffect(() => {
     if (!projectId) return;
@@ -133,7 +220,7 @@ const ProjectPage: React.FC = () => {
                 <select
                   className="control-select"
                   value={groupBy}
-                  onChange={(e) => setGroupBy(e.target.value as 'none' | 'location')}
+                  onChange={(e) => updateGroupBy(e.target.value as 'none' | 'location')}
                 >
                   <option value="none">None</option>
                   <option value="location">Location</option>
@@ -145,7 +232,7 @@ const ProjectPage: React.FC = () => {
                 <select
                   className="control-select"
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'name' | 'date' | 'location')}
+                  onChange={(e) => updateSortBy(e.target.value as 'name' | 'date' | 'location')}
                 >
                   <option value="date">Date Added</option>
                   <option value="name">Name</option>
@@ -157,7 +244,7 @@ const ProjectPage: React.FC = () => {
             <div className="view-toggle">
               <button
                 className={`toggle-button ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
+                onClick={() => updateViewMode('grid')}
                 title="Grid view"
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
@@ -169,7 +256,7 @@ const ProjectPage: React.FC = () => {
               </button>
               <button
                 className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
-                onClick={() => setViewMode('list')}
+                onClick={() => updateViewMode('list')}
                 title="List view"
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
