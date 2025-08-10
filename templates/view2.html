@@ -1,0 +1,1312 @@
+{% extends "base.html" %}
+
+{% block title %}Product Inspector - Simple Validation UI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .inspection-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .navigation-panel {
+        background: white;
+        border-radius: 4px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .left-section {
+        justify-self: start;
+    }
+
+    .center-section {
+        justify-self: center;
+    }
+
+    .right-section {
+        justify-self: end;
+    }
+
+    .nav-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .nav-controls button {
+        min-width: 100px;
+    }
+
+    .nav-controls button:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+    }
+
+    .current-position {
+        font-weight: bold;
+        color: #2c3e50;
+        font-size: 1.1rem;
+    }
+
+    .llm-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 300px;
+    }
+
+    .model-selection {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .model-selection label {
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .model-selection select {
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: white;
+        min-width: 150px;
+    }
+
+    .invoke-section {
+        display: flex;
+        align-items: center;
+    }
+
+    #invoke-llm-btn {
+        background-color: #27ae60;
+        padding: 0.5rem 1rem;
+        min-width: 120px;
+    }
+
+    #invoke-llm-btn:hover:not(:disabled) {
+        background-color: #219a52;
+    }
+
+    #invoke-llm-btn:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+    }
+
+    #invoke-spinner {
+        margin-left: 0.5rem;
+    }
+
+    .content-panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 400px auto;
+        gap: 1rem;
+    }
+
+    .panel {
+        background: white;
+        border-radius: 4px;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .raw-html-panel {
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
+    }
+
+    .prompt-panel {
+        grid-column: 2 / 2;
+        grid-row: 1 / 2;
+    }
+
+    .result-panel {
+        grid-column: 1 / 3;
+        grid-row: 2 / 3;
+    }
+
+    .panel h4 {
+        margin-bottom: 1rem;
+        color: #2c3e50;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .panel textarea {
+        flex: 1;
+        height: 100%;
+        min-height: 300px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.8rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 0.5rem;
+        resize: none;
+    }
+
+    .result-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .result-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #eee;
+        vertical-align: top;
+    }
+
+    .result-table td:first-child {
+        font-weight: bold;
+        background-color: #f8f9fa;
+        width: 120px;
+        color: #2c3e50;
+    }
+
+    .result-table td:last-child {
+        word-break: break-word;
+    }
+
+    .result-table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .results-container {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .no-results {
+        padding: 2rem;
+        text-align: center;
+        color: #666;
+        font-style: italic;
+    }
+
+    .results-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .results-table thead th {
+        background-color: #2c3e50;
+        color: white;
+        padding: 0.75rem;
+        text-align: left;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .results-table tbody td {
+        padding: 0.5rem;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+    }
+
+    .results-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .results-table .original-row {
+        background-color: #f0f8ff;
+        border-left: 4px solid #3498db;
+    }
+
+    .model-badge {
+        background: #3498db;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .original-row .model-badge {
+        background: #2c3e50;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    .status-badge.success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-badge.error {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .description-cell {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .url-cell {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .error-cell {
+        color: #e74c3c;
+        font-style: italic;
+    }
+
+    .actions-cell {
+        text-align: center;
+    }
+
+    .view-details-btn {
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .view-details-btn:hover {
+        background: #5a6268;
+    }
+
+    /* Modal styles */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-header {
+        background: #2c3e50;
+        color: white;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+    }
+
+    .modal-close:hover {
+        opacity: 0.8;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .detail-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .detail-section h4 {
+        margin-bottom: 0.75rem;
+        color: #2c3e50;
+    }
+
+    .detail-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .detail-table td {
+        padding: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .detail-table td:first-child {
+        font-weight: bold;
+        width: 150px;
+        background: #f8f9fa;
+    }
+
+    .prompt-display, .raw-response {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 4px;
+        border-left: 4px solid #3498db;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .error-details {
+        background: #fff5f5;
+        padding: 1rem;
+        border-radius: 4px;
+        border-left: 4px solid #e74c3c;
+    }
+
+    .result-entry {
+        border-bottom: 1px solid #eee;
+        margin-bottom: 0;
+    }
+
+    .result-entry:last-child {
+        border-bottom: none;
+    }
+
+    .result-entry.original-result {
+        border: 2px solid #3498db;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+    }
+
+    .result-entry.original-result .result-header {
+        background: #f0f8ff;
+        border-left: 4px solid #3498db;
+    }
+
+    .result-header {
+        background: #f8f9fa;
+        padding: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        user-select: none;
+    }
+
+    .result-header:hover {
+        background: #e9ecef;
+    }
+
+    .result-header.error {
+        background: #fff5f5;
+        border-left: 4px solid #e74c3c;
+    }
+
+    .result-header.success {
+        background: #f0f8f0;
+        border-left: 4px solid #27ae60;
+    }
+
+    .result-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .result-timestamp {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .result-model {
+        background: #3498db;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+
+    .result-status {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    .result-status.success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .result-status.error {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .expand-icon {
+        transition: transform 0.2s;
+    }
+
+    .expand-icon.expanded {
+        transform: rotate(180deg);
+    }
+
+    .result-content {
+        display: none;
+        padding: 0;
+    }
+
+    .result-content.expanded {
+        display: block;
+    }
+
+    .result-table-wrapper {
+        padding: 1rem;
+    }
+
+    .result-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+    .success-indicator {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    .success-indicator.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .success-indicator.failed {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .copy-btn {
+        background-color: #6c757d;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .copy-btn:hover {
+        background-color: #5a6268;
+    }
+
+    .goto-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .goto-controls input {
+        width: 80px;
+        padding: 0.25rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .keyboard-shortcuts {
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+
+    @media (max-width: 1200px) {
+        .navigation-panel {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 1rem;
+        }
+        
+        .left-section, .center-section, .right-section {
+            justify-self: center;
+        }
+        
+        .content-panels {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto auto;
+        }
+        
+        .raw-html-panel {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        .prompt-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        .result-panel {
+            grid-column: 1;
+            grid-row: 3;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="loading">
+    <h2>Loading product inspector...</h2>
+</div>
+
+<div class="content" style="display: none;">
+    <div class="inspection-container">
+        <div class="navigation-panel">
+            <div class="left-section">
+                <h3>Product Inspector</h3>
+                <div class="keyboard-shortcuts">
+                    Use ← → arrow keys to navigate | Enter to go to specific product
+                </div>
+            </div>
+            
+            <div class="center-section">
+                <div class="nav-controls">
+                    <button id="prev-btn" onclick="navigateProduct(-1)">← Previous</button>
+                    <span class="current-position" id="current-position">- / -</span>
+                    <button id="next-btn" onclick="navigateProduct(1)">Next →</button>
+                    
+                    <div class="goto-controls">
+                        <span>Go to:</span>
+                        <input type="number" id="goto-input" min="1" placeholder="1">
+                        <button onclick="gotoProduct()">Go</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-section">
+                <div class="llm-controls">
+                    <div class="model-selection">
+                        <label for="model-select">Model:</label>
+                        <select id="model-select">
+                            <option value="">Loading models...</option>
+                        </select>
+                    </div>
+                    <div class="invoke-section">
+                        <button id="invoke-llm-btn" onclick="invokeLLM()" disabled>
+                            <span id="invoke-btn-text">Invoke LLM</span>
+                            <span id="invoke-spinner" style="display: none;">⏳</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-panels">
+            <div class="panel raw-html-panel">
+                <h4>
+                    Raw HTML Content
+                    <button class="copy-btn" onclick="copyToClipboard('raw-html')">Copy</button>
+                </h4>
+                <textarea id="raw-html" readonly placeholder="Raw HTML content will appear here..."></textarea>
+            </div>
+            
+            <div class="panel prompt-panel">
+                <h4>
+                    LLM Prompt <span style="font-size: 0.8rem; font-weight: normal; color: #666;">(Editable - modify before invoking)</span>
+                    <button class="copy-btn" onclick="copyToClipboard('llm-prompt')">Copy</button>
+                </h4>
+                <textarea id="llm-prompt" placeholder="LLM prompt will appear here. You can edit this prompt before invoking the LLM."></textarea>
+            </div>
+            
+            <div class="panel result-panel">
+                <h4>
+                    LLM Extraction Results
+                    <button class="copy-btn" onclick="exportLLMResults()" title="Export results as CSV">Export CSV</button>
+                </h4>
+                <div class="results-container" id="results-container">
+                    <div class="no-results" id="no-results">
+                        No LLM results yet. Use "Invoke LLM" to generate new results.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentIndex = 0;
+let totalProducts = 0;
+
+function onDataLoaded(response) {
+    totalProducts = response.total_products;
+    $('#goto-input').attr('max', totalProducts);
+    loadModels();
+    loadProduct(0);
+}
+
+function loadProduct(index) {
+    if (index < 0 || index >= totalProducts) {
+        return;
+    }
+    
+    currentIndex = index;
+    
+    // Update navigation state
+    updateNavigationState();
+    
+    // Load product data
+    $.get(`/get_product/${index}`)
+        .done(function(data) {
+            displayProduct(data);
+        })
+        .fail(function(xhr) {
+            const error = xhr.responseJSON ? xhr.responseJSON.error : 'Failed to load product';
+            showError(error);
+        });
+}
+
+function displayProduct(data) {
+    // Update navigation info
+    $('#current-position').text(`${data.index + 1} / ${data.total}`);
+    
+    // Update content areas
+    $('#raw-html').val(data.raw_html);
+    $('#llm-prompt').val(data.prompt);
+    
+    // Combine original LLM result with history
+    const allResults = [];
+    
+    // Add original result as first entry if it exists
+    if (data.llm_result && Object.keys(data.llm_result).length > 0) {
+        const originalResult = {
+            timestamp: 'Original Extraction',
+            model: 'Initial Processing',
+            prompt: data.prompt,
+            success: true,
+            result: data.llm_result,
+            raw_response: '',
+            error: null,
+            isOriginal: true
+        };
+        allResults.push(originalResult);
+    }
+    
+    // Add history results
+    if (data.llm_history && data.llm_history.length > 0) {
+        allResults.push(...data.llm_history);
+    }
+    
+    // Display all results
+    displayLLMResults(allResults);
+    
+    // Update goto input
+    $('#goto-input').val(currentIndex + 1);
+}
+
+function updateNavigationState() {
+    $('#prev-btn').prop('disabled', currentIndex <= 0);
+    $('#next-btn').prop('disabled', currentIndex >= totalProducts - 1);
+}
+
+function navigateProduct(direction) {
+    const newIndex = currentIndex + direction;
+    if (newIndex >= 0 && newIndex < totalProducts) {
+        loadProduct(newIndex);
+    }
+}
+
+function gotoProduct() {
+    const input = $('#goto-input').val();
+    const targetIndex = parseInt(input) - 1; // Convert to 0-based index
+    
+    if (isNaN(targetIndex) || targetIndex < 0 || targetIndex >= totalProducts) {
+        showError(`Invalid product number. Please enter a number between 1 and ${totalProducts}.`);
+        return;
+    }
+    
+    loadProduct(targetIndex);
+}
+
+function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    element.select();
+    document.execCommand('copy');
+    
+    // Show feedback
+    const button = event.target;
+    const originalText = button.textContent;
+    button.textContent = 'Copied!';
+    button.style.backgroundColor = '#27ae60';
+    
+    setTimeout(function() {
+        button.textContent = originalText;
+        button.style.backgroundColor = '';
+    }, 1000);
+}
+
+function loadModels() {
+    $.get('/get_models')
+        .done(function(response) {
+            if (response.success) {
+                const select = $('#model-select');
+                select.empty();
+                
+                if (response.llm_available) {
+                    select.append('<option value="">Select a model...</option>');
+                    response.models.forEach(function(model) {
+                        select.append(`<option value="${model}">${model}</option>`);
+                    });
+                    
+                    // Enable the invoke button when model is selected
+                    select.on('change', function() {
+                        const invokeBtn = $('#invoke-llm-btn');
+                        if ($(this).val()) {
+                            invokeBtn.prop('disabled', false);
+                        } else {
+                            invokeBtn.prop('disabled', true);
+                        }
+                    });
+                } else {
+                    select.append('<option value="">LLM not available</option>');
+                    $('#invoke-llm-btn').prop('disabled', true);
+                }
+            } else {
+                $('#model-select').html('<option value="">Error loading models</option>');
+                $('#invoke-llm-btn').prop('disabled', true);
+            }
+        })
+        .fail(function(xhr) {
+            $('#model-select').html('<option value="">Failed to load models</option>');
+            $('#invoke-llm-btn').prop('disabled', true);
+            console.error('Failed to load models:', xhr);
+        });
+}
+
+function invokeLLM() {
+    const model = $('#model-select').val();
+    const prompt = $('#llm-prompt').val();
+    
+    if (!model) {
+        showError('Please select a model first');
+        return;
+    }
+    
+    if (!prompt.trim()) {
+        showError('Prompt is empty');
+        return;
+    }
+    
+    // Update UI for loading state
+    const invokeBtn = $('#invoke-llm-btn');
+    const btnText = $('#invoke-btn-text');
+    const spinner = $('#invoke-spinner');
+    
+    invokeBtn.prop('disabled', true);
+    btnText.text('Invoking...');
+    spinner.show();
+    
+    // Clear any existing errors
+    $('.error').fadeOut();
+    
+    $.ajax({
+        url: '/invoke_llm',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            model: model,
+            prompt: prompt,
+            product_index: currentIndex
+        }),
+        success: function(response) {
+            if (response.success) {
+                // Reload the product to get updated results with original result preserved
+                loadProduct(currentIndex);
+                showSuccess('LLM invocation successful!');
+            } else {
+                showError('LLM invocation failed: ' + (response.error || 'Unknown error'));
+            }
+        },
+        error: function(xhr) {
+            const error = xhr.responseJSON ? xhr.responseJSON.error : 'Failed to invoke LLM';
+            showError(error);
+        },
+        complete: function() {
+            // Reset UI
+            invokeBtn.prop('disabled', false);
+            btnText.text('Invoke LLM');
+            spinner.hide();
+        }
+    });
+}
+
+function displayLLMResults(results) {
+    const container = $('#results-container');
+    const noResults = $('#no-results');
+    
+    if (!results || results.length === 0) {
+        noResults.show();
+        container.find('.results-table-wrapper').remove();
+        return;
+    }
+    
+    noResults.hide();
+    container.find('.results-table-wrapper').remove();
+    
+    // Create table HTML
+    let tableHtml = `
+        <div class="results-table-wrapper">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Model</th>
+                        <th>Status</th>
+                        <th>Image URL</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Model No</th>
+                        <th>Product Link</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    results.forEach(function(result, index) {
+        const rowClass = result.isOriginal ? 'original-row' : '';
+        const statusClass = result.success ? 'success' : 'error';
+        const statusText = result.success ? 'Success' : 'Error';
+        const data = result.result || {};
+        
+        tableHtml += `
+            <tr class="${rowClass}">
+                <td class="timestamp-cell">${result.timestamp}</td>
+                <td class="model-cell">
+                    <span class="model-badge">${result.model}</span>
+                </td>
+                <td class="status-cell">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </td>
+        `;
+        
+        if (result.success) {
+            tableHtml += `
+                <td class="url-cell">${makeClickableShort(data.image_url) || '-'}</td>
+                <td>${data.type || '-'}</td>
+                <td class="description-cell" title="${escapeHtml(data.description || '')}">${truncateText(data.description, 50) || '-'}</td>
+                <td>${data.model_no || '-'}</td>
+                <td class="url-cell">${makeClickableShort(data.product_link) || '-'}</td>
+            `;
+        } else {
+            tableHtml += `
+                <td colspan="5" class="error-cell">
+                    <span class="error-text">${result.error || 'Unknown error'}</span>
+                </td>
+            `;
+        }
+        
+        tableHtml += `
+                <td class="actions-cell">
+                    <button class="view-details-btn" onclick="viewResultDetails(${index})" title="View full details">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tableHtml += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.append(tableHtml);
+    
+    // Store results for detail viewing
+    container.data('results', results);
+}
+
+function createResultEntry(result, index) {
+    const statusClass = result.success ? 'success' : 'error';
+    const headerClass = result.success ? 'success' : 'error';
+    const isOriginal = result.isOriginal || false;
+    
+    let resultTableHtml = '';
+    
+    // Create prompt section if available
+    const promptSection = result.prompt ? `
+        <div style="margin-bottom: 1rem; padding: 0.75rem; background: #f8f9fa; border-radius: 4px; border-left: 4px solid #3498db;">
+            <strong style="color: #2c3e50;">Prompt Used:</strong>
+            <div style="margin-top: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.85rem; max-height: 150px; overflow-y: auto; white-space: pre-wrap;">${result.prompt}</div>
+        </div>
+    ` : '';
+    
+    if (result.success && result.result) {
+        const data = result.result;
+        resultTableHtml = `
+            <div class="result-table-wrapper">
+                ${promptSection}
+                <table class="result-table">
+                    <tr><td>Image URL:</td><td>${makeClickable(data.image_url) || '-'}</td></tr>
+                    <tr><td>Type:</td><td>${data.type || '-'}</td></tr>
+                    <tr><td>Description:</td><td>${data.description || '-'}</td></tr>
+                    <tr><td>Model No:</td><td>${data.model_no || '-'}</td></tr>
+                    <tr><td>Product Link:</td><td>${makeClickable(data.product_link) || '-'}</td></tr>
+                </table>
+            </div>
+        `;
+    } else {
+        resultTableHtml = `
+            <div class="result-table-wrapper">
+                ${promptSection}
+                <div style="color: #e74c3c; padding: 1rem;">
+                    <strong>Error:</strong> ${result.error || 'Unknown error'}
+                    <br><br>
+                    <strong>Raw Response:</strong><br>
+                    <pre style="background: #f8f9fa; padding: 0.5rem; border-radius: 4px; max-height: 200px; overflow-y: auto;">${result.raw_response || 'No response'}</pre>
+                </div>
+            </div>
+        `;
+    }
+    
+    const originalClass = isOriginal ? ' original-result' : '';
+    const modelBadgeStyle = isOriginal ? 'background: #2c3e50;' : '';
+    
+    return `
+        <div class="result-entry${originalClass}">
+            <div class="result-header ${headerClass}" onclick="toggleResultExpansion(this)">
+                <div class="result-info">
+                    <span class="result-timestamp">${result.timestamp}</span>
+                    <span class="result-model" style="${modelBadgeStyle}">${result.model}</span>
+                    <span class="result-status ${statusClass}">${result.success ? 'SUCCESS' : 'ERROR'}</span>
+                </div>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="result-content">
+                ${resultTableHtml}
+            </div>
+        </div>
+    `;
+}
+
+function toggleResultExpansion(header) {
+    const entry = $(header).closest('.result-entry');
+    const content = entry.find('.result-content');
+    const icon = entry.find('.expand-icon');
+    
+    if (content.hasClass('expanded')) {
+        content.removeClass('expanded');
+        icon.removeClass('expanded');
+    } else {
+        content.addClass('expanded');
+        icon.addClass('expanded');
+    }
+}
+
+function makeClickable(url) {
+    if (url && url.trim() && url.startsWith('http')) {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    }
+    return url;
+}
+
+function makeClickableShort(url) {
+    if (url && url.trim() && url.startsWith('http')) {
+        const displayText = url.length > 30 ? url.substring(0, 30) + '...' : url;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(url)}">${displayText}</a>`;
+    }
+    return url;
+}
+
+function truncateText(text, maxLength) {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+function viewResultDetails(index) {
+    const results = $('#results-container').data('results');
+    const result = results[index];
+    
+    if (!result) return;
+    
+    // Create modal content
+    let modalContent = `
+        <div class="modal-backdrop" onclick="closeDetailsModal()">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3>Result Details - ${result.timestamp}</h3>
+                    <button class="modal-close" onclick="closeDetailsModal()">×</button>
+                </div>
+                <div class="modal-body">
+    `;
+    
+    // Add model and status info
+    modalContent += `
+        <div class="detail-section">
+            <h4>Execution Info</h4>
+            <table class="detail-table">
+                <tr><td>Model:</td><td>${result.model}</td></tr>
+                <tr><td>Status:</td><td>${result.success ? 'Success' : 'Error'}</td></tr>
+                <tr><td>Timestamp:</td><td>${result.timestamp}</td></tr>
+            </table>
+        </div>
+    `;
+    
+    // Add prompt if available
+    if (result.prompt) {
+        modalContent += `
+            <div class="detail-section">
+                <h4>Prompt Used</h4>
+                <pre class="prompt-display">${escapeHtml(result.prompt)}</pre>
+            </div>
+        `;
+    }
+    
+    // Add extraction results or error
+    if (result.success && result.result) {
+        const data = result.result;
+        modalContent += `
+            <div class="detail-section">
+                <h4>Extraction Results</h4>
+                <table class="detail-table">
+                    <tr><td>Image URL:</td><td>${makeClickable(data.image_url) || '-'}</td></tr>
+                    <tr><td>Type:</td><td>${data.type || '-'}</td></tr>
+                    <tr><td>Description:</td><td>${data.description || '-'}</td></tr>
+                    <tr><td>Model No:</td><td>${data.model_no || '-'}</td></tr>
+                    <tr><td>Product Link:</td><td>${makeClickable(data.product_link) || '-'}</td></tr>
+                </table>
+            </div>
+        `;
+    } else {
+        modalContent += `
+            <div class="detail-section">
+                <h4>Error Details</h4>
+                <div class="error-details">
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    ${result.raw_response ? `<pre class="raw-response">${escapeHtml(result.raw_response)}</pre>` : ''}
+                </div>
+            </div>
+        `;
+    }
+    
+    modalContent += `
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to page
+    $('body').append(modalContent);
+}
+
+function closeDetailsModal() {
+    $('.modal-backdrop').remove();
+}
+
+function exportLLMResults() {
+    // Get current product data
+    if (currentIndex < 0 || currentIndex >= totalProducts) {
+        showError('No product selected for export');
+        return;
+    }
+
+    // Get all results from the current display
+    const resultsContainer = $('#results-container');
+    const resultEntries = resultsContainer.find('.result-entry');
+    
+    if (resultEntries.length === 0) {
+        showError('No results to export');
+        return;
+    }
+
+    // Create CSV data
+    const csvData = [];
+    const headers = [
+        'Product_Index',
+        'Product_URL', 
+        'Timestamp',
+        'Model',
+        'Success',
+        'Image_URL',
+        'Type',
+        'Description',
+        'Model_No',
+        'Product_Link',
+        'Prompt_Preview',
+        'Error',
+        'Raw_Response_Preview'
+    ];
+    
+    csvData.push(headers);
+    
+    // Get current product URL from the get_product response
+    $.get(`/get_product/${currentIndex}`)
+        .done(function(productData) {
+            const productUrl = productData.url || '';
+            
+            // Collect all results data
+            const allResults = [];
+            
+            // Add original result
+            if (productData.llm_result && Object.keys(productData.llm_result).length > 0) {
+                allResults.push({
+                    timestamp: 'Original Extraction',
+                    model: 'Initial Processing',
+                    prompt: productData.prompt || '',
+                    success: true,
+                    result: productData.llm_result,
+                    raw_response: '',
+                    error: null
+                });
+            }
+            
+            // Add history results
+            if (productData.llm_history) {
+                allResults.push(...productData.llm_history);
+            }
+            
+            // Convert results to CSV rows
+            allResults.forEach(function(result) {
+                const data = result.result || {};
+                const promptPreview = (result.prompt || '').substring(0, 100).replace(/[\r\n]+/g, ' ') + '...';
+                const rawResponsePreview = (result.raw_response || '').substring(0, 100).replace(/[\r\n]+/g, ' ') + '...';
+                
+                const row = [
+                    currentIndex,
+                    `"${productUrl.replace(/"/g, '""')}"`,
+                    result.timestamp || '',
+                    result.model || '',
+                    result.success ? 'TRUE' : 'FALSE',
+                    `"${(data.image_url || '').replace(/"/g, '""')}"`,
+                    `"${(data.type || '').replace(/"/g, '""')}"`,
+                    `"${(data.description || '').replace(/"/g, '""')}"`,
+                    `"${(data.model_no || '').replace(/"/g, '""')}"`,
+                    `"${(data.product_link || '').replace(/"/g, '""')}"`,
+                    `"${promptPreview.replace(/"/g, '""')}"`,
+                    `"${(result.error || '').replace(/"/g, '""')}"`,
+                    `"${rawResponsePreview.replace(/"/g, '""')}"`
+                ];
+                
+                csvData.push(row);
+            });
+            
+            // Generate CSV content
+            const csvContent = csvData.map(row => row.join(',')).join('\n');
+            
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            const filename = `llm_extraction_results_product_${currentIndex}_${timestamp}.csv`;
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showSuccess('Results exported successfully!');
+            } else {
+                showError('Export not supported in this browser');
+            }
+        })
+        .fail(function() {
+            showError('Failed to get product data for export');
+        });
+}
+
+// Keyboard navigation
+$(document).keydown(function(e) {
+    // Only handle keys when not in an input field
+    if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') {
+        if (e.key === 'Enter' && e.target.id === 'goto-input') {
+            gotoProduct();
+        }
+        return;
+    }
+    
+    switch(e.key) {
+        case 'ArrowLeft':
+            e.preventDefault();
+            navigateProduct(-1);
+            break;
+        case 'ArrowRight':
+            e.preventDefault();
+            navigateProduct(1);
+            break;
+        case 'Home':
+            e.preventDefault();
+            loadProduct(0);
+            break;
+        case 'End':
+            e.preventDefault();
+            loadProduct(totalProducts - 1);
+            break;
+    }
+});
+</script>
+{% endblock %}

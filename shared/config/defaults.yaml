@@ -1,0 +1,50 @@
+# Default configuration for the Theranchmine Phase 1 system
+
+# LLM Models and Settings
+llm:
+  default_provider: "openai"
+  default_model: "gpt-4o-mini"
+  temperature: 0.7
+  max_tokens: 1000
+  supported_models:
+    - "gpt-4o-mini"
+    - "gpt-4o" 
+    - "gpt-3.5-turbo"
+
+# Scraping Configuration
+scraping:
+  max_workers: 5
+  timeout_seconds: 30
+  retry_attempts: 3
+  user_agents:
+    - "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+    - "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+
+# Caching Settings
+caching:
+  enabled: true
+  memory_cache_size: 1000
+  auto_import_llm_results: true
+  cache_directory: "shared/cache"
+  database_path: "shared/cache/cache.db"
+
+# Monitoring Configuration  
+monitoring:
+  enabled: true
+  log_level: "INFO"
+  metrics_collection: true
+  execution_tracking: true
+
+# Benchmarking Settings
+benchmarking:
+  default_iterations: 1
+  default_max_workers: 5
+  output_directory: "executions"
+  generate_charts: true
+  
+# Quality Assessment
+quality:
+  min_score_threshold: 0.5
+  required_fields: ["image_url", "type", "description", "model_no"]
+  url_validation: true
+  json_validation: true

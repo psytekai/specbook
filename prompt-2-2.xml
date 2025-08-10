@@ -1,0 +1,72 @@
+
+<system>
+    **Role & Function**
+    You are an high end residential architect fetching product specification details from product websites.
+    You are given a product data pulled from a website from which you will extract the relevant product information defined below.
+    Clients will be reviewing the specification book, so it is important that you extract the data accurately and completely.
+    
+    **Product Url**
+    https://www.coloratelierpaint.com/product-page/tadelakt-shower-plaster
+
+    **Input Data Format**
+    The input data is a dictionary with the following keys:
+    - title
+    - metadata
+    - text
+    - images
+
+    **Data to Extract**
+    - image_url
+        - description: main product image URL
+        - instructions 
+            - If the url is a relative url, append to the base_url **without modifying the url as found in the html <img> tag**. 
+            - Prioritize <img> tag urls that have attributes such as `id`, `product_id`, `product-image`, etc
+    - type
+        - description: The product category
+        - examples
+            - "range hood"
+            - "grill"
+            - "fireplace"
+    - description
+        - description: Short product description capturing the simple essence of the product
+        - examples
+            - "Kwikset\nMilan Round\nMatte Black"
+            - "Drywall Finish Level 4 Smooth\nMFR: Dunn Edwards\nColor:DEW340 Whisper\nSheen: Flat\nNote: Ceiling Finish"
+            - "Fireclay\n2x2 Sheeted\nBasalt"
+            - "Delta\nTrinsic - Single handle pull-down faucet\nMatte Black"
+            - "BainUltra\nNokori Oval 6737"
+            - "Kohler\nElmbrook\nWhite"
+            - "Nuvo Lighting\nBlink Plus LED 7 inch White Flush Mount Ceiling Light\nWhite"
+            - "DWR\nMondrian Mirror 22x44"
+            - "Wolf\nBlack\n30\" M Series Contemporary Built-In Double Oven"
+            - "Fireorb\nFireorb\nBlack"
+    - model_no
+        - description: Manufacturer model number, item no, or sku no.
+        - instructions
+            - If the model number is not found, return "model_no not found"
+    - product_link
+        - description: Original product page URL defined in the `**Product Url**` section.
+    
+    ```
+    **Output Format**
+    1. Extract the following data in JSON format from <product_data>
+    2. Return your output in this JSON format without the json tag and codeblocks
+    3. You **don't add extra formatting instructions yourself**
+
+    ```json
+    {
+    "image_url": "",
+    "type": "",
+    "description": "",
+    "model_no": "",
+    "product_link": ""
+    }
+    ```
+
+    **IMPORTANT**:
+    1. If you are not 99.9% sure that the information is accurate, return "I don't know" for the value.
+</system>
+
+<product_data>
+{"title":"Tadelakt Shower Plaster | Color Atelier Paint & Plaster","metadata":{"unknown":"IE=edge","viewport":"width=device-width,initial-scale=1","description":"Color Atelier Tadelakt is designed for use in wet areas like showers, tub surrounds, and backsplashes. It can also be used for decorative dry area applications, and outdoors. Tadelakt, an ancient lime plaster finish, dates back to Romans, originated in Morocco. For millennia, it has been appreciated for its beauty, and","og:site_name":"Color Atelier Paint","og:url":"https://www.coloratelierpaint.com/products/tadelakt-shower-plaster","og:title":"Tadelakt Shower Plaster | Color Atelier Paint & Plaster","og:type":"product","og:description":"Color Atelier Tadelakt is designed for use in wet areas like showers, tub surrounds, and backsplashes. It can also be used for decorative dry area applications, and outdoors. Tadelakt, an ancient lime plaster finish, dates back to Romans, originated in Morocco. For millennia, it has been appreciated for its beauty, and","og:image":"http://www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Stone_White_ea0d9bed-e633-4968-a159-7001007f1e9c.jpg?v=1747186065","og:image:secure_url":"https://www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Stone_White_ea0d9bed-e633-4968-a159-7001007f1e9c.jpg?v=1747186065","og:image:width":"907","og:image:height":"1280","og:price:amount":"179.90","og:price:currency":"USD","twitter:card":"summary_large_image","twitter:title":"Tadelakt Shower Plaster | Color Atelier Paint & Plaster","twitter:description":"Color Atelier Tadelakt is designed for use in wet areas like showers, tub surrounds, and backsplashes. It can also be used for decorative dry area applications, and outdoors. Tadelakt, an ancient lime plaster finish, dates back to Romans, originated in Morocco. For millennia, it has been appreciated for its beauty, and","google-site-verification":"2B8Kuf3Dr24QMTF-5jfwWOR21APEBqchD6bI3gumpVs","shopify-digital-wallet":"/62393975031/digital_wallets/dialog","shopify-checkout-api-token":"9eab35acc7cbadcd5f8807b514f2b76c"},"text":"Tadelakt Shower Plaster | Color Atelier Paint & Plaster\nSan Francisco and Brooklyn showrooms are open for appointments, and order pick ups.\nSearch\nLog in\n0\nCart\nLIMEWASH\nPLASTERS\nPREPARATION & TOPCOATS\nBRUSHES & TOOLS\nFAN DECKS & SAMPLES\nCOLORS\nPROJECT GALLERY\n0\nTadelakt Shower Plaster\nPrice\n$179.90\nSize:\n5 Gallon | 32 lbs\n5 Gallon | 32 lbs\nColor:\nStone White\nQuantity\nColor Atelier Tadelakt is designed for use in wet areas like showers, tub surrounds, and backsplashes. It can also be used for decorative dry area applications, and outdoors.\nTadelakt, an ancient lime plaster finish, dates back to Romans, originated in Morocco. For millennia, it has been appreciated for its beauty, and function. Color Atelier Tadelakt is manufactured in America with the highest quality natural ingredients. The artisanal techniques behind the Tadelakt finish have been modernized, making it a popular choice for both luxury residences and commercial properties. Its burnished smooth, waxed, and water repellent finish results in seamless, elegant, and durable applications.\nProduct description\nExperience the elegance of Color Atelier Tadelakt, where surfaces are crafted to be as smooth as silk and as hard as stone with a luxurious feel.\nA unique blend of lime plaster creates a beautiful finish that is water-resistant and durable. It will provide an excellent bond to any properly prepared porous substrate, interior or exterior. The mineral pigments are already incorporated into the formula; simply add water to mix. For custom color ordering, please contact us.\nNaturally resistant to mold, mildew, and fungus. Tadelakt not only offers a beautiful finish, but it also helps to provide a healthy living environment.\nTadelakt in wet areas requires a certain level of expertise, and knowledge, contact us for further information.\nCoverage\n32 lbs. will cover approximately 200 sq ft in 1 coat. 2 coats are necessary for application.\nSubstrate Prep\nFOR NON-WET AREAS:\nThe drywall should be finished to level 3+. Prime with Color Atelier Bonding Primer. Apply Tadelakt once the primer is fully dry. Sealer, Wax are optional.\nFOR WET AREAS:\nOver the studs, follow either of these recommended methods.\nMETHOD #1\n1. Plywood\n2. Waterproof membrane\n3. Metal lathe with J-mold casing\n4. Scratch + Brown coat (if dried cured for less than two weeks, apply Bonding Primer)\n5.\nBase\n6. Tadelakt\n7.\nWax-sealer\nor\nWax-paste\nMETHOD #2\n1. Plywood\n2. Waterproof membrane\n3. Backer boards with J-mold casing\n4. Fiberglass mesh + Bonding Primer or Adhesive\n5. Base\n6. Tadelakt\n7.\nWax-sealer\nor\nWax-paste\nSpecification Guide Sheet\nDownload the spec sheet\nShipping Information\nOrders typically ship within 1-to-4 business days. Shipping charges vary depending on your zip code and weight of your orders and will be calculated at checkout.\nShare\nShare on Facebook\nOpens in a new window.\nPin it\nPin on Pinterest\nOpens in a new window.\nFAQ\nFind all our frequently asked questions regarding Tadelakt Shower Plaster\nRead\nTadelakt Project Gallery\nA little glimpse of projects to get you inspired\nDiscover\nYou may also like\nSHOP\nLime Paint\nPlasters\nPreparation & Topcoats\nTools & Brushes\nFan Deck & Samples\nSarah Sherman Samuel Collection\nfrenchCALIFORNIA Collection\nGift Card\nSUPPORT\nFAQs\nHow To Videos\nSpec Sheets\nTrade\nShipping & Returns\nContact Us\nCOMPANY\nOur Story\nEnvironment\nInformation\nCareers\nTerms & Conditions\nFOLLOW US\n© 2025,\nColor Atelier Paint\nOrderEditing","images":[{"src":"//www.coloratelierpaint.com/cdn/shop/files/Color_Atelier_Logo_Site_3.png?v=1648878614","alt":"Color Atelier Paint & Plaster Logo Black White"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Color_Atelier_Logo_Site_2.png?v=1648874135","alt":"Color Atelier Paint Logo"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Stone_White_ea0d9bed-e633-4968-a159-7001007f1e9c_600x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt-Chevre_600x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Wabi_copy_600x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Plateau_600x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Nue_600x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Rose_copy_600x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Du_Monde_600x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Konkrete_600x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Mineral_ce3199b7-75e6-4283-823b-93948052e515_600x.jpg?v=1747354817","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Greystone_copy_600x.jpg?v=1747354817","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadealakt_Verdigris_600x.jpg?v=1749329598","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Blue_Fog_copy_600x.jpg?v=1749329598","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_SoftTaupe_copy_600x.jpg?v=1749329598","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Velvet_Noir_e9023c58-363a-4789-9395-ccfe87e7f79c_600x.jpg?v=1749329598","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/ColorAtelier_Tadelakt_600x.jpg?v=1749329598","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Stone_White_ea0d9bed-e633-4968-a159-7001007f1e9c_50x@2x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt-Chevre_50x@2x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Wabi_copy_50x@2x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Plateau_50x@2x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Nue_50x@2x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Rose_copy_50x@2x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Du_Monde_50x@2x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Konkrete_50x@2x.jpg?v=1747186065","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Mineral_ce3199b7-75e6-4283-823b-93948052e515_50x@2x.jpg?v=1747354817","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Greystone_copy_50x@2x.jpg?v=1747354817","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadealakt_Verdigris_50x@2x.jpg?v=1749329598","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Blue_Fog_copy_50x@2x.jpg?v=1749329598","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_SoftTaupe_copy_50x@2x.jpg?v=1749329598","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Velvet_Noir_e9023c58-363a-4789-9395-ccfe87e7f79c_50x@2x.jpg?v=1749329598","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/ColorAtelier_Tadelakt_50x@2x.jpg?v=1749329598","alt":"Tadelakt Shower Plaster"},{"src":"//www.coloratelierpaint.com/cdn/shop/files/Tadelakt_Greystone_bfa13f35-3703-40e4-8b73-6e7e845de2ad_600x.jpg?v=1696123549","alt":""},{"src":"//www.coloratelierpaint.com/cdn/shop/files/tadelakt_Greystone_2_600x.webp?v=1655933949","alt":""}]}
+</product_data>

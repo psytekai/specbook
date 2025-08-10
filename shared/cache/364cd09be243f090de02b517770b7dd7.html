@@ -1,0 +1,2552 @@
+<!doctype html>
+<html lang="en">
+    <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# product: http://ogp.me/ns/product#">
+        <script>
+    var LOCALE = 'en\u002DUS';
+    var BASE_URL = 'https\u003A\u002F\u002Fwww.hinkley.com\u002F';
+    var require = {
+        'baseUrl': 'https\u003A\u002F\u002Fwww.hinkley.com\u002Fstatic\u002Fversion1750893362\u002Ffrontend\u002FWSC\u002FHinkley2018\u002Fen_US'
+    };</script>        <meta charset="utf-8"/><script type="text/javascript">(window.NREUM||(NREUM={})).init={ajax:{deny_list:["bam.nr-data.net"]}};(window.NREUM||(NREUM={})).loader_config={licenseKey:"abbb8a7801",applicationID:"114550246"};;/*! For license information please see nr-loader-rum-1.292.0.min.js.LICENSE.txt */
+(()=>{var e,t,r={122:(e,t,r)=>{"use strict";r.d(t,{a:()=>i});var n=r(944);function i(e,t){try{if(!e||"object"!=typeof e)return(0,n.R)(3);if(!t||"object"!=typeof t)return(0,n.R)(4);const r=Object.create(Object.getPrototypeOf(t),Object.getOwnPropertyDescriptors(t)),a=0===Object.keys(r).length?e:r;for(let o in a)if(void 0!==e[o])try{if(null===e[o]){r[o]=null;continue}Array.isArray(e[o])&&Array.isArray(t[o])?r[o]=Array.from(new Set([...e[o],...t[o]])):"object"==typeof e[o]&&"object"==typeof t[o]?r[o]=i(e[o],t[o]):r[o]=e[o]}catch(e){r[o]||(0,n.R)(1,e)}return r}catch(e){(0,n.R)(2,e)}}},555:(e,t,r)=>{"use strict";r.d(t,{D:()=>s,f:()=>o});var n=r(384),i=r(122);const a={beacon:n.NT.beacon,errorBeacon:n.NT.errorBeacon,licenseKey:void 0,applicationID:void 0,sa:void 0,queueTime:void 0,applicationTime:void 0,ttGuid:void 0,user:void 0,account:void 0,product:void 0,extra:void 0,jsAttributes:{},userAttributes:void 0,atts:void 0,transactionName:void 0,tNamePlain:void 0};function o(e){try{return!!e.licenseKey&&!!e.errorBeacon&&!!e.applicationID}catch(e){return!1}}const s=e=>(0,i.a)(e,a)},324:(e,t,r)=>{"use strict";r.d(t,{F3:()=>i,Xs:()=>a,xv:()=>n});const n="1.292.0",i="PROD",a="CDN"},154:(e,t,r)=>{"use strict";r.d(t,{OF:()=>c,RI:()=>i,WN:()=>d,bv:()=>a,gm:()=>o,mw:()=>s,sb:()=>u});var n=r(863);const i="undefined"!=typeof window&&!!window.document,a="undefined"!=typeof WorkerGlobalScope&&("undefined"!=typeof self&&self instanceof WorkerGlobalScope&&self.navigator instanceof WorkerNavigator||"undefined"!=typeof globalThis&&globalThis instanceof WorkerGlobalScope&&globalThis.navigator instanceof WorkerNavigator),o=i?window:"undefined"!=typeof WorkerGlobalScope&&("undefined"!=typeof self&&self instanceof WorkerGlobalScope&&self||"undefined"!=typeof globalThis&&globalThis instanceof WorkerGlobalScope&&globalThis),s=Boolean("hidden"===o?.document?.visibilityState),c=/iPad|iPhone|iPod/.test(o.navigator?.userAgent),u=c&&"undefined"==typeof SharedWorker,d=((()=>{const e=o.navigator?.userAgent?.match(/Firefox[/\s](\d+\.\d+)/);Array.isArray(e)&&e.length>=2&&e[1]})(),Date.now()-(0,n.t)())},241:(e,t,r)=>{"use strict";r.d(t,{W:()=>a});var n=r(154);const i="newrelic";function a(e={}){try{n.gm.dispatchEvent(new CustomEvent(i,{detail:e}))}catch(e){}}},687:(e,t,r)=>{"use strict";r.d(t,{Ak:()=>u,Ze:()=>f,x3:()=>d});var n=r(241),i=r(836),a=r(606),o=r(860),s=r(646);const c={};function u(e,t){const r={staged:!1,priority:o.P3[t]||0};l(e),c[e].get(t)||c[e].set(t,r)}function d(e,t){e&&c[e]&&(c[e].get(t)&&c[e].delete(t),p(e,t,!1),c[e].size&&g(e))}function l(e){if(!e)throw new Error("agentIdentifier required");c[e]||(c[e]=new Map)}function f(e="",t="feature",r=!1){if(l(e),!e||!c[e].get(t)||r)return p(e,t);c[e].get(t).staged=!0,g(e)}function g(e){const t=Array.from(c[e]);t.every((([e,t])=>t.staged))&&(t.sort(((e,t)=>e[1].priority-t[1].priority)),t.forEach((([t])=>{c[e].delete(t),p(e,t)})))}function p(e,t,r=!0){const o=e?i.ee.get(e):i.ee,c=a.i.handlers;if(!o.aborted&&o.backlog&&c){if((0,n.W)({agentIdentifier:e,type:"lifecycle",name:"drain",feature:t}),r){const e=o.backlog[t],r=c[t];if(r){for(let t=0;e&&t<e.length;++t)m(e[t],r);Object.entries(r).forEach((([e,t])=>{Object.values(t||{}).forEach((t=>{t[0]?.on&&t[0]?.context()instanceof s.y&&t[0].on(e,t[1])}))}))}}o.isolatedBacklog||delete c[t],o.backlog[t]=null,o.emit("drain-"+t,[])}}function m(e,t){var r=e[1];Object.values(t[r]||{}).forEach((t=>{var r=e[0];if(t[0]===r){var n=t[1],i=e[3],a=e[2];n.apply(i,a)}}))}},836:(e,t,r)=>{"use strict";r.d(t,{P:()=>s,ee:()=>c});var n=r(384),i=r(990),a=r(646),o=r(607);const s="nr@context:".concat(o.W),c=function e(t,r){var n={},o={},d={},l=!1;try{l=16===r.length&&u.initializedAgents?.[r]?.runtime.isolatedBacklog}catch(e){}var f={on:p,addEventListener:p,removeEventListener:function(e,t){var r=n[e];if(!r)return;for(var i=0;i<r.length;i++)r[i]===t&&r.splice(i,1)},emit:function(e,r,n,i,a){!1!==a&&(a=!0);if(c.aborted&&!i)return;t&&a&&t.emit(e,r,n);for(var s=g(n),u=m(e),d=u.length,l=0;l<d;l++)u[l].apply(s,r);var p=v()[o[e]];p&&p.push([f,e,r,s]);return s},get:h,listeners:m,context:g,buffer:function(e,t){const r=v();if(t=t||"feature",f.aborted)return;Object.entries(e||{}).forEach((([e,n])=>{o[n]=t,t in r||(r[t]=[])}))},abort:function(){f._aborted=!0,Object.keys(f.backlog).forEach((e=>{delete f.backlog[e]}))},isBuffering:function(e){return!!v()[o[e]]},debugId:r,backlog:l?{}:t&&"object"==typeof t.backlog?t.backlog:{},isolatedBacklog:l};return Object.defineProperty(f,"aborted",{get:()=>{let e=f._aborted||!1;return e||(t&&(e=t.aborted),e)}}),f;function g(e){return e&&e instanceof a.y?e:e?(0,i.I)(e,s,(()=>new a.y(s))):new a.y(s)}function p(e,t){n[e]=m(e).concat(t)}function m(e){return n[e]||[]}function h(t){return d[t]=d[t]||e(f,t)}function v(){return f.backlog}}(void 0,"globalEE"),u=(0,n.Zm)();u.ee||(u.ee=c)},646:(e,t,r)=>{"use strict";r.d(t,{y:()=>n});class n{constructor(e){this.contextId=e}}},908:(e,t,r)=>{"use strict";r.d(t,{d:()=>n,p:()=>i});var n=r(836).ee.get("handle");function i(e,t,r,i,a){a?(a.buffer([e],i),a.emit(e,t,r)):(n.buffer([e],i),n.emit(e,t,r))}},606:(e,t,r)=>{"use strict";r.d(t,{i:()=>a});var n=r(908);a.on=o;var i=a.handlers={};function a(e,t,r,a){o(a||n.d,i,e,t,r)}function o(e,t,r,i,a){a||(a="feature"),e||(e=n.d);var o=t[a]=t[a]||{};(o[r]=o[r]||[]).push([e,i])}},878:(e,t,r)=>{"use strict";function n(e,t){return{capture:e,passive:!1,signal:t}}function i(e,t,r=!1,i){window.addEventListener(e,t,n(r,i))}function a(e,t,r=!1,i){document.addEventListener(e,t,n(r,i))}r.d(t,{DD:()=>a,jT:()=>n,sp:()=>i})},607:(e,t,r)=>{"use strict";r.d(t,{W:()=>n});const n=(0,r(566).bz)()},566:(e,t,r)=>{"use strict";r.d(t,{LA:()=>s,bz:()=>o});var n=r(154);const i="xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";function a(e,t){return e?15&e[t]:16*Math.random()|0}function o(){const e=n.gm?.crypto||n.gm?.msCrypto;let t,r=0;return e&&e.getRandomValues&&(t=e.getRandomValues(new Uint8Array(30))),i.split("").map((e=>"x"===e?a(t,r++).toString(16):"y"===e?(3&a()|8).toString(16):e)).join("")}function s(e){const t=n.gm?.crypto||n.gm?.msCrypto;let r,i=0;t&&t.getRandomValues&&(r=t.getRandomValues(new Uint8Array(e)));const o=[];for(var s=0;s<e;s++)o.push(a(r,i++).toString(16));return o.join("")}},614:(e,t,r)=>{"use strict";r.d(t,{BB:()=>o,H3:()=>n,g:()=>u,iL:()=>c,tS:()=>s,uh:()=>i,wk:()=>a});const n="NRBA",i="SESSION",a=144e5,o=18e5,s={STARTED:"session-started",PAUSE:"session-pause",RESET:"session-reset",RESUME:"session-resume",UPDATE:"session-update"},c={SAME_TAB:"same-tab",CROSS_TAB:"cross-tab"},u={OFF:0,FULL:1,ERROR:2}},863:(e,t,r)=>{"use strict";function n(){return Math.floor(performance.now())}r.d(t,{t:()=>n})},944:(e,t,r)=>{"use strict";r.d(t,{R:()=>i});var n=r(241);function i(e,t){"function"==typeof console.debug&&(console.debug("New Relic Warning: https://github.com/newrelic/newrelic-browser-agent/blob/main/docs/warning-codes.md#".concat(e),t),(0,n.W)({agentIdentifier:null,drained:null,type:"data",name:"warn",feature:"warn",data:{code:e,secondary:t}}))}},701:(e,t,r)=>{"use strict";r.d(t,{B:()=>a,t:()=>o});var n=r(241);const i=new Set,a={};function o(e,t){const r=t.agentIdentifier;a[r]??={},e&&"object"==typeof e&&(i.has(r)||(t.ee.emit("rumresp",[e]),a[r]=e,i.add(r),(0,n.W)({agentIdentifier:r,loaded:!0,drained:!0,type:"lifecycle",name:"load",feature:void 0,data:e})))}},990:(e,t,r)=>{"use strict";r.d(t,{I:()=>i});var n=Object.prototype.hasOwnProperty;function i(e,t,r){if(n.call(e,t))return e[t];var i=r();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,t,{value:i,writable:!0,enumerable:!1}),i}catch(e){}return e[t]=i,i}},389:(e,t,r)=>{"use strict";function n(e,t=500,r={}){const n=r?.leading||!1;let i;return(...r)=>{n&&void 0===i&&(e.apply(this,r),i=setTimeout((()=>{i=clearTimeout(i)}),t)),n||(clearTimeout(i),i=setTimeout((()=>{e.apply(this,r)}),t))}}function i(e){let t=!1;return(...r)=>{t||(t=!0,e.apply(this,r))}}r.d(t,{J:()=>i,s:()=>n})},289:(e,t,r)=>{"use strict";r.d(t,{GG:()=>a,Qr:()=>s,sB:()=>o});var n=r(878);function i(){return"undefined"==typeof document||"complete"===document.readyState}function a(e,t){if(i())return e();(0,n.sp)("load",e,t)}function o(e){if(i())return e();(0,n.DD)("DOMContentLoaded",e)}function s(e){if(i())return e();(0,n.sp)("popstate",e)}},384:(e,t,r)=>{"use strict";r.d(t,{NT:()=>a,US:()=>u,Zm:()=>o,bQ:()=>c,dV:()=>s,pV:()=>d});var n=r(154),i=r(863);const a={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net"};function o(){return n.gm.NREUM||(n.gm.NREUM={}),void 0===n.gm.newrelic&&(n.gm.newrelic=n.gm.NREUM),n.gm.NREUM}function s(){let e=o();return e.o||(e.o={ST:n.gm.setTimeout,SI:n.gm.setImmediate,CT:n.gm.clearTimeout,XHR:n.gm.XMLHttpRequest,REQ:n.gm.Request,EV:n.gm.Event,PR:n.gm.Promise,MO:n.gm.MutationObserver,FETCH:n.gm.fetch,WS:n.gm.WebSocket}),e}function c(e,t){let r=o();r.initializedAgents??={},t.initializedAt={ms:(0,i.t)(),date:new Date},r.initializedAgents[e]=t}function u(e,t){o()[e]=t}function d(){return function(){let e=o();const t=e.info||{};e.info={beacon:a.beacon,errorBeacon:a.errorBeacon,...t}}(),function(){let e=o();const t=e.init||{};e.init={...t}}(),s(),function(){let e=o();const t=e.loader_config||{};e.loader_config={...t}}(),o()}},843:(e,t,r)=>{"use strict";r.d(t,{u:()=>i});var n=r(878);function i(e,t=!1,r,i){(0,n.DD)("visibilitychange",(function(){if(t)return void("hidden"===document.visibilityState&&e());e(document.visibilityState)}),r,i)}},773:(e,t,r)=>{"use strict";r.d(t,{z_:()=>a,XG:()=>s,TZ:()=>n,rs:()=>i,xV:()=>o});r(154),r(566),r(384);const n=r(860).K7.metrics,i="sm",a="cm",o="storeSupportabilityMetrics",s="storeEventMetrics"},630:(e,t,r)=>{"use strict";r.d(t,{T:()=>n});const n=r(860).K7.pageViewEvent},782:(e,t,r)=>{"use strict";r.d(t,{T:()=>n});const n=r(860).K7.pageViewTiming},234:(e,t,r)=>{"use strict";r.d(t,{W:()=>a});var n=r(836),i=r(687);class a{constructor(e,t){this.agentIdentifier=e,this.ee=n.ee.get(e),this.featureName=t,this.blocked=!1}deregisterDrain(){(0,i.x3)(this.agentIdentifier,this.featureName)}}},741:(e,t,r)=>{"use strict";r.d(t,{W:()=>a});var n=r(944),i=r(261);class a{#e(e,...t){if(this[e]!==a.prototype[e])return this[e](...t);(0,n.R)(35,e)}addPageAction(e,t){return this.#e(i.hG,e,t)}register(e){return this.#e(i.eY,e)}recordCustomEvent(e,t){return this.#e(i.fF,e,t)}setPageViewName(e,t){return this.#e(i.Fw,e,t)}setCustomAttribute(e,t,r){return this.#e(i.cD,e,t,r)}noticeError(e,t){return this.#e(i.o5,e,t)}setUserId(e){return this.#e(i.Dl,e)}setApplicationVersion(e){return this.#e(i.nb,e)}setErrorHandler(e){return this.#e(i.bt,e)}addRelease(e,t){return this.#e(i.k6,e,t)}log(e,t){return this.#e(i.$9,e,t)}start(){return this.#e(i.d3)}finished(e){return this.#e(i.BL,e)}recordReplay(){return this.#e(i.CH)}pauseReplay(){return this.#e(i.Tb)}addToTrace(e){return this.#e(i.U2,e)}setCurrentRouteName(e){return this.#e(i.PA,e)}interaction(){return this.#e(i.dT)}wrapLogger(e,t,r){return this.#e(i.Wb,e,t,r)}measure(e,t){return this.#e(i.V1,e,t)}}},261:(e,t,r)=>{"use strict";r.d(t,{$9:()=>u,BL:()=>s,CH:()=>g,Dl:()=>_,Fw:()=>y,PA:()=>h,Pl:()=>n,Tb:()=>l,U2:()=>a,V1:()=>k,Wb:()=>x,bt:()=>b,cD:()=>v,d3:()=>w,dT:()=>c,eY:()=>p,fF:()=>f,hG:()=>i,k6:()=>o,nb:()=>m,o5:()=>d});const n="api-",i="addPageAction",a="addToTrace",o="addRelease",s="finished",c="interaction",u="log",d="noticeError",l="pauseReplay",f="recordCustomEvent",g="recordReplay",p="register",m="setApplicationVersion",h="setCurrentRouteName",v="setCustomAttribute",b="setErrorHandler",y="setPageViewName",_="setUserId",w="start",x="wrapLogger",k="measure"},163:(e,t,r)=>{"use strict";r.d(t,{j:()=>E});var n=r(384),i=r(741);var a=r(555);r(860).K7.genericEvents;const o="experimental.marks",s="experimental.measures",c="experimental.resources",u=e=>{if(!e||"string"!=typeof e)return!1;try{document.createDocumentFragment().querySelector(e)}catch{return!1}return!0};var d=r(614),l=r(944),f=r(122);const g="[data-nr-mask]",p=e=>(0,f.a)(e,(()=>{const e={feature_flags:[],experimental:{marks:!1,measures:!1,resources:!1},mask_selector:"*",block_selector:"[data-nr-block]",mask_input_options:{color:!1,date:!1,"datetime-local":!1,email:!1,month:!1,number:!1,range:!1,search:!1,tel:!1,text:!1,time:!1,url:!1,week:!1,textarea:!1,select:!1,password:!0}};return{ajax:{deny_list:void 0,block_internal:!0,enabled:!0,autoStart:!0},api:{allow_registered_children:!0,duplicate_registered_data:!1},distributed_tracing:{enabled:void 0,exclude_newrelic_header:void 0,cors_use_newrelic_header:void 0,cors_use_tracecontext_headers:void 0,allowed_origins:void 0},get feature_flags(){return e.feature_flags},set feature_flags(t){e.feature_flags=t},generic_events:{enabled:!0,autoStart:!0},harvest:{interval:30},jserrors:{enabled:!0,autoStart:!0},logging:{enabled:!0,autoStart:!0},metrics:{enabled:!0,autoStart:!0},obfuscate:void 0,page_action:{enabled:!0},page_view_event:{enabled:!0,autoStart:!0},page_view_timing:{enabled:!0,autoStart:!0},performance:{get capture_marks(){return e.feature_flags.includes(o)||e.experimental.marks},set capture_marks(t){e.experimental.marks=t},get capture_measures(){return e.feature_flags.includes(s)||e.experimental.measures},set capture_measures(t){e.experimental.measures=t},capture_detail:!0,resources:{get enabled(){return e.feature_flags.includes(c)||e.experimental.resources},set enabled(t){e.experimental.resources=t},asset_types:[],first_party_domains:[],ignore_newrelic:!0}},privacy:{cookies_enabled:!0},proxy:{assets:void 0,beacon:void 0},session:{expiresMs:d.wk,inactiveMs:d.BB},session_replay:{autoStart:!0,enabled:!1,preload:!1,sampling_rate:10,error_sampling_rate:100,collect_fonts:!1,inline_images:!1,fix_stylesheets:!0,mask_all_inputs:!0,get mask_text_selector(){return e.mask_selector},set mask_text_selector(t){u(t)?e.mask_selector="".concat(t,",").concat(g):""===t||null===t?e.mask_selector=g:(0,l.R)(5,t)},get block_class(){return"nr-block"},get ignore_class(){return"nr-ignore"},get mask_text_class(){return"nr-mask"},get block_selector(){return e.block_selector},set block_selector(t){u(t)?e.block_selector+=",".concat(t):""!==t&&(0,l.R)(6,t)},get mask_input_options(){return e.mask_input_options},set mask_input_options(t){t&&"object"==typeof t?e.mask_input_options={...t,password:!0}:(0,l.R)(7,t)}},session_trace:{enabled:!0,autoStart:!0},soft_navigations:{enabled:!0,autoStart:!0},spa:{enabled:!0,autoStart:!0},ssl:void 0,user_actions:{enabled:!0,elementAttributes:["id","className","tagName","type"]}}})());var m=r(154),h=r(324);let v=0;const b={buildEnv:h.F3,distMethod:h.Xs,version:h.xv,originTime:m.WN},y={appMetadata:{},customTransaction:void 0,denyList:void 0,disabled:!1,entityManager:void 0,harvester:void 0,isolatedBacklog:!1,isRecording:!1,loaderType:void 0,maxBytes:3e4,obfuscator:void 0,onerror:void 0,ptid:void 0,releaseIds:{},session:void 0,timeKeeper:void 0,get harvestCount(){return++v}},_=e=>{const t=(0,f.a)(e,y),r=Object.keys(b).reduce(((e,t)=>(e[t]={value:b[t],writable:!1,configurable:!0,enumerable:!0},e)),{});return Object.defineProperties(t,r)};var w=r(701);const x=e=>{const t=e.startsWith("http");e+="/",r.p=t?e:"https://"+e};var k=r(836),A=r(241);const S={accountID:void 0,trustKey:void 0,agentID:void 0,licenseKey:void 0,applicationID:void 0,xpid:void 0},T=e=>(0,f.a)(e,S),R=new Set;function E(e,t={},r,o){let{init:s,info:c,loader_config:u,runtime:d={},exposed:l=!0}=t;if(!c){const e=(0,n.pV)();s=e.init,c=e.info,u=e.loader_config}e.init=p(s||{}),e.loader_config=T(u||{}),c.jsAttributes??={},m.bv&&(c.jsAttributes.isWorker=!0),e.info=(0,a.D)(c);const f=e.init,g=[c.beacon,c.errorBeacon];R.has(e.agentIdentifier)||(f.proxy.assets&&(x(f.proxy.assets),g.push(f.proxy.assets)),f.proxy.beacon&&g.push(f.proxy.beacon),function(e){const t=(0,n.pV)();Object.getOwnPropertyNames(i.W.prototype).forEach((r=>{const n=i.W.prototype[r];if("function"!=typeof n||"constructor"===n)return;let a=t[r];e[r]&&!1!==e.exposed&&"micro-agent"!==e.runtime?.loaderType&&(t[r]=(...t)=>{const n=e[r](...t);return a?a(...t):n})}))}(e),(0,n.US)("activatedFeatures",w.B),e.runSoftNavOverSpa&&=!0===f.soft_navigations.enabled&&f.feature_flags.includes("soft_nav")),d.denyList=[...f.ajax.deny_list||[],...f.ajax.block_internal?g:[]],d.ptid=e.agentIdentifier,d.loaderType=r,e.runtime=_(d),R.has(e.agentIdentifier)||(e.ee=k.ee.get(e.agentIdentifier),e.exposed=l,(0,A.W)({agentIdentifier:e.agentIdentifier,drained:!!w.B?.[e.agentIdentifier],type:"lifecycle",name:"initialize",feature:void 0,data:e.config})),R.add(e.agentIdentifier)}},374:(e,t,r)=>{r.nc=(()=>{try{return document?.currentScript?.nonce}catch(e){}return""})()},860:(e,t,r)=>{"use strict";r.d(t,{$J:()=>d,K7:()=>c,P3:()=>u,XX:()=>i,Yy:()=>s,df:()=>a,qY:()=>n,v4:()=>o});const n="events",i="jserrors",a="browser/blobs",o="rum",s="browser/logs",c={ajax:"ajax",genericEvents:"generic_events",jserrors:i,logging:"logging",metrics:"metrics",pageAction:"page_action",pageViewEvent:"page_view_event",pageViewTiming:"page_view_timing",sessionReplay:"session_replay",sessionTrace:"session_trace",softNav:"soft_navigations",spa:"spa"},u={[c.pageViewEvent]:1,[c.pageViewTiming]:2,[c.metrics]:3,[c.jserrors]:4,[c.spa]:5,[c.ajax]:6,[c.sessionTrace]:7,[c.softNav]:8,[c.sessionReplay]:9,[c.logging]:10,[c.genericEvents]:11},d={[c.pageViewEvent]:o,[c.pageViewTiming]:n,[c.ajax]:n,[c.spa]:n,[c.softNav]:n,[c.metrics]:i,[c.jserrors]:i,[c.sessionTrace]:a,[c.sessionReplay]:a,[c.logging]:s,[c.genericEvents]:"ins"}}},n={};function i(e){var t=n[e];if(void 0!==t)return t.exports;var a=n[e]={exports:{}};return r[e](a,a.exports,i),a.exports}i.m=r,i.d=(e,t)=>{for(var r in t)i.o(t,r)&&!i.o(e,r)&&Object.defineProperty(e,r,{enumerable:!0,get:t[r]})},i.f={},i.e=e=>Promise.all(Object.keys(i.f).reduce(((t,r)=>(i.f[r](e,t),t)),[])),i.u=e=>"nr-rum-1.292.0.min.js",i.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t),e={},t="NRBA-1.292.0.PROD:",i.l=(r,n,a,o)=>{if(e[r])e[r].push(n);else{var s,c;if(void 0!==a)for(var u=document.getElementsByTagName("script"),d=0;d<u.length;d++){var l=u[d];if(l.getAttribute("src")==r||l.getAttribute("data-webpack")==t+a){s=l;break}}if(!s){c=!0;var f={296:"sha512-vV6XfBYRKdW1mnqFJICmxO127P1af8JBWoP0dBYfzpZBHBDM/opWrZh1SphTpUuf8Sw+aTcyEDjMvkVQA9lHgQ=="};(s=document.createElement("script")).charset="utf-8",s.timeout=120,i.nc&&s.setAttribute("nonce",i.nc),s.setAttribute("data-webpack",t+a),s.src=r,0!==s.src.indexOf(window.location.origin+"/")&&(s.crossOrigin="anonymous"),f[o]&&(s.integrity=f[o])}e[r]=[n];var g=(t,n)=>{s.onerror=s.onload=null,clearTimeout(p);var i=e[r];if(delete e[r],s.parentNode&&s.parentNode.removeChild(s),i&&i.forEach((e=>e(n))),t)return t(n)},p=setTimeout(g.bind(null,void 0,{type:"timeout",target:s}),12e4);s.onerror=g.bind(null,s.onerror),s.onload=g.bind(null,s.onload),c&&document.head.appendChild(s)}},i.r=e=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},i.p="https://js-agent.newrelic.com/",(()=>{var e={374:0,840:0};i.f.j=(t,r)=>{var n=i.o(e,t)?e[t]:void 0;if(0!==n)if(n)r.push(n[2]);else{var a=new Promise(((r,i)=>n=e[t]=[r,i]));r.push(n[2]=a);var o=i.p+i.u(t),s=new Error;i.l(o,(r=>{if(i.o(e,t)&&(0!==(n=e[t])&&(e[t]=void 0),n)){var a=r&&("load"===r.type?"missing":r.type),o=r&&r.target&&r.target.src;s.message="Loading chunk "+t+" failed.\n("+a+": "+o+")",s.name="ChunkLoadError",s.type=a,s.request=o,n[1](s)}}),"chunk-"+t,t)}};var t=(t,r)=>{var n,a,[o,s,c]=r,u=0;if(o.some((t=>0!==e[t]))){for(n in s)i.o(s,n)&&(i.m[n]=s[n]);if(c)c(i)}for(t&&t(r);u<o.length;u++)a=o[u],i.o(e,a)&&e[a]&&e[a][0](),e[a]=0},r=self["webpackChunk:NRBA-1.292.0.PROD"]=self["webpackChunk:NRBA-1.292.0.PROD"]||[];r.forEach(t.bind(null,0)),r.push=t.bind(null,r.push.bind(r))})(),(()=>{"use strict";i(374);var e=i(566),t=i(741);class r extends t.W{agentIdentifier=(0,e.LA)(16)}var n=i(860);const a=Object.values(n.K7);var o=i(163);var s=i(908),c=i(863),u=i(261),d=i(241),l=i(944),f=i(701),g=i(773);function p(e,t,i,a){const o=a||i;!o||o[e]&&o[e]!==r.prototype[e]||(o[e]=function(){(0,s.p)(g.xV,["API/"+e+"/called"],void 0,n.K7.metrics,i.ee),(0,d.W)({agentIdentifier:i.agentIdentifier,drained:!!f.B?.[i.agentIdentifier],type:"data",name:"api",feature:u.Pl+e,data:{}});try{return t.apply(this,arguments)}catch(e){(0,l.R)(23,e)}})}function m(e,t,r,n,i){const a=e.info;null===r?delete a.jsAttributes[t]:a.jsAttributes[t]=r,(i||null===r)&&(0,s.p)(u.Pl+n,[(0,c.t)(),t,r],void 0,"session",e.ee)}var h=i(687),v=i(234),b=i(289),y=i(154),_=i(384);const w=e=>y.RI&&!0===e?.privacy.cookies_enabled;function x(e){return!!(0,_.dV)().o.MO&&w(e)&&!0===e?.session_trace.enabled}var k=i(389);class A extends v.W{constructor(e,t){super(e.agentIdentifier,t),this.abortHandler=void 0,this.featAggregate=void 0,this.onAggregateImported=void 0,this.deferred=Promise.resolve(),!1===e.init[this.featureName].autoStart?this.deferred=new Promise(((t,r)=>{this.ee.on("manual-start-all",(0,k.J)((()=>{(0,h.Ak)(e.agentIdentifier,this.featureName),t()})))})):(0,h.Ak)(e.agentIdentifier,t)}importAggregator(e,t,r={}){if(this.featAggregate)return;let a;this.onAggregateImported=new Promise((e=>{a=e}));const o=async()=>{let o;await this.deferred;try{if(w(e.init)){const{setupAgentSession:t}=await i.e(296).then(i.bind(i,663));o=t(e)}}catch(e){(0,l.R)(20,e),this.ee.emit("internal-error",[e]),this.featureName===n.K7.sessionReplay&&this.abortHandler?.()}try{if(!this.#t(this.featureName,o,e.init))return(0,h.Ze)(this.agentIdentifier,this.featureName),void a(!1);const{Aggregate:n}=await t();this.featAggregate=new n(e,r),e.runtime.harvester.initializedAggregates.push(this.featAggregate),a(!0)}catch(e){(0,l.R)(34,e),this.abortHandler?.(),(0,h.Ze)(this.agentIdentifier,this.featureName,!0),a(!1),this.ee&&this.ee.abort()}};y.RI?(0,b.GG)((()=>o()),!0):o()}#t(e,t,r){switch(e){case n.K7.sessionReplay:return x(r)&&!!t;case n.K7.sessionTrace:return!!t;default:return!0}}}var S=i(630),T=i(614);class R extends A{static featureName=S.T;constructor(e){var t;super(e,S.T),this.setupInspectionEvents(e.agentIdentifier),t=e,p(u.Fw,(function(e,r){"string"==typeof e&&("/"!==e.charAt(0)&&(e="/"+e),t.runtime.customTransaction=(r||"http://custom.transaction")+e,(0,s.p)(u.Pl+u.Fw,[(0,c.t)()],void 0,void 0,t.ee))}),t),this.ee.on("api-send-rum",((e,t)=>(0,s.p)("send-rum",[e,t],void 0,this.featureName,this.ee))),this.importAggregator(e,(()=>i.e(296).then(i.bind(i,108))))}setupInspectionEvents(e){const t=(t,r)=>{t&&(0,d.W)({agentIdentifier:e,timeStamp:t.timeStamp,loaded:"complete"===t.target.readyState,type:"window",name:r,data:t.target.location+""})};(0,b.sB)((e=>{t(e,"DOMContentLoaded")})),(0,b.GG)((e=>{t(e,"load")})),(0,b.Qr)((e=>{t(e,"navigate")})),this.ee.on(T.tS.UPDATE,((t,r)=>{(0,d.W)({agentIdentifier:e,type:"lifecycle",name:"session",data:r})}))}}var E=i(843),N=i(878),j=i(782);class I extends A{static featureName=j.T;constructor(e){super(e,j.T),y.RI&&((0,E.u)((()=>(0,s.p)("docHidden",[(0,c.t)()],void 0,j.T,this.ee)),!0),(0,N.sp)("pagehide",(()=>(0,s.p)("winPagehide",[(0,c.t)()],void 0,j.T,this.ee))),this.importAggregator(e,(()=>i.e(296).then(i.bind(i,350)))))}}class O extends A{static featureName=g.TZ;constructor(e){super(e,g.TZ),y.RI&&document.addEventListener("securitypolicyviolation",(e=>{(0,s.p)(g.xV,["Generic/CSPViolation/Detected"],void 0,this.featureName,this.ee)})),this.importAggregator(e,(()=>i.e(296).then(i.bind(i,373))))}}new class extends r{constructor(e){var t;(super(),y.gm)?(this.features={},(0,_.bQ)(this.agentIdentifier,this),this.desiredFeatures=new Set(e.features||[]),this.desiredFeatures.add(R),this.runSoftNavOverSpa=[...this.desiredFeatures].some((e=>e.featureName===n.K7.softNav)),(0,o.j)(this,e,e.loaderType||"agent"),t=this,p(u.cD,(function(e,r,n=!1){if("string"==typeof e){if(["string","number","boolean"].includes(typeof r)||null===r)return m(t,e,r,u.cD,n);(0,l.R)(40,typeof r)}else(0,l.R)(39,typeof e)}),t),function(e){p(u.Dl,(function(t){if("string"==typeof t||null===t)return m(e,"enduser.id",t,u.Dl,!0);(0,l.R)(41,typeof t)}),e)}(this),function(e){p(u.nb,(function(t){if("string"==typeof t||null===t)return m(e,"application.version",t,u.nb,!1);(0,l.R)(42,typeof t)}),e)}(this),function(e){p(u.d3,(function(){e.ee.emit("manual-start-all")}),e)}(this),this.run()):(0,l.R)(21)}get config(){return{info:this.info,init:this.init,loader_config:this.loader_config,runtime:this.runtime}}get api(){return this}run(){try{const e=function(e){const t={};return a.forEach((r=>{t[r]=!!e[r]?.enabled})),t}(this.init),t=[...this.desiredFeatures];t.sort(((e,t)=>n.P3[e.featureName]-n.P3[t.featureName])),t.forEach((t=>{if(!e[t.featureName]&&t.featureName!==n.K7.pageViewEvent)return;if(this.runSoftNavOverSpa&&t.featureName===n.K7.spa)return;if(!this.runSoftNavOverSpa&&t.featureName===n.K7.softNav)return;const r=function(e){switch(e){case n.K7.ajax:return[n.K7.jserrors];case n.K7.sessionTrace:return[n.K7.ajax,n.K7.pageViewEvent];case n.K7.sessionReplay:return[n.K7.sessionTrace];case n.K7.pageViewTiming:return[n.K7.pageViewEvent];default:return[]}}(t.featureName).filter((e=>!(e in this.features)));r.length>0&&(0,l.R)(36,{targetFeature:t.featureName,missingDependencies:r}),this.features[t.featureName]=new t(this)}))}catch(e){(0,l.R)(22,e);for(const e in this.features)this.features[e].abortHandler?.();const t=(0,_.Zm)();delete t.initializedAgents[this.agentIdentifier]?.features,delete this.sharedAggregator;return t.ee.get(this.agentIdentifier).abort(),!1}}}({features:[R,I,O],loaderType:"lite"})})()})();</script>
+<meta name="title" content="Silo Small Up/Down Wall Mount Lantern"/>
+<meta name="description" content="The perfect addition to Modern Coastal, Silo’s compact design blends simple and long-lasting practicality. Built to stand up to harsh climates and available in three rust and corrosion-resistant finishes, Silo is available in a downlight-only option to me"/>
+<meta name="robots" content="INDEX,FOLLOW"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="format-detection" content="telephone=no"/>
+<meta name="msapplication-TileColor" content="#000000"/>
+<meta name="theme-color" content="#ffffff"/>
+<title>Silo Small Up/Down Wall Mount Lantern</title>
+<link  rel="stylesheet" type="text/css"  media="all" href="https://www.hinkley.com/static/version1750893362/_cache/merged/41b4e1f8b38df0d11d6ff31fb772bdd1.min.css" />
+<link  rel="icon" type="image/x-icon" href="https://www.hinkley.com/static/version1750893362/frontend/WSC/Hinkley2018/en_US/Magento_Enterprise/favicon.ico" />
+<link  rel="shortcut icon" type="image/x-icon" href="https://www.hinkley.com/static/version1750893362/frontend/WSC/Hinkley2018/en_US/Magento_Enterprise/favicon.ico" />
+<script  type="text/javascript"  src="https://www.hinkley.com/static/version1750893362/_cache/merged/865b8a209161fb8fbdbfa0177a491038.min.js"></script>
+<script  type="text/javascript"  defer="defer" src="//use.fontawesome.com/releases/v5.8.1/js/all.js"></script>
+<link rel="preload" as="font" crossorigin="anonymous" href="https://www.hinkley.com/static/version1750893362/frontend/WSC/Hinkley2018/en_US/Magento_Theme/safari-pinned-tab.svg" />
+<link  rel="apple-touch-icon" sizes="180x180" href="https://www.hinkley.com/static/version1750893362/frontend/WSC/Hinkley2018/en_US/Magento_Theme/apple-touch-icon.png" />
+<link  rel="icon" type="image/png" sizes="32x32" href="https://www.hinkley.com/static/version1750893362/frontend/WSC/Hinkley2018/en_US/Magento_Theme/favicon-32x32.png" />
+<link  rel="icon" type="image/png" sizes="16x16" href="https://www.hinkley.com/static/version1750893362/frontend/WSC/Hinkley2018/en_US/Magento_Theme/favicon-16x16.png" />
+<link  rel="manifest" href="https://www.hinkley.com/static/version1750893362/frontend/WSC/Hinkley2018/en_US/Magento_Theme/site.webmanifest" />
+<link  rel="stylesheet" href="//fonts.googleapis.com/css?family=Oswald:500,600,700" />
+<link  rel="canonical" href="https://www.hinkley.com/13594bk-ll.html" />
+<meta name="google-site-verification" content="wvgQYJRuJgbJ5GPBk_kEqa3zsTbdE7pikFVca-4krtk" />
+<meta name="google-site-verification" content="-WH8zGS0Gl3zgvVD1pWdsXbpzHVhasCa-iHHbiX00jU" />
+<meta name="p:domain_verify" content="29236bd3f5b9711bc2e4d1c89c1e8016"/>
+
+<!--ea0e377f3062b8cffe51a346edf3fd54-->
+
+<!--Magento security scan confirmation code-->
+<!--7NTTY7ZodovJoN0QkKRcom5bfaXIP9V6-->
+
+<!--Magento security scan confirmation code-->
+<!--OFdgQv7fMAuBrfpr3U82LH3igs6CyZyk-->
+<meta name="p:domain_verify" content="OFdgQv7fMAuBrfpr3U82LH3igs6CyZyk"/>
+<!-- Facebook Pixel Code -->
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '3027528703979136');
+  fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=3027528703979136&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Facebook Pixel Code -->
+
+<!-- Microsoft Clarity -->
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "3v5vq8x4zr");
+</script>
+<!-- End Microsoft Clarity -->
+
+<!--tracking pixel for premier partners page - StackAdapt-Thundertech-->
+<script>!function(s,a,e,v,n,t,z){if(s.saq)return;n=s.saq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!s._saq)s._saq=n;
+n.push=n;n.loaded=!0;n.version='1.0';n.queue=[];t=a.createElement(e);t.async=!0;t.src=v;z=a.getElementsByTagName(e)[0];z.parentNode.insertBefore(t,z)}(window,document,'script','https://tags.srv.stackadapt.com/events.js');saq('ts', 'yYjIcMpty07z0xFuqhllmw');</script>
+<!--END tracking pixel for premier partners page-->
+
+<meta name="facebook-domain-verification" content="cxrakcaeb915z8migqeg1y5oi1jj5i" />
+
+<!-- hover effects for homepage and blog- JUNE 2023 -->
+<style> 
+.white-v2-standard.btn:hover {background: #000 !important; color: #fff !important }
+.white-v1-standard.btn:hover { background: #000 !important; color: #fff !important }
+
+  .product-grey-boxes:hover {
+    -webkit-box-shadow: 0px 8px 5px 1px rgb(0 0 0 / 20%);
+    -moz-box-shadow: 0px 8px 5px 1px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 5px 1px rgb(0 0 0 / 20%);
+    overflow: hidden;
+  }
+</style>
+
+<!-- Start of HubSpot Embed Code -->
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/22821074.js"></script>
+<!-- End of HubSpot Embed Code -->
+
+
+<script>
+require(['jquery',], function ($) {
+        $('body').on('click', '.bv_main_container_row_flex, .bv_button_component_container', function() {
+            $('#trigger-reviews').trigger('click');
+    });
+});
+</script>
+        
+<meta property="og:type" content="product" />
+<meta property="og:title" content="Silo Small Up/Down Wall Mount Lantern" />
+<meta property="og:description" content="The perfect addition to Modern Coastal, Silo’s compact design blends simple and long-lasting practicality. Built to stand up to harsh climates and available in three rust and corrosion-resistant finishes, Silo is available in a downlight-only option to me" />
+<meta property="og:image:width" content="1000" />
+<meta property="og:image:height" content="1000" />
+<meta property="og:image" content="https://www.hinkley.com/media/catalog/product/9/5/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg" />
+<meta property="og:image:secure_url" content="https://www.hinkley.com/media/catalog/product/9/5/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg" />
+<meta property="og:url" content="https://www.hinkley.com/13594bk-ll.html" />
+<meta property="og:locale" content="en_US" />
+<meta property="product:price:amount" content="245.28"/>
+<meta property="product:price:currency" content="USD"/>
+<meta property="product:availability" content="instock"/>
+<meta property="product:retailer_item_id" content="13594BK-LL"/>
+
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "Magento_PageCache/js/form-key-provider": {
+                    "isPaginationCacheEnabled":
+                        0                }
+            }
+        }
+    </script>
+            <!-- GOOGLE TAG MANAGER -->
+            <script type="text/x-magento-init">
+            {
+                "*": {
+                    "Magento_GoogleTagManager/js/google-tag-manager": {
+                        "isCookieRestrictionModeEnabled": 1,
+                        "currentWebsite": 1,
+                        "cookieName": "user_allowed_save_cookie",
+                        "gtmAccountId": "GTM\u002DMT8MJ9N",
+                        "storeCurrencyCode": "USD",
+                        "ordersData": []                    }
+                }
+            }
+            </script>
+            <!-- END GOOGLE TAG MANAGER -->
+            <!-- Client injected code -->
+<script type="application/ld+json">
+    {
+        "@context" : "https://schema.org",
+        "@type" : "Product",
+        "@id" : "https://www.hinkley.com/13594bk-ll.html",
+        "name" : "Small Up/Down Wall Mount Lantern",
+        "image" : "https://www.hinkley.com/media/catalog/product/9/5/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg",
+        "description" : "The perfect addition to Modern Coastal, Silo’s compact design blends simple and long-lasting practicality. Built to stand up to harsh climates and available in three rust and corrosion-resistant finishes, Silo is available in a downlight-only option to meet dark sky compliance, an up and downlight for additional wall washing, and a small flush mount.",
+        "sku" : "13594BK-LL",
+        "brand" : "Hinkley"
+    }
+</script>
+    
+    <script>window.algoliaConfig = {"instant":{"enabled":true,"selector":".columns","isAddToCartEnabled":false,"addToCartParams":{"action":"https:\/\/www.hinkley.com\/checkout\/cart\/add\/","formKey":"MSxcLB3061kL9VHX","redirectUrlParam":"uenc"},"infiniteScrollEnabled":true,"urlTrackedParameters":["query","attribute:*","index"],"isSearchBoxEnabled":true,"isVisualMerchEnabled":true,"categorySeparator":" \/\/\/ ","categoryPageIdAttribute":"categoryPageId","isCategoryNavigationEnabled":false,"hidePagination":false},"autocomplete":{"enabled":true,"selector":".algolia-search-input","sections":[{"name":"pages","label":"Pages","hitsPerPage":"2"}],"nbOfProductsSuggestions":8,"nbOfCategoriesSuggestions":5,"nbOfQueriesSuggestions":10,"isDebugEnabled":false,"isNavigatorEnabled":true,"debounceMilliseconds":300,"minimumCharacters":0},"landingPage":{"query":"","configuration":"[]"},"recommend":{"enabledFBT":false,"enabledRelated":false,"enabledFBTInCart":false,"enabledRelatedInCart":false,"enabledLookingSimilar":0,"limitFBTProducts":6,"limitRelatedProducts":6,"limitTrendingItems":6,"limitLookingSimilar":6,"enabledTrendItems":0,"trendItemFacetName":null,"trendItemFacetValue":null,"isTrendItemsEnabledInPDP":0,"isTrendItemsEnabledInCartPage":0,"isAddToCartEnabledInFBT":false,"isAddToCartEnabledInRelatedProduct":false,"isAddToCartEnabledInTrendsItem":false,"isAddToCartEnabledInLookingSimilar":false,"FBTTitle":"Frequently bought together","relatedProductsTitle":"Related products","trendingItemsTitle":"Trending items","addToCartParams":{"action":"https:\/\/www.hinkley.com\/checkout\/cart\/add\/","formKey":"MSxcLB3061kL9VHX","redirectUrlParam":"uenc"},"isLookingSimilarEnabledInPDP":0,"isLookingSimilarEnabledInCartPage":0,"lookingSimilarTitle":"Looking Similar"},"extensionVersion":"3.15.1","applicationId":"Z40KWY7GST","indexName":"production_default","apiKey":"ODQ3MTkwM2NhMjFhMjRlOTczZDQwN2VkNWFlODU5OWMyMzAxY2U3ZjcyYTM5MDc5YmJjMGNjMWEyZDczN2IzYWZpbHRlcnM9Y2F0YWxvZ19wZXJtaXNzaW9ucy5jdXN0b21lcl9ncm91cF8wJTIwJTIxJTNEJTIwMCZ0YWdGaWx0ZXJzPSZ2YWxpZFVudGlsPTE3NTIwMzY2OTI=","attributeFilter":{"filters":"catalog_permissions.customer_group_0 != 0"},"facets":[{"attribute":"hl_height","type":"slider","label":"Height","searchable":"2","create_rule":"2"},{"attribute":"hl_width","type":"slider","label":"Width","searchable":"2","create_rule":"2"},{"attribute":"hl_cl1_maincategory","type":"disjunctive","label":"Main Category","searchable":"1","create_rule":"2"},{"attribute":"hl_cl2_categorygroup","type":"disjunctive","label":"Fixture Type & Mount Location","searchable":"1","create_rule":"2"},{"attribute":"hl_stock_status_algolia_facet","type":"conjunctive","label":"In Stock","searchable":"2","create_rule":"2"},{"attribute":"hl_new_item","type":"conjunctive","label":"New Products","searchable":"2","create_rule":"2"},{"attribute":"hl_finish_group","type":"disjunctive","label":"Finish","searchable":"1","create_rule":"2"},{"attribute":"hl_fan_blade_finish","type":"disjunctive","label":"Main Fan Blade Finish","searchable":"1","create_rule":"2"},{"attribute":"hl_fan_blade_reverse_finish","type":"disjunctive","label":"Reverse Fan Blade Finish","searchable":"1","create_rule":"2"},{"attribute":"hl_glass","type":"disjunctive","label":"Glass","searchable":"1","create_rule":"2"},{"attribute":"price","type":"slider","label":"Price","searchable":"2","create_rule":"2"},{"attribute":"hl_family_description","type":"disjunctive","label":"Family","searchable":"1","create_rule":"2"},{"attribute":"hl_algolia_collection_filter","type":"disjunctive","label":"Collection","searchable":"1","create_rule":"2"},{"attribute":"hl_algolia_style_filter","type":"disjunctive","label":"Style","searchable":"1","create_rule":"2"},{"attribute":"hl_brand","type":"disjunctive","label":"Brand","searchable":"1","create_rule":"2"},{"attribute":"hl_fan_mount_type","type":"conjunctive","label":"Fan Mount Type","searchable":"1","create_rule":"2"},{"attribute":"hl_voltage","type":"disjunctive","label":"Voltage","searchable":"1","create_rule":"2"},{"attribute":"hl_dark_sky","type":"conjunctive","label":"Dark Sky Compliant","searchable":"1","create_rule":"2"},{"attribute":"hl_ada","type":"conjunctive","label":"ADA Compliant","searchable":"1","create_rule":"2"},{"attribute":"hl_certification","type":"disjunctive","label":"Certificate","searchable":"1","create_rule":"2"},{"attribute":"hl_fan_motor_type","type":"conjunctive","label":"Motor Type","searchable":"1","create_rule":"2"}],"areCategoriesInFacets":false,"hitsPerPage":45,"sortingIndices":[{"attribute":"hl_algolia_sales_ranking","sort":"asc","sortLabel":"Popularity","virtualReplica":"0","name":"production_default_products_hl_algolia_sales_ranking_asc","ranking":["asc(hl_algolia_sales_ranking)","typo","geo","words","filters","proximity","attribute","exact","custom"],"label":"Popularity"},{"attribute":"price","sort":"asc","sortLabel":"Lowest price","virtualReplica":"0","name":"production_default_products_price_default_asc","ranking":["asc(price.USD.default)","typo","geo","words","filters","proximity","attribute","exact","custom"],"label":"Lowest price"},{"attribute":"price","sort":"desc","sortLabel":"Highest price","virtualReplica":"0","name":"production_default_products_price_default_desc","ranking":["desc(price.USD.default)","typo","geo","words","filters","proximity","attribute","exact","custom"],"label":"Highest price"},{"attribute":"created_at","sort":"desc","sortLabel":"Newest first","virtualReplica":"0","name":"production_default_products_created_at_desc","ranking":["desc(created_at)","typo","geo","words","filters","proximity","attribute","exact","custom"],"label":"Newest first"},{"attribute":"hl_family_description","sort":"asc","sortLabel":"Name A-Z","virtualReplica":"0","name":"production_default_products_hl_family_description_asc","ranking":["asc(hl_family_description)","typo","geo","words","filters","proximity","attribute","exact","custom"],"label":"Name A-Z"},{"attribute":"hl_family_description","sort":"desc","sortLabel":"Name Z-A","virtualReplica":"0","name":"production_default_products_hl_family_description_desc","ranking":["desc(hl_family_description)","typo","geo","words","filters","proximity","attribute","exact","custom"],"label":"Name Z-A"}],"isSearchPage":false,"isCategoryPage":false,"isLandingPage":false,"removeBranding":true,"productId":"52069","priceKey":".USD.default","priceGroup":null,"origFormatedVar":"price.USD.default_original_formated","tierFormatedVar":"price.USD.default_tier_formated","currencyCode":"USD","currencySymbol":" $","priceFormat":{"pattern":"$%s","precision":2,"requiredPrecision":2,"decimalSymbol":".","groupSymbol":",","groupLength":3,"integerRequired":false},"maxValuesPerFacet":50,"autofocus":true,"resultPageUrl":"https:\/\/www.hinkley.com\/catalogsearch\/result\/","request":{"query":"","refinementKey":"","refinementValue":"","categoryId":"","landingPageId":"","path":"","level":"","parentCategory":"","childCategories":[],"url":"https:\/\/www.hinkley.com\/13594bk-ll.html"},"showCatsNotIncludedInNavigation":true,"showSuggestionsOnNoResultsPage":false,"baseUrl":"https:\/\/www.hinkley.com","popularQueries":[],"useAdaptiveImage":false,"urls":{"logo":"https:\/\/www.hinkley.com\/static\/version1750893362\/frontend\/WSC\/Hinkley2018\/en_US\/Algolia_AlgoliaSearch\/js\/images\/algolia-logo-blue.svg"},"cookieConfiguration":{"customerTokenCookie":"_ALGOLIA_MAGENTO_AUTH","consentCookieName":"user_allowed_save_cookie","cookieAllowButtonSelector":"#btn-cookie-allow","cookieRestrictionModeEnabled":true,"cookieDuration":"15552000000"},"ccAnalytics":{"enabled":true,"ISSelector":".ais-Hits-item a.result, .ais-InfiniteHits-item a.result","conversionAnalyticsMode":"all","addToCartSelector":".product-custom-actions li:first-child a.btn,#buy-now-options a","orderedProductIds":[]},"isPersonalizationEnabled":true,"personalization":{"enabled":true,"viewedEvents":{"viewProduct":{"eventName":"Viewed Product","enabled":true,"method":"viewedObjectIDs"}},"clickedEvents":{"productClicked":{"eventName":"Product Clicked","enabled":true,"selector":".ais-Hits-item a.result, .ais-InfiniteHits-item a.result","method":"clickedObjectIDs"},"productRecommended":{"eventName":"Recommended Product Clicked","enabled":false,"selector":".products-upsell .product-item","method":"clickedObjectIDs"}},"filterClicked":{"eventName":"Filter Clicked","enabled":true,"method":"clickedFilters"}},"analytics":{"enabled":true,"delay":"3000","triggerOnUiInteraction":"1","pushInitialSearch":"0"},"now":1751932800,"queue":{"isEnabled":true,"nbOfJobsToRun":40,"retryLimit":3,"nbOfElementsPerIndexingJob":300},"isPreventBackendRenderingEnabled":false,"translations":{"to":"to","or":"or","go":"Go","popularQueries":"You can try one of the popular search queries","seeAll":"See all products","allDepartments":"All departments","seeIn":"See products in","orIn":"or in","noProducts":"No products for query","noResults":"No results","refine":"Refine","selectedFilters":"Selected Filters","clearAll":"Clear all","previousPage":"Previous page","nextPage":"Next page","searchFor":"Search for products","relevance":"Relevance","categories":"Categories","products":"Products","suggestions":"Suggestions","searchBy":"Search by","searchForFacetValuesPlaceholder":"Search for other ...","showMore":"Show more products","searchTitle":"Search results for","placeholder":"Search Products","addToCart":"Add to Cart"}};</script>
+
+    </head>
+    <body data-container="body"
+          data-mage-init='{"loaderAjax": {}, "loader": { "icon": "https://www.hinkley.com/static/version1750893362/frontend/WSC/Hinkley2018/en_US/images/loader-2.gif"}}'
+        id="html-body" itemtype="http://schema.org/Product" itemscope="itemscope" class="light-product-page catalog-product-view product-13594bk-ll page-layout-1column">
+        
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_PageBuilder/js/widget-initializer": {
+                "config": {"[data-content-type=\"slider\"][data-appearance=\"default\"]":{"Magento_PageBuilder\/js\/content-type\/slider\/appearance\/default\/widget":false},"[data-content-type=\"map\"]":{"Magento_PageBuilder\/js\/content-type\/map\/appearance\/default\/widget":false},"[data-content-type=\"row\"]":{"Magento_PageBuilder\/js\/content-type\/row\/appearance\/default\/widget":false},"[data-content-type=\"tabs\"]":{"Magento_PageBuilder\/js\/content-type\/tabs\/appearance\/default\/widget":false},"[data-content-type=\"slide\"]":{"Magento_PageBuilder\/js\/content-type\/slide\/appearance\/default\/widget":{"buttonSelector":".pagebuilder-slide-button","showOverlay":"hover","dataRole":"slide"}},"[data-content-type=\"banner\"]":{"Magento_PageBuilder\/js\/content-type\/banner\/appearance\/default\/widget":{"buttonSelector":".pagebuilder-banner-button","showOverlay":"hover","dataRole":"banner"}},"[data-content-type=\"buttons\"]":{"Magento_PageBuilder\/js\/content-type\/buttons\/appearance\/inline\/widget":false},"[data-content-type=\"products\"][data-appearance=\"carousel\"]":{"Magento_PageBuilder\/js\/content-type\/products\/appearance\/carousel\/widget":false},"[data-content-type=\"dotdigitalgroup_form\"]":{"Dotdigitalgroup_Enterprise\/js\/content-type\/dotdigitalgroup-form\/appearance\/default\/widget":false}},
+                "breakpoints": {"desktop":{"label":"Desktop","stage":true,"default":true,"class":"desktop-switcher","icon":"Magento_PageBuilder::css\/images\/switcher\/switcher-desktop.svg","conditions":{"min-width":"1024px"},"options":{"products":{"default":{"slidesToShow":"5"}}}},"tablet":{"conditions":{"max-width":"1024px","min-width":"768px"},"options":{"products":{"default":{"slidesToShow":"4"},"continuous":{"slidesToShow":"3"}}}},"mobile":{"label":"Mobile","stage":true,"class":"mobile-switcher","icon":"Magento_PageBuilder::css\/images\/switcher\/switcher-mobile.svg","media":"only screen and (max-width: 768px)","conditions":{"max-width":"768px","min-width":"640px"},"options":{"products":{"default":{"slidesToShow":"3"}}}},"mobile-small":{"conditions":{"max-width":"640px"},"options":{"products":{"default":{"slidesToShow":"2"},"continuous":{"slidesToShow":"1"}}}}}            }
+        }
+    }
+</script>
+
+<div class="cookie-status-message" id="cookie-status">
+    The store will not work correctly in the case when cookies are disabled.</div>
+<script type="text&#x2F;javascript">document.querySelector("#cookie-status").style.display = "none";</script>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "cookieStatus": {}
+        }
+    }
+</script>
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "mage/cookies": {
+                "expires": null,
+                "path": "\u002F",
+                "domain": ".www.hinkley.com",
+                "secure": true,
+                "lifetime": "3600"
+            }
+        }
+    }
+</script>
+    <noscript>
+        <div class="message global noscript">
+            <div class="content">
+                <p>
+                    <strong>JavaScript seems to be disabled in your browser.</strong>
+                    <span>
+                        For the best experience on our site, be sure to turn on Javascript in your browser.                    </span>
+                </p>
+            </div>
+        </div>
+    </noscript>
+<script>    require.config({
+        map: {
+            '*': {
+                wysiwygAdapter: 'mage/adminhtml/wysiwyg/tiny_mce/tinymceAdapter'
+            }
+        }
+    });</script>    <div role="alertdialog"
+         tabindex="-1"
+         class="message global cookie"
+         id="notice-cookie-block"
+         style="display: none;">
+        <div role="document" class="content" tabindex="0">
+            <div class="cookie-content-inside">
+                <p>
+                    <strong>We use cookies to make your experience better.</strong>
+                    <span>To comply with the new e-Privacy directive, we need to ask for your consent to set the cookies.</span>
+                    <a href="https://www.hinkley.com/privacy-policy-cookie-restriction-mode/">Learn more</a>.                </p>
+                <div class="actions">
+                    <button id="btn-cookie-allow" class="btn white action allow primary">
+                        <span>Allow Cookies</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/x-magento-init">
+        {
+            "#notice-cookie-block": {
+                "cookieNotices": {
+                    "cookieAllowButtonSelector": "#btn-cookie-allow",
+                    "cookieName": "user_allowed_save_cookie",
+                    "cookieValue": {"1":1},
+                    "cookieLifetime": 31536000,
+                    "noCookiesUrl": "https\u003A\u002F\u002Fwww.hinkley.com\u002Fcookie\u002Findex\u002FnoCookies\u002F"
+                }
+            }
+        }
+    </script>
+
+<script>
+    window.cookiesConfig = window.cookiesConfig || {};
+    window.cookiesConfig.secure = true;
+</script>    <!-- GOOGLE TAG MANAGER -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MT8MJ9N"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- END GOOGLE TAG MANAGER -->
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_GoogleTagManager/js/google-tag-manager-cart": {
+                "blockNames": ["category.products.list","product.info.upsell","catalog.product.related","checkout.cart.crosssell","search_result_list"],
+                "cookieAddToCart": "add_to_cart",
+                "cookieRemoveFromCart":
+                    "remove_from_cart",
+                "advancedAddToCart": "add_to_cart_advanced"
+            }
+        }
+    }
+</script>
+<script>    require.config({
+        paths: {
+            googleMaps: 'https\u003A\u002F\u002Fmaps.googleapis.com\u002Fmaps\u002Fapi\u002Fjs\u003Fv\u003D3\u0026key\u003D'
+        },
+        config: {
+            'Magento_PageBuilder/js/utils/map': {
+                style: '',
+            },
+            'Magento_PageBuilder/js/content-type/map/preview': {
+                apiKey: '',
+                apiKeyErrorMessage: 'You\u0020must\u0020provide\u0020a\u0020valid\u0020\u003Ca\u0020href\u003D\u0027https\u003A\u002F\u002Fwww.hinkley.com\u002Fadminhtml\u002Fsystem_config\u002Fedit\u002Fsection\u002Fcms\u002F\u0023cms_pagebuilder\u0027\u0020target\u003D\u0027_blank\u0027\u003EGoogle\u0020Maps\u0020API\u0020key\u003C\u002Fa\u003E\u0020to\u0020use\u0020a\u0020map.'
+            },
+            'Magento_PageBuilder/js/form/element/map': {
+                apiKey: '',
+                apiKeyErrorMessage: 'You\u0020must\u0020provide\u0020a\u0020valid\u0020\u003Ca\u0020href\u003D\u0027https\u003A\u002F\u002Fwww.hinkley.com\u002Fadminhtml\u002Fsystem_config\u002Fedit\u002Fsection\u002Fcms\u002F\u0023cms_pagebuilder\u0027\u0020target\u003D\u0027_blank\u0027\u003EGoogle\u0020Maps\u0020API\u0020key\u003C\u002Fa\u003E\u0020to\u0020use\u0020a\u0020map.'
+            },
+        }
+    });</script><script>
+    require.config({
+        shim: {
+            'Magento_PageBuilder/js/utils/map': {
+                deps: ['googleMaps']
+            }
+        }
+    });</script>
+
+        <!--suppress HtmlUnknownTarget -->
+    <!-- BV | Magento Extension 9.1.8 -->
+    <script async type="text/javascript" src="//apps.bazaarvoice.com/deployments/hinkley/main_site/production/en_US/bv.js"></script>
+
+
+
+    <!-- BV | Magento Extension 9.1.8 -->
+            <script async type="text/javascript">
+                window.bvCallback = function (BV) {
+            if (BV.reviews !== undefined) {
+                BV.reviews.on('show', function () {
+                    jQuery('#trigger-reviews').trigger('click');
+console.log('Show review tab');                });
+            }
+            if (BV.questions !== undefined) {
+                BV.questions.on('show', function () {
+                                    });
+            }
+                    };
+    </script>
+<div class="page-wrapper"><div class="header-wrap wrap"><header class="page-header"><div class="panel wrapper"><div class="panel header"><div class="widget block block-static-block">
+    <style>#html-body [data-pb-style=A8R31NX]{justify-content:flex-start;display:block;flex-direction:column;background-position:left top;background-size:cover;background-repeat:no-repeat;background-attachment:scroll}#html-body [data-pb-style=A8R31NX],#html-body [data-pb-style=LPDSE85]{border-style:none;border-width:1px;border-radius:0;margin:0;padding:0}</style><div data-content-type="html" data-appearance="default" data-element="main" data-decoded="true"><!--CSS Additional Style--> 
+
+<!--CSS Powerreviews Q&A-->
+<style>
+
+.p-w-r .pr-read-review a, .p-w-r .pr-review-display a {
+  color: #606060;
+}
+
+.p-w-r .pr-accessible-btn, .p-w-r .pr-review-snapshot .pr-review-snapshot-simple .pr-review-snapshot-snippets .pr-snippet-read-and-write a {
+    background-color: #000;
+    background-image: none;
+    border: 1px solid #000;
+  }
+
+  .p-w-r .pr-accessible-btn:hover, .p-w-r .pr-review-snapshot .pr-review-snapshot-simple .pr-review-snapshot-snippets .pr-snippet-read-and-write a:hover {
+    background: #fff;
+    color: #000;
+    border-color: #000;
+  }
+
+  .p-w-r .pr-review-snapshot .pr-review-snapshot-simple .pr-review-snapshot-snippets .custom-pr-snippet-write-review-link {
+    display:none;
+  }
+
+  .p-w-r .pr-read-review a, .p-w-r .pr-review-display .pr-rd-main-footer .pr-rd-to-top {
+    color: #606060;
+    clear: both;
+    margin: 10px 0;
+  }
+
+  .p-w-r .pr-read-review p, .p-w-r .pr-review-display .pr-rd-description-text::first-letter {
+    text-transform: capitalize;
+  }
+
+.p-w-r .pr-qa-display.pr-qa-display-desktop .pr-qa-display-headline .pr-h1, .p-w-r .pr-qa-display.pr-qa-display-desktop .pr-qa-display-headline h1, .p-w-r .pr-qa-display.pr-qa-display-tablet .pr-qa-display-headline .pr-h1, .p-w-r .pr-qa-display.pr-qa-display-tablet .pr-qa-display-headline h1 {
+    width: 100%;
+}
+
+.p-w-r .pr-qa-display.pr-qa-display-desktop .pr-qa-display-ask-question, .p-w-r .pr-qa-display.pr-qa-display-tablet .pr-qa-display-ask-question {
+    float: right;
+    width: 100%;
+}
+
+.p-w-r .pr-qa-display.pr-qa-display-desktop .pr-qa-display-headline .pr-qa-display-ask-question button, .p-w-r .pr-qa-display.pr-qa-display-tablet .pr-qa-display-headline .pr-qa-display-ask-question button {
+    position: absolute;
+    top: -45px;
+    right: 0;
+}
+
+.pr-answer-form .pr-header-required, .pr-question-form .pr-header-required {
+    margin-top: 2em;
+    margin-bottom: 0;
+}
+
+.p-w-r .form-group {
+  margin-bottom: 10px;
+}
+
+.p-w-r .pr-waqwaa {
+  max-width: unset;
+}
+
+.questionText-form-group, .authorEmail-form-group, .authorName-form-group, .authorLocation-form-group {
+  margin-bottom: 1em;
+  vertical-align: top;
+}
+
+.questionText-form-group .pr-control-label, .authorName-form-group .pr-control-label, .authorLocation-form-group .pr-control-label {
+  margin-bottom: 36px;
+}
+
+.questionText-form-group {
+  width: 100%;
+}
+.authorEmail-form-group {
+  width: calc(50% - 1em);
+  float: left;
+}
+.authorEmail-form-group .pr-control-label{
+  margin-bottom: 26px;
+}
+.authorEmail-form-group #authorEmail .pr-helper-text{
+  margin-bottom: -6px;
+}
+.authorName-form-group {
+  width: calc(50% - 1em);
+  float: right;
+}
+
+.authorLocation-form-group {
+  width: 100%;
+  clear: both
+}
+#authorEmail {
+  margin-top: -20px;
+}
+#questionText-input, #authorName, #authorLocation {
+  margin-top: -14px;
+}
+  
+.p-w-r .pr-accessible-btn, .p-w-r .pr-review-snapshot .pr-review-snapshot-simple .pr-review-snapshot-snippets .pr-snippet-read-and-write a {
+    background-color: #000;
+    border: 1px solid #000;
+}
+
+.p-w-r .pr-accessible-btn:hover, .p-w-r .pr-review-snapshot .pr-review-snapshot-simple .pr-review-snapshot-snippets .pr-snippet-read-and-write a:hover {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #000;
+}
+
+
+.pr-qa-display-questionlist {
+    padding: 2em 0 !important;
+    background: #fafafa;
+    border-radius: 15px;
+    -webkit-box-shadow: 0px 3px 11px 1px rgb(0 0 0 / 10%);
+    -moz-box-shadow: 0px 3px 11px 1px rgba(0,0,0,0.1);
+    box-shadow: 0px 3px 11px 1px rgb(0 0 0 / 10%);
+}
+
+.pr-qa-display-item {
+    width: calc(100% - 4em) !important;
+    display: flex;
+    align-items: center;
+    margin: 0 2em !important;
+    text-align: center;
+    background: #fff;
+    padding: 2em 0 !important;
+    border-radius: 15px 15px 15px 0px;
+    -webkit-box-shadow: 0px 3px 11px 1px rgb(0 0 0 / 15%);
+    -moz-box-shadow: 0px 3px 11px 1px rgba(0,0,0,0.15);
+    box-shadow: 0px 3px 11px 1px rgb(0 0 0 / 15%);
+}
+
+.p-w-r .pr-qa-display .pr-qa-display-item .pr-qa-display-item-icon {
+    background-color: #ccc;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 25px;
+    left: 0px;
+    top: 0px;
+    z-index: 1;
+    margin-left: 18px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 20px 30px 20px 10px;
+  }
+
+.pr-qa-display-item-text {
+    font-size: 1.5em;
+}
+
+.p-w-r .pr-qa-display.pr-qa-display-desktop .pr-qa-display-answer-by-container.pr-qa-display-answer-by-container-expert, .p-w-r .pr-qa-display.pr-qa-display-tablet .pr-qa-display-answer-by-container.pr-qa-display-answer-by-container-expert {
+    border-left: 1px solid #bbb;
+    padding-left: 2em;
+    padding-top: 2em;
+    padding-bottom: 2em;
+    border-radius: 0 0 0 25px;
+}
+
+.p-w-r .pr-qa-display.pr-qa-display-desktop .pr-qa-display-answer, .p-w-r .pr-qa-display.pr-qa-display-tablet .pr-qa-display-answer, .p-w-r .pr-qa-display .pr-qa-display-answer {
+    margin: 0 calc(2em - 1px) 0 calc(2em + 1px) !important;
+}
+
+.p-w-r .pr-qa-display .pr-qa-display-answer .pr-qa-display-answer-icon {
+    background: none;
+    border: none;
+}
+
+.p-w-r .pr-qa-display-answer-details span {
+    color: #767676;
+    font-size: 1.3em;
+}
+
+.p-w-r .pr-qa-display .pr-qa-display-item h2 {
+    font-size: 1.3em;
+    margin: 0 1em;
+    display: inline-block;
+}
+
+.pr-qa-display-answer-link-container {
+  display: none;
+}
+
+@media only screen and (max-width: 979px){
+  .header-wrap header {
+    padding-bottom: 1em;
+  }
+}
+
+@media screen and (max-width: 810px) {
+
+  .authorEmail-form-group, .authorName-form-group {
+    width: 100%;
+    clear:both;
+    float:none;
+  }
+  
+  .p-w-r .pr-qa-display .pr-qa-display-questionlist {
+    border-left: none !important;
+    margin:0 0 45px;
+    position: relative;
+    padding: 2em 0 !important;
+  }
+
+  .p-w-r .pr-qa-display .pr-qa-display-answer-by-container.pr-qa-display-answer-by-container-expert{
+      border-left: 1px solid #bbb;
+      padding-left: 2em;
+      padding-top: 2em;
+      padding-bottom: 2em;
+      border-radius: 0 0 0 25px;
+  }
+  .pr-qa-display-item-details {
+    margin-left: 2em !important;
+  }
+  .p-w-r .pr-qa-display .pr-qa-display-answer .pr-qa-display-answer-icon {
+    bottom: 0;
+    display: inline-block;
+    left: -5px;
+    position: relative;
+    top: inherit;
+    vertical-align: top;
+  }
+  .p-w-r .pr-qa-display .pr-qa-display-answer-details {
+    display: inline-block;
+    margin-right: 5px;
+  }
+  .p-w-r .pr-qa-display span.pr-qa-display-answer-by {
+    display: inline-block;
+  }
+  .p-w-r .pr-qa-display .pr-qa-display-ask-question {
+    margin-left: 2em;
+  }
+  .p-w-r .pr-qa-display .pr-btn-answer span, .p-w-r .pr-qa-display .pr-btn-ask-question span {
+    color: #353535;
+  }
+  .p-w-r .pr-qa-display .pr-btn-ask-question .pr-cross-icon {
+    filter: grayscale();
+  }
+
+}
+
+
+/* CSS Algolia */
+
+
+mark {
+    background-color: transparent !important;
+    font-weight: 900;
+    text-decoration: underline lightslategray 2px;
+    /* text-decoration-color: lightslategray; */
+    /* text-decoration-thickness: 2px; */
+    text-underline-offset: 3px;
+}
+
+
+#instant-search-bar {visibility: hidden;}
+
+
+#algolia-autocomplete-container-on-focus .aa-dropdown-menu, .aa-Panel {
+    border-top: 3px solid #353535;
+}
+.ais-RangeSlider .rheostat-progress {
+  background-color: #333 !important;
+}
+.ais-Panel-header {
+  font-weight: bold;
+  font-family: "Chalet",sans-serif;
+  letter-spacing: 0.125em;
+}
+.aa-Panel .algoliasearch-autocomplete-hit .info .algoliasearch-autocomplete-category {
+  display: none;
+}
+
+.is-widget-container-hl_dark_sky:has(ul li:only-child),.is-widget-container-hl_ada:has(ul li:only-child) {
+  display: none;
+}
+.is-widget-container-hl_dark_sky:has(ul li:only-child .checked),.is-widget-container-hl_ada:has(ul li:only-child .checked) {
+  display: block;
+}
+
+
+@media only screen and (max-width: 480px){
+  #algolia-autocomplete-container-on-focus .aa-dropdown-menu .aa-dataset-products .algoliasearch-autocomplete-hit {
+      padding: 8px 10px;
+  }
+  #algolia-autocomplete-container-on-focus .other-sections {
+      margin: 10px 10px;
+  }
+  .aa-Panel .aa-PanelLayout section {
+    padding-top: 0px;
+  }
+  .aa-Panel .aa-PanelLayout section .aa-SourceHeader {
+    padding: none;
+  }
+}
+
+
+  .fotorama__nav-wrap--vertical.fotorama__nav-wrap--vertical {
+    overflow: hidden;
+  }
+  .fotorama__nav-wrap--vertical.fotorama__nav-wrap--vertical:hover {
+    overflow-y: scroll;
+    scrollbar-width: none;
+  }
+
+/*prevents Edge browser "search similar items"*/
+  img {
+    pointer-events: none !important;
+  }
+</style>
+
+<!--Hides most recent blog post when editing, IMPORTANT: COMMENT-OUT THIS STYLE SECTION WHEN POST IS DONE -->
+<!-- <style>
+.page-layout-blog-landing .blog-posts .blog-post:first-child {display: none;}
+.page-layout-blog-landing .blog-posts .blog-post:nth-child(2) {margin-left: auto !important; margin-right: auto !important; float: unset !important; 
+</style> -->
+
+</div><div data-content-type="row" data-appearance="contained" data-element="main"><div data-enable-parallax="0" data-parallax-speed="0.5" data-background-images="{}" data-video-fallback-src="" data-element="inner" data-pb-style="A8R31NX"><div data-content-type="html" data-appearance="default" data-element="main" data-pb-style="LPDSE85" data-decoded="true"><!--<script type="text/javascript" xml="space">// <![CDATA[
+    require([
+        'jquery',
+    ], function ($) {
+        $(".chat_btn").click(function(){
+                $("#xima-chat-container-outer").css({width: '250px !important'}).show();
+                $("#xima-chat-container-outer").find(".xima-always-collapse-area").trigger("click");
+            })
+    });
+// ]]></script>-->
+
+<!-- Move Allow Cookies button to left side to avoid chat pop up -->
+<style>
+.cookie-content-inside .actions {
+    text-align: left;
+    margin-bottom: 0;
+}
+
+/* MOBILE DISPLAY & HIDE */
+
+.content-desktop {display: block !important;}
+.content-mobile {display: none !important;}
+
+@media screen and (max-width: 768px) {
+
+.content-desktop { 
+   /*display: block !important;*/
+   padding-bottom: 10px !important;
+}
+/*.content-mobile {display: none !important;}*/
+
+}
+
+@media screen and (max-width: 420px) {
+
+.content-desktop {display: none !important;}
+.content-mobile {
+      display: block !important;
+      /*padding-left: 20px;*/
+padding-bottom: 10px;
+}
+}
+
+/* END MOBILE DISPLAY & HIDE */
+
+
+
+<!-- End move allow cookies CSS override -->
+
+<!-- "Next" in blog section changes to say "Next Blog" -->
+
+.next-post-link>a {
+    visibility: hidden;
+}
+
+.next-post-link>a::after {
+    visibility: visible;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "Next Blog »";
+}
+
+
+<!-- Add grey underline animation to links on PDP Overview - Features & Benefits attributes section -->
+<!-- ALSO add grey underline animation to links on size manually by adding <a class="zline" href="#">text to link</a> on individual links  -->
+
+.zline, .attribute-content-area a {
+    text-decoration: underline;
+    text-decoration-color: rgba(0, 0, 0, 0.25);
+    text-decoration-thickness: 2px;
+    
+    background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 1));
+    background-position: 0% 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 2px;
+    transition: background-size 0.3s;
+}
+.zline:hover, .zline:focus, .attribute-content-area a:hover, .attribute-content-area a:focus {
+    background-size: 100% 2px;
+    color: #000;
+}
+
+
+<!--Hides payment option fields on customer account page for brochure site-->
+
+.account-nav-content ul.items li:last-child {
+display:none
+}
+
+
+<!--Hides remote shopping option fields on customer creation page-->
+
+.form-create-account .fieldset .field:last-child{
+display:none;
+}
+
+
+
+<!---prevents random attribute from being shown in H1 on some category/family pages-->
+
+  .catalog-category-view .page-title .counts {
+    display: none;
+  }
+
+
+<!--forces slider to show-->
+
+ div[data-content-type='slider'] {
+    visibility: visible !important;
+}
+
+</style>
+
+<div class="eyebrow-links-wrap wrap"><div class="eyebrow-links">
+<ul>
+<li><a href="/support-chat">Live Chat</a></li>
+<li><a href="/contact-us/">Contact Us</a></li>
+</ul>
+<ul>
+<li><a href="/buy-local.html" class="icon-location">Find a Showroom</a></li>
+<li><a href="#" class="btn-speedbump">Subscribe</a></li>
+</ul>
+</div></div></div></div></div></div>
+</div></div><div class="header content">    <script type="text/x-magento-init">
+        {
+            "*": {
+                "algoliaAutocomplete": {}
+            }
+        }
+    </script>
+    <div id="algoliaAutocomplete" class="block block-search algolia-search-block algolia-search-input"></div>
+<a class="logo" href="https://www.hinkley.com/" title="Hinkley">
+    <img src="https://www.hinkley.com/media/logo/websites/1/logo-black.svg"
+         alt="Hinkley"
+         width="170"         height="37"    />
+</a><div id="algolia-autocomplete-container-on-focus">
+    <span class="aa-dropdown-menu aa-with-products" role="listbox">
+        <div class="autocomplete-wrapper">
+            <div class="col9">
+                <div class="aa-dataset-products">
+                    <span class="aa-suggestions">
+                        <div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="https://www.hinkley.com/5163cm.html"
+                data-objectid="13425"
+                data-index="production_default_products">
+                    <div class="thumb">
+                        <img src="/media/catalog/product/5/1/5163cm.jpg" alt="Medium Three Light Vanity">
+                    </div>
+
+                    <div class="info">
+                        Filmore 5163CM
+
+                        <div class="algoliasearch-autocomplete-category">
+                            Medium Three Light Vanity
+                        </div>
+
+                        <div class="algoliasearch-autocomplete-price">
+                            <span class="after_special">
+                                 $379.68
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="https://www.hinkley.com/900852fmb-lwd.html"
+                data-objectid="42953"
+                data-index="production_default_products">
+                    <div class="thumb">
+                        <img src="/media/catalog/product/c/d/cdd8c93ab063788e9456162fe5c6a36baad9441ad5a1c045a4e20360164f3750.jpeg" alt="Hover Flush 52" LED Smart Fan">
+                    </div>
+
+                    <div class="info">
+                        Hover Flush 900852FMB-LWD
+
+                        <div class="algoliasearch-autocomplete-category">
+                            Hover Flush 52" LED Smart Fan
+                        </div>
+
+                        <div class="algoliasearch-autocomplete-price">
+                            <span class="after_special">
+                                 $659.68
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="https://www.hinkley.com/1325bk.html"
+                data-objectid="5735"
+                data-index="production_default_products">
+                    <div class="thumb">
+                        <img src="/media/catalog/product/1/3/1325bk.jpg" alt="Large Wall Mount Lantern">
+                    </div>
+
+                    <div class="info">
+                        Shelter 1325BK
+
+                        <div class="algoliasearch-autocomplete-category">
+                            Large Wall Mount Lantern
+                        </div>
+
+                        <div class="algoliasearch-autocomplete-price">
+                            <span class="after_special">
+                                 $446.88
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="https://www.hinkley.com/30306hbr.html"
+                data-objectid="15777"
+                data-index="production_default_products">
+                    <div class="thumb">
+                        <img src="/media/catalog/product/3/0/30306hbr.jpg" alt="Medium Six Light Multi Tier Chandelier">
+                    </div>
+
+                    <div class="info">
+                        Skye 30306HBR
+
+                        <div class="algoliasearch-autocomplete-category">
+                            Medium Six Light Multi Tier Chandelier
+                        </div>
+
+                        <div class="algoliasearch-autocomplete-price">
+                            <span class="after_special">
+                                 $1342.88
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="https://www.hinkley.com/1005oz.html"
+                data-objectid="13032"
+                data-index="production_default_products">
+                    <div class="thumb">
+                        <img src="/media/catalog/product/a/c/ac5f90ec666879077d0896ce349ac2d476243eb4958fd0a3271d16be4ce11a8f.jpeg" alt="Medium Outdoor Wall Mount Lantern">
+                    </div>
+
+                    <div class="info">
+                        Republic 1005OZ
+
+                        <div class="algoliasearch-autocomplete-category">
+                            Medium Outdoor Wall Mount Lantern
+                        </div>
+
+                        <div class="algoliasearch-autocomplete-price">
+                            <span class="after_special">
+                                 $334.88
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="https://www.hinkley.com/2595bk.html"
+                data-objectid="42587"
+                data-index="production_default_products">
+                    <div class="thumb">
+                        <img src="/media/catalog/product/2/5/2595bk_2.jpg" alt="Large Wall Mount Lantern">
+                    </div>
+
+                    <div class="info">
+                        Max 2595BK
+
+                        <div class="algoliasearch-autocomplete-category">
+                            Large Wall Mount Lantern
+                        </div>
+
+                        <div class="algoliasearch-autocomplete-price">
+                            <span class="after_special">
+                                 $469.28
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+                                </span>
+                </div>
+            </div>
+
+            <div class="col3">
+                <div class="other-sections" style="min-height: 0px;">
+                    <div class="aa-dataset-suggestions">
+                        <span class="aa-suggestions" style="display: block;">
+                            <div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="/pendant-perfection" style="white-space: normal"
+                data-objectid="552" data-index="production_default_pages">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="algolia-glass-suggestion magnifying-glass"
+width="24" height="24" viewBox="0 0 128 128">
+    <g transform="scale(2.5)">
+        <path stroke-width="3" d="M19.5 19.582l9.438 9.438"></path>
+        <circle stroke-width="3" cx="12" cy="12" r="10.5" fill="none"></circle>
+        <path d="M23.646 20.354l-3.293 3.293c-.195.195-.195.512 0 .707l7.293 7.293c.195.195.512.195.707
+            0l3.293-3.293c.195-.195.195-.512 0-.707l-7.293-7.293c-.195-.195-.512-.195-.707 0z"></path>
+    </g>
+</svg>
+                    <div class="info-without-thumb">Pendants in Indoor</div>
+                    <div class="algolia-clearfix"></div>
+                </a>
+            </div><div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="/style/transitional.html" style="white-space: normal"
+                data-objectid="51" data-index="production_default_categories">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="algolia-glass-suggestion magnifying-glass"
+width="24" height="24" viewBox="0 0 128 128">
+    <g transform="scale(2.5)">
+        <path stroke-width="3" d="M19.5 19.582l9.438 9.438"></path>
+        <circle stroke-width="3" cx="12" cy="12" r="10.5" fill="none"></circle>
+        <path d="M23.646 20.354l-3.293 3.293c-.195.195-.195.512 0 .707l7.293 7.293c.195.195.512.195.707
+            0l3.293-3.293c.195-.195.195-.512 0-.707l-7.293-7.293c-.195-.195-.512-.195-.707 0z"></path>
+    </g>
+</svg>
+                    <div class="info-without-thumb">Transitional Style</div>
+                    <div class="algolia-clearfix"></div>
+                </a>
+            </div><div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="/1004bk.html" style="white-space: normal"
+                data-objectid="45087" data-index="production_default_products">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="algolia-glass-suggestion magnifying-glass"
+width="24" height="24" viewBox="0 0 128 128">
+    <g transform="scale(2.5)">
+        <path stroke-width="3" d="M19.5 19.582l9.438 9.438"></path>
+        <circle stroke-width="3" cx="12" cy="12" r="10.5" fill="none"></circle>
+        <path d="M23.646 20.354l-3.293 3.293c-.195.195-.195.512 0 .707l7.293 7.293c.195.195.512.195.707
+            0l3.293-3.293c.195-.195.195-.512 0-.707l-7.293-7.293c-.195-.195-.512-.195-.707 0z"></path>
+    </g>
+</svg>
+                    <div class="info-without-thumb">Republic in Outdoor</div>
+                    <div class="algolia-clearfix"></div>
+                </a>
+            </div><div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="/products/fans.html" style="white-space: normal"
+                data-objectid="55145" data-index="production_default_categories">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="algolia-glass-suggestion magnifying-glass"
+width="24" height="24" viewBox="0 0 128 128">
+    <g transform="scale(2.5)">
+        <path stroke-width="3" d="M19.5 19.582l9.438 9.438"></path>
+        <circle stroke-width="3" cx="12" cy="12" r="10.5" fill="none"></circle>
+        <path d="M23.646 20.354l-3.293 3.293c-.195.195-.195.512 0 .707l7.293 7.293c.195.195.512.195.707
+            0l3.293-3.293c.195-.195.195-.512 0-.707l-7.293-7.293c-.195-.195-.512-.195-.707 0z"></path>
+    </g>
+</svg>
+                    <div class="info-without-thumb">Fans</div>
+                    <div class="algolia-clearfix"></div>
+                </a>
+            </div>                        </span>
+                    </div>
+
+                    <div class="aa-dataset-0">
+                        <div class="category">Categories</div>
+                        <span class="aa-suggestions" style="display: block;">
+                            <div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="https://outlet.hinkley.com/" style="white-space: normal"
+                data-clicked="1">
+                    <div class="info-without-thumb">Outlet</div>
+                    <div class="algolia-clearfix"></div>
+                </a>
+            </div><div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="/products/landscape.html" style="white-space: normal"
+                data-objectid="37" data-index="production_default_categories">
+                    <div class="info-without-thumb">Landscape</div>
+                    <div class="algolia-clearfix"></div>
+                </a>
+            </div><div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="/products/fans.html" style="white-space: normal"
+                data-objectid="55145" data-index="production_default_categories">
+                    <div class="info-without-thumb">Fans</div>
+                    <div class="algolia-clearfix"></div>
+                </a>
+            </div><div class="aa-suggestion" role="option">
+                <a class="algoliasearch-autocomplete-hit" href="https://larkliving.com/" style="white-space: normal"
+                data-clicked="1">
+                    <div class="info-without-thumb">LARK</div>
+                    <div class="algolia-clearfix"></div>
+                </a>
+            </div>                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </span>
+</div>
+<ul class="header links"><li class="link wishlist" data-bind="scope: 'wishlist'">
+    <a href="https://www.hinkley.com/wishlist/">Favorites        <!-- ko if: wishlist().counter -->
+        <span data-bind="text: wishlist().counter" class="counter qty"></span>
+        <!-- /ko -->
+    </a>
+</li>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "wishlist": {
+                        "component": "Magento_Wishlist/js/view/wishlist"
+                    }
+                }
+            }
+        }
+    }
+
+</script>
+    <li>
+        <a href="https://www.hinkley.com/customer/account/login/">
+            Create an Account        </a>
+    </li>
+</ul></div><style>#html-body [data-pb-style=SKE96PW]{justify-content:flex-start;display:block;flex-direction:column;background-position:left top;background-size:cover;background-repeat:no-repeat;background-attachment:scroll;border-style:none;border-width:1px;border-radius:0;margin:0;padding:0}#html-body [data-pb-style=I1I1UN9]{text-align:left;border-style:none;border-width:1px;border-radius:0;margin:0;padding:0 10px}</style><div data-content-type="row" data-appearance="contained" data-element="main"><div data-enable-parallax="0" data-parallax-speed="0.5" data-background-images="{}" data-video-fallback-src="" data-element="inner" data-pb-style="SKE96PW"><div data-content-type="html" data-appearance="default" data-element="main" data-pb-style="I1I1UN9" data-decoded="true"><style>
+  .nav-sections nav ul .submenu .column {
+    float: left;
+    width: 16.5%;
+  }
+  .nav-sections nav ul .level1.nav-1-3 {
+    margin: 0;
+    position: relative;
+  }
+
+  .nav-sections nav ul .level1.nav-1-3:before {
+    content: none;
+    line-height: 1px;
+    position: absolute;
+    top: -1em;
+    left: 0;
+    font-weight: bold;
+    transform: translateY(-50%);
+  }
+
+#store\.menu .submenu.level0 img:hover{
+        opacity: 55%;
+}
+
+@media only screen and (max-width: 979px) {
+    #store\.menu .submenu.level0 img {
+        display: block!important;
+        filter: invert(1);
+}
+.no-invert img {
+        filter: none!important;
+}
+    }
+</style>
+
+<nav class="sections nav-sections">
+  <div class="section-items nav-sections-items" role="tablist">
+    <div class="section-item-title nav-sections-item-title active" data-role="collapsible" role="tab" data-collapsible="true" aria-controls="store.menu" aria-selected="false" aria-expanded="true" tabindex="0">
+      <a class="nav-sections-item-switch" data-toggle="switch" href="#store.menu">Menu</a>
+    </div>
+    <div class="section-item-content nav-sections-item-content" id="store.menu" data-role="content" role="tabpanel" aria-hidden="false">
+      <nav class="navigation" data-action="navigation">
+        <ul>
+          <li class="level0 nav-1 first level-top parent">
+            <a class="level-top"><span>Products</span></a>
+            <ul class="level0 submenu">
+              <li class="column">
+                <ul>
+                  <li class="level1 nav-1-1">
+                    <a href="/products/new-products.html?hl_new_item=Yes"><span>New Products</span></a>
+                  </li>
+                  <li class="level1 nav-1-2 parent">
+                    <a href="/products/collections.html"><span>Featured Collections</span></a>
+                    <ul class="level1 submenu">
+                      <li class="level2 nav-1-2-1"><a href="/products/collections/lisa-mcdennon.html?hl_algolia_collection_filter=Lisa%20McDennon">
+                        <span>Lisa McDennon </span></a>
+                      </li>
+                      <li class="level2 nav-1-2-2"><a href="/products/families/lumiglo-bulb.html">
+                        <span>LumiGlo </span></a>
+                      </li>
+                      <li class="level2 nav-1-2-3"><a href="/products/collections/coastal-elements.html">
+                        <span>Coastal Elements </span></a>
+                      </li>
+                      <li class="level2 nav-1-2-4"><a href="/products/collections/estate-series.html">
+                        <span>Estate</span></a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="level1 nav-1-3">
+                    <a href="products/hinkley-hospitality.html"><span>Hinkley Hospitality</span></a>
+                  </li>
+                  <li class="level1 nav-1-4">
+                    <a href="https://larkliving.com/" title="larkliving.com" target="_blank" rel="noopener"><img style="max-height:16px;" src="/media/wysiwyg/LarkCms/Lark_Logo__Black.png" alt="Chic, well-priced lighting that you can easily mix, match, and add onto as your style and space evolves." /></a>
+</li>
+                  <li class="level1 nav-1-5">
+<a href="/products/fredrick-ramond.html"><img src="/media/catalog/category/Asset_2.png" alt="Fredrick Ramond" width="165" padding: 2px;></a></li>
+                  </li>
+                </ul>
+              </li>
+              <li class="column">
+                <ul>
+                  <li class="level1 nav-1-6 parent">
+                    <a href="/products/interior-lighting.html"><span>Interior Lighting</span></a>
+                    <ul class="level1 submenu">
+                      <li class="level2 nav-1-6-1 first"><a href="/products/interior-lighting/hanging.html"><span>Hanging</span></a></li>
+                      <li class="level2 nav-1-6-2"><a href="/products/interior-lighting/ceiling.html"><span>Ceiling</span></a></li>
+                      <li class="level2 nav-1-6-3"><a href="/products/interior-lighting/wall-mount.html"><span>Wall Mount</span></a></li>
+                      <li class="level2 nav-1-6-4"><a href="/products/interior-lighting/bath.html"><span>Bath</span></a></li>
+                      <li class="level2 nav-1-6-5 last"><a href="/products/interior-lighting/shades-and-accessories.html"><span>Shades and Accessories</span></a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li class="column">
+                <ul>
+                  <li class="level1 nav-1-7 parent">
+                    <a href="/products/outdoor-lighting.html"><span>Outdoor Lighting</span></a>
+                    <ul class="level1 submenu">
+                      <li class="level2 nav-1-7-1"><a href="/products/outdoor-lighting/wall-mount.html"><span>Wall Mount</span></a></li>
+                      <li class="level2 nav-1-7-2 first"><a href="/products/outdoor-lighting/ceiling.html"><span>Ceiling</span></a></li>
+                      <li class="level2 nav-1-7-3"><a href="/products/outdoor-lighting/hanging.html"><span>Hanging</span></a></li>
+                      <li class="level2 nav-1-7-4"><a href="/products/outdoor-lighting/post-mount.html"><span>Post Mount</span></a></li>
+                      <li class="level2 nav-1-7-5"><a href="/products/outdoor-lighting/pier-mounts.html"><span>Pier Mounts</span></a></li>
+                      <li class="level2 nav-1-7-6 last"><a href="/products/outdoor-lighting/post-and-pier-accessories.html"><span>Post and Pier Accessories</span></a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li class="column">
+                <ul>
+                  <li class="level1 nav-1-8 parent">
+                    <a href="/products/landscape.html"><span>Landscape</span></a>
+                    <ul class="level1 submenu">
+                      <li class="level2 nav-1-8-1"><a href="/products/landscape/path.html"><span>Path</span></a></li>
+                      <li class="level2 nav-1-8-2 first"><a href="/products/landscape/accent.html"><span>Accent</span></a></li>
+                      <li class="level2 nav-1-8-3"><a href="/products/landscape/deck-and-patio.html"><span>Deck and Patio</span></a></li>
+                      <li class="level2 nav-1-8-4"><a href="/products/landscape/lamps.html"><span>Bulbs</span></a></li>
+                      <li class="level2 nav-1-8-5 last"><a href="/products/landscape/power-supplies-and-accessories.html"><span>Power Supplies and Accessories</span></a></li>
+                      <li class="level2 nav-1-8-6 last"><a href="/helps"><span>H.E.L.P.S.</span></a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li class="column">
+                <ul>
+                  <li class="level1 nav-1-9 parent">
+                    <a href="/products/fans.html"><span>Fans</span></a>
+                    <ul class="level1 submenu">
+                      <li class="level2 nav-1-9-1"><a href="/products/fans/indoor.html"><span>Indoor</span></a></li>
+                      <li class="level2 nav-1-9-2 first"><a href="/products/fans/outdoor.html"><span>Outdoor</span></a></li>
+                      <li class="level2 nav-1-9-3"><a href="/products/fans/light-kits-and-accessories.html"><span>Light Kits and Accessories</span></a></li>
+                      <li class="level2 nav-1-9-4 last"><a href="/products/fans/controls.html"><span>Controls</span></a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li class="column">
+                <ul>
+                  <li class="level1 nav-1-10 parent"><span class="no-invert">
+                    <a href="https://larkliving.com/" target="_blank" rel="noopener" title="larkliving.com"><img src="/media/wysiwyg/LarkCms/LarkBanner.png" alt="Chic, well-priced lighting that you can easily mix, match, and add onto as your style and space evolves."/></a></span>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li class="level0 nav-2 level-top parent">
+            <a class="level-top"><span>Style</span></a>
+            <!-- If two new styles needs to be added, change all important width's below to 15.3333% and add Bohemian and Scandinavian column -->
+            <ul class="level0 submenu">
+              <li class="column" style="width: 15.3333% !important;">
+                <ul>
+                  <li class="level1 nav-2-1">
+                    <a href="/style/industrial.html">
+                      <img src="/media/catalog/category/INDUSTRIAL-Stinson_Cartwright_3534BK_3394PL_H.png" alt="Industrial">
+                      <span>Industrial</span>
+                    </a>
+                  </li>
+                  <li class="level1 nav-2-2">
+                    <a href="/style/coastal.html">
+                      <img src="/media/catalog/category/COASTAL-nautique_49065hb_h_on_AND_off.png" alt="Coastal">
+                      <span>Coastal</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="column" style="width: 15.3333% !important;">
+                <ul>
+                  <li class="level1 nav-2-3">
+                    <a href="/style/rustic.html">
+                      <img src="/media/catalog/category/RUSTIC-Clancy_3034KZ.png" alt="Rustic">
+                      <span>Rustic</span>
+                    </a>
+                  </li>
+                  <li class="level1 nav-2-4">
+                    <a href="/style/craftsman.html">
+                      <img src="/media/catalog/category/Craftsman_Dropdown.jpg" alt="Craftsman">
+                      <span>Craftsman</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="column" style="width: 15.3333% !important;">
+                <ul>
+                  <li class="level1 nav-2-5">
+                    <a href="/style/traditional.html">
+                      <img src="/media/catalog/category/TRADITIONAL-beaconhill_17461blc_h.png" alt="Traditional">
+                      <span>Traditional</span>
+                    </a>
+                  </li>
+                  <li class="level1 nav-2-6">
+                    <a href="/style/modern.html">
+                      <img src="/media/catalog/category/MODERN-Ludlow_41315BGR_1_H.png" alt="Modern">
+                      <span>Modern</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="column" style="width: 15.3333% !important;">
+                <ul>
+                  <li class="level1 nav-2-7">
+                    <a href="/style/transitional.html">
+                      <img src="/media/catalog/category/TRANSITIONAL-poppy_40698bk_h.png" alt="Transitional">
+                      <span>Transitional</span>
+                    </a>
+                  </li>
+                  <li class="level1 nav-2-8">
+                    <a href="/style/mid-century-modern.html">
+                      <img src="/media/catalog/category/MIDCENTURY-facet_51152pn_closeup.png" alt="Mid-Century Modern">
+                      <span>Mid-Century Modern</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="column" style="width: 15.3333% !important;">
+                <ul>
+                  <li class="level1 nav-2-9">
+                    <a href="/style/bohemian.html">
+                      <img src="/media/catalog/category/BOHEMIAN-ziggy_4457blk_h_on_AND_on.png" alt="Bohemian">
+                      <span>Bohemian</span>
+                    </a>
+                  </li>
+                  <li class="level1 nav-2-10">
+                    <a href="/style/scandinavian.html">
+                      <img src="/media/catalog/category/SCANDINAVIAN-nikko_41065blk_h.png" alt="Scandinavian">
+                      <span>Scandinavian</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="column" style="width: 15.3333% !important;">
+                <ul>
+                  <li class="level1 nav-2-11">
+                    <a href="/style/glam.html">
+                      <img src="/media/catalog/category/GLAM-revel_fr30905bng_styx_fr46402blk_h.jpg.png" alt="Glam">
+                      <span>Glam</span>
+                    </a>
+                  </li>
+                  <li class="level1 nav-2-12">
+                    <a href="/style.html" class="btn-style-view-all">
+                      <span>View All</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+
+          </li>
+          <li class="level0 nav-3 level-top parent">
+            <a class="level-top"><span>Where to Buy</span></a>
+            <ul class="level0 submenu">
+              <li class="level1 nav-3-1 last"><a href="/buy-local.html"><span>Buy Local</span></a></li>
+              <li class="level1 nav-3-2 first"><a href="/where-to-buy/buy-online.html"><span>Buy Online</span></a></li>
+            </ul>
+          </li>
+          <!--  <li class="level0 nav-4 level-top"><a href="/blog.html" class="level-top"><span>Blog</span></a></li> -->
+          <li class="level0 nav-4 level-top parent">
+            <a class="level-top"><span>For Professionals</span></a>
+            <ul class="level0 submenu">
+              <li class="level1 nav-4-1 first"><a href="/for-pros-showroom"><span>Showroom</span></a></li>
+              <li class="level1 nav-4-2 first"><a href="/for-pros-landscape"><span>Landscape</span></a></li>
+              <li class="level1 nav-4-3 first"><a href="/for-pros-hospitality"><span>Hospitality</span></a></li>
+<li class="level1 nav-4-4 first"><a href="/trade-professionals"><span>Trade Professionals</span></a></li>
+              <li class="level1 nav-4-4 last"><a href="https://shop.hinkley.com/"><span>shop<strong>>HINKLEY</strong></span></a></li>
+            </ul>
+          </li>
+          <li class="level0 nav-5 level-top parent">
+            <a class="level-top" href="https://outlet.hinkley.com/" target="_blank"><span>Clearance</span></a>
+
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</nav>
+</div></div></div></header></div><script type="text/x-magento-init">
+        {
+            "*": {
+                "Magento_Ui/js/core/app": {
+                    "components": {
+                        "storage-manager": {
+                            "component": "Magento_Catalog/js/storage-manager",
+                            "appendTo": "",
+                            "storagesConfiguration" : {"recently_viewed_product":{"requestConfig":{"syncUrl":"https:\/\/www.hinkley.com\/catalog\/product\/frontend_action_synchronize\/"},"lifetime":"1000","allowToSendRequest":null},"recently_compared_product":{"requestConfig":{"syncUrl":"https:\/\/www.hinkley.com\/catalog\/product\/frontend_action_synchronize\/"},"lifetime":"1000","allowToSendRequest":null},"product_data_storage":{"updateRequestConfig":{"url":"https:\/\/www.hinkley.com\/rest\/default\/V1\/products-render-info"},"requestConfig":{"syncUrl":"https:\/\/www.hinkley.com\/catalog\/product\/frontend_action_synchronize\/"},"allowToSendRequest":null}}                        }
+                    }
+                }
+            }
+        }
+</script>
+<script type="text/javascript">
+_linkedin_partner_id = "2608193";
+window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+</script><script type="text/javascript">
+(function(){var s = document.getElementsByTagName("script")[0];
+var b = document.createElement("script");
+b.type = "text/javascript";b.async = true;
+b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+s.parentNode.insertBefore(b, s);})();
+</script>
+<noscript>
+<img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=2608193&fmt=gif" />
+</noscript>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "Oak3_Customer/js/aws": {}
+    }
+}
+</script>
+<input type="hidden" name="store-code" id="store-code" value="default">
+<script>
+    require(['jquery', 'iframeResizer' ],
+        function ($) {
+            $(function () {
+                waitUntilExists(function() { return $('.embedded-iframe').length; }, function() {
+                    var iframe = $('.embedded-iframe'),
+                        headerHeight = $('header').outerHeight(),
+                        windowHeight = $(window).innerHeight(),
+                        availableHeight =  windowHeight - headerHeight - 70,
+                        isOldIE = (navigator.userAgent.indexOf("MSIE") !== -1);
+                    iframe.css({'height': availableHeight + 'px'});
+
+                    iframe.on('load', function(){
+                        iFrameResize({
+                            log: false,
+                            minHeight: availableHeight,
+                            resizeFrom: 'parent',
+                            scrolling: true,
+                            inPageLinks: true,
+                            autoResize: true,
+                            heightCalculationMethod: isOldIE ? 'max' : 'bodyScroll',
+                            onInit: function(iframe) {
+                                iframe.style.height = availableHeight + 'px';
+                            },
+                            onResized: function(messageData) {
+                                setTimeout(function() {
+                                    messageData.iframe.style.visibility = 'visible';
+                                }, 300);
+                            },
+                            onMessage: function(messageData) {
+                                if (history.pushState && messageData.message.hasOwnProperty('trackNo')) {
+                                    var newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname.replace(/\/$/, '') + '/' + messageData.message.trackNo;
+                                    window.history.pushState({path:newUrl}, '', newUrl);
+                                }
+                            }
+                        }, '.embedded-iframe');
+                    });
+
+                }, function() { });
+                function waitUntilExists(isReady, success, error, count, interval){
+                    if (count === undefined) {
+                        count = 300;
+                    }
+                    if (interval === undefined) {
+                        interval = 20;
+                    }
+                    if (isReady()) {
+                        success();
+                        return;
+                    }
+                    setTimeout(function(){
+                        if (!count) {
+                            if (error !== undefined) {
+                                error();
+                            }
+                        } else {
+                            waitUntilExists(isReady, success, error, count -1, interval);
+                        }
+                    }, interval);
+                }
+            });
+        });
+</script>
+
+<!-- Wrapping template -->
+<script type="text/template" id="instant_wrapper_template">
+    {{#findAutocomplete}}
+    <div id="algolia-autocomplete-container"></div>
+    {{/findAutocomplete}}
+
+    <div id="algolia_instant_selector"
+         class=" with-facets">
+        <div class="row">
+            <div class="col-md-3" id="algolia-left-container">
+                <div id="refine-toggle" class="visible-xs visible-sm">
+                    + Refine                </div>
+                <div class="hidden-xs hidden-sm" id="instant-search-facets-container">
+                                        <a href="#" id="algolia-expand-collapse" class="algolia-expand">Expand all</a>
+                                        <div id="clear-refinements"></div>
+                    <div id="current-refinements"></div>
+                </div>
+            </div>
+
+            <div class="col-md-9" id="algolia-right-container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div>
+                            {{#second_bar}}
+                            <div id="instant-search-bar"></div>
+                            {{/second_bar}}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div itemscope itemtype="http://schema.org/ItemList" class="hits">
+                            <div class="algolia-infos">
+                                <div class="pull-left" id="algolia-stats"></div>
+                                <div class="pull-right">
+                                    <div class="sort-by-label pull-left">
+                                        SORT BY &nbsp;
+                                    </div>
+                                    <div class="pull-left" id="algolia-sorts"></div>
+                                </div>
+                                <div class="algolia-clearfix"></div>
+                            </div>
+                            <div id="algolia-banner"></div>
+                            <div id="instant-empty-results-container"></div>
+                            <div id="instant-search-results-container"></div>
+                        </div>
+                    </div>
+                    <div class="algolia-clearfix"></div>
+                </div>
+
+                <div class="text-center">
+                    <div id="instant-search-pagination-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/template" id="instant-hit-template">
+    <div class="col-md-4 col-sm-6" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+        <meta itemprop="position" content="{{__position}}" />
+        <div class="result-wrapper" itemprop="item" itemscope itemtype="http://schema.org/Product">
+            <meta itemprop="url"
+                  {{^__queryID}} content="{{url}}" {{/__queryID}}
+            {{#__queryID}} content="{{urlForInsights}}" {{/__queryID}}
+            />
+            <a class="result"
+               {{^__queryID}} href="{{url}}" {{/__queryID}}
+            {{#__queryID}} href="{{urlForInsights}}" {{/__queryID}}
+            data-objectid="{{objectID}}"
+            data-indexname="{{__indexName}}"
+            data-position="{{__position}}"
+            data-queryid="{{__queryID}}">
+                <div class="result-content">
+                    <div class="result-thumbnail">
+                        {{#image_url}}<img itemprop="image" src="{{{image_url}}}" alt="{{{name}}}" />{{/image_url}}
+                        {{^image_url}}<span class="no-image"></span>{{/image_url}}
+                    </div>
+                    <div class="result-sub-content">
+                        <h3 itemprop="family" class="family-title text-ellipsis">
+                            {{{ hl_family_description }}}
+                        </h3>
+                        <h3 itemprop="name" class="result-title text-ellipsis">
+                            {{{ _highlightResult.name.value }}}
+                        </h3>
+
+                        {{^price.USD.default_max}}
+                        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="price">
+                            <meta itemprop="price" content="{{price.USD.default}}" />
+                            {{/price.USD.default_max}}
+                            {{#price.USD.default_max}}
+                            <div itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer" class="price">
+                                <meta itemprop="lowPrice" content="{{price.USD.default}}" />
+                                <meta itemprop="highPrice" content="{{price.USD.default_max}}" />
+                                {{/price.USD.default_max}}
+                                <meta itemprop="priceCurrency" content="USD" />
+                                <div class="price-wrapper">
+                                    <div>
+                                        <span class="after_special
+                                                {{#price.USD.default_original_formated}}
+                                                    promotion
+                                                {{/price.USD.default_original_formated}}">
+                                            {{price.USD.default_formated}}
+                                        </span>
+                                        {{#price.USD.default_original_formated}}
+                                        <span class="before_special">
+                                            {{price.USD.default_original_formated}}
+                                        </span>
+                                        {{/price.USD.default_original_formated}}
+                                        {{#price.USD.default_tier_formated}}
+                                        <span class="tier_price">
+                                            As low as                                            <span class="tier_value">{{price.USD.default_tier_formated}}</span>
+                                        </span>
+                                        {{/price.USD.default_tier_formated}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bottom-info">
+                            {{sku}}
+                            | W {{hl_width}}" H {{hl_height}}"
+                        </div>
+                    </div>
+                    <div class="algolia-clearfix"></div>
+                </a>
+
+                <!-- BEGIN HS-177 - Add back "Add to Favorites" link to PLP -->
+                <a href="#" class="action towishlist" title="Add to Favorites" data-action="add-to-wishlist"
+                   data-mage-init='{"wishlistjs": {}}'
+                   data-post="{&quot;action&quot;:&quot;\/wishlist\/index\/add\/&quot;,&quot;data&quot;:{&quot;product&quot;:{{objectID}}}}">
+                    <span>Add to Favorites</span>
+                </a>
+                <!-- END HS-177 -->
+
+                <div class="product-list-item-footer">
+                    {{{ finishes }}}
+                </div>
+            </div>
+        </div>
+</script>
+<script type="text/template" id="instant-stats-template">
+    {{#hasOneResult}}<strong>1</strong> result found{{/hasOneResult}}
+
+    {{#hasManyResults}}
+        {{^hasNoResults}}{{first}}-{{last}} out of{{/hasNoResults}}
+        <strong>
+            <span itemprop="numberOfItems">{{nbHits}}</span>
+            results found        </strong>
+    {{/hasManyResults}}
+
+    {{^hasNoResults}}
+    in {{seconds}} seconds    {{/hasNoResults}}
+</script>
+<script type="text/template" id="refinements-lists-item-template">
+    <label class="{{cssClasses.label}} {{#isRefined}}checked{{/isRefined}}">
+        <input class="{{cssClasses.checkbox}}" {{#isRefined}}checked{{/isRefined}} type="checkbox" value="{{value}}" />
+        {{label}}
+        <span class="{{cssClasses.count}}">{{count}}</span>
+    </label>
+</script>
+<script type="text/template" id="current-refinements-template">
+    <div class="cross-wrapper">
+        <span class="clear-cross clear-refinement"></span>
+    </div>
+    <div class="current-refinement-wrapper">
+        {{#label}}
+        <span class="current-refinement-label">{{label}}{{^operator}}:{{/operator}}</span>
+        {{/label}}
+        {{#operator}}
+        {{{displayOperator}}}
+        {{/operator}}
+        {{#exclude}}-{{/exclude}}
+        <span class="current-refinement-name">{{name}}</span>
+    </div>
+</script><div class="main-wrap wrap"><main id="maincontent" class="page-main"><div id="algolia-autocomplete-container"></div><div class="page messages"><div data-placeholder="messages"></div>
+<div data-bind="scope: 'messages'">
+    <!-- ko if: cookieMessages && cookieMessages.length > 0 -->
+    <div aria-atomic="true" role="alert" data-bind="foreach: { data: cookieMessages, as: 'message' }" class="messages">
+        <div data-bind="attr: {
+            class: 'message-' + message.type + ' ' + message.type + ' message',
+            'data-ui-id': 'message-' + message.type
+        }">
+            <div data-bind="html: $parent.prepareMessageForHtml(message.text)"></div>
+        </div>
+    </div>
+    <!-- /ko -->
+
+    <!-- ko if: messages().messages && messages().messages.length > 0 -->
+    <div aria-atomic="true" role="alert" class="messages" data-bind="foreach: {
+        data: messages().messages, as: 'message'
+    }">
+        <div data-bind="attr: {
+            class: 'message-' + message.type + ' ' + message.type + ' message',
+            'data-ui-id': 'message-' + message.type
+        }">
+            <div data-bind="html: $parent.prepareMessageForHtml(message.text)"></div>
+        </div>
+    </div>
+    <!-- /ko -->
+</div>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                        "messages": {
+                            "component": "Magento_Theme/js/view/messages"
+                        }
+                    }
+                }
+            }
+    }
+</script>
+</div><div class="columns"><div class="column main"><div class="product-top"><div class="product media"><a id="gallery-prev-area" tabindex="-1"></a>
+
+
+<div class="gallery-placeholder _block-content-loading" data-gallery-role="gallery-placeholder">
+    <img
+        alt="main product photo"
+        class="gallery-placeholder__image"
+        src="https://www.hinkley.com/media/catalog/product/cache/885f062f3acdd1395daacd4faa08d91b/9/5/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg"
+    />
+</div>
+
+<meta itemprop="image" content="https&#x3A;&#x2F;&#x2F;www.hinkley.com&#x2F;media&#x2F;catalog&#x2F;product&#x2F;cache&#x2F;885f062f3acdd1395daacd4faa08d91b&#x2F;9&#x2F;5&#x2F;957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg" />
+
+<script type="text/x-magento-init">
+    {
+        "[data-gallery-role=gallery-placeholder]": {
+            "mage/gallery/gallery": {
+                "mixins":["magnifier/magnify"],
+                "magnifierOpts": {"fullscreenzoom":"20","top":"","left":"","width":"","height":"","eventType":"hover","enabled":false},
+                "data": [{"thumb":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/6d0a8083b7d04dd948496f90918ddbad\/9\/5\/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg","img":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/885f062f3acdd1395daacd4faa08d91b\/9\/5\/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg","full":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/c5687ffb93944b1fb9aa0289f98893b4\/9\/5\/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg","caption":"Small Up\/Down Wall Mount Lantern","position":"1","isMain":true,"type":"image","videoUrl":null},{"thumb":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/6d0a8083b7d04dd948496f90918ddbad\/8\/f\/8f42d619e97d55c0fdd279ee9fd308a580016f0110b5a64a3c4081a2763a19c6.jpeg","img":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/885f062f3acdd1395daacd4faa08d91b\/8\/f\/8f42d619e97d55c0fdd279ee9fd308a580016f0110b5a64a3c4081a2763a19c6.jpeg","full":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/c5687ffb93944b1fb9aa0289f98893b4\/8\/f\/8f42d619e97d55c0fdd279ee9fd308a580016f0110b5a64a3c4081a2763a19c6.jpeg","caption":"Small Up\/Down Wall Mount Lantern","position":"3","isMain":false,"type":"image","videoUrl":null},{"thumb":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/6d0a8083b7d04dd948496f90918ddbad\/6\/b\/6b1dcea79f1886afcbb85acc68694512a2615565cf98dd306f73306e8485313c.jpeg","img":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/885f062f3acdd1395daacd4faa08d91b\/6\/b\/6b1dcea79f1886afcbb85acc68694512a2615565cf98dd306f73306e8485313c.jpeg","full":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/c5687ffb93944b1fb9aa0289f98893b4\/6\/b\/6b1dcea79f1886afcbb85acc68694512a2615565cf98dd306f73306e8485313c.jpeg","caption":"Small Up\/Down Wall Mount Lantern","position":"4","isMain":false,"type":"image","videoUrl":null},{"thumb":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/6d0a8083b7d04dd948496f90918ddbad\/0\/4\/04ccb620dab5d0d32709e637e2719f7d304b345f1af6424ba1fe84b7a6bf6f8c.jpeg","img":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/885f062f3acdd1395daacd4faa08d91b\/0\/4\/04ccb620dab5d0d32709e637e2719f7d304b345f1af6424ba1fe84b7a6bf6f8c.jpeg","full":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/c5687ffb93944b1fb9aa0289f98893b4\/0\/4\/04ccb620dab5d0d32709e637e2719f7d304b345f1af6424ba1fe84b7a6bf6f8c.jpeg","caption":"Small Up\/Down Wall Mount Lantern","position":"5","isMain":false,"type":"image","videoUrl":null},{"thumb":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/6d0a8083b7d04dd948496f90918ddbad\/f\/c\/fcded68051b96158dce124c6d4bee50ffea45d79f7a79cfb7d67386c1c3fbbf2.jpeg","img":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/885f062f3acdd1395daacd4faa08d91b\/f\/c\/fcded68051b96158dce124c6d4bee50ffea45d79f7a79cfb7d67386c1c3fbbf2.jpeg","full":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/c5687ffb93944b1fb9aa0289f98893b4\/f\/c\/fcded68051b96158dce124c6d4bee50ffea45d79f7a79cfb7d67386c1c3fbbf2.jpeg","caption":"Small Up\/Down Wall Mount Lantern","position":"6","isMain":false,"type":"image","videoUrl":null},{"thumb":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/6d0a8083b7d04dd948496f90918ddbad\/2\/7\/277979afa20f16981c3eb6293c8a0ee76b8c49501785c14a4664d0e7333a4c56.jpeg","img":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/885f062f3acdd1395daacd4faa08d91b\/2\/7\/277979afa20f16981c3eb6293c8a0ee76b8c49501785c14a4664d0e7333a4c56.jpeg","full":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/c5687ffb93944b1fb9aa0289f98893b4\/2\/7\/277979afa20f16981c3eb6293c8a0ee76b8c49501785c14a4664d0e7333a4c56.jpeg","caption":"Small Up\/Down Wall Mount Lantern","position":"7","isMain":false,"type":"image","videoUrl":null},{"thumb":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/6d0a8083b7d04dd948496f90918ddbad\/3\/5\/35bb7a2aeb6ec985c8092db5f26447476ab76489ec94f4b0a7dfeb1d0149b2ec.jpeg","img":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/885f062f3acdd1395daacd4faa08d91b\/3\/5\/35bb7a2aeb6ec985c8092db5f26447476ab76489ec94f4b0a7dfeb1d0149b2ec.jpeg","full":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/c5687ffb93944b1fb9aa0289f98893b4\/3\/5\/35bb7a2aeb6ec985c8092db5f26447476ab76489ec94f4b0a7dfeb1d0149b2ec.jpeg","caption":"Small Up\/Down Wall Mount Lantern","position":"8","isMain":false,"type":"image","videoUrl":null}],
+                "options": {"nav":"thumbs","loop":true,"keyboard":false,"arrows":true,"allowfullscreen":true,"showCaption":false,"width":511,"thumbwidth":60,"thumbheight":60,"height":480,"transitionduration":500,"transition":"slide","navarrows":true,"navtype":"slides","navdir":"vertical"},
+                "fullscreen": {"nav":"thumbs","loop":true,"navdir":"vertical","navarrows":false,"navtype":"slides","arrows":false,"showCaption":false,"transitionduration":500,"transition":"dissolve"},
+                 "breakpoints": {"mobile":{"conditions":{"max-width":"767px"},"options":{"options":{"nav":"dots"}}}}            }
+        }
+    }
+</script>
+<script type="text/x-magento-init">
+    {
+        "[data-gallery-role=gallery-placeholder]": {
+            "Magento_ProductVideo/js/fotorama-add-video-events": {
+                "videoData": [{"mediaType":"image","videoUrl":null,"isBase":true},{"mediaType":"image","videoUrl":null,"isBase":false},{"mediaType":"image","videoUrl":null,"isBase":false},{"mediaType":"image","videoUrl":null,"isBase":false},{"mediaType":"image","videoUrl":null,"isBase":false},{"mediaType":"image","videoUrl":null,"isBase":false},{"mediaType":"image","videoUrl":null,"isBase":false}],
+                "videoSettings": [{"playIfBase":"0","showRelated":"0","videoAutoRestart":"0"}],
+                "optionsVideoData": []            }
+        }
+    }
+</script>
+<a id="gallery-next-area" tabindex="-1"></a>
+<div class="share-this">
+    <div class="share-wrap">
+        <span class="share-toggle">Share</span>
+        <ul class="ssk-group">
+            <li><a class="ssk ssk-pinterest"></a></li>
+            <li><a class="ssk ssk-facebook"></a></li>
+            <li><a class="ssk houzz-share-button"></a></li>
+            <li><a class="ssk ssk-email"></a></li>
+        </ul>
+    </div>
+</div></div><div class="product-info-main">    <div class="page-title-wrapper">
+        <h1 class="page-title"
+                        >
+
+                            Silo                        <span itemprop="sku" style="white-space: nowrap;">13594BK-LL</span>
+
+                    </h1>
+
+                    <div class="title product-name" itemprop="name">
+                Small Up/Down Wall Mount Lantern            </div>
+        
+            </div>
+<div class="bazaarvoice-summary-container">
+
+    <!-- BV | Magento Extension 9.1.8 -->
+    <div data-bv-show="rating_summary"
+         data-bv-product-id="13594BK-LL">
+            </div>
+</div><div class="product-info-price"><div class="price-box price-final_price" data-role="priceBox" data-product-id="52069" data-price-box="product-id-52069">
+    
+
+<span class="price-container price-final_price tax weee"
+       itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+    <span class="price-label">MSRP</span>
+    <span  id="product-price-52069"                data-price-amount="245.28"
+        data-price-type="finalPrice"
+        class="price-wrapper ">
+        <span class="price">$245.28</span>    </span>
+                <meta itemprop="price" content="245.28" />
+        <meta itemprop="priceCurrency" content="USD" />
+        <meta itemprop="availability" content="InStock" />
+        <meta itemprop="url" content="https&#x3A;&#x2F;&#x2F;www.hinkley.com&#x2F;13594bk-ll.html" />
+    </span>
+<meta itemprop="description" content="The perfect addition to Modern Coastal, Silo’s compact design blends simple and long-lasting practicality. Built to stand up to harsh climates and available in three rust and corrosion-resistant finishes, Silo is available in a downlight-only option to meet dark sky compliance, an up and downlight for additional wall washing, and a small flush mount." />
+
+</div></div><div class="product-social-links"><div class="stocklevel-message">
+    <p>IN STOCK - Quick Ship</p>
+</div>
+
+
+<script type="text/x-magento-init">
+    {
+        ".barcode": {
+            "Hammer_Barcode/js/barcode": {
+                "enabled": "0"
+            }
+        }
+    }
+</script>
+<ul class="product-custom-actions">
+    <li><a href="/buy-local.html" class="btn reverse btn-buy-local">Buy Local</a></li>
+    <li><a href="#buy-now-options" class="btn btn-buy-online reverse">Buy Online</a></li>
+</ul>
+
+<div class="mfp-hide">
+    <div id="buy-now-options">
+        <style>#html-body [data-pb-style=A61G9E5]{justify-content:flex-start;display:block;flex-direction:column;background-position:left top;background-size:cover;background-repeat:no-repeat;background-attachment:scroll}#html-body [data-pb-style=A61G9E5],#html-body [data-pb-style=ICBHRME]{border-style:none;border-width:1px;border-radius:0;margin:0;padding:0}</style><div data-content-type="row" data-appearance="contained" data-element="main"><div data-enable-parallax="0" data-parallax-speed="0.5" data-background-images="{}" data-video-fallback-src="" data-element="inner" data-pb-style="A61G9E5"><div data-content-type="html" data-appearance="default" data-element="main" data-pb-style="ICBHRME" data-decoded="true"><p>Hinkley and Fredrick Ramond products are available through these premium online partners.</p>
+<div class="content-columns cols-4">
+<div class="col"><a href="https://www.1stoplighting.com/Hinkley-Lighting.htm?qd=1" target="_blank"><img src="https://www.hinkley.com/media/wysiwyg/content-buy-online-1.png" alt="1Stoplighting" /></a></div>
+<div class="col"><a href="https://www.bellacor.com/hinkley.htm?pnr=1" target="_blank"><img src="https://www.hinkley.com/media/wysiwyg/content-buy-online-2.png" alt="Bellacor" /></a></div>
+<div class="col"><a href="https://www.build.com/hinkley-lighting/c109328?term=hinkley" target="_blank"><img src="https://www.hinkley.com/media/wysiwyg/content-buy-online-3.png" alt="Build" /></a></div>
+<div class="col"><a href="https://www.1800lighting.com/Hinkley-Lighting/mn/N-1z140x6/" target="_blank"><img src="https://www.hinkley.com/media/wysiwyg/content-buy-online-4.png" alt="1800Lighting" /></a></div>
+</div>
+<div class="content-columns cols-4">
+<div class="col"><a href="https://www.lightingnewyork.com/brand/hinkley-lighting.html" target="_blank"><img src="https://www.hinkley.com/media/wysiwyg/content-buy-online-5_v3.png" alt="Lightingnewyork" /></a></div>
+<div class="col"><a href="https://www.lumens.com/hinkley-lighting/" target="_blank"><img src="https://www.hinkley.com/media/wysiwyg/content-buy-online-6_v2.png" alt="Lumens" /></a></div>
+<div class="col"><a href="https://www.wayfair.com/brand/bnd/hinkley-lighting-b427.html?redir=Hinkley" target="_blank"><img src="https://www.hinkley.com/media/wysiwyg/content-buy-online-7.png" alt="Wayfair" /></a></div>
+<div class="col"><a href="https://www.lampsplus.com/products/manufacturer_hinkley/" target="_blank"><img src="https://www.hinkley.com/media/wysiwyg/content-buy-online-8_v2.png" alt="YLighting" /></a></div>
+</div></div></div></div>    </div>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Algolia_AlgoliaSearch/js/tracking": {}
+        }
+    }
+</script>
+</div>
+<div class="product-add-form">
+    <form data-product-sku="13594BK-LL"
+          action="https://www.hinkley.com/checkout/cart/add/uenc/aHR0cHM6Ly93d3cuaGlua2xleS5jb20vMTM1OTRiay1sbC5odG1s/product/52069/" method="post"
+          id="product_addtocart_form">
+        <input type="hidden" name="product" value="52069" />
+        <input type="hidden" name="selected_configurable_option" value="" />
+        <input type="hidden" name="related_product" id="related-products-field" value="" />
+        <input type="hidden" name="item"  value="52069" />
+        <input name="form_key" type="hidden" value="MSxcLB3061kL9VHX" />        		
+		<!-- Start Recurring -->
+				<!-- End Recurring -->
+		
+                    <div class="product-addto-links" data-role="add-to-links">
+        <a href="#"
+       class="action towishlist"
+       data-post='{"action":"https:\/\/www.hinkley.com\/wishlist\/index\/add\/","data":{"product":52069,"uenc":"aHR0cHM6Ly93d3cuaGlua2xleS5jb20vMTM1OTRiay1sbC5odG1s"}}'
+       data-action="add-to-wishlist"><span>Add to Favorites</span></a>
+<script type="text/x-magento-init">
+    {
+        "body": {
+            "addToWishlist": {"productType":"simple","giftcardInfo":"[id^=giftcard]"}        }
+    }
+</script>
+</div>
+        
+                    </form>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "[data-role=priceBox][data-price-box=product-id-52069]": {
+            "priceBox": {
+                "priceConfig":  {"productId":"52069","priceFormat":{"pattern":"$%s","precision":2,"requiredPrecision":2,"decimalSymbol":".","groupSymbol":",","groupLength":3,"integerRequired":false},"tierPrices":[]}            }
+        }
+    }
+</script>    <div class="product info detailed">
+                <div class="product data items" data-mage-init='{"tabs":{"openedState":"active"}}'>
+                                            <div class="data item content" id="description" data-role="content">
+                    
+<div class="product attribute description">
+        <div class="value" >The perfect addition to Modern Coastal, Silo’s compact design blends simple and long-lasting practicality. Built to stand up to harsh climates and available in three rust and corrosion-resistant finishes, Silo is available in a downlight-only option to meet dark sky compliance, an up and downlight for additional wall washing, and a small flush mount.</div>
+</div>
+                </div>
+                                            <div class="data item content" id="additional" data-role="content">
+                        <div class="additional-attributes-wrapper">
+        <ul class="additional-attributes attributes-list">
+                            <li>
+                    <strong>Finish:</strong>
+                    <span>Black</span>
+                </li>
+                                <li>
+                    <strong>Width:</strong>
+                    <span>4.5"</span>
+                </li>
+                                <li>
+                    <strong>Height:</strong>
+                    <span>12"</span>
+                </li>
+                                <li>
+                    <strong>Glass:</strong>
+                    <span>Etched Lens</span>
+                </li>
+                                <li>
+                    <strong>Material:</strong>
+                    <span>Composite</span>
+                </li>
+                                <li>
+                    <strong>Brand:</strong>
+                    <span>Hinkley</span>
+                </li>
+                                <li>
+                    <strong>Length:</strong>
+                    <span>5.75"</span>
+                </li>
+                        </ul>
+    </div>
+                </div>
+                    </div>
+    </div>
+
+<div class="product-attributes-footer"><div class="product-attributes-options">
+            <h5>Finish Options</h5>
+        <ul class="product-list-item-finishes finish-options">
+                            <li>
+                    <a href="#"
+                       class="finish-icon black selected"
+                       style="background-image: url('https://www.hinkley.com/media/catalog/product/cache/3eeaa9b28c448217e434fb01ac534133/b/k/bk.jpg')"
+                       title="Black">
+                        Black                    </a>
+                </li>
+
+                                    <li>
+                        <a href="https://www.hinkley.com/13594az-ll.html"
+                           class="finish-icon architectural-bronze"
+                           style="background-image: url('https://www.hinkley.com/media/catalog/product/cache/3eeaa9b28c448217e434fb01ac534133/a/z/az.jpg')"
+                           title="Architectural Bronze">
+                            Architectural Bronze                        </a>
+                    </li>
+                                        <li>
+                        <a href="https://www.hinkley.com/13594sw-ll.html"
+                           class="finish-icon satin-white"
+                           style="background-image: url('https://www.hinkley.com/media/catalog/product/cache/3eeaa9b28c448217e434fb01ac534133/s/w/sw.jpg')"
+                           title="Satin White">
+                            Satin White                        </a>
+                    </li>
+                    
+                                    </ul>
+    </div>
+
+<script type="text/x-magento-init">
+    {
+        ".product-attributes-options": {
+            "Hammer_RepProducts/js/finishes": {}
+        }
+    }
+</script>
+</div></div></div><input name="form_key" type="hidden" value="MSxcLB3061kL9VHX" /><div id="authenticationPopup" data-bind="scope:'authenticationPopup', style: {display: 'none'}">
+        <script>window.authenticationPopup = {"autocomplete":"off","customerRegisterUrl":"https:\/\/www.hinkley.com\/customer\/account\/create\/","customerForgotPasswordUrl":"https:\/\/www.hinkley.com\/customer\/account\/forgotpassword\/","baseUrl":"https:\/\/www.hinkley.com\/","customerLoginUrl":"https:\/\/www.hinkley.com\/customer\/ajax\/login\/"}</script>    <!-- ko template: getTemplate() --><!-- /ko -->
+        <script type="text/x-magento-init">
+        {
+            "#authenticationPopup": {
+                "Magento_Ui/js/core/app": {"components":{"authenticationPopup":{"component":"Magento_Customer\/js\/view\/authentication-popup","children":{"messages":{"component":"Magento_Ui\/js\/view\/messages","displayArea":"messages"},"captcha":{"component":"Magento_Captcha\/js\/view\/checkout\/loginCaptcha","displayArea":"additional-login-form-fields","formId":"user_login","configSource":"checkout"},"recaptcha":{"component":"Magento_ReCaptchaFrontendUi\/js\/reCaptcha","displayArea":"additional-login-form-fields","reCaptchaId":"recaptcha-popup-login","settings":{"rendering":{"sitekey":"6Ldxwf4gAAAAAHGfsCRyMrdUa_PuTC7iELUeoXJL","size":"normal","theme":"light","hl":""},"invisible":false}}}}}}            },
+            "*": {
+                "Magento_Ui/js/block-loader": "https\u003A\u002F\u002Fwww.hinkley.com\u002Fstatic\u002Fversion1750893362\u002Ffrontend\u002FWSC\u002FHinkley2018\u002Fen_US\u002Fimages\u002Floader\u002D1.gif"
+                            }
+        }
+    </script>
+</div>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Customer/js/section-config": {
+                "sections": {"stores\/store\/switch":["*"],"stores\/store\/switchrequest":["*"],"directory\/currency\/switch":["*"],"*":["messages","company"],"customer\/account\/logout":["*","recently_viewed_product","recently_compared_product","persistent"],"customer\/account\/loginpost":["*"],"customer\/account\/createpost":["*"],"customer\/account\/editpost":["*"],"customer\/ajax\/login":["checkout-data","cart","captcha"],"catalog\/product_compare\/add":["compare-products","wp_ga4"],"catalog\/product_compare\/remove":["compare-products"],"catalog\/product_compare\/clear":["compare-products"],"sales\/guest\/reorder":["cart"],"sales\/order\/reorder":["cart"],"rest\/v1\/requisition_lists":["requisition"],"requisition_list\/requisition\/delete":["requisition"],"requisition_list\/item\/addtocart":["cart"],"checkout\/cart\/add":["cart","directory-data","wp_ga4"],"checkout\/cart\/delete":["cart","wp_ga4"],"checkout\/cart\/updatepost":["cart","wp_ga4"],"checkout\/cart\/updateitemoptions":["cart","wp_ga4"],"checkout\/cart\/couponpost":["cart"],"checkout\/cart\/estimatepost":["cart"],"checkout\/cart\/estimateupdatepost":["cart"],"checkout\/onepage\/saveorder":["cart","checkout-data","last-ordered-items"],"checkout\/sidebar\/removeitem":["cart","wp_ga4"],"checkout\/sidebar\/updateitemqty":["cart","wp_ga4"],"rest\/*\/v1\/carts\/*\/payment-information":["cart","last-ordered-items","captcha","instant-purchase","mpdt-data","wp_ga4"],"rest\/*\/v1\/guest-carts\/*\/payment-information":["cart","captcha","mpdt-data","wp_ga4"],"rest\/*\/v1\/guest-carts\/*\/selected-payment-method":["cart","checkout-data"],"rest\/*\/v1\/carts\/*\/selected-payment-method":["cart","checkout-data","instant-purchase"],"wishlist\/index\/add":["wishlist","wp_ga4"],"wishlist\/index\/remove":["wishlist"],"wishlist\/index\/updateitemoptions":["wishlist"],"wishlist\/index\/update":["wishlist"],"wishlist\/index\/cart":["wishlist","cart","wp_ga4"],"wishlist\/index\/fromcart":["wishlist","cart"],"wishlist\/index\/allcart":["wishlist","cart","wp_ga4"],"wishlist\/shared\/allcart":["wishlist","cart"],"wishlist\/shared\/cart":["cart"],"customer_order\/cart\/updatefaileditemoptions":["cart"],"checkout\/cart\/updatefaileditemoptions":["cart"],"customer_order\/cart\/advancedadd":["cart"],"checkout\/cart\/advancedadd":["cart"],"checkout\/cart\/removeallfailed":["cart"],"checkout\/cart\/removefailed":["cart"],"customer_order\/cart\/addfaileditems":["cart"],"checkout\/cart\/addfaileditems":["cart"],"customer_order\/sku\/uploadfile":["cart"],"giftregistry\/index\/cart":["cart"],"giftregistry\/view\/addtocart":["cart"],"customer\/address\/*":["instant-purchase"],"customer\/account\/*":["instant-purchase"],"vault\/cards\/deleteaction":["instant-purchase"],"multishipping\/checkout\/overviewpost":["cart"],"wishlist\/index\/copyitem":["wishlist"],"wishlist\/index\/copyitems":["wishlist"],"wishlist\/index\/deletewishlist":["wishlist","multiplewishlist"],"wishlist\/index\/createwishlist":["multiplewishlist"],"wishlist\/index\/editwishlist":["multiplewishlist"],"wishlist\/index\/moveitem":["wishlist"],"wishlist\/index\/moveitems":["wishlist"],"wishlist\/search\/addtocart":["cart","wishlist"],"paypal\/express\/placeorder":["cart","checkout-data"],"paypal\/payflowexpress\/placeorder":["cart","checkout-data"],"paypal\/express\/onauthorization":["cart","checkout-data"],"rest\/*\/v1\/carts\/*\/po-payment-information":["cart","checkout-data","last-ordered-items"],"purchaseorder\/purchaseorder\/success":["cart","checkout-data","last-ordered-items"],"persistent\/index\/unsetcookie":["persistent"],"quickorder\/sku\/uploadfile\/":["cart"],"review\/product\/post":["review"],"hello\/ajax\/complete":["*"],"hello\/ajax\/personal":["*"],"hello\/ajax\/info":["hellohinkley"],"checkout\/cart\/addajax":["cart","directory-data"],"braintree\/paypal\/placeorder":["cart","checkout-data"],"braintree\/googlepay\/placeorder":["cart","checkout-data"],"checkout\/cart\/configure":["wp_ga4"],"rest\/*\/v1\/guest-carts\/*\/shipping-information":["wp_ga4"],"rest\/*\/v1\/carts\/*\/shipping-information":["wp_ga4"]},
+                "clientSideSections": ["checkout-data","cart-data","hellohinkley","mpdt-data"],
+                "baseUrls": ["https:\/\/www.hinkley.com\/"],
+                "sectionNames": ["messages","customer","compare-products","last-ordered-items","requisition","cart","directory-data","captcha","wishlist","company","company_authorization","negotiable_quote","instant-purchase","loggedAsCustomer","multiplewishlist","purchase_order","persistent","review","hellohinkley","wp_ga4","recently_viewed_product","recently_compared_product","product_data_storage","paypal-billing-agreement"]            }
+        }
+    }
+</script>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Customer/js/customer-data": {
+                "sectionLoadUrl": "https\u003A\u002F\u002Fwww.hinkley.com\u002Fcustomer\u002Fsection\u002Fload\u002F",
+                "expirableSectionLifetime": 60,
+                "expirableSectionNames": ["cart","persistent"],
+                "cookieLifeTime": "3600",
+                "updateSessionUrl": "https\u003A\u002F\u002Fwww.hinkley.com\u002Fcustomer\u002Faccount\u002FupdateSession\u002F"
+            }
+        }
+    }
+</script>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Customer/js/invalidation-processor": {
+                "invalidationRules": {
+                    "website-rule": {
+                        "Magento_Customer/js/invalidation-rules/website-rule": {
+                            "scopeConfig": {
+                                "websiteId": "1"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+</script>
+<script type="text/x-magento-init">
+    {
+        "body": {
+            "pageCache": {"url":"https:\/\/www.hinkley.com\/page_cache\/block\/render\/id\/52069\/","handles":["default","catalog_product_view","light-product-page","algolia_search_handle","catalog_product_view_type_simple","catalog_product_view_id_52069","catalog_product_view_sku_13594BK-LL"],"originalRequest":{"route":"catalog","controller":"product","action":"view","uri":"\/13594bk-ll.html"},"versionCookieName":"private_content_version"}        }
+    }
+</script>
+<script type="text/x-magento-init">
+    {
+        "body": {
+            "awBlogAjax": {"url":"https:\/\/www.hinkley.com\/aw_blog\/block\/render\/id\/52069\/"}        }
+    }
+</script>
+<script type="text/javascript">
+    require([
+        "jquery"
+    ], function(jQuery){
+        (function($) {
+            $(document).ready(function () {
+                if($('.pin__type').length){
+                    $('.lookbook-container .pin__type').hover(function(){
+                        $('.lookbook-container .pin__image').toggleClass('pm-mask');
+                    });
+
+                    $('.lookbook-container .pin__type').click(function(){
+                        $('.lookbook-container .pin__type').not(this).removeClass('pin__opened');
+                        $(this).toggleClass('pin__opened');
+                    });
+
+                    $('.lookbook-image').click(function(){
+                        $('.lookbook-container .pin__type').removeClass('pin__opened');
+                    });
+                }
+            });
+        })(jQuery);
+    });
+</script><script type="text/x-magento-init">
+    {
+        "body": {
+            "requireCookie": {"noCookieUrl":"https:\/\/www.hinkley.com\/cookie\/index\/noCookies\/","triggers":[".action.tocompare"],"isRedirectCmsPage":true}        }
+    }
+</script>
+<script type="text/x-magento-init">
+    {
+        "*": {
+                "Magento_Catalog/js/product/view/provider": {
+                    "data": {"items":{"52069":{"add_to_cart_button":{"post_data":"{\"action\":\"https:\\\/\\\/www.hinkley.com\\\/checkout\\\/cart\\\/add\\\/uenc\\\/%25uenc%25\\\/product\\\/52069\\\/\",\"data\":{\"product\":\"52069\",\"uenc\":\"%uenc%\"}}","url":"https:\/\/www.hinkley.com\/checkout\/cart\/add\/uenc\/%25uenc%25\/product\/52069\/","required_options":false},"add_to_compare_button":{"post_data":null,"url":"{\"action\":\"https:\\\/\\\/www.hinkley.com\\\/catalog\\\/product_compare\\\/add\\\/\",\"data\":{\"product\":\"52069\",\"uenc\":\"aHR0cHM6Ly93d3cuaGlua2xleS5jb20vMTM1OTRiay1sbC5odG1s\"}}","required_options":null},"price_info":{"final_price":245.28,"max_price":245.28,"max_regular_price":245.28,"minimal_regular_price":245.28,"special_price":null,"minimal_price":245.28,"regular_price":245.28,"formatted_prices":{"final_price":"<span class=\"price\">$245.28<\/span>","max_price":"<span class=\"price\">$245.28<\/span>","minimal_price":"<span class=\"price\">$245.28<\/span>","max_regular_price":"<span class=\"price\">$245.28<\/span>","minimal_regular_price":null,"special_price":null,"regular_price":"<span class=\"price\">$245.28<\/span>"},"extension_attributes":{"msrp":{"msrp_price":"<span class=\"price\">$0.00<\/span>","is_applicable":"","is_shown_price_on_gesture":"","msrp_message":"","explanation_message":"Our price is lower than the manufacturer&#039;s &quot;minimum advertised price.&quot; As a result, we cannot show you the price in catalog or the product page. <br><br> You have no obligation to purchase the product once you know the price. You can simply remove the item from your cart."},"tax_adjustments":{"final_price":245.28,"max_price":245.28,"max_regular_price":245.28,"minimal_regular_price":245.28,"special_price":245.28,"minimal_price":245.28,"regular_price":245.28,"formatted_prices":{"final_price":"<span class=\"price\">$245.28<\/span>","max_price":"<span class=\"price\">$245.28<\/span>","minimal_price":"<span class=\"price\">$245.28<\/span>","max_regular_price":"<span class=\"price\">$245.28<\/span>","minimal_regular_price":null,"special_price":"<span class=\"price\">$245.28<\/span>","regular_price":"<span class=\"price\">$245.28<\/span>"}},"weee_attributes":[],"weee_adjustment":"<span class=\"price\">$245.28<\/span>"}},"images":[{"url":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/cca68010f580a88b4fb3f8c0dc2a3b83\/9\/5\/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg","code":"recently_viewed_products_grid_content_widget","height":300,"width":240,"label":"Small Up\/Down Wall Mount Lantern","resized_width":240,"resized_height":300},{"url":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/51c9752c12ff3b5cebfca4aafc4ef0bc\/9\/5\/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg","code":"recently_viewed_products_list_content_widget","height":270,"width":270,"label":"Small Up\/Down Wall Mount Lantern","resized_width":270,"resized_height":270},{"url":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/e76eb8433ddbac72bb2afe311e5706c0\/9\/5\/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg","code":"recently_viewed_products_images_names_widget","height":90,"width":75,"label":"Small Up\/Down Wall Mount Lantern","resized_width":75,"resized_height":90},{"url":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/cca68010f580a88b4fb3f8c0dc2a3b83\/9\/5\/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg","code":"recently_compared_products_grid_content_widget","height":300,"width":240,"label":"Small Up\/Down Wall Mount Lantern","resized_width":240,"resized_height":300},{"url":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/44158889720b8f829f0d28f9ce0647e1\/9\/5\/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg","code":"recently_compared_products_list_content_widget","height":207,"width":270,"label":"Small Up\/Down Wall Mount Lantern","resized_width":270,"resized_height":207},{"url":"https:\/\/www.hinkley.com\/media\/catalog\/product\/cache\/e76eb8433ddbac72bb2afe311e5706c0\/9\/5\/957b645b2ab12ce044bad86f3bcad2127cb9dc5cd30ec321d1751d4e460b962b.jpeg","code":"recently_compared_products_images_names_widget","height":90,"width":75,"label":"Small Up\/Down Wall Mount Lantern","resized_width":75,"resized_height":90}],"url":"https:\/\/www.hinkley.com\/13594bk-ll.html","id":52069,"name":"Small Up\/Down Wall Mount Lantern","type":"simple","is_salable":"1","store_id":1,"currency_code":"USD","extension_attributes":{"wishlist_button":{"post_data":null,"url":"{\"action\":\"https:\\\/\\\/www.hinkley.com\\\/wishlist\\\/index\\\/add\\\/\",\"data\":{\"product\":52069,\"uenc\":\"aHR0cHM6Ly93d3cuaGlua2xleS5jb20vMTM1OTRiay1sbC5odG1s\"}}","required_options":null},"review_html":""},"is_available":true}},"store":"1","currency":"USD","productCurrentScope":"website"}            }
+        }
+    }
+</script>
+
+
+    <div class="product tabs tabs-container">
+        <input type="radio" name="tab-controls" id="tab-overview" checked="checked"/>
+        <input type="radio" name="tab-controls" id="tab-details"/>
+        <input type="radio" name="tab-controls" id="tab-resources"/>
+        <input type="radio" name="tab-controls" id="tab-reviews"/>
+        <input type="radio" name="tab-controls" id="tab-questions"/>
+
+        <ul class="tabs-nav">
+            <li><label for="tab-overview">Overview</label></li>
+            <li><label for="tab-details">Details</label></li>
+            <li><label for="tab-resources">Resources</label></li>
+            <li><label for="tab-reviews" id="trigger-reviews">Reviews</label></li>
+            <li><label for="tab-questions" id="trigger-questions">Q&A</label></li>
+        </ul>
+
+        <div class="tab" data-tab="tab-overview">
+            <ul class="attributes-list">
+                                                                                                                                                                                                            <li>
+                            <strong>Finish:</strong>
+                            <span>Black</span>
+                        </li>
+                                                                                <li>
+                            <strong>Width:</strong>
+                            <span>4.5"</span>
+                        </li>
+                                                                                <li>
+                            <strong>Height:</strong>
+                            <span>12"</span>
+                        </li>
+                                                                                <li>
+                            <strong>Glass:</strong>
+                            <span>Etched Lens</span>
+                        </li>
+                                                                                                                                                                                            <li>
+                            <strong>Light Source:</strong>
+                            <span>Socketed</span>
+                        </li>
+                                                                                <li>
+                            <strong>LED Name:</strong>
+                            <span>GU10LED-3K</span>
+                        </li>
+                                                                                <li>
+                            <strong>Wattage:</strong>
+                            <span>2-6.50w GU10 LED *Included</span>
+                        </li>
+                                                                                <li>
+                            <strong>Voltage:</strong>
+                            <span>120v</span>
+                        </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li>
+                            <strong>Length:</strong>
+                            <span>5.75"</span>
+                        </li>
+                                                                                                                                                        <li>
+                            <strong>LED Color Temp:</strong>
+                            <span>3000</span>
+                        </li>
+                                                                                <li>
+                            <strong>LED Lumens:</strong>
+                            <span>1000</span>
+                        </li>
+                                                                                                                                                                                                                                                                                                        <li>
+                            <strong>Number of lights:</strong>
+                            <span>2</span>
+                        </li>
+                                                </ul>
+                                <div class="attribute-content-area">
+                        <strong>Features</strong>
+                        <ul><li>5-year finish warranty</li> <li>Suitable for use in wet (outdoor direct rain) locations as defined by NEC and CEC. Meets United States UL Underwriters Laboratories & CSA Canadian Standards Association Product Safety Standards</li> <li>LED Bulbs carry a 3-year limited warranty</li> <li>The Coastal Elements Collection offers versatile designs, constructed of composite materials and coated with anti-fading finishes, for maximum durability in harsh climates</li> <li>Suitable for use in both interior and outdoor spaces.</li> <li>Bold lines and a clean, minimalist style complement contemporary architecture</li> <li>Mounting hardware is hidden on the back plate to ensure a clean silhouette</li></ul>                    </div>
+                        </div>
+
+        <div class="tab" data-tab="tab-details">
+            <ul class="attributes-list">
+                                        <li>
+                            <strong>LED CRI:</strong>
+                            <span>80</span>
+                        </li>
+                                            <li>
+                            <strong>Incandescent Equivalency:</strong>
+                            <span>2 x 50w</span>
+                        </li>
+                                            <li>
+                            <strong>LED Lifespan:</strong>
+                            <span>25,000 hrs</span>
+                        </li>
+                                            <li>
+                            <strong>Dimmable:</strong>
+                            <span>Yes - CL Type Dimmer (SSL7A)</span>
+                        </li>
+                                            <li>
+                            <strong>Back Plate:</strong>
+                            <span>4.5"W x 4.75"H</span>
+                        </li>
+                                            <li>
+                            <strong>Extension:</strong>
+                            <span>5.75”</span>
+                        </li>
+                                            <li>
+                            <strong>Top To Outlet:</strong>
+                            <span>6"</span>
+                        </li>
+                                            <li>
+                            <strong>Weight:</strong>
+                            <span>1.94lb</span>
+                        </li>
+                                            <li>
+                            <strong>UPC Code:</strong>
+                            <span>640665136074</span>
+                        </li>
+                                </ul>
+                            
+    <div class="warning-information">
+        <h4 class="title">
+            <a href="https://www.hinkley.com/prop-65" title="WARNING for California Customers">
+                WARNING for California Customers            </a>
+        </h4>
+    </div>
+                    </div>
+
+        <div class="tab" data-tab="tab-resources">
+            <ul class="link-list">
+                <li>
+                    <a href="/product_spec_print/download/pdf/product_id/52069"
+                       target="_blank">
+                        Base Spec Sheet PDF
+                    </a>
+                </li>
+                <li>
+                    <a href="/product_spec_print/download/pdf/product_id/52069/Advanced/1"
+                       target="_blank">
+                        Detailed Spec Sheet PDF
+                    </a>
+                </li>
+                                                <li>
+                                    <a href="/product_spec_print/download/pdf/product_id/52069/Family/1"
+                                       target="_blank">
+                                        Silo Family Spec Sheet                                    </a>
+                                </li>
+                                                        <li>
+                                <a href="https://d1lnz90t7xw0i5.cloudfront.net/Products/files/13594.pdf" target="_blank">
+                                    Instruction Sheet PDF                                </a>
+                            </li>
+                                                    <li>
+                                <a href="https://hinkleymedia.s3.amazonaws.com/Products/files/ies/13592.ies" target="_blank">
+                                    IES File IES                                </a>
+                            </li>
+                                                            <li>
+                        <form data-role="tocart-form" name="finishsample"
+                              action="https://www.hinkley.com/checkout/cart/add/uenc/aHR0cHM6Ly93d3cuaGlua2xleS5jb20vMTM1OTRiay1sbC5odG1s/product/16166/" method="post">
+                            <input name="form_key" type="hidden" value="MSxcLB3061kL9VHX" />                            <a href="#" onclick="document.finishsample.submit();">
+                                Order a Finish Sample</a>
+                        </form>
+                    </li>
+                            </ul>
+        </div>
+
+        <!-- BazaarVoice Reviews: Reviews tab -->
+        <div class="tab" data-tab="tab-reviews" id="reviews-tab">
+            
+
+    <!-- BV | Magento Extension 9.1.8 -->
+        <div data-bv-show="reviews" data-bv-product-id="13594BK-LL">
+            </div>
+        </div>
+
+        <!-- BazaarVoice Reviews: QA tab -->
+        <div class="tab" data-tab="tab-questions" id="questions-tab">
+            
+
+    <!-- BV | Magento Extension 9.1.8 -->
+        <div data-bv-show="questions" data-bv-product-id="13594BK-LL">
+            </div>
+        </div>
+    </div>
+
+
+    <div class="related-peers-items products wrapper grid products-grid">
+                    <div class="related-products" style="margin: 20px 0;">
+                <h1 class="page-title">
+                    Silo family                </h1>
+            </div>
+        
+        
+    <div class="order-products-toolbar toolbar top">
+            </div>
+
+    
+    <div class="products wrapper grid products-grid">
+        <ol class="products list items product-items">
+                            <li class="item product product-item">
+                    <div class="product-item-info" data-container="product-grid">
+                        <a href="https://www.hinkley.com/13590bk-ll.html" class="product photo product-item-photo"
+                           tabindex="-1">
+                            <span class="product-image-container" style="min-height: 300px">
+                                <span class="product-image-wrapper" style="white-space: nowrap">
+                                    <img class="product-image-photo"
+                                         src="https://www.hinkley.com/media/catalog/product/cache/de652eedc8d0021c80d3cc27abe1d373/4/1/41b2de08de1136fa6f1cbf64ff126a0b28c474ad499b23531586673987912b77.jpeg"
+                                         width="240"
+                                         height="300"
+                                         alt="Small Down Light Wall Mount Lantern"/>
+                                </span>
+                            </span>
+                        </a>
+
+                        <div class="product details product-item-details">
+                            <strong class="product name product-item-name">
+                                <a class="product-item-link"
+                                   href="https://www.hinkley.com/13590bk-ll.html">
+                                    Small Down Light Wall Mount Lantern                                </a>
+                            </strong>
+                            <ul class="product-list-item-details">
+                                <li>
+                                    13590BK-LL                                </li>
+                                <li>
+                                                                            W 4.5"                                                                                                                H 8"                                                                    </li>
+                            </ul>
+
+                            <div class="product-list-item-footer">
+                                <a href="https://www.hinkley.com/13590bk-ll.html">View Details</a>
+                                                                    <ul class="product-list-item-finishes finish-options">
+                                                                                            <li>
+                                                        <a href="https://www.hinkley.com/13590bk-ll.html"
+                                                           class="finish-icon black selected"
+                                                           style="background-image: url('https://www.hinkley.com/media/catalog/product/cache/3eeaa9b28c448217e434fb01ac534133/b/k/bk.jpg')"
+                                                           title="Black">
+                                                            Black                                                        </a>
+                                                    </li>
+                                                                                                                                                                                                                            <li>
+                                                    <a href="https://www.hinkley.com/13590az-ll.html"
+                                                       class="finish-icon architectural-bronze"
+                                                       style="background-image: url('https://www.hinkley.com/media/catalog/product/cache/3eeaa9b28c448217e434fb01ac534133/a/z/az.jpg')"
+                                                       title="Architectural Bronze">
+                                                        Architectural Bronze                                                    </a>
+                                                </li>
+                                                                                                                            
+                                                                                                                                        <li>
+                                                        <a href="https://www.hinkley.com/13590sw-ll.html"
+                                                           class="finish-icon satin-white"
+                                                           style="background-image: url('https://www.hinkley.com/media/catalog/product/cache/3eeaa9b28c448217e434fb01ac534133/s/w/sw.jpg')"
+                                                           title="Satin White">
+                                                            Satin White                                                        </a>
+                                                    </li>
+                                                                                            
+                                                                            </ul>
+                                                            </div>
+
+                            <ul class="product-list-item-badges badge-options">
+                                                            </ul>
+
+                                                            <a href="#" data-post='{"action":"https:\/\/www.hinkley.com\/wishlist\/index\/add\/","data":{"product":52060,"uenc":"aHR0cHM6Ly93d3cuaGlua2xleS5jb20vMTM1OTRiay1sbC5odG1s"}}' class="action towishlist"
+                                   data-action="add-to-wishlist"
+                                   title="Add&#x20;to&#x20;Favorites">
+                                    <span>Add to Favorites</span>
+                                </a>
+                            
+                        </div>
+                    </div>
+
+                                    </li>
+                            <li class="item product product-item">
+                    <div class="product-item-info" data-container="product-grid">
+                        <a href="https://www.hinkley.com/13595bk-ll.html" class="product photo product-item-photo"
+                           tabindex="-1">
+                            <span class="product-image-container" style="min-height: 300px">
+                                <span class="product-image-wrapper" style="white-space: nowrap">
+                                    <img class="product-image-photo"
+                                         src="https://www.hinkley.com/media/catalog/product/cache/de652eedc8d0021c80d3cc27abe1d373/f/f/ff3a1d5e0e16852e70bdd9d7c50229ab604aa5de500ca68e1272161c243bd5ae.jpeg"
+                                         width="240"
+                                         height="300"
+                                         alt="Medium Wall Mount Lantern"/>
+                                </span>
+                            </span>
+                        </a>
+
+                        <div class="product details product-item-details">
+                            <strong class="product name product-item-name">
+                                <a class="product-item-link"
+                                   href="https://www.hinkley.com/13595bk-ll.html">
+                                    Medium Wall Mount Lantern                                </a>
+                            </strong>
+                            <ul class="product-list-item-details">
+                                <li>
+                                    13595BK-LL                                </li>
+                                <li>
+                                                                            W 6.25"                                                                                                                H 16"                                                                    </li>
+                            </ul>
+
+                            <div class="product-list-item-footer">
+                                <a href="https://www.hinkley.com/13595bk-ll.html">View Details</a>
+                                                                    <ul class="product-list-item-finishes finish-options">
+                                                                                            <li>
+                                                        <a href="https://www.hinkley.com/13595bk-ll.html"
+                                                           class="finish-icon black selected"
+                                                           style="background-image: url('https://www.hinkley.com/media/catalog/product/cache/3eeaa9b28c448217e434fb01ac534133/b/k/bk.jpg')"
+                                                           title="Black">
+                                                            Black                                                        </a>
+                                                    </li>
+                                                                                                                                                                                                                            <li>
+                                                    <a href="https://www.hinkley.com/13595az-ll.html"
+                                                       class="finish-icon architectural-bronze"
+                                                       style="background-image: url('https://www.hinkley.com/media/catalog/product/cache/3eeaa9b28c448217e434fb01ac534133/a/z/az.jpg')"
+                                                       title="Architectural Bronze">
+                                                        Architectural Bronze                                                    </a>
+                                                </li>
+                                                                                                                            
+                                                                                                                                        <li>
+                                                        <a href="https://www.hinkley.com/13595tw-ll.html"
+                                                           class="finish-icon textured-white"
+                                                           style="background-image: url('https://www.hinkley.com/media/catalog/product/cache/3eeaa9b28c448217e434fb01ac534133/t/w/tw.jpg')"
+                                                           title="Textured White">
+                                                            Textured White                                                        </a>
+                                                    </li>
+                                                                                            
+                                                                            </ul>
+                                                            </div>
+
+                            <ul class="product-list-item-badges badge-options">
+                                                            </ul>
+
+                                                            <a href="#" data-post='{"action":"https:\/\/www.hinkley.com\/wishlist\/index\/add\/","data":{"product":91332,"uenc":"aHR0cHM6Ly93d3cuaGlua2xleS5jb20vMTM1OTRiay1sbC5odG1s"}}' class="action towishlist"
+                                   data-action="add-to-wishlist"
+                                   title="Add&#x20;to&#x20;Favorites">
+                                    <span>Add to Favorites</span>
+                                </a>
+                            
+                        </div>
+                    </div>
+
+                                    </li>
+                    </ol>
+    </div>
+
+    
+    
+    
+    <script type="text/x-magento-init">
+    {
+        ".product-item": {
+            "Hammer_RepProducts/js/finishes": {}
+        }
+    }
+
+    </script>
+
+    <script type="text/x-magento-init">
+    {
+        ".barcode": {
+            "Hammer_Barcode/js/barcode": {
+                "enabled": "0"
+            }
+        }
+    }
+    </script>
+
+    
+                    <a class="products-view-all" href="/products/families/silo.html">
+                Show More Silo Products            </a>
+            </div>
+</div></div></main></div><div class="before-footer-wrap wrap"><div class="page-bottom"><div class="content"><div class="widget block block-static-block">
+    <div data-content-type="row" data-appearance="contained" data-element="main"><div data-enable-parallax="0" data-parallax-speed="0.5" data-background-images="{}" data-element="inner" data-pb-style="61A6D8925EC9F"><div data-content-type="html" data-appearance="default" data-element="main" data-pb-style="61A6D8925ECB0" data-decoded="true"><div class="callout-row cols-3">
+<div class="callout" style="background-image:url(https://www.hinkley.com/media/wysiwyg/OurStory_C2A.jpg);">
+<a class="callout-box bottom left" href="/our-story/">
+<h2>Our Story</h2>
+<h3>The Hinkley Legacy, family-owned since 1922</h3>
+</a>
+</div>
+<div class="callout" style="background-image:url(https://www.hinkley.com/media/wysiwyg/footer-callout-2.jpg);">
+<a class="callout-box bottom left" href="/buy-local.html">
+<h2>Find a Showroom</h2>
+<h3>Locate a lighting showroom closest to you</h3>
+</a>
+</div>
+<div class="callout" style="background-image:url(https://www.hinkley.com/media/wysiwyg/footer-callout-3.jpg);">
+<a class="callout-box bottom left" href="/contact-us/">
+<h2>Customer Support</h2>
+<h3>Connect with our in-house customer support team</h3>
+</a>
+</div>
+</div></div></div></div><style>#html-body [data-pb-style="61A6D8925EC9F"]{justify-content: flex-start; display: flex; flex-direction: column; background-position: left top; background-size: cover; background-repeat: no-repeat; background-attachment: scroll; border-style: none; border-width: 1px; border-radius: 0px; margin: 0px; padding: 0px;}#html-body [data-pb-style="61A6D8925ECB0"]{border-style: none; border-width: 1px; border-radius: 0px; margin: 0px; padding: 0px;}</style></div>
+</div></div></div><div class="footer-wrap wrap"><footer class="page-footer"><div class="footer content"><div class="block newsletter">
+    <div class="content">
+        <form class="form subscribe"
+            novalidate
+            action="https://www.hinkley.com/newsletter/subscriber/new/"
+            method="post"
+            data-mage-init='{"validation": {"errorClass": "mage-error"}}'
+            id="newsletter-validate-detail">
+            <div class="field newsletter">
+                <label class="label" for="newsletter"><span>Sign Up for Our Mailing List:</span></label>
+                <div class="control">
+                    <input name="email" type="email" id="newsletter"
+                                placeholder="Enter&#x20;Your&#x20;Email&#x20;Address"
+                                data-validate="{required:true, 'validate-email':true}"/>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button id="subscribe" class="action subscribe primary" title="Sign&#x20;Up" type="submit">
+                    <span>Sign Up</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="links"><div class="widget block block-static-block">
+    <div data-content-type="html" data-appearance="default" data-element="main" data-decoded="true"><div class="footer-links-block">
+<ul>
+<li><a href="/buy-local.html">Buy Local</a></li>
+<li><a href="/catalog-and-media-resources">Catalog and Media</a></li>
+<li><a href="/replacement-parts">Replacement Parts</a></li>
+<li><a href="/hello/register/item">Product Registration</a></li>
+<li><a href="/warranty">Warranty</a></li>
+<li><a href="/hinkley-home-app">Hinkley Home App</a></li>
+</ul>
+<ul>
+<li><a href="/support-chat">Live Chat</a></li>
+<li><a href="/contact-us">Contact Us</a></li>
+<li><a href="/careers">Careers</a></li>
+<li><a href="/hinkley-news">Hinkley News</a></li>
+<li><a href="https://esynergy.hinkleylighting.com/synergy/" target="_blank">Employees</a></li>
+<li><a href="https://myhinkley.hinkley.com" target="_blank">myHinkley Login</a></li>
+<li><a href="https://www.hinkleyrewards.com" target="_blank">Hinkley Rewards</a></li>
+</ul>
+<ul>
+<li><a href="/our-story/">Our Story</a></li>
+<li><a href="/products/fredrick-ramond.html">Fredrick Ramond</a></li>
+<li><a href="/products/fans.html">Ceiling Fans</a></li>
+<li><a href="/products/landscape.html">Landscape</a></li>
+<li><a href="/products/hinkley-hospitality.html">Hospitality</a></li>
+<li><a href="/blog.html">Blog</a></li>
+</ul>
+</div></div></div>
+<div class="widget block block-static-block">
+    <style>#html-body [data-pb-style=XDOWEAY]{justify-content:flex-start;display:block;flex-direction:column;background-position:left top;background-size:cover;background-repeat:no-repeat;background-attachment:scroll}#html-body [data-pb-style=LOHA6CF],#html-body [data-pb-style=XDOWEAY]{border-style:none;border-width:1px;border-radius:0;margin:0;padding:0}</style><div data-content-type="row" data-appearance="contained" data-element="main"><div data-enable-parallax="0" data-parallax-speed="0.5" data-background-images="{}" data-video-fallback-src="" data-element="inner" data-pb-style="XDOWEAY"><div data-content-type="html" data-appearance="default" data-element="main" data-pb-style="LOHA6CF" data-decoded="true"><div class="footer-follow-block">
+    <h6>Follow Hinkley</h6>
+    <ul class="social-media-links">
+        <li><a href="https://www.pinterest.com/hinkleylighting/" title="Pinterest" target="_blank"><i class="fab fa-pinterest-p"></i></a></li>
+        <li><a href="https://www.facebook.com/hinkleylighting/" title="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+        <li><a href="https://www.instagram.com/hinkleylighting/" title="Instagram" target="_blank"><i class="fab fa-instagram"></i></a></li>
+        <li><a href="https://www.linkedin.com/company/hinkley/" title="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a></li>
+    </ul>
+    <ul class="social-hashtags">
+        <li>#hinkleystyle</li>
+    </ul>
+</div></div></div></div></div>
+</div><div class="widget block block-static-block">
+    <div data-content-type="row" data-appearance="contained" data-element="main"><div data-enable-parallax="0" data-parallax-speed="0.5" data-background-images="{}" data-video-fallback-src="" data-element="inner" data-pb-style="61A6D89259E27"><div data-content-type="html" data-appearance="default" data-element="main" data-pb-style="61A6D89259E38" data-decoded="true"><div class="footer-contact-block">
+<address>
+<h6>Hinkley, Inc.</h6>
+<span>33000 Pin Oak Parkway  Avon Lake, Ohio 44012</span><span>P (440) 653-5500</span><span>F (440) 653-5555</span><span><a href="mailto:customercare@hinkley.com">customercare@hinkley.com</a></span>
+</address>
+<span class="tollfree">1(800)446&#8209;5539</span>
+</div></div></div></div><style>#html-body [data-pb-style="61A6D89259E27"]{justify-content: flex-start; display: block; flex-direction: column; background-position: left top; background-size: cover; background-repeat: no-repeat; background-attachment: scroll; border-style: none; border-width: 1px; border-radius: 0px; margin: 0px; padding: 0px;}#html-body [data-pb-style="61A6D89259E38"]{border-style: none; border-width: 1px; border-radius: 0px; margin: 0px; padding: 0px;}</style></div>
+<div class="widget block block-static-block">
+    <style>#html-body [data-pb-style=QOXIMMG]{justify-content:flex-start;display:block;flex-direction:column;background-position:left top;background-size:cover;background-repeat:no-repeat;background-attachment:scroll}#html-body [data-pb-style=HT527KY],#html-body [data-pb-style=QOXIMMG]{border-style:none;border-width:1px;border-radius:0;margin:0;padding:0}</style><div data-content-type="row" data-appearance="contained" data-element="main"><div data-enable-parallax="0" data-parallax-speed="0.5" data-background-images="{}" data-video-fallback-src="" data-element="inner" data-pb-style="QOXIMMG"><div data-content-type="html" data-appearance="default" data-element="main" data-pb-style="HT527KY" data-decoded="true"><div class="footer-copyright-block">
+<ul>
+<li><a href="/privacy-policy-cookie-restriction-mode">Policy</a></li>
+<li>Copyright © 2025 Hinkley, Inc.</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+<!-- <div class="footer-copyright-block">
+<ul>
+<li><a href="/privacy-policy-cookie-restriction-mode">Policy</a></li>
+<li>Copyright © 2024 Hinkley, Inc.</li>
+</ul>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p> --></div></div></div></div>
+<div
+    class="field-recaptcha"
+    id="recaptcha-caa20ac351216e6f76edced1efe7c61fff5f4796-container"
+    data-bind="scope:'recaptcha-caa20ac351216e6f76edced1efe7c61fff5f4796'"
+>
+    <!-- ko template: getTemplate() --><!-- /ko -->
+</div>
+
+<script>
+    require(['jquery', 'domReady!'], function ($) {
+        $('#recaptcha-caa20ac351216e6f76edced1efe7c61fff5f4796-container')
+            .appendTo('#newsletter-validate-detail');
+    });
+</script>
+
+<script type="text/x-magento-init">
+{
+    "#recaptcha-caa20ac351216e6f76edced1efe7c61fff5f4796-container": {
+        "Magento_Ui/js/core/app": {"components":{"recaptcha-caa20ac351216e6f76edced1efe7c61fff5f4796":{"settings":{"rendering":{"sitekey":"6LdlB14aAAAAAKJcOP3BnDWoPZY0m5o4kcpaqQKy","badge":"inline","size":"invisible","theme":"light","hl":""},"invisible":true},"component":"Magento_ReCaptchaFrontendUi\/js\/reCaptcha","reCaptchaId":"recaptcha-caa20ac351216e6f76edced1efe7c61fff5f4796"}}}    }
+}
+</script>
+</div></footer></div><style>#html-body [data-pb-style=HJAUFMM]{justify-content:flex-start;display:block;flex-direction:column;background-position:left top;background-size:cover;background-repeat:no-repeat;background-attachment:scroll}#html-body [data-pb-style=FC1FQ3F],#html-body [data-pb-style=HJAUFMM]{border-style:none;border-width:1px;border-radius:0;margin:0;padding:0}</style><div data-content-type="row" data-appearance="contained" data-element="main"><div data-enable-parallax="0" data-parallax-speed="0.5" data-background-images="{}" data-video-fallback-src="" data-element="inner" data-pb-style="HJAUFMM"><div data-content-type="html" data-appearance="default" data-element="main" data-pb-style="FC1FQ3F" data-decoded="true"><style>
+
+.mfp-bg {
+    background: -webkit-gradient(linear, left top, left bottom, from(rgba(255,255,255,0.9)), color-stop(25%, #fff), color-stop(50%, #fff), color-stop(75%, #fff), to(rgba(255,255,255,0.9)));
+
+#speedbump .speedbump-image {
+    height: 340px;
+    position: absolute;
+    top: 5%;
+    right: 0%;
+}
+
+
+@media only screen and (min-width: 768px)
+#speedbump .speedbump-image {
+    height: 340px !important;
+    position: absolute !important;
+    top: 5% !important;
+    right: 2% !important;
+}
+
+</style>
+
+<div id="speedbump" class="mfp-hide">
+<div class="speedbump-flex">
+<div class="speedbump-content">
+<strong>Hinkley lighting and fans: Our mission is to provide consumers with exceptional lighting and ceiling fan products that are superior in design and quality</strong>
+<h2>Be The First</h2>
+<p>Subscribe to our mailing list for updates about new products, décor trends and designer collaborations. We won't flood your inbox, we promise.</p>
+<div class="webforms">
+	<form class="form subscribe"
+	            novalidate
+	            action="https://www.hinkley.com/newsletter/subscriber/new/"
+	            method="post"
+	            data-mage-init='{"validation": {"errorClass": "mage-error"}}'
+	            id="speedbump-validate-detail">
+
+		<div class="field newsletter type-email">
+		    <label class="label" for="speedbump-email"><span>Email Address</span></label>
+		    <div class="control">
+		        <input name="email" type="email" id="speedbump-email"
+		                    placeholder="Enter your email address"
+		                    data-validate="{required:true, 'validate-email':true}"/>
+		    </div>
+		</div>
+
+		<div id="subscription-message" class="error"></div>
+
+		<div class="actions-toolbar">
+		    <div class="primary">
+		        <button type="submit" class="action submit primary" id="submit_button" title="Submit">
+		            <span>Submit</span>
+		        </button>
+		    </div>
+		    <div class="secondary">
+		        <div class="please-wait" id="sending_data" style="display: none;">
+		            <div class="loading-indicator"></div>
+		            <span id="progress_text">Sending...</span>
+		        </div>
+		    </div>
+		</div>
+	</form>
+</div>
+<div role="group" class="field type-select-checkbox">                                
+    <div class="control" role="group">
+        <div>
+            <div class="field choice option-0">
+                <input type="checkbox" name="speedbump-opt-out" id="speedbump-opt-out" value="Don't show this pop up again" class="checkbox">
+                <label id="fieldHWmTJS690_label" for="speedbump-opt-out" class="" style="">Don't show this pop up again</label>
+            </div>
+        </div>
+    </div>
+</div>
+</form></div>
+</div>
+<div class="speedbump-image" style="background-image:url(https://www.hinkley.com/media/wysiwyg/speedbump.jpg);"></div>
+</div>
+</div></div></div></div></div>    <script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam.nr-data.net","licenseKey":"abbb8a7801","applicationID":"114550246","transactionName":"ZAFRZkpZXkdXARdfXF1LclFMUV9aGQECQlJfC1QdSEpfUEMBFxlFWgFE","queueTime":0,"applicationTime":1771,"atts":"SEZGEAJDTRgUA0EMSE4Z","errorBeacon":"bam.nr-data.net","agent":""}</script></body>
+</html>

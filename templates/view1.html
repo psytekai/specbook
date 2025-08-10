@@ -1,0 +1,798 @@
+{% extends "base.html" %}
+
+{% block title %}Row Validation - Simple Validation UI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .validation-container {
+        width: 100%;
+        height: calc(100vh - 200px);
+    }
+
+    .top-panel {
+        background: white;
+        border-radius: 4px;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    .instructions-section {
+        background-color: #e8f4fd;
+        border: 1px solid #bee5eb;
+        border-radius: 4px;
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .instructions-section h4 {
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+    }
+
+    .instructions-section ul {
+        margin-left: 1rem;
+        margin-bottom: 0;
+    }
+
+    .instructions-section li {
+        margin-bottom: 0.25rem;
+    }
+
+    .stats-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    .validation-stats {
+        background: #f8f9fa;
+        border-radius: 4px;
+        padding: 1rem;
+    }
+
+    .validation-stats h4 {
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+        font-size: 0.9rem;
+    }
+
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.25rem;
+        font-size: 0.8rem;
+    }
+
+    .stat-value {
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .field-failures {
+        background: #fff5f5;
+        border-radius: 4px;
+        padding: 1rem;
+    }
+
+    .field-failures h4 {
+        margin-bottom: 0.5rem;
+        color: #e74c3c;
+        font-size: 0.9rem;
+    }
+
+    .export-section {
+        display: flex;
+        align-items: center;
+    }
+
+    .export-btn {
+        background-color: #27ae60;
+        white-space: nowrap;
+        padding: 0.75rem 1.5rem;
+    }
+
+    .export-btn:hover {
+        background-color: #219a52;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 4px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        flex: 1;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        max-height: calc(100vh - 350px);
+        overflow-y: auto;
+    }
+
+    #validation-table {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    #validation-table th {
+        position: sticky;
+        top: 0;
+        background-color: #2c3e50;
+        color: white;
+        z-index: 10;
+    }
+
+    .row-header {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        cursor: pointer;
+        user-select: none;
+        text-align: center;
+        min-width: 50px;
+    }
+
+    .row-header:hover {
+        background-color: #e9ecef;
+    }
+
+    .data-cell {
+        cursor: pointer;
+        user-select: none;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .data-cell:hover {
+        background-color: #f0f8ff;
+    }
+
+    .data-cell.rejected {
+        background-color: #ffebee !important;
+        color: #c62828;
+        border: 2px solid #e74c3c;
+    }
+
+    .row-rejected .data-cell {
+        background-color: #ffcdd2 !important;
+        color: #c62828;
+    }
+
+    .row-rejected .row-header {
+        background-color: #f44336 !important;
+        color: white;
+    }
+
+    .action-cell {
+        text-align: center;
+        width: 40px;
+        min-width: 40px;
+        max-width: 40px;
+        padding: 0.5rem 0.25rem;
+    }
+
+    .open-btn {
+        background-color: #2c3e50;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        padding: 0.25rem;
+        cursor: pointer;
+        font-size: 0.8rem;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+    }
+
+    .open-btn:hover {
+        background-color: #34495e;
+    }
+
+    .open-btn svg {
+        width: 14px;
+        height: 14px;
+        fill: white;
+    }
+
+    .export-btn {
+        width: 100%;
+        margin-top: 1rem;
+        background-color: #27ae60;
+    }
+
+    .export-btn:hover {
+        background-color: #219a52;
+    }
+
+    .description-tooltip {
+        position: absolute;
+        background: #2c3e50;
+        color: white;
+        padding: 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        max-width: 300px;
+        word-wrap: break-word;
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .description-tooltip.show {
+        opacity: 1;
+    }
+
+    .description-cell {
+        position: relative;
+    }
+
+    /* Column resizing styles */
+    .resizable-table th {
+        position: relative;
+        border-right: 1px solid #ddd;
+    }
+
+    .column-resizer {
+        position: absolute;
+        top: 0;
+        right: -2px;
+        width: 4px;
+        height: 100%;
+        cursor: col-resize;
+        background: transparent;
+        z-index: 20;
+    }
+
+    .column-resizer:hover {
+        background: rgba(52, 73, 94, 0.3);
+    }
+
+    .column-resizer.resizing {
+        background: #3498db;
+    }
+
+    .resizing-indicator {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #3498db;
+        z-index: 1000;
+        pointer-events: none;
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="loading">
+    <h2>Loading validation interface...</h2>
+</div>
+
+<div class="content" style="display: none;">
+    <div class="top-panel">
+        <div class="instructions-section">
+            <h4>How to Use Row Validation:</h4>
+            <ul>
+                <li><strong>Click any cell</strong> to mark it as rejected (turns red)</li>
+                <li><strong>Click row number</strong> to reject entire row</li>
+                <li><strong>Click again</strong> to un-reject cells or rows</li>
+                <li><strong>Hover description</strong> to see full text</li>
+                <li><strong>Export button</strong> downloads validation summary</li>
+            </ul>
+        </div>
+        
+        <div class="stats-section">
+            <div class="validation-stats">
+                <h4>Validation Stats</h4>
+                <div class="stat-item">
+                    <span>Total Rows:</span>
+                    <span class="stat-value" id="total-rows">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Failed Rows:</span>
+                    <span class="stat-value" id="failed-rows">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Pass Rate:</span>
+                    <span class="stat-value" id="pass-rate">100%</span>
+                </div>
+            </div>
+            
+            <div class="field-failures">
+                <h4>Field Failures</h4>
+                <div id="field-failure-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+            
+            <div class="export-section">
+                <button class="export-btn" onclick="exportValidation()">
+                    Export Validation Summary
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="validation-container">
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table id="validation-table" class="resizable-table">
+                    <thead>
+                        <tr>
+                            <th>Row</th>
+                            <!-- Column headers populated dynamically -->
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Table rows populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Description tooltip -->
+<div id="description-tooltip" class="description-tooltip"></div>
+
+<!-- Column resizing indicator -->
+<div id="resizing-indicator" class="resizing-indicator"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let tableData = [];
+let validationState = {
+    failed_cells: {},
+    failed_rows: []
+};
+
+// Column resizing variables
+let isResizing = false;
+let currentResizer = null;
+let startX = 0;
+let startWidth = 0;
+let currentColumn = null;
+
+function onDataLoaded(response) {
+    loadTableData();
+}
+
+function loadTableData() {
+    $.get('/get_table_data')
+        .done(function(response) {
+            tableData = response.data;
+            const columns = response.columns;
+            validationState = response.validation_state;
+            
+            buildTable(columns, tableData);
+            updateValidationStats();
+        })
+        .fail(function(xhr) {
+            const error = xhr.responseJSON ? xhr.responseJSON.error : 'Failed to load table data';
+            console.error('Table data loading error:', xhr);
+            showError(error);
+        });
+}
+
+function buildTable(columns, data) {
+    const table = $('#validation-table');
+    const thead = table.find('thead tr');
+    const tbody = table.find('tbody');
+    
+    // Clear existing content
+    thead.find('th:not(:first)').remove();
+    tbody.empty();
+    
+    // Add resizer to the first "Row" column
+    const firstHeader = thead.find('th:first');
+    if (!firstHeader.find('.column-resizer').length) {
+        firstHeader.append('<div class="column-resizer" data-column="row"></div>');
+    }
+    
+    // Build header row with action columns
+    columns.forEach(function(col) {
+        if (col !== 'key') {  // Skip 'key' column
+            thead.append(`<th data-column="${col}">${col}<div class="column-resizer" data-column="${col}"></div></th>`);
+            
+            // Add action button column after image_url
+            if (col === 'image_url') {
+                thead.append(`<th class="action-cell"><div class="column-resizer"></div></th>`);
+            }
+            // Add action button column after product_link
+            if (col === 'product_link') {
+                thead.append(`<th class="action-cell"><div class="column-resizer"></div></th>`);
+            }
+        }
+    });
+    
+    // Initialize column resizing after building the table
+    initializeColumnResizing();
+    
+    // Load saved column widths
+    loadColumnWidths();
+    
+    // Build data rows
+    data.forEach(function(rowData, index) {
+        const rowIdx = rowData.row_idx;
+        const isRowRejected = validationState.failed_rows.includes(rowIdx);
+        const rowClass = isRowRejected ? 'row-rejected' : '';
+        
+        let rowHtml = `<tr class="${rowClass}" data-row-idx="${rowIdx}">`;
+        rowHtml += `<td class="row-header" onclick="toggleRowRejection(${rowIdx})">${rowIdx + 1}</td>`;
+        
+        columns.forEach(function(col) {
+            if (col !== 'key') {  // Skip 'key' column
+                const cellValue = rowData.data[col] || '';
+                const isCellRejected = validationState.failed_cells[rowIdx] && 
+                                     validationState.failed_cells[rowIdx][col];
+                const cellClass = isCellRejected ? 'rejected' : '';
+                
+                // Special handling for description column
+                if (col === 'description') {
+                    rowHtml += `<td class="data-cell description-cell ${cellClass}" 
+                               id="cell-${rowIdx}-${col}"
+                               data-row="${rowIdx}" 
+                               data-column="${col}"
+                               onclick="toggleCellRejection(${rowIdx}, '${col}')"
+                               onmouseenter="showDescriptionTooltip(event, '${cellValue.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')"
+                               onmouseleave="hideDescriptionTooltip()"
+                               title="Hover for full description">
+                               ${cellValue}
+                               </td>`;
+                } else {
+                    rowHtml += `<td class="data-cell ${cellClass}" 
+                               id="cell-${rowIdx}-${col}"
+                               data-row="${rowIdx}" 
+                               data-column="${col}"
+                               onclick="toggleCellRejection(${rowIdx}, '${col}')"
+                               title="${cellValue}">
+                               ${cellValue}
+                               </td>`;
+                }
+                
+                // Add action button after image_url
+                if (col === 'image_url') {
+                    const imageUrl = cellValue;
+                    const buttonHtml = imageUrl ? 
+                        `<button class="open-btn" onclick="openUrl(this.dataset.url, event)" data-url="${imageUrl.replace(/"/g, '&quot;')}" title="Open image in new tab">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+                            </svg>
+                         </button>` : 
+                        `<span style="width: 28px; height: 28px; display: inline-block;"></span>`;
+                    
+                    rowHtml += `<td class="action-cell">${buttonHtml}</td>`;
+                }
+                
+                // Add action button after product_link
+                if (col === 'product_link') {
+                    const productUrl = cellValue;
+                    const buttonHtml = productUrl ? 
+                        `<button class="open-btn" onclick="openUrl(this.dataset.url, event)" data-url="${productUrl.replace(/"/g, '&quot;')}" title="Open product in new tab">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+                            </svg>
+                         </button>` : 
+                        `<span style="width: 28px; height: 28px; display: inline-block;"></span>`;
+                    
+                    rowHtml += `<td class="action-cell">${buttonHtml}</td>`;
+                }
+            }
+        });
+        
+        rowHtml += '</tr>';
+        tbody.append(rowHtml);
+    });
+}
+
+function toggleCellRejection(rowIdx, column) {
+    const cell = $(`#cell-${rowIdx}-${column}`);
+    const isRejected = cell.hasClass('rejected');
+    
+    // Update server state
+    $.ajax({
+        url: '/reject_cell',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            row_idx: rowIdx,
+            column: column,
+            rejected: !isRejected
+        }),
+        success: function(response) {
+            // Update UI
+            cell.toggleClass('rejected');
+            
+            // Update validation stats from server response
+            if (response.stats) {
+                updateStatsFromResponse(response.stats);
+            } else {
+                updateValidationStats();
+            }
+        },
+        error: function(xhr) {
+            const error = xhr.responseJSON ? xhr.responseJSON.error : 'Failed to update cell';
+            showError(error);
+        }
+    });
+}
+
+function toggleRowRejection(rowIdx) {
+    const row = $(`tr[data-row-idx="${rowIdx}"]`);
+    const isRejected = row.hasClass('row-rejected');
+    
+    // Update server state
+    $.ajax({
+        url: '/reject_row',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            row_idx: rowIdx,
+            rejected: !isRejected
+        }),
+        success: function(response) {
+            // Update UI
+            row.toggleClass('row-rejected');
+            
+            // Update validation stats from server response
+            if (response.stats) {
+                updateStatsFromResponse(response.stats);
+            } else {
+                updateValidationStats();
+            }
+        },
+        error: function(xhr) {
+            const error = xhr.responseJSON ? xhr.responseJSON.error : 'Failed to update row';
+            showError(error);
+        }
+    });
+}
+
+function updateStatsFromResponse(stats) {
+    $('#total-rows').text(stats.total_rows);
+    $('#failed-rows').text(stats.failed_rows);
+    
+    const passRate = stats.total_rows > 0 ? 
+        ((stats.total_rows - stats.failed_rows) / stats.total_rows * 100).toFixed(1) : 100;
+    $('#pass-rate').text(passRate + '%');
+    
+    // Update field failures
+    const fieldFailureList = $('#field-failure-list');
+    fieldFailureList.empty();
+    
+    Object.entries(stats.field_failures).forEach(function([field, count]) {
+        if (count > 0) {
+            fieldFailureList.append(`
+                <div class="stat-item">
+                    <span>${field}:</span>
+                    <span class="stat-value">${count}</span>
+                </div>
+            `);
+        }
+    });
+    
+    if (fieldFailureList.is(':empty')) {
+        fieldFailureList.append('<div class="stat-item">No field failures</div>');
+    }
+}
+
+function updateValidationStats() {
+    $.get('/get_validation_stats')
+        .done(function(stats) {
+            updateStatsFromResponse(stats);
+        })
+        .fail(function(xhr) {
+            console.error('Failed to update stats:', xhr);
+        });
+}
+
+function openUrl(url, event) {
+    // Prevent event from bubbling up to cell/row click handlers
+    event.stopPropagation();
+    event.preventDefault();
+    
+    // Validate URL and open in new tab
+    if (url && url.trim() !== '') {
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }
+}
+
+function showDescriptionTooltip(event, description) {
+    if (!description || description.trim() === '') return;
+    
+    const tooltip = document.getElementById('description-tooltip');
+    tooltip.textContent = description;
+    
+    // Position tooltip above cursor
+    const rect = event.target.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    
+    let left = event.clientX - (tooltipRect.width / 2);
+    let top = event.clientY - tooltipRect.height - 10;
+    
+    // Keep tooltip within viewport bounds
+    if (left < 10) left = 10;
+    if (left + tooltipRect.width > window.innerWidth - 10) {
+        left = window.innerWidth - tooltipRect.width - 10;
+    }
+    if (top < 10) top = event.clientY + 10; // Show below if no room above
+    
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = top + 'px';
+    tooltip.classList.add('show');
+}
+
+function hideDescriptionTooltip() {
+    const tooltip = document.getElementById('description-tooltip');
+    tooltip.classList.remove('show');
+}
+
+function exportValidation() {
+    window.location.href = '/export_validation';
+}
+
+// Column resizing functionality
+function initializeColumnResizing() {
+    const table = document.getElementById('validation-table');
+    const resizers = table.querySelectorAll('.column-resizer');
+    
+    resizers.forEach(function(resizer) {
+        resizer.addEventListener('mousedown', initResize);
+    });
+    
+    // Add global mouse events
+    document.addEventListener('mousemove', doResize);
+    document.addEventListener('mouseup', stopResize);
+}
+
+function initResize(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    isResizing = true;
+    currentResizer = event.target;
+    startX = event.clientX;
+    
+    // Find the header cell
+    currentColumn = currentResizer.closest('th');
+    if (!currentColumn) return;
+    
+    // Get current width
+    const rect = currentColumn.getBoundingClientRect();
+    startWidth = rect.width;
+    
+    // Add resizing class
+    currentResizer.classList.add('resizing');
+    
+    // Show resizing indicator
+    const indicator = document.getElementById('resizing-indicator');
+    indicator.style.left = event.clientX + 'px';
+    indicator.style.display = 'block';
+    
+    // Prevent text selection during resize
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'col-resize';
+}
+
+function doResize(event) {
+    if (!isResizing || !currentColumn) return;
+    
+    event.preventDefault();
+    
+    // Calculate new width
+    const deltaX = event.clientX - startX;
+    const newWidth = Math.max(50, startWidth + deltaX); // Minimum width of 50px
+    
+    // Apply new width
+    currentColumn.style.width = newWidth + 'px';
+    currentColumn.style.minWidth = newWidth + 'px';
+    
+    // Update resizing indicator position
+    const indicator = document.getElementById('resizing-indicator');
+    indicator.style.left = event.clientX + 'px';
+    
+    // Find corresponding cells in all rows and update their width
+    const columnIndex = Array.from(currentColumn.parentNode.children).indexOf(currentColumn);
+    const table = document.getElementById('validation-table');
+    const rows = table.querySelectorAll('tbody tr');
+    
+    rows.forEach(function(row) {
+        const cell = row.children[columnIndex];
+        if (cell) {
+            cell.style.width = newWidth + 'px';
+            cell.style.minWidth = newWidth + 'px';
+        }
+    });
+}
+
+function stopResize(event) {
+    if (!isResizing) return;
+    
+    isResizing = false;
+    
+    // Remove resizing class
+    if (currentResizer) {
+        currentResizer.classList.remove('resizing');
+    }
+    
+    // Hide resizing indicator
+    const indicator = document.getElementById('resizing-indicator');
+    indicator.style.display = 'none';
+    
+    // Restore normal cursor and text selection
+    document.body.style.userSelect = '';
+    document.body.style.cursor = '';
+    
+    // Save column widths to localStorage for persistence
+    saveColumnWidths();
+    
+    // Reset variables
+    currentResizer = null;
+    currentColumn = null;
+}
+
+function saveColumnWidths() {
+    const table = document.getElementById('validation-table');
+    const headers = table.querySelectorAll('thead th');
+    const widths = {};
+    
+    headers.forEach(function(header, index) {
+        const columnName = header.dataset.column || `column_${index}`;
+        const width = header.style.width;
+        if (width) {
+            widths[columnName] = width;
+        }
+    });
+    
+    localStorage.setItem('validationTableColumnWidths', JSON.stringify(widths));
+}
+
+function loadColumnWidths() {
+    const savedWidths = localStorage.getItem('validationTableColumnWidths');
+    if (!savedWidths) return;
+    
+    try {
+        const widths = JSON.parse(savedWidths);
+        const table = document.getElementById('validation-table');
+        const headers = table.querySelectorAll('thead th');
+        
+        headers.forEach(function(header) {
+            const columnName = header.dataset.column;
+            if (columnName && widths[columnName]) {
+                const width = widths[columnName];
+                header.style.width = width;
+                header.style.minWidth = width;
+                
+                // Apply to corresponding cells in rows
+                const columnIndex = Array.from(header.parentNode.children).indexOf(header);
+                const rows = table.querySelectorAll('tbody tr');
+                
+                rows.forEach(function(row) {
+                    const cell = row.children[columnIndex];
+                    if (cell) {
+                        cell.style.width = width;
+                        cell.style.minWidth = width;
+                    }
+                });
+            }
+        });
+    } catch (e) {
+        console.warn('Failed to load saved column widths:', e);
+    }
+}
+</script>
+{% endblock %}
