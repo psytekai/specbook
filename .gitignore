@@ -1,3 +1,4 @@
+shared/cache/**
 .env
 .DS_Store
 .idea
