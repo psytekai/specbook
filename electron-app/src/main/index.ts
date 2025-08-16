@@ -13,13 +13,20 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    minWidth: 800,
+    minHeight: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
-    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
-    frame: process.platform !== 'darwin',
+    titleBarStyle: 'default',
+    frame: true,
+    title: 'Specbook Manager',
+    resizable: true,
+    minimizable: true,
+    maximizable: true,
+    closable: true,
     icon: path.join(__dirname, '../../public/icons/icon.png'),
   });
 
