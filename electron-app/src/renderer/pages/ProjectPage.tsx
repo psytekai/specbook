@@ -12,6 +12,7 @@ interface ProjectPageState {
   groupBy: 'none' | 'location' | 'category' | 'manufacturer';
   sortBy: 'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category';
   visibleColumns: {
+    select: boolean;
     image: boolean;
     productName: boolean;
     description: boolean;
@@ -62,6 +63,7 @@ const getStoredState = (): Partial<ProjectPageState> => {
     // Validate visibleColumns
     if (parsed.visibleColumns && typeof parsed.visibleColumns === 'object') {
       const defaultColumns = {
+        select: true,
         image: true,
         productName: true,
         description: true,
@@ -144,6 +146,7 @@ const ProjectPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [showColumnPicker, setShowColumnPicker] = useState(false);
+  const [selectAll, setSelectAll] = useState(false);
 
   // Initialize state from localStorage with fallback defaults
   const storedState = getStoredState();
@@ -151,6 +154,7 @@ const ProjectPage: React.FC = () => {
   const [groupBy, setGroupBy] = useState<'none' | 'location' | 'category' | 'manufacturer'>(storedState.groupBy || 'none');
   const [sortBy, setSortBy] = useState<'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category'>(storedState.sortBy || 'date');
   const [visibleColumns, setVisibleColumns] = useState(storedState.visibleColumns || {
+    select: true,
     image: true,
     productName: true,
     description: true,
@@ -170,6 +174,7 @@ const ProjectPage: React.FC = () => {
     priceMax: null
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
 
   const project = projects.find(p => p.id === projectId);
 
@@ -402,6 +407,36 @@ const ProjectPage: React.FC = () => {
   const uniqueCategories = [...new Set(products.flatMap(p => Array.isArray(p.category) ? p.category : [p.category]).filter(Boolean))].sort();
   const uniqueLocations = [...new Set(products.flatMap(p => Array.isArray(p.location) ? p.location : [p.location]).filter(Boolean))].sort();
   const uniqueManufacturers = [...new Set(products.map(p => p.manufacturer).filter(Boolean))].sort();
+
+  // Selection handlers
+  const handleSelectProduct = (productId: string, checked: boolean) => {
+    const newSelected = new Set(selectedProducts);
+    if (checked) {
+      newSelected.add(productId);
+    } else {
+      newSelected.delete(productId);
+    }
+    setSelectedProducts(newSelected);
+    
+    // Update select all state
+    const currentPageProducts = Object.values(organizedProducts).flat();
+    const allSelected = currentPageProducts.every(p => newSelected.has(p.id));
+    setSelectAll(allSelected);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    const currentPageProducts = Object.values(organizedProducts).flat();
+    const newSelected = new Set(selectedProducts);
+    
+    if (checked) {
+      currentPageProducts.forEach(p => newSelected.add(p.id));
+    } else {
+      currentPageProducts.forEach(p => newSelected.delete(p.id));
+    }
+    
+    setSelectedProducts(newSelected);
+    setSelectAll(checked);
+  };
   
   // Get organized products based on current settings
   const organizedProducts = (() => {
@@ -593,6 +628,7 @@ const ProjectPage: React.FC = () => {
                         </div>
                         <div className="column-options">
                           {Object.entries({
+                            select: 'Select',
                             image: 'Image',
                             productName: 'Product Name',
                             description: 'Description',
@@ -713,6 +749,47 @@ const ProjectPage: React.FC = () => {
           </div>
         )}
 
+        {!loading && !error && selectedProducts.size > 0 && (
+          <div className="bulk-actions-toolbar">
+            <div className="bulk-actions-info">
+              <span>{selectedProducts.size} product{selectedProducts.size !== 1 ? 's' : ''} selected</span>
+            </div>
+            <div className="bulk-actions-buttons">
+              <button 
+                className="bulk-action-button secondary"
+                onClick={() => {
+                  // TODO: Implement bulk export
+                  console.log('Exporting selected products:', Array.from(selectedProducts));
+                }}
+              >
+                Export
+              </button>
+              <button 
+                className="bulk-action-button secondary"
+                onClick={() => {
+                  // TODO: Implement bulk category update
+                  console.log('Updating categories for:', Array.from(selectedProducts));
+                }}
+              >
+                Update Category
+              </button>
+              <button 
+                className="bulk-action-button danger"
+                onClick={() => {
+                  // TODO: Implement bulk delete
+                  if (confirm(`Are you sure you want to delete ${selectedProducts.size} product${selectedProducts.size !== 1 ? 's' : ''}?`)) {
+                    console.log('Deleting selected products:', Array.from(selectedProducts));
+                    setSelectedProducts(new Set());
+                    setSelectAll(false);
+                  }
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <div className="loading-state">
             <p>Loading products...</p>
@@ -822,6 +899,16 @@ const ProjectPage: React.FC = () => {
                   <table>
                     <thead>
                       <tr>
+                        {visibleColumns.select && (
+                          <th>
+                            <input
+                              type="checkbox"
+                              className="row-checkbox"
+                              checked={selectAll}
+                              onChange={(e) => handleSelectAll(e.target.checked)}
+                            />
+                          </th>
+                        )}
                         {visibleColumns.image && <th>Image</th>}
                         {visibleColumns.productName && <th>Product Name</th>}
                         {visibleColumns.description && <th>Description</th>}
@@ -839,6 +926,16 @@ const ProjectPage: React.FC = () => {
                           <td colSpan={Object.values(visibleColumns).filter(Boolean).length} className="row-wrapper">
                             <div className="row-scroll-container">
                               <div className="row-content">
+                                {visibleColumns.select && (
+                                  <div className="row-cell select-cell">
+                                    <input
+                                      type="checkbox"
+                                      className="row-checkbox"
+                                      checked={selectedProducts.has(product.id)}
+                                      onChange={(e) => handleSelectProduct(product.id, e.target.checked)}
+                                    />
+                                  </div>
+                                )}
                                 {visibleColumns.image && (
                                   <div className="row-cell image-cell">
                                     <div className="list-product-image">
@@ -896,7 +993,7 @@ const ProjectPage: React.FC = () => {
                                   <div className="row-cell actions-cell">
                                     <div className="list-actions">
                                       <button
-                                        className="product-link button-link"
+                                        className="action-button primary"
                                         onClick={() => navigate(`/projects/${projectId}/products/${product.id}`)}
                                       >
                                         View
@@ -905,7 +1002,7 @@ const ProjectPage: React.FC = () => {
                                         href={product.url} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="product-link external-link"
+                                        className="action-button secondary"
                                       >
                                         Source
                                       </a>

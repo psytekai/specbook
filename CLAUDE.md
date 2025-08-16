@@ -272,3 +272,310 @@ monitor.record_metric("scrape", results)
 - **Use proper error boundaries** to catch and handle component errors gracefully
 - **Implement proper cleanup** in useEffect return functions
 - **Test with React DevTools** Profiler to identify performance bottlenecks
+
+## Table UI Design Patterns
+
+### Design Principles for Data Tables
+
+#### Core Principles
+- **Prioritize Readability**: Tables should be free from clutter, focusing on data comprehension
+- **Strategic Color Usage**: Use colors only for specific purposes (status, highlighting, headers)
+- **Zebra Striping**: Implement alternating row colors using light shades only
+- **Typography Standards**: Use monospace fonts for numerical data, proper spacing for readability
+
+#### Row Height Standards
+- **Condensed**: 40px (high-density data, >100 items)
+- **Regular**: 48px (standard use, 50-100 items)  
+- **Relaxed**: 56px (comfortable reading, <50 items)
+
+### React Table Implementation Patterns
+
+#### Performance-Optimized Table Hook
+```tsx
+const useSortableTable = <T,>(data: T[], defaultSort?: SortConfig) => {
+  const [sortConfig, setSortConfig] = useState<SortConfig | null>(defaultSort || null);
+  
+  const sortedData = useMemo(() => {
+    if (!sortConfig) return data;
+    return [...data].sort((a, b) => {
+      const aValue = a[sortConfig.key];
+      const bValue = b[sortConfig.key];
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [data, sortConfig]);
+  
+  const handleSort = useCallback((key: keyof T) => {
+    setSortConfig(current => ({
+      key,
+      direction: current?.key === key && current.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  }, []);
+  
+  return { sortedData, sortConfig, handleSort };
+};
+```
+
+#### Multi-Value Cell Components
+```tsx
+// For Product arrays (location[], category[], images[])
+const MultiValueCell: React.FC<{ values: string[], max?: number }> = ({ 
+  values, 
+  max = 3 
+}) => {
+  const displayValues = values?.slice(0, max) || [];
+  const remainingCount = Math.max(0, (values?.length || 0) - max);
+  
+  return (
+    <div className="flex gap-1 flex-wrap">
+      {displayValues.map((value, index) => (
+        <span key={index} className="px-2 py-1 bg-slate-100 rounded text-xs">
+          {value}
+        </span>
+      ))}
+      {remainingCount > 0 && (
+        <span className="px-2 py-1 bg-slate-200 rounded text-xs">
+          +{remainingCount}
+        </span>
+      )}
+    </div>
+  );
+};
+
+// For Product image galleries
+const ImageGalleryCell: React.FC<{ images: string[], primary?: string }> = ({
+  images,
+  primary
+}) => {
+  const [showGallery, setShowGallery] = useState(false);
+  
+  return (
+    <div className="relative">
+      <img 
+        src={primary || images[0]} 
+        alt="Product"
+        className="w-12 h-12 object-cover rounded cursor-pointer"
+        onClick={() => setShowGallery(true)}
+      />
+      {images.length > 1 && (
+        <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+          {images.length}
+        </span>
+      )}
+      {/* Gallery modal implementation */}
+    </div>
+  );
+};
+```
+
+#### Editable Table Cells
+```tsx
+const EditableCell: React.FC<EditableCellProps> = ({ 
+  value, 
+  onChange, 
+  onSave,
+  type = 'text' 
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(value);
+  
+  const handleSave = useCallback(() => {
+    onChange(editValue);
+    onSave?.(editValue);
+    setIsEditing(false);
+  }, [editValue, onChange, onSave]);
+  
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleSave();
+    if (e.key === 'Escape') {
+      setEditValue(value);
+      setIsEditing(false);
+    }
+  }, [value, handleSave]);
+  
+  if (isEditing) {
+    return (
+      <input
+        value={editValue}
+        onChange={(e) => setEditValue(e.target.value)}
+        onBlur={handleSave}
+        onKeyDown={handleKeyDown}
+        autoFocus
+        className="w-full border-0 outline-none bg-transparent"
+      />
+    );
+  }
+  
+  return (
+    <span 
+      onClick={() => setIsEditing(true)}
+      className="cursor-pointer hover:bg-blue-50 px-1 rounded"
+    >
+      {value}
+    </span>
+  );
+};
+```
+
+#### Virtual Scrolling for Large Datasets
+```tsx
+const VirtualizedTable: React.FC<VirtualTableProps> = ({ 
+  data, 
+  rowHeight = 48,
+  containerHeight = 400 
+}) => {
+  const [scrollTop, setScrollTop] = useState(0);
+  
+  const visibleRange = useMemo(() => {
+    const start = Math.floor(scrollTop / rowHeight);
+    const visibleCount = Math.ceil(containerHeight / rowHeight);
+    const end = Math.min(start + visibleCount + 1, data.length);
+    return { start, end };
+  }, [scrollTop, rowHeight, containerHeight, data.length]);
+  
+  const visibleData = useMemo(() => 
+    data.slice(visibleRange.start, visibleRange.end),
+    [data, visibleRange]
+  );
+  
+  return (
+    <div 
+      style={{ height: containerHeight, overflow: 'auto' }}
+      onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+    >
+      <div style={{ height: data.length * rowHeight, position: 'relative' }}>
+        <div style={{ transform: `translateY(${visibleRange.start * rowHeight}px)` }}>
+          {visibleData.map((row, index) => (
+            <TableRow 
+              key={visibleRange.start + index} 
+              data={row} 
+              style={{ height: rowHeight }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+#### Pagination Hook
+```tsx
+const usePagination = <T,>(data: T[], itemsPerPage: number = 25) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return data.slice(start, start + itemsPerPage);
+  }, [data, currentPage, itemsPerPage]);
+  
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  
+  const goToPage = useCallback((page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  }, [totalPages]);
+  
+  return {
+    currentPage,
+    totalPages,
+    paginatedData,
+    goToPage,
+    hasNext: currentPage < totalPages,
+    hasPrev: currentPage > 1
+  };
+};
+```
+
+### Project-Specific Table Integration
+
+#### Product Table Component Structure
+```
+electron-app/src/renderer/components/ProductTable/
+├── ProductTable.tsx              # Main table component
+├── ProductTableRow.tsx           # Individual row component  
+├── ProductTableCell.tsx          # Cell component
+├── hooks/
+│   ├── useProductTableState.ts   # Product-specific table logic
+│   ├── useTableKeyboard.ts       # Keyboard navigation
+│   └── useTableExport.ts         # Electron export integration
+├── cells/
+│   ├── MultiValueCell.tsx        # For location[], category[]
+│   ├── ImageGalleryCell.tsx      # For product images
+│   ├── PriceCell.tsx            # For formatted pricing
+│   └── ActionsCell.tsx          # For row actions
+├── filters/
+│   ├── TableFilters.tsx         # Filter controls
+│   └── ColumnPicker.tsx         # Column visibility
+├── types.ts                     # TypeScript interfaces
+└── index.ts                     # Public exports
+```
+
+#### Empty State Handling
+```tsx
+const EmptyStateCell: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
+  <td className="text-slate-400 italic text-center">
+    {children || '—'}
+  </td>
+);
+
+// Usage pattern for missing data
+const renderCell = (value: any) => {
+  if (value === null || value === undefined || value === '') {
+    return <EmptyStateCell>No data</EmptyStateCell>;
+  }
+  return <td>{value}</td>;
+};
+```
+
+#### Electron Desktop Integration
+```tsx
+const useDesktopTableFeatures = () => {
+  const handleExport = useCallback(async (data: Product[]) => {
+    const { ipcRenderer } = window.electron;
+    await ipcRenderer.invoke('export-products', data);
+  }, []);
+  
+  const handleKeyboardShortcuts = useCallback((e: KeyboardEvent) => {
+    if (e.metaKey || e.ctrlKey) {
+      switch (e.key) {
+        case 'a': // Select all
+        case 'e': // Export  
+        case 'f': // Filter
+          e.preventDefault();
+          // Handle shortcuts
+      }
+    }
+  }, []);
+  
+  return { handleExport, handleKeyboardShortcuts };
+};
+```
+
+### CSS Architecture for Tables
+```css
+.table-container {
+  --table-border: var(--border-color);
+  --table-row-hover: var(--bg-secondary);
+  --table-header-bg: var(--bg-secondary);
+  --table-zebra-even: var(--bg-primary);
+  --table-zebra-odd: #fafafa;
+}
+
+.product-table {
+  border: 1px solid var(--table-border);
+  border-radius: 0.375rem;
+  font-family: inherit;
+}
+
+.table-row:hover {
+  background-color: var(--table-row-hover);
+}
+
+.table-header {
+  background-color: var(--table-header-bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+```
