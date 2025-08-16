@@ -2,7 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
 import { Product } from '../types';
-import { api } from '../services/api';
+import { api, fetchProductCategories, fetchProductLocations, addProductCategory, addProductLocation } from '../services/api';
+import { EditableSection } from '../components/EditableSection';
+import { FileUpload } from '../components/FileUpload';
+import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
+import { LocationMultiSelect } from '../components/LocationMultiSelect';
+import { formatPrice } from '../utils/formatters';
 import './ProductPage.css';
 
 const ProductPage: React.FC = () => {
@@ -12,6 +17,27 @@ const ProductPage: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [locations, setLocations] = useState<string[]>([]);
+  
+  // Add handlers for multi-select components
+  const handleAddLocation = async (location: string) => {
+    try {
+      await addProductLocation(location);
+      setLocations(prev => [...prev, location]);
+    } catch (error) {
+      throw new Error('Failed to add location');
+    }
+  };
+
+  const handleAddCategory = async (category: string) => {
+    try {
+      await addProductCategory(category);
+      setCategories(prev => [...prev, category]);
+    } catch (error) {
+      throw new Error('Failed to add category');
+    }
+  };
 
   const project = projects.find(p => p.id === projectId);
 
@@ -41,6 +67,61 @@ const ProductPage: React.FC = () => {
 
     fetchProduct();
   }, [projectId, productId]);
+
+  // Load categories and locations for dropdowns
+  useEffect(() => {
+    const loadOptions = async () => {
+      try {
+        const [categoriesData, locationsData] = await Promise.all([
+          fetchProductCategories(),
+          fetchProductLocations()
+        ]);
+        setCategories(categoriesData);
+        setLocations(locationsData);
+      } catch (err) {
+        console.error('Failed to load options:', err);
+      }
+    };
+
+    loadOptions();
+  }, []);
+
+  // Function to update a single product field
+  const updateProductField = async (field: keyof Product, value: string | number | string[]) => {
+    if (!product) return;
+
+    try {
+      // For now, we'll update locally since there's no specific update API endpoint
+      // In a real app, this would make an API call to update the specific field
+      const updatedProduct = { ...product, [field]: value };
+      setProduct(updatedProduct);
+      
+      // Here you would typically make an API call like:
+      // await api.patch(`/projects/${projectId}/products/${productId}`, { [field]: value });
+      
+      console.log(`Updated ${field} to:`, value);
+    } catch (err) {
+      throw new Error(`Failed to update ${field}`);
+    }
+  };
+
+  // Function to handle image uploads
+  const handleImageUpload = async (file: File) => {
+    if (!product) return;
+
+    try {
+      // For now, create a mock URL for the uploaded file
+      // In a real implementation, you would upload to a server and get a URL back
+      const imageUrl = URL.createObjectURL(file);
+      
+      // Update the product with the new image
+      await updateProductField('custom_image_url', imageUrl);
+      
+      console.log('Image uploaded:', imageUrl);
+    } catch (err) {
+      throw new Error('Failed to upload image');
+    }
+  };
 
   if (!project) {
     return (
@@ -95,7 +176,7 @@ const ProductPage: React.FC = () => {
       <div className="product-page">
         <div className="page-header">
           <div>
-            <h1>{product.description}</h1>
+            <h1>{product.product_name || product.description || "Untitled Product"}</h1>
             <p className="project-breadcrumb">
               <span 
                 className="breadcrumb-link"
@@ -117,16 +198,51 @@ const ProductPage: React.FC = () => {
 
         <div className="product-content">
           <div className="product-images">
-            {product.image ? (
-              <div className="main-image">
-                <img src={product.image} alt={product.description} />
+            {/* Main Image Section */}
+            <div className="main-image-section">
+              <h3>Product Image</h3>
+              
+              {/* Current Image Display */}
+              {(product.custom_image_url || product.image) ? (
+                <div className="main-image">
+                  <div className="image-header">
+                    <span className="image-label">
+                      {product.custom_image_url ? 'Custom Image' : 'Original Image'}
+                    </span>
+                    {product.custom_image_url && (
+                      <button
+                        type="button"
+                        className="button button-secondary button-small"
+                        onClick={() => updateProductField('custom_image_url', '')}
+                      >
+                        Remove Custom Image
+                      </button>
+                    )}
+                  </div>
+                  <img 
+                    src={product.custom_image_url || product.image} 
+                    alt={product.description}
+                  />
+                </div>
+              ) : (
+                <div className="no-image-large">
+                  <p>No Image Available</p>
+                </div>
+              )}
+              
+              {/* Image Upload Section */}
+              <div className="image-upload-section">
+                <h4>Upload New Image</h4>
+                <FileUpload
+                  onFileSelected={handleImageUpload}
+                  accept="image/*"
+                  maxSize={5 * 1024 * 1024} // 5MB
+                />
+                <p className="upload-help">Upload a new image for this product (max 5MB)</p>
               </div>
-            ) : (
-              <div className="no-image-large">
-                <p>No Image Available</p>
-              </div>
-            )}
+            </div>
             
+            {/* Additional Images Gallery */}
             {product.images && product.images.length > 1 && (
               <div className="image-gallery">
                 <h3>Additional Images</h3>
@@ -144,39 +260,89 @@ const ProductPage: React.FC = () => {
           <div className="product-details">
             <div className="detail-section">
               <h2>Product Information</h2>
-              <div className="detail-grid">
-                <div className="detail-item">
-                  <label>Category:</label>
-                  <span>{product.category || 'Not specified'}</span>
+              <div className="editable-details">
+                <EditableSection
+                  label="Product Name"
+                  value={product.product_name}
+                  type="text"
+                  placeholder="Enter product name"
+                  onSave={(value) => updateProductField('product_name', value as string)}
+                />
+                
+                <EditableSection
+                  label="Manufacturer"
+                  value={product.manufacturer}
+                  type="text"
+                  placeholder="Enter manufacturer"
+                  onSave={(value) => updateProductField('manufacturer', value as string)}
+                />
+                
+                <EditableSection
+                  label="Price"
+                  value={product.price}
+                  type="number"
+                  placeholder="0.00"
+                  formatDisplay={(value) => value ? formatPrice(value as number) : 'Not specified'}
+                  onSave={(value) => updateProductField('price', value as number)}
+                />
+                
+                <div className="editable-field">
+                  <label className="editable-label">Categories</label>
+                  <CategoryMultiSelect
+                    selectedCategories={Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)}
+                    onSelectionChange={(categories) => updateProductField('category', categories)}
+                    availableCategories={categories}
+                    onAddCategory={handleAddCategory}
+                  />
                 </div>
-                <div className="detail-item">
-                  <label>Location:</label>
-                  <span>{product.location}</span>
+                
+                <div className="editable-field">
+                  <label className="editable-label">Locations</label>
+                  <LocationMultiSelect
+                    selectedLocations={Array.isArray(product.location) ? product.location : [product.location].filter(Boolean)}
+                    onSelectionChange={(locations: string[]) => updateProductField('location', locations)}
+                    availableLocations={locations}
+                    onAddLocation={handleAddLocation}
+                  />
                 </div>
-                <div className="detail-item">
+
+                <div className="detail-item static">
                   <label>Tag ID:</label>
                   <span>{product.tagId}</span>
                 </div>
-                <div className="detail-item">
+                
+                <div className="detail-item static">
                   <label>Added:</label>
                   <span>{new Date(product.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
 
-            {product.description && (
-              <div className="detail-section">
-                <h2>Description</h2>
-                <p className="description-text">{product.description}</p>
-              </div>
-            )}
+            <div className="detail-section">
+              <h2>Description</h2>
+              <EditableSection
+                label="Product Description"
+                value={product.description}
+                type="textarea"
+                placeholder="Enter product description"
+                multiline={true}
+                onSave={(value) => updateProductField('description', value as string)}
+                className="full-width"
+              />
+            </div>
 
-            {product.specificationDescription && (
-              <div className="detail-section">
-                <h2>Specifications</h2>
-                <p className="specification-text">{product.specificationDescription}</p>
-              </div>
-            )}
+            <div className="detail-section">
+              <h2>Specifications</h2>
+              <EditableSection
+                label="Specification Details"
+                value={product.specificationDescription}
+                type="textarea"
+                placeholder="Enter specification details"
+                multiline={true}
+                onSave={(value) => updateProductField('specificationDescription', value as string)}
+                className="full-width"
+              />
+            </div>
 
             <div className="detail-section">
               <h2>Source</h2>

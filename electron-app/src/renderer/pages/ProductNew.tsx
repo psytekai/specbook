@@ -9,6 +9,10 @@ import {
   fetchProductLocations,
   addProductLocation 
 } from '../services/api';
+import { FileUpload } from '../components/FileUpload';
+import { LocationMultiSelect } from '../components/LocationMultiSelect';
+import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
+import { fetchProductCategories, addProductCategory } from '../services/api';
 import './ProductNew.css';
 
 const ProductNew: React.FC = () => {
@@ -20,20 +24,20 @@ const ProductNew: React.FC = () => {
   const [formData, setFormData] = useState({
     product_url: '',
     tag_id: '',
-    product_location: '',
+    product_location: [] as string[],
     product_image: '',
     product_images: [] as string[],
     product_description: '',
     specification_description: '',
-    category: '',
+    category: [] as string[],
+    custom_image_url: '',
   });
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasDetails, setHasDetails] = useState(false);
   const [locations, setLocations] = useState<string[]>([]);
-  const [showAddLocation, setShowAddLocation] = useState(false);
-  const [newLocation, setNewLocation] = useState('');
+  const [categories, setCategories] = useState<string[]>([]);
 
   const currentProject = projects.find(p => p.id === projectId);
 
@@ -45,16 +49,20 @@ const ProductNew: React.FC = () => {
   }, [projectId, currentProject, navigate, showToast]);
 
   useEffect(() => {
-    // Fetch available locations when component mounts
-    const loadLocations = async () => {
+    // Fetch available locations and categories when component mounts
+    const loadData = async () => {
       try {
-        const availableLocations = await fetchProductLocations();
+        const [availableLocations, availableCategories] = await Promise.all([
+          fetchProductLocations(),
+          fetchProductCategories()
+        ]);
         setLocations(availableLocations);
+        setCategories(availableCategories);
       } catch (error) {
-        console.error('Failed to fetch locations:', error);
+        console.error('Failed to fetch data:', error);
       }
     };
-    loadLocations();
+    loadData();
   }, []);
 
   if (!currentProject) {
@@ -68,21 +76,40 @@ const ProductNew: React.FC = () => {
     }));
   };
 
-  const handleAddLocation = async () => {
-    if (!newLocation.trim()) {
-      showToast('Please enter a location name', 'error');
-      return;
-    }
-
+  const handleAddLocation = async (location: string) => {
     try {
-      await addProductLocation(newLocation.trim());
-      setLocations(prev => [...prev, newLocation.trim()]);
-      setFormData(prev => ({ ...prev, product_location: newLocation.trim() }));
-      setNewLocation('');
-      setShowAddLocation(false);
+      await addProductLocation(location);
+      setLocations(prev => [...prev, location]);
       showToast('Location added successfully', 'success');
-    } catch (error) {
+    } catch (_error) {
       showToast('Failed to add location', 'error');
+    }
+  };
+
+  const handleAddCategory = async (category: string) => {
+    try {
+      await addProductCategory(category);
+      setCategories(prev => [...prev, category]);
+      showToast('Category added successfully', 'success');
+    } catch (_error) {
+      showToast('Failed to add category', 'error');
+    }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      // For now, create a mock URL for the uploaded file
+      // In a real implementation, you would upload to a server and get a URL back
+      const imageUrl = URL.createObjectURL(file);
+      
+      setFormData(prev => ({
+        ...prev,
+        custom_image_url: imageUrl
+      }));
+      
+      showToast('Image uploaded successfully', 'success');
+    } catch (error) {
+      showToast('Failed to upload image', 'error');
     }
   };
 
@@ -91,7 +118,7 @@ const ProductNew: React.FC = () => {
     
     const { product_url, tag_id, product_location } = formData;
     
-    if (!product_url || !tag_id || !product_location) {
+    if (!product_url || !tag_id || !product_location.length) {
       showToast('Please fill in all required fields', 'error');
       return;
     }
@@ -102,7 +129,7 @@ const ProductNew: React.FC = () => {
       const details = await fetchProductDetails({
         product_url,
         tag_id,
-        product_location
+        product_location: product_location[0] // Use first location for API call
       });
       
       setFormData(prev => ({
@@ -141,12 +168,13 @@ const ProductNew: React.FC = () => {
         projectId: currentProject.id,
         url: formData.product_url,
         tagId: formData.tag_id,
-        location: formData.product_location,
-        image: formData.product_image,
+        location: formData.product_location, // Already an array
+        image: formData.custom_image_url || formData.product_image, // Use custom image if available
         images: formData.product_images,
         description: formData.product_description,
         specificationDescription: formData.specification_description,
-        category: formData.category,
+        category: formData.category, // Already an array
+        custom_image_url: formData.custom_image_url,
       });
       
       showToast('Product saved successfully', 'success');
@@ -211,65 +239,16 @@ const ProductNew: React.FC = () => {
             </div>
             
             <div className="form-group">
-              <label htmlFor="product_location" className="label">
-                Product Location *
+              <label className="label">
+                Product Locations *
               </label>
-              {!showAddLocation ? (
-                <div className="location-dropdown-wrapper">
-                  <select
-                    id="product_location"
-                    name="product_location"
-                    className="input"
-                    value={formData.product_location}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">-- Select a location --</option>
-                    {locations.map(location => (
-                      <option key={location} value={location}>
-                        {location}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    className="button button-secondary button-small"
-                    onClick={() => setShowAddLocation(true)}
-                  >
-                    Add New
-                  </button>
-                </div>
-              ) : (
-                <div className="add-location-wrapper">
-                  <input
-                    type="text"
-                    className="input"
-                    value={newLocation}
-                    onChange={(e) => setNewLocation(e.target.value)}
-                    placeholder="Enter new location"
-                    autoFocus
-                  />
-                  <div className="add-location-actions">
-                    <button
-                      type="button"
-                      className="button button-primary button-small"
-                      onClick={handleAddLocation}
-                    >
-                      Add
-                    </button>
-                    <button
-                      type="button"
-                      className="button button-secondary button-small"
-                      onClick={() => {
-                        setShowAddLocation(false);
-                        setNewLocation('');
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
+              <LocationMultiSelect
+                selectedLocations={formData.product_location}
+                onSelectionChange={(locations: string[]) => setFormData(prev => ({ ...prev, product_location: locations }))}
+                availableLocations={locations}
+                onAddLocation={handleAddLocation}
+                required={true}
+              />
             </div>
             
             <button 
@@ -285,10 +264,36 @@ const ProductNew: React.FC = () => {
             <div className="form-section">
               <h2>Product Details</h2>
               
-              {formData.product_image && (
+              {/* Image Upload Section */}
+              <div className="form-group">
+                <label className="label">Custom Product Image</label>
+                <FileUpload
+                  onFileSelected={handleImageUpload}
+                  accept="image/*"
+                  maxSize={5 * 1024 * 1024} // 5MB
+                />
+                <p className="form-help">Upload a custom image for this product (optional)</p>
+              </div>
+              
+              {/* Image Preview */}
+              {(formData.custom_image_url || formData.product_image) && (
                 <div className="product-preview">
+                  <div className="preview-header">
+                    <span className="preview-label">
+                      {formData.custom_image_url ? 'Custom Image' : 'Fetched Image'}
+                    </span>
+                    {formData.custom_image_url && (
+                      <button
+                        type="button"
+                        className="button button-secondary button-small"
+                        onClick={() => setFormData(prev => ({ ...prev, custom_image_url: '' }))}
+                      >
+                        Remove Custom Image
+                      </button>
+                    )}
+                  </div>
                   <img 
-                    src={formData.product_image} 
+                    src={formData.custom_image_url || formData.product_image} 
                     alt="Product preview" 
                     className="product-image"
                   />
@@ -324,16 +329,14 @@ const ProductNew: React.FC = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="category" className="label">
-                  Category
+                <label className="label">
+                  Categories
                 </label>
-                <input
-                  id="category"
-                  name="category"
-                  type="text"
-                  className="input"
-                  value={formData.category}
-                  onChange={handleInputChange}
+                <CategoryMultiSelect
+                  selectedCategories={formData.category}
+                  onSelectionChange={(categories) => setFormData(prev => ({ ...prev, category: categories }))}
+                  availableCategories={categories}
+                  onAddCategory={handleAddCategory}
                 />
               </div>
               

@@ -24,6 +24,24 @@ const mockLocations: string[] = [
   'Attic'
 ];
 
+// Mock storage for categories
+const mockCategories: string[] = [
+  'Lighting',
+  'Plumbing',
+  'Electrical',
+  'Flooring',
+  'Windows & Doors',
+  'HVAC',
+  'Insulation',
+  'Roofing',
+  'Cabinets & Storage',
+  'Countertops',
+  'Fixtures & Hardware',
+  'Building Materials',
+  'Appliances',
+  'Painting & Finishes'
+];
+
 export const fetchProductDetails = async (
   request: FetchProductDetailsRequest
 ): Promise<FetchProductDetailsResponse> => {
@@ -46,7 +64,10 @@ export const fetchProductDetails = async (
     ],
     product_description: `High-quality architectural product suitable for modern buildings. This product is designed for ${request.product_location} and offers excellent durability and aesthetic appeal.`,
     specification_description: `Dimensions: 24" x 36" x 2". Material: Stainless steel with powder coating. Weather resistant and suitable for ${request.product_location}. Tag ID: ${request.tag_id}`,
-    category: 'Building Materials',
+    category: [mockCategories[Math.floor(Math.random() * mockCategories.length)]],
+    product_name: `Premium ${mockCategories[Math.floor(Math.random() * mockCategories.length)]} Product`,
+    manufacturer: ['Acme Corp', 'BuildPro', 'QualityFirst', 'TechBuilder', 'ModernDesign'][Math.floor(Math.random() * 5)],
+    price: Math.floor(Math.random() * 500) + 50, // Random price between $50-$550
   };
 };
 
@@ -72,12 +93,16 @@ export const saveProduct = async (
     projectId: request.project_id,
     url: request.product_url,
     tagId: request.tag_id,
-    location: request.product_location,
+    location: request.product_location, // Already an array
     image: request.product_image,
     images: request.product_images,
     description: request.product_description,
     specificationDescription: request.specification_description,
     category: request.category,
+    product_name: request.product_name,
+    manufacturer: request.manufacturer,
+    price: request.price,
+    custom_image_url: request.custom_image_url,
     createdAt: new Date()
   };
   
@@ -118,6 +143,26 @@ export const addProductLocation = async (location: string): Promise<{ success: b
   // Add to mock storage if not already exists
   if (!mockLocations.includes(location)) {
     mockLocations.push(location);
+  }
+  
+  return { success: true };
+};
+
+export const fetchProductCategories = async (): Promise<string[]> => {
+  // Simulate network delay
+  await delay(300);
+  
+  // Return mock categories
+  return [...mockCategories];
+};
+
+export const addProductCategory = async (category: string): Promise<{ success: boolean }> => {
+  // Simulate network delay
+  await delay(200);
+  
+  // Add to mock storage if not already exists
+  if (!mockCategories.includes(category)) {
+    mockCategories.push(category);
   }
   
   return { success: true };

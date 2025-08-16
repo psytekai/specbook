@@ -11,12 +11,16 @@ export interface Product {
   projectId: string;
   url: string;
   tagId: string;
-  location: string;
+  location: string[];           // CHANGED: multi-select
   image: string;
   images: string[];
   description: string;
   specificationDescription: string;
-  category: string;
+  category: string[];           // CHANGED: multi-select
+  product_name?: string;        // NEW
+  manufacturer?: string;        // NEW  
+  price?: number;              // NEW
+  custom_image_url?: string;   // NEW
   createdAt: Date;
 }
 
@@ -36,15 +40,25 @@ export interface FetchProductDetailsResponse {
   product_images: string[];
   product_description: string;
   specification_description: string;
-  category: string;
+  category: string[];
+  product_name?: string;        // NEW
+  manufacturer?: string;        // NEW
+  price?: number;              // NEW
 }
 
-export interface SaveProductRequest extends FetchProductDetailsRequest {
+export interface SaveProductRequest {
+  product_url: string;
+  tag_id: string;
+  product_location: string[];   // CHANGED: multi-select
   product_image: string;
   product_images: string[];
   product_description: string;
   specification_description: string;
-  category: string;
+  category: string[];
+  product_name?: string;        // NEW
+  manufacturer?: string;        // NEW
+  price?: number;              // NEW
+  custom_image_url?: string;   // NEW
   project_id: string;
 }
 

@@ -1,0 +1,197 @@
+.editable-section {
+  margin-bottom: 1rem;
+}
+
+.editable-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.editable-label label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.required-indicator {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+/* Display mode */
+.editable-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+}
+
+.display-value {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  background-color: #f9fafb;
+  min-height: 1.5rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.15s ease-in-out;
+}
+
+.display-value.clickable {
+  cursor: pointer;
+  background-color: #ffffff;
+}
+
+.display-value.clickable:hover {
+  border-color: #d1d5db;
+  background-color: #f3f4f6;
+}
+
+.display-value.disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.edit-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.edit-button:hover {
+  border-color: #d1d5db;
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.edit-button:active {
+  transform: scale(0.95);
+}
+
+/* Edit mode */
+.editable-edit {
+  width: 100%;
+}
+
+.edit-input-wrapper {
+  margin-bottom: 0.75rem;
+}
+
+.editable-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.editable-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.editable-input:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.editable-input[type="number"] {
+  text-align: left;
+}
+
+textarea.editable-input {
+  resize: vertical;
+  min-height: 4rem;
+}
+
+select.editable-input {
+  cursor: pointer;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.edit-actions .button {
+  flex: none;
+}
+
+.edit-error {
+  font-size: 0.875rem;
+  color: #dc2626;
+  margin-top: 0.25rem;
+  padding: 0.25rem 0;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .editable-display {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .edit-button {
+    align-self: flex-end;
+    width: auto;
+    height: auto;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .edit-actions {
+    flex-direction: column;
+  }
+  
+  .edit-actions .button {
+    flex: 1;
+  }
+}
+
+/* States */
+.editable-section.compact {
+  margin-bottom: 0.5rem;
+}
+
+.editable-section.compact .editable-label {
+  margin-bottom: 0.25rem;
+}
+
+.editable-section.inline .editable-display {
+  flex-direction: row;
+  align-items: center;
+}
+
+.editable-section.full-width .display-value,
+.editable-section.full-width .editable-input {
+  width: 100%;
+}
+
+/* Loading state */
+.editable-section.saving .display-value {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.editable-section.saving .edit-button {
+  opacity: 0.6;
+  pointer-events: none;
+}
