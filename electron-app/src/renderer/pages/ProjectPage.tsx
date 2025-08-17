@@ -28,8 +28,6 @@ interface ProjectPageState {
     category: string;
     location: string;
     manufacturer: string;
-    priceMin: number | null;
-    priceMax: number | null;
   };
 }
 
@@ -92,9 +90,7 @@ const getStoredState = (): Partial<ProjectPageState> => {
         search: '',
         category: '',
         location: '',
-        manufacturer: '',
-        priceMin: null,
-        priceMax: null
+        manufacturer: ''
       };
       
       validatedState.filters = { ...defaultFilters };
@@ -111,12 +107,6 @@ const getStoredState = (): Partial<ProjectPageState> => {
       }
       if (typeof parsed.filters.manufacturer === 'string') {
         validatedState.filters.manufacturer = parsed.filters.manufacturer;
-      }
-      if (typeof parsed.filters.priceMin === 'number' || parsed.filters.priceMin === null) {
-        validatedState.filters.priceMin = parsed.filters.priceMin;
-      }
-      if (typeof parsed.filters.priceMax === 'number' || parsed.filters.priceMax === null) {
-        validatedState.filters.priceMax = parsed.filters.priceMax;
       }
     }
     
@@ -169,11 +159,8 @@ const ProjectPage: React.FC = () => {
     search: '',
     category: '',
     location: '',
-    manufacturer: '',
-    priceMin: null,
-    priceMax: null
+    manufacturer: ''
   });
-  const [showFilters, setShowFilters] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
 
   const project = projects.find(p => p.id === projectId);
@@ -221,9 +208,7 @@ const ProjectPage: React.FC = () => {
       search: '',
       category: '',
       location: '',
-      manufacturer: '',
-      priceMin: null,
-      priceMax: null
+      manufacturer: ''
     };
     setFilters(clearedFilters);
     if (isInitialized) {
@@ -269,14 +254,6 @@ const ProjectPage: React.FC = () => {
         return false;
       }
       
-      // Price range filters
-      if (filters.priceMin !== null && (product.price || 0) < filters.priceMin) {
-        return false;
-      }
-      
-      if (filters.priceMax !== null && (product.price || 0) > filters.priceMax) {
-        return false;
-      }
       
       return true;
     });
@@ -562,9 +539,71 @@ const ProjectPage: React.FC = () => {
                   <option value="location">Location</option>
                 </select>
               </div>
+              
+              <div className="control-group">
+                <label className="control-label">Category:</label>
+                <select
+                  className="control-select"
+                  value={filters.category}
+                  onChange={(e) => updateFilters('category', e.target.value)}
+                >
+                  <option value="">All</option>
+                  {uniqueCategories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="control-group">
+                <label className="control-label">Location:</label>
+                <select
+                  className="control-select"
+                  value={filters.location}
+                  onChange={(e) => updateFilters('location', e.target.value)}
+                >
+                  <option value="">All</option>
+                  {uniqueLocations.map(location => (
+                    <option key={location} value={location}>{location}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="control-group">
+                <label className="control-label">Manufacturer:</label>
+                <select
+                  className="control-select"
+                  value={filters.manufacturer}
+                  onChange={(e) => updateFilters('manufacturer', e.target.value)}
+                >
+                  <option value="">All</option>
+                  {uniqueManufacturers.map(manufacturer => (
+                    <option key={manufacturer} value={manufacturer}>{manufacturer}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="control-group">
+                <input
+                  type="text"
+                  className="control-select search-input"
+                  placeholder="Search..."
+                  value={filters.search}
+                  onChange={(e) => updateFilters('search', e.target.value)}
+                />
+              </div>
             </div>
 
             <div className="view-controls">
+              {(filters.search || filters.category || filters.location || filters.manufacturer) && (
+                <button
+                  className="button button-secondary button-small clear-filters-button"
+                  onClick={clearFilters}
+                  title="Clear all filters"
+                >
+                  Clear Filters
+                </button>
+              )}
+              
               <div className="view-toggle">
                 <button
                   className={`toggle-button ${viewMode === 'grid' ? 'active' : ''}`}
@@ -591,163 +630,56 @@ const ProjectPage: React.FC = () => {
                 </button>
               </div>
               
-              <div className="table-controls">
-                <button
-                  className="toggle-button filter-button"
-                  onClick={() => setShowFilters(!showFilters)}
-                  title="Filter products"
-                >
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
-                    <path d="M3 6h14l-4 4v6l-2-2v-4L3 6z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  {(filters.search || filters.category || filters.location || filters.manufacturer || 
-                    filters.priceMin !== null || filters.priceMax !== null) && (
-                    <span className="filter-indicator">•</span>
-                  )}
-                </button>
-                
-                {viewMode === 'list' && (
-                  <div className="column-picker">
-                    <button
-                      className="toggle-button column-button"
-                      onClick={() => setShowColumnPicker(!showColumnPicker)}
-                      title="Column visibility"
-                    >
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
-                        <rect x="3" y="3" width="14" height="2" strokeWidth="2"/>
-                        <rect x="3" y="7" width="14" height="2" strokeWidth="2"/>
-                        <rect x="3" y="11" width="14" height="2" strokeWidth="2"/>
-                        <rect x="3" y="15" width="14" height="2" strokeWidth="2"/>
-                      </svg>
-                    </button>
-                    
-                    {showColumnPicker && (
-                      <div className="column-picker-dropdown">
-                        <div className="column-picker-header">
-                          <span>Show/Hide Columns</span>
-                        </div>
-                        <div className="column-options">
-                          {Object.entries({
-                            select: 'Select',
-                            image: 'Image',
-                            productName: 'Product Name',
-                            description: 'Description',
-                            manufacturer: 'Manufacturer',
-                            price: 'Price',
-                            category: 'Category',
-                            location: 'Location',
-                            tagId: 'Tag ID'
-                          }).map(([key, label]) => (
-                            <label key={key} className="column-option">
-                              <input
-                                type="checkbox"
-                                checked={visibleColumns[key as keyof typeof visibleColumns]}
-                                onChange={(e) => updateVisibleColumns(key as keyof typeof visibleColumns, e.target.checked)}
-                              />
-                              <span>{label}</span>
-                            </label>
-                          ))}
-                        </div>
+              {viewMode === 'list' && (
+                <div className="column-picker">
+                  <button
+                    className="toggle-button column-button"
+                    onClick={() => setShowColumnPicker(!showColumnPicker)}
+                    title="Column visibility"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                      <rect x="3" y="3" width="14" height="2" strokeWidth="2"/>
+                      <rect x="3" y="7" width="14" height="2" strokeWidth="2"/>
+                      <rect x="3" y="11" width="14" height="2" strokeWidth="2"/>
+                      <rect x="3" y="15" width="14" height="2" strokeWidth="2"/>
+                    </svg>
+                  </button>
+                  
+                  {showColumnPicker && (
+                    <div className="column-picker-dropdown">
+                      <div className="column-picker-header">
+                        <span>Show/Hide Columns</span>
                       </div>
-                    )}
-                  </div>
-                )}
-              </div>
+                      <div className="column-options">
+                        {Object.entries({
+                          select: 'Select',
+                          image: 'Image',
+                          productName: 'Product Name',
+                          description: 'Description',
+                          manufacturer: 'Manufacturer',
+                          price: 'Price',
+                          category: 'Category',
+                          location: 'Location',
+                          tagId: 'Tag ID'
+                        }).map(([key, label]) => (
+                          <label key={key} className="column-option">
+                            <input
+                              type="checkbox"
+                              checked={visibleColumns[key as keyof typeof visibleColumns]}
+                              onChange={(e) => updateVisibleColumns(key as keyof typeof visibleColumns, e.target.checked)}
+                            />
+                            <span>{label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {!loading && !error && products.length > 0 && showFilters && (
-          <div className="filters-panel">
-            <div className="filters-header">
-              <h3>Filter Products</h3>
-              <button
-                className="button button-secondary button-small"
-                onClick={clearFilters}
-                disabled={!filters.search && !filters.category && !filters.location && 
-                         !filters.manufacturer && filters.priceMin === null && filters.priceMax === null}
-              >
-                Clear All
-              </button>
-            </div>
-            
-            <div className="filters-grid">
-              <div className="filter-group">
-                <label className="filter-label">Search</label>
-                <input
-                  type="text"
-                  className="input filter-input"
-                  placeholder="Search products..."
-                  value={filters.search}
-                  onChange={(e) => updateFilters('search', e.target.value)}
-                />
-              </div>
-              
-              <div className="filter-group">
-                <label className="filter-label">Category</label>
-                <select
-                  className="input filter-select"
-                  value={filters.category}
-                  onChange={(e) => updateFilters('category', e.target.value)}
-                >
-                  <option value="">All Categories</option>
-                  {uniqueCategories.map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="filter-group">
-                <label className="filter-label">Location</label>
-                <select
-                  className="input filter-select"
-                  value={filters.location}
-                  onChange={(e) => updateFilters('location', e.target.value)}
-                >
-                  <option value="">All Locations</option>
-                  {uniqueLocations.map(location => (
-                    <option key={location} value={location}>{location}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="filter-group">
-                <label className="filter-label">Manufacturer</label>
-                <select
-                  className="input filter-select"
-                  value={filters.manufacturer}
-                  onChange={(e) => updateFilters('manufacturer', e.target.value)}
-                >
-                  <option value="">All Manufacturers</option>
-                  {uniqueManufacturers.map(manufacturer => (
-                    <option key={manufacturer} value={manufacturer}>{manufacturer}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="filter-group">
-                <label className="filter-label">Price Range</label>
-                <div className="price-range">
-                  <input
-                    type="number"
-                    className="input price-input"
-                    placeholder="Min"
-                    value={filters.priceMin || ''}
-                    onChange={(e) => updateFilters('priceMin', e.target.value ? parseFloat(e.target.value) : null)}
-                  />
-                  <span className="price-separator">to</span>
-                  <input
-                    type="number"
-                    className="input price-input"
-                    placeholder="Max"
-                    value={filters.priceMax || ''}
-                    onChange={(e) => updateFilters('priceMax', e.target.value ? parseFloat(e.target.value) : null)}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {!loading && !error && selectedProducts.size > 0 && (
           <div className="bulk-actions-toolbar">
