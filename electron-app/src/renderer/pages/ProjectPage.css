@@ -722,3 +722,18 @@
   white-space: nowrap;
   width: 100%;
 }
+
+/* Table Settings Button */
+.table-settings-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.table-settings-button svg {
+  flex-shrink: 0;
+}

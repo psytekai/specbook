@@ -4,6 +4,7 @@ import { useProjects } from '../hooks/useProjects';
 import { Product } from '../types';
 import { api } from '../services/api';
 import { formatArray, formatPrice } from '../utils/formatters';
+import { TableSettingsModal, useTableSettings } from '../components/TableSettings';
 import './ProjectPage.css';
 
 // Types for persisted state
@@ -135,26 +136,29 @@ const ProjectPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [showColumnPicker, setShowColumnPicker] = useState(false);
+  const [showTableSettings, setShowTableSettings] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
+
+  // Initialize TableSettings hook
+  const tableSettings = useTableSettings({ 
+    projectId: projectId || 'default',
+    initialSettings: {
+      // Convert legacy state to new format if needed
+      display: {
+        rowDensity: 'regular',
+        enableZebraStriping: true,
+        imageSize: 'medium',
+        enableTextWrapping: false,
+        showRowNumbers: false
+      }
+    }
+  });
 
   // Initialize state from localStorage with fallback defaults
   const storedState = getStoredState();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(storedState.viewMode || 'list');
   const [groupBy, setGroupBy] = useState<'none' | 'location' | 'category' | 'manufacturer'>(storedState.groupBy || 'none');
   const [sortBy, setSortBy] = useState<'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category'>(storedState.sortBy || 'date');
-  const [visibleColumns, setVisibleColumns] = useState(storedState.visibleColumns || {
-    select: true,
-    image: true,
-    productName: true,
-    description: true,
-    manufacturer: true,
-    price: true,
-    category: true,
-    location: true,
-    tagId: true,
-    actions: true
-  });
   const [filters, setFilters] = useState(storedState.filters || {
     search: '',
     category: '',
@@ -187,13 +191,6 @@ const ProjectPage: React.FC = () => {
     }
   };
 
-  const updateVisibleColumns = (columnKey: keyof typeof visibleColumns, visible: boolean) => {
-    const newVisibleColumns = { ...visibleColumns, [columnKey]: visible };
-    setVisibleColumns(newVisibleColumns);
-    if (isInitialized) {
-      saveState({ visibleColumns: newVisibleColumns });
-    }
-  };
 
   const updateFilters = (filterKey: keyof typeof filters, value: string | number | null) => {
     const newFilters = { ...filters, [filterKey]: value };
@@ -270,18 +267,21 @@ const ProjectPage: React.FC = () => {
   const sortProducts = (products: Product[]) => {
     return [...products].sort((a, b) => {
       switch (sortBy) {
-        case 'name':
+        case 'name': {
           const aName = a.product_name || a.description;
           const bName = b.product_name || b.description;
           return aName.localeCompare(bName);
-        case 'manufacturer':
+        }
+        case 'manufacturer': {
           const aManufacturer = a.manufacturer || '';
           const bManufacturer = b.manufacturer || '';
           return aManufacturer.localeCompare(bManufacturer);
-        case 'price':
+        }
+        case 'price': {
           const aPrice = a.price || 0;
           const bPrice = b.price || 0;
           return aPrice - bPrice;
+        }
         case 'category': {
           const aCategory = typeof a.category === 'string' ? a.category : formatArray(a.category);
           const bCategory = typeof b.category === 'string' ? b.category : formatArray(b.category);
@@ -642,52 +642,18 @@ const ProjectPage: React.FC = () => {
                 </button>
               </div>
               
-              {viewMode === 'list' && (
-                <div className="column-picker">
-                  <button
-                    className="toggle-button column-button"
-                    onClick={() => setShowColumnPicker(!showColumnPicker)}
-                    title="Column visibility"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
-                      <rect x="3" y="3" width="14" height="2" strokeWidth="2"/>
-                      <rect x="3" y="7" width="14" height="2" strokeWidth="2"/>
-                      <rect x="3" y="11" width="14" height="2" strokeWidth="2"/>
-                      <rect x="3" y="15" width="14" height="2" strokeWidth="2"/>
-                    </svg>
-                  </button>
-                  
-                  {showColumnPicker && (
-                    <div className="column-picker-dropdown">
-                      <div className="column-picker-header">
-                        <span>Show/Hide Columns</span>
-                      </div>
-                      <div className="column-options">
-                        {Object.entries({
-                          select: 'Select',
-                          image: 'Image',
-                          productName: 'Product Name',
-                          description: 'Description',
-                          manufacturer: 'Manufacturer',
-                          price: 'Price',
-                          category: 'Category',
-                          location: 'Location',
-                          tagId: 'Tag ID'
-                        }).map(([key, label]) => (
-                          <label key={key} className="column-option">
-                            <input
-                              type="checkbox"
-                              checked={visibleColumns[key as keyof typeof visibleColumns]}
-                              onChange={(e) => updateVisibleColumns(key as keyof typeof visibleColumns, e.target.checked)}
-                            />
-                            <span>{label}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+              <button
+                className="table-settings-button toggle-button"
+                onClick={() => setShowTableSettings(true)}
+                title="Table Settings"
+                aria-label="Open table settings"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <circle cx="10" cy="10" r="2"/>
+                  <path d="M19 10a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H1m9 9a9 9 0 01-9-9m9 9v-2m-9-7a9 9 0 019-9v2"/>
+                </svg>
+                Settings
+              </button>
             </div>
           </div>
         )}
@@ -843,7 +809,7 @@ const ProjectPage: React.FC = () => {
                   <table>
                     <thead>
                       <tr>
-                        {visibleColumns.select && (
+                        {tableSettings.settings.columns.select?.visible && (
                           <th>
                             <input
                               type="checkbox"
@@ -853,24 +819,24 @@ const ProjectPage: React.FC = () => {
                             />
                           </th>
                         )}
-                        {visibleColumns.image && <th>Image</th>}
-                        {visibleColumns.productName && <th>Product Name</th>}
-                        {visibleColumns.description && <th>Description</th>}
-                        {visibleColumns.manufacturer && <th>Manufacturer</th>}
-                        {visibleColumns.price && <th>Price</th>}
-                        {visibleColumns.category && <th>Category</th>}
-                        {visibleColumns.location && <th>Location</th>}
-                        {visibleColumns.tagId && <th>Tag ID</th>}
-                        {visibleColumns.actions && <th>Actions</th>}
+                        {tableSettings.settings.columns.image?.visible && <th>Image</th>}
+                        {tableSettings.settings.columns.productName?.visible && <th>Product Name</th>}
+                        {tableSettings.settings.columns.description?.visible && <th>Description</th>}
+                        {tableSettings.settings.columns.manufacturer?.visible && <th>Manufacturer</th>}
+                        {tableSettings.settings.columns.price?.visible && <th>Price</th>}
+                        {tableSettings.settings.columns.category?.visible && <th>Category</th>}
+                        {tableSettings.settings.columns.location?.visible && <th>Location</th>}
+                        {tableSettings.settings.columns.tagId?.visible && <th>Tag ID</th>}
+                        {tableSettings.settings.columns.actions?.visible && <th>Actions</th>}
                       </tr>
                     </thead>
                     <tbody>
                       {locationProducts.map(product => (
                         <tr key={product.id} className="table-row">
-                          <td colSpan={Object.values(visibleColumns).filter(Boolean).length} className="row-wrapper">
+                          <td colSpan={tableSettings.visibleColumns.length} className="row-wrapper">
                             <div className="row-scroll-container">
                               <div className="row-content">
-                                {visibleColumns.select && (
+                                {tableSettings.settings.columns.select?.visible && (
                                   <div className="row-cell select-cell">
                                     <input
                                       type="checkbox"
@@ -880,7 +846,7 @@ const ProjectPage: React.FC = () => {
                                     />
                                   </div>
                                 )}
-                                {visibleColumns.image && (
+                                {tableSettings.settings.columns.image?.visible && (
                                   <div className="row-cell image-cell">
                                     <div className="list-product-image">
                                       {product.image ? (
@@ -891,32 +857,32 @@ const ProjectPage: React.FC = () => {
                                     </div>
                                   </div>
                                 )}
-                                {visibleColumns.productName && (
+                                {tableSettings.settings.columns.productName?.visible && (
                                   <div className="row-cell product-name-cell">
                                     <span className="product-name">{product.product_name || 'N/A'}</span>
                                   </div>
                                 )}
-                                {visibleColumns.description && (
+                                {tableSettings.settings.columns.description?.visible && (
                                   <div className="row-cell description-cell">
                                     <span className="product-description">{product.description}</span>
                                   </div>
                                 )}
-                                {visibleColumns.manufacturer && (
+                                {tableSettings.settings.columns.manufacturer?.visible && (
                                   <div className="row-cell manufacturer-cell">
                                     <span>{product.manufacturer || 'N/A'}</span>
                                   </div>
                                 )}
-                                {visibleColumns.price && (
+                                {tableSettings.settings.columns.price?.visible && (
                                   <div className="row-cell price-cell">
                                     <span>{formatPrice(product.price)}</span>
                                   </div>
                                 )}
-                                {visibleColumns.category && (
+                                {tableSettings.settings.columns.category?.visible && (
                                   <div className="row-cell category-cell">
                                     <span>{typeof product.category === 'string' ? product.category : formatArray(product.category)}</span>
                                   </div>
                                 )}
-                                {visibleColumns.location && (
+                                {tableSettings.settings.columns.location?.visible && (
                                   <div className="row-cell location-cell">
                                     <div className="table-location-info">
                                       <span>{formatArray(product.location)}</span>
@@ -928,12 +894,12 @@ const ProjectPage: React.FC = () => {
                                     </div>
                                   </div>
                                 )}
-                                {visibleColumns.tagId && (
+                                {tableSettings.settings.columns.tagId?.visible && (
                                   <div className="row-cell tagid-cell">
                                     <span>{product.tagId}</span>
                                   </div>
                                 )}
-                                {visibleColumns.actions && (
+                                {tableSettings.settings.columns.actions?.visible && (
                                   <div className="row-cell actions-cell">
                                     <div className="list-actions">
                                       <button
@@ -965,6 +931,20 @@ const ProjectPage: React.FC = () => {
             ))}
           </div>
         )}
+
+        {/* Table Settings Modal */}
+        <TableSettingsModal
+          isOpen={showTableSettings}
+          onClose={() => setShowTableSettings(false)}
+          settings={tableSettings.settings}
+          onApply={(newSettings) => {
+            tableSettings.updateSettings(newSettings);
+            setShowTableSettings(false);
+          }}
+          onReset={() => {
+            tableSettings.resetSettings();
+          }}
+        />
       </div>
     </div>
   );
