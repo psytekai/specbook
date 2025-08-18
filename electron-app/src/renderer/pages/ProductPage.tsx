@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
 import { Product } from '../types';
-import { api, fetchProductCategories, fetchProductLocations, addProductCategory, addProductLocation } from '../services/api';
+import { api } from '../services/api';
+import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
 import { EditableSection } from '../components/EditableSection';
 import { FileUpload } from '../components/FileUpload';
 import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
@@ -17,23 +18,25 @@ const ProductPage: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [locations, setLocations] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   
   // Add handlers for multi-select components
-  const handleAddLocation = async (location: string) => {
+  const handleAddLocation = async (locationName: string) => {
     try {
-      await addProductLocation(location);
-      setLocations(prev => [...prev, location]);
+      const request: AddLocationRequest = { name: locationName };
+      const response = await api.post<Location>('/api/locations', request);
+      setLocations(prev => [...prev, response.data]);
     } catch (error) {
       throw new Error('Failed to add location');
     }
   };
 
-  const handleAddCategory = async (category: string) => {
+  const handleAddCategory = async (categoryName: string) => {
     try {
-      await addProductCategory(category);
-      setCategories(prev => [...prev, category]);
+      const request: AddCategoryRequest = { name: categoryName };
+      const response = await api.post<Category>('/api/categories', request);
+      setCategories(prev => [...prev, response.data]);
     } catch (error) {
       throw new Error('Failed to add category');
     }
@@ -72,12 +75,12 @@ const ProductPage: React.FC = () => {
   useEffect(() => {
     const loadOptions = async () => {
       try {
-        const [categoriesData, locationsData] = await Promise.all([
-          fetchProductCategories(),
-          fetchProductLocations()
+        const [categoriesResponse, locationsResponse] = await Promise.all([
+          api.get<Category[]>('/api/categories'),
+          api.get<Location[]>('/api/locations')
         ]);
-        setCategories(categoriesData);
-        setLocations(locationsData);
+        setCategories(categoriesResponse.data);
+        setLocations(locationsResponse.data);
       } catch (err) {
         console.error('Failed to load options:', err);
       }

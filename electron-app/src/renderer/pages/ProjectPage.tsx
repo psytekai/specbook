@@ -233,11 +233,18 @@ const ProjectPage: React.FC = () => {
         }
       }
       
-      // Category filter - handles array of categories
+      // Category filter - handles both string and array formats
       if (filters.category) {
-        const productCategories = Array.isArray(product.category) ? product.category : [product.category];
-        if (!productCategories.includes(filters.category)) {
-          return false;
+        if (typeof product.category === 'string') {
+          if (product.category !== filters.category) {
+            return false;
+          }
+        } else {
+          // Handle legacy array format
+          const productCategories = Array.isArray(product.category) ? product.category : [product.category];
+          if (!productCategories.includes(filters.category)) {
+            return false;
+          }
         }
       }
       
@@ -276,8 +283,8 @@ const ProjectPage: React.FC = () => {
           const bPrice = b.price || 0;
           return aPrice - bPrice;
         case 'category': {
-          const aCategory = formatArray(a.category);
-          const bCategory = formatArray(b.category);
+          const aCategory = typeof a.category === 'string' ? a.category : formatArray(a.category);
+          const bCategory = typeof b.category === 'string' ? b.category : formatArray(b.category);
           return aCategory.localeCompare(bCategory);
         }
         case 'location': {
@@ -381,7 +388,12 @@ const ProjectPage: React.FC = () => {
   };
 
   // Get unique values for filter dropdowns
-  const uniqueCategories = [...new Set(products.flatMap(p => Array.isArray(p.category) ? p.category : [p.category]).filter(Boolean))].sort();
+  const uniqueCategories = [...new Set(products.flatMap(p => {
+    if (typeof p.category === 'string') {
+      return [p.category];
+    }
+    return Array.isArray(p.category) ? p.category : [p.category];
+  }).filter(Boolean))].sort();
   const uniqueLocations = [...new Set(products.flatMap(p => Array.isArray(p.location) ? p.location : [p.location]).filter(Boolean))].sort();
   const uniqueManufacturers = [...new Set(products.map(p => p.manufacturer).filter(Boolean))].sort();
 
@@ -449,7 +461,7 @@ const ProjectPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await api.get<Product[]>(`/projects/${projectId}/products`);
+        const response = await api.get<Product[]>(`/api/projects/${projectId}/products`);
         setProducts(response.data);
       } catch (err) {
         setError('Failed to load products');
@@ -775,7 +787,7 @@ const ProjectPage: React.FC = () => {
                         <p className="product-description">{product.description}</p>
                         {product.manufacturer && <p className="product-manufacturer">By: {product.manufacturer}</p>}
                         {product.price && <p className="product-price">{formatPrice(product.price)}</p>}
-                        <p className="product-category">{product.category}</p>
+                        <p className="product-category">{typeof product.category === 'string' ? product.category : formatArray(product.category)}</p>
                         <div className="product-location-info">
                           <p className="product-location">{formatArray(product.location)}</p>
                           {isMultiLocationProduct(product) && groupBy === 'location' && (
@@ -901,7 +913,7 @@ const ProjectPage: React.FC = () => {
                                 )}
                                 {visibleColumns.category && (
                                   <div className="row-cell category-cell">
-                                    <span>{product.category}</span>
+                                    <span>{typeof product.category === 'string' ? product.category : formatArray(product.category)}</span>
                                   </div>
                                 )}
                                 {visibleColumns.location && (

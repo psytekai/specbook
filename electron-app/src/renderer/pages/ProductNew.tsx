@@ -6,19 +6,18 @@ import {
   fetchProductDetails, 
   saveProduct, 
   handleApiError,
-  fetchProductLocations,
-  addProductLocation 
+  api
 } from '../services/api';
 import { FileUpload } from '../components/FileUpload';
 import { LocationMultiSelect } from '../components/LocationMultiSelect';
 import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
-import { fetchProductCategories, addProductCategory } from '../services/api';
+import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
 import './ProductNew.css';
 
 const ProductNew: React.FC = () => {
   const navigate = useNavigate();
   const { projectId } = useParams<{ projectId: string }>();
-  const { projects, addProduct } = useProjects();
+  const { projects, refreshProjects } = useProjects();
   const { showToast } = useToast();
   
   const [formData, setFormData] = useState({
@@ -36,8 +35,8 @@ const ProductNew: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasDetails, setHasDetails] = useState(false);
-  const [locations, setLocations] = useState<string[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const currentProject = projects.find(p => p.id === projectId);
 
@@ -52,12 +51,12 @@ const ProductNew: React.FC = () => {
     // Fetch available locations and categories when component mounts
     const loadData = async () => {
       try {
-        const [availableLocations, availableCategories] = await Promise.all([
-          fetchProductLocations(),
-          fetchProductCategories()
+        const [locationsResponse, categoriesResponse] = await Promise.all([
+          api.get<Location[]>('/api/locations'),
+          api.get<Category[]>('/api/categories')
         ]);
-        setLocations(availableLocations);
-        setCategories(availableCategories);
+        setLocations(locationsResponse.data);
+        setCategories(categoriesResponse.data);
       } catch (error) {
         console.error('Failed to fetch data:', error);
       }
@@ -76,20 +75,22 @@ const ProductNew: React.FC = () => {
     }));
   };
 
-  const handleAddLocation = async (location: string) => {
+  const handleAddLocation = async (locationName: string) => {
     try {
-      await addProductLocation(location);
-      setLocations(prev => [...prev, location]);
+      const request: AddLocationRequest = { name: locationName };
+      const response = await api.post<Location>('/api/locations', request);
+      setLocations(prev => [...prev, response.data]);
       showToast('Location added successfully', 'success');
     } catch (_error) {
       showToast('Failed to add location', 'error');
     }
   };
 
-  const handleAddCategory = async (category: string) => {
+  const handleAddCategory = async (categoryName: string) => {
     try {
-      await addProductCategory(category);
-      setCategories(prev => [...prev, category]);
+      const request: AddCategoryRequest = { name: categoryName };
+      const response = await api.post<Category>('/api/categories', request);
+      setCategories(prev => [...prev, response.data]);
       showToast('Category added successfully', 'success');
     } catch (_error) {
       showToast('Failed to add category', 'error');
@@ -155,6 +156,11 @@ const ProductNew: React.FC = () => {
       return;
     }
     
+    if (!formData.category || formData.category.length === 0) {
+      showToast('Please select at least one category', 'error');
+      return;
+    }
+    
     setIsSaving(true);
     
     try {
@@ -163,19 +169,8 @@ const ProductNew: React.FC = () => {
         project_id: currentProject.id
       });
       
-      // Add to local state
-      addProduct({
-        projectId: currentProject.id,
-        url: formData.product_url,
-        tagId: formData.tag_id,
-        location: formData.product_location, // Already an array
-        image: formData.custom_image_url || formData.product_image, // Use custom image if available
-        images: formData.product_images,
-        description: formData.product_description,
-        specificationDescription: formData.specification_description,
-        category: formData.category, // Already an array
-        custom_image_url: formData.custom_image_url,
-      });
+      // Refresh projects to get updated product count
+      await refreshProjects();
       
       showToast('Product saved successfully', 'success');
       navigate(`/projects/${projectId}`);
@@ -330,13 +325,14 @@ const ProductNew: React.FC = () => {
               
               <div className="form-group">
                 <label className="label">
-                  Categories
+                  Categories *
                 </label>
                 <CategoryMultiSelect
                   selectedCategories={formData.category}
                   onSelectionChange={(categories) => setFormData(prev => ({ ...prev, category: categories }))}
                   availableCategories={categories}
                   onAddCategory={handleAddCategory}
+                  required={true}
                 />
               </div>
               

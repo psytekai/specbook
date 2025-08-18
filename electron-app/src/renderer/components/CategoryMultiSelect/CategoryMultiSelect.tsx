@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { Category } from '../../types';
 import './CategoryMultiSelect.css';
 
 interface CategoryMultiSelectProps {
   selectedCategories: string[];
   onSelectionChange: (categories: string[]) => void;
-  availableCategories: string[];
+  availableCategories: Category[];
   onAddCategory: (category: string) => Promise<void>;
   disabled?: boolean;
   required?: boolean;
@@ -63,7 +64,7 @@ export const CategoryMultiSelect: React.FC<CategoryMultiSelectProps> = ({
   };
 
   const availableForSelection = availableCategories.filter(
-    category => !selectedCategories.includes(category)
+    category => !selectedCategories.includes(category.name)
   );
 
   return (
@@ -112,8 +113,8 @@ export const CategoryMultiSelect: React.FC<CategoryMultiSelectProps> = ({
               }
             </option>
             {availableForSelection.map(category => (
-              <option key={category} value={category}>
-                {category}
+              <option key={category.id} value={category.name}>
+                {category.name}
               </option>
             ))}
           </select>

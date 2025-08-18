@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { Location } from '../../types';
 import './LocationMultiSelect.css';
 
 interface LocationMultiSelectProps {
   selectedLocations: string[];
   onSelectionChange: (locations: string[]) => void;
-  availableLocations: string[];
+  availableLocations: Location[];
   onAddLocation: (location: string) => Promise<void>;
   disabled?: boolean;
   required?: boolean;
@@ -63,7 +64,7 @@ export const LocationMultiSelect: React.FC<LocationMultiSelectProps> = ({
   };
 
   const availableForSelection = availableLocations.filter(
-    location => !selectedLocations.includes(location)
+    location => !selectedLocations.includes(location.name)
   );
 
   return (
@@ -112,8 +113,8 @@ export const LocationMultiSelect: React.FC<LocationMultiSelectProps> = ({
               }
             </option>
             {availableForSelection.map(location => (
-              <option key={location} value={location}>
-                {location}
+              <option key={location.id} value={location.name}>
+                {location.name}
               </option>
             ))}
           </select>

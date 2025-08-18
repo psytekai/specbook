@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { Project, Product } from '../types';
+import { api } from '../services/api';
 
 interface ProjectState {
   projects: Project[];
@@ -21,6 +22,7 @@ interface ProjectContextType extends ProjectState {
   updateProject: (id: string, name: string) => void;
   selectProject: (id: string | null) => void;
   addProduct: (product: Omit<Product, 'id' | 'createdAt'>) => void;
+  refreshProjects: () => Promise<void>;
 }
 
 const initialState: ProjectState = {
@@ -72,24 +74,44 @@ const projectReducer = (state: ProjectState, action: ProjectAction): ProjectStat
 export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(projectReducer, initialState);
 
-  // Load projects from localStorage on mount
+  // Load projects from API on mount, fallback to localStorage
   useEffect(() => {
-    const savedProjects = localStorage.getItem('projects');
-    const savedCurrentProjectId = localStorage.getItem('currentProjectId');
-    const savedProducts = localStorage.getItem('products');
-    
-    if (savedProjects) {
-      const projects = JSON.parse(savedProjects);
-      dispatch({ type: 'LOAD_PROJECTS', payload: projects });
-      
-      if (savedCurrentProjectId) {
-        dispatch({ type: 'SELECT_PROJECT', payload: savedCurrentProjectId });
+    const loadProjects = async () => {
+      try {
+        // Try to load from API first (for mock data)
+        const response = await api.get<Project[]>('/api/projects');
+        dispatch({ type: 'LOAD_PROJECTS', payload: response.data });
+        
+        // Check for saved current project
+        const savedCurrentProjectId = localStorage.getItem('currentProjectId');
+        if (savedCurrentProjectId) {
+          dispatch({ type: 'SELECT_PROJECT', payload: savedCurrentProjectId });
+        }
+      } catch (error) {
+        console.warn('Failed to load projects from API, trying localStorage:', error);
+        
+        // Fallback to localStorage
+        const savedProjects = localStorage.getItem('projects');
+        const savedCurrentProjectId = localStorage.getItem('currentProjectId');
+        
+        if (savedProjects) {
+          const projects = JSON.parse(savedProjects);
+          dispatch({ type: 'LOAD_PROJECTS', payload: projects });
+          
+          if (savedCurrentProjectId) {
+            dispatch({ type: 'SELECT_PROJECT', payload: savedCurrentProjectId });
+          }
+        }
       }
-    }
+      
+      // Load saved products from localStorage (for user-added products)
+      const savedProducts = localStorage.getItem('products');
+      if (savedProducts) {
+        dispatch({ type: 'LOAD_PRODUCTS', payload: JSON.parse(savedProducts) });
+      }
+    };
     
-    if (savedProducts) {
-      dispatch({ type: 'LOAD_PRODUCTS', payload: JSON.parse(savedProducts) });
-    }
+    loadProjects();
   }, []);
 
   // Persist projects to localStorage
@@ -155,6 +177,15 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
     }
   };
 
+  const refreshProjects = async () => {
+    try {
+      const response = await api.get<Project[]>('/api/projects');
+      dispatch({ type: 'LOAD_PROJECTS', payload: response.data });
+    } catch (error) {
+      console.warn('Failed to refresh projects from API:', error);
+    }
+  };
+
   return (
     <ProjectContext.Provider 
       value={{ 
@@ -163,7 +194,8 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
         createProject, 
         updateProject, 
         selectProject,
-        addProduct 
+        addProduct,
+        refreshProjects 
       }}
     >
       {children}

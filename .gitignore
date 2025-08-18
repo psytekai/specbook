@@ -1,5 +1,6 @@
 shared/cache/**
 .env
+.env.*
 .DS_Store
 .idea
 .venv
