@@ -309,10 +309,13 @@ const ProductPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="detail-item static">
-                  <label>Tag ID:</label>
-                  <span>{product.tagId}</span>
-                </div>
+                <EditableSection
+                  label="Tag ID"
+                  value={product.tagId}
+                  type="text"
+                  placeholder="Enter tag ID"
+                  onSave={(value) => updateProductField('tagId', value as string)}
+                />
                 
                 <div className="detail-item static">
                   <label>Added:</label>
