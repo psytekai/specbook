@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
 import { useToast } from '../hooks/useToast';
@@ -36,6 +36,7 @@ const ProductNew: React.FC = () => {
   const [hasDetails, setHasDetails] = useState(false);
   const [locations, setLocations] = useState<Location[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const currentProject = projects.find(p => p.id === projectId);
 
@@ -98,19 +99,42 @@ const ProductNew: React.FC = () => {
 
   const handleImageUpload = async (file: File) => {
     try {
-      // For now, create a mock URL for the uploaded file
-      // In a real implementation, you would upload to a server and get a URL back
-      const imageUrl = URL.createObjectURL(file);
+      // Validate file size (5MB limit)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        showToast('Image file size must be less than 5MB', 'error');
+        return;
+      }
+
+      // Validate file type (must be an image)
+      if (!file.type.startsWith('image/')) {
+        showToast('Please select a valid image file', 'error');
+        return;
+      }
+
+      // Convert file to data URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        setFormData(prev => ({
+          ...prev,
+          custom_image_url: imageUrl
+        }));
+        showToast('Custom image uploaded successfully', 'success');
+      };
       
-      setFormData(prev => ({
-        ...prev,
-        custom_image_url: imageUrl
-      }));
+      reader.onerror = () => {
+        showToast('Failed to read image file', 'error');
+      };
       
-      showToast('Image uploaded successfully', 'success');
+      reader.readAsDataURL(file);
     } catch (error) {
       showToast('Failed to upload image', 'error');
     }
+  };
+
+  const handleCustomImageClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleFetchDetails = async (e: React.FormEvent) => {
@@ -258,56 +282,40 @@ const ProductNew: React.FC = () => {
             <div className="form-section">
               <h2>Product Details</h2>
               
-              {/* Fetched Image Display */}
-              {formData.product_image && (
+              {/* Image Display - Shows fetched image or custom image */}
+              {(formData.product_image || formData.custom_image_url) && (
                 <div className="form-group">
                   <label className="label">Product Image</label>
                   <div className="product-preview">
                     <img 
-                      src={formData.product_image} 
+                      src={formData.custom_image_url || formData.product_image} 
                       alt="Product image" 
                       className="product-image"
                     />
                     <div className="image-actions">
-                      <button
-                        type="button"
-                        className="button button-secondary"
-                        onClick={() => {
-                          // Handle custom image upload logic here
-                          // For now, just show a toast
-                          showToast('Custom image upload functionality to be implemented', 'info');
-                        }}
-                      >
-                        Add Custom Image
-                      </button>
+                      {formData.custom_image_url ? (
+                        <button
+                          type="button"
+                          className="button button-secondary"
+                          onClick={() => setFormData(prev => ({ ...prev, custom_image_url: '' }))}
+                        >
+                          Remove Custom Image
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="button button-secondary"
+                          onClick={handleCustomImageClick}
+                        >
+                          Add Custom Image
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
               )}
               
-              {/* Custom Image Preview (if exists) */}
-              {formData.custom_image_url && (
-                <div className="form-group">
-                  <label className="label">Custom Image</label>
-                  <div className="product-preview">
-                    <div className="preview-header">
-                      <span className="preview-label">Custom Image</span>
-                      <button
-                        type="button"
-                        className="button button-secondary button-small"
-                        onClick={() => setFormData(prev => ({ ...prev, custom_image_url: '' }))}
-                      >
-                        Remove Custom Image
-                      </button>
-                    </div>
-                    <img 
-                      src={formData.custom_image_url} 
-                      alt="Custom product image" 
-                      className="product-image"
-                    />
-                  </div>
-                </div>
-              )}
+              {/* Remove the separate custom image preview section */}
               
               <div className="form-group">
                 <label htmlFor="product_description" className="label">
@@ -361,6 +369,22 @@ const ProductNew: React.FC = () => {
             </div>
           )}
         </form>
+        
+        {/* Hidden file input for custom image upload */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              handleImageUpload(file);
+              // Reset the input value so the same file can be selected again
+              e.target.value = '';
+            }
+          }}
+        />
       </div>
     </div>
   );
