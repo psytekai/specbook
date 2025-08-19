@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
 import { Product } from '../types';
@@ -20,6 +20,8 @@ const ProductPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const additionalImageFileInputRef = useRef<HTMLInputElement>(null);
   
   // Add handlers for multi-select components
   const handleAddLocation = async (locationName: string) => {
@@ -113,17 +115,44 @@ const ProductPage: React.FC = () => {
     if (!product) return;
 
     try {
-      // For now, create a mock URL for the uploaded file
-      // In a real implementation, you would upload to a server and get a URL back
-      const imageUrl = URL.createObjectURL(file);
+      // Validate file size (5MB limit)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        console.error('Image file size must be less than 5MB');
+        return;
+      }
+
+      // Validate file type (must be an image)
+      if (!file.type.startsWith('image/')) {
+        console.error('Please select a valid image file');
+        return;
+      }
+
+      // Convert file to data URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        // Update the product with the new image
+        updateProductField('custom_image_url', imageUrl);
+        console.log('Custom image uploaded:', imageUrl);
+      };
       
-      // Update the product with the new image
-      await updateProductField('custom_image_url', imageUrl);
+      reader.onerror = () => {
+        console.error('Failed to read image file');
+      };
       
-      console.log('Image uploaded:', imageUrl);
+      reader.readAsDataURL(file);
     } catch (err) {
       throw new Error('Failed to upload image');
     }
+  };
+
+  const handleCustomImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAdditionalImageClick = () => {
+    additionalImageFileInputRef.current?.click();
   };
 
   // Function to handle additional image uploads
@@ -259,13 +288,14 @@ const ProductPage: React.FC = () => {
               
               {/* Image Upload Section */}
               <div className="image-upload-section">
-                <h4>Upload New Image</h4>
-                <FileUpload
-                  onFileSelected={handleImageUpload}
-                  accept="image/*"
-                  maxSize={5 * 1024 * 1024} // 5MB
-                />
-                <p className="upload-help">Upload a new image for this product (max 5MB)</p>
+                <button
+                  type="button"
+                  className="button button-secondary"
+                  onClick={handleCustomImageClick}
+                >
+                  Add Custom Image
+                </button>
+                <p className="upload-help">Upload a custom image to replace the current product image (max 5MB)</p>
               </div>
             </div>
             
@@ -297,11 +327,13 @@ const ProductPage: React.FC = () => {
               ) : (
                 <div className="no-additional-images">
                   <p>No additional images yet</p>
-                  <FileUpload
-                    onFileSelected={handleAdditionalImageUpload}
-                    accept="image/*"
-                    maxSize={5 * 1024 * 1024} // 5MB
-                  />
+                  <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={handleAdditionalImageClick}
+                  >
+                    Add Custom Image
+                  </button>
                   <p className="upload-help">Upload additional images for this product (max 5MB each)</p>
                 </div>
               )}
@@ -309,12 +341,13 @@ const ProductPage: React.FC = () => {
               {/* Upload Section for Additional Images */}
               {product.images && product.images.length > 1 && (
                 <div className="additional-upload-section">
-                  <h4>Add More Images</h4>
-                  <FileUpload
-                    onFileSelected={handleAdditionalImageUpload}
-                    accept="image/*"
-                    maxSize={5 * 1024 * 1024} // 5MB
-                  />
+                  <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={handleAdditionalImageClick}
+                  >
+                    Add Custom Image
+                  </button>
                   <p className="upload-help">Upload more images for this product (max 5MB each)</p>
                 </div>
               )}
@@ -425,6 +458,38 @@ const ProductPage: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Hidden file input for custom image upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleImageUpload(file);
+            // Reset the input value so the same file can be selected again
+            e.target.value = '';
+          }
+        }}
+      />
+      
+      {/* Hidden file input for additional images upload */}
+      <input
+        ref={additionalImageFileInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleAdditionalImageUpload(file);
+            // Reset the input value so the same file can be selected again
+            e.target.value = '';
+          }
+        }}
+      />
     </div>
   );
 };
