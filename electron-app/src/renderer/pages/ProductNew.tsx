@@ -8,7 +8,6 @@ import {
   handleApiError,
   api
 } from '../services/api';
-import { FileUpload } from '../components/FileUpload';
 import { LocationMultiSelect } from '../components/LocationMultiSelect';
 import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
 import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
@@ -259,25 +258,40 @@ const ProductNew: React.FC = () => {
             <div className="form-section">
               <h2>Product Details</h2>
               
-              {/* Image Upload Section */}
-              <div className="form-group">
-                <label className="label">Custom Product Image</label>
-                <FileUpload
-                  onFileSelected={handleImageUpload}
-                  accept="image/*"
-                  maxSize={5 * 1024 * 1024} // 5MB
-                />
-                <p className="form-help">Upload a custom image for this product (optional)</p>
-              </div>
+              {/* Fetched Image Display */}
+              {formData.product_image && (
+                <div className="form-group">
+                  <label className="label">Product Image</label>
+                  <div className="product-preview">
+                    <img 
+                      src={formData.product_image} 
+                      alt="Product image" 
+                      className="product-image"
+                    />
+                    <div className="image-actions">
+                      <button
+                        type="button"
+                        className="button button-secondary"
+                        onClick={() => {
+                          // Handle custom image upload logic here
+                          // For now, just show a toast
+                          showToast('Custom image upload functionality to be implemented', 'info');
+                        }}
+                      >
+                        Add Custom Image
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
               
-              {/* Image Preview */}
-              {(formData.custom_image_url || formData.product_image) && (
-                <div className="product-preview">
-                  <div className="preview-header">
-                    <span className="preview-label">
-                      {formData.custom_image_url ? 'Custom Image' : 'Fetched Image'}
-                    </span>
-                    {formData.custom_image_url && (
+              {/* Custom Image Preview (if exists) */}
+              {formData.custom_image_url && (
+                <div className="form-group">
+                  <label className="label">Custom Image</label>
+                  <div className="product-preview">
+                    <div className="preview-header">
+                      <span className="preview-label">Custom Image</span>
                       <button
                         type="button"
                         className="button button-secondary button-small"
@@ -285,13 +299,13 @@ const ProductNew: React.FC = () => {
                       >
                         Remove Custom Image
                       </button>
-                    )}
+                    </div>
+                    <img 
+                      src={formData.custom_image_url} 
+                      alt="Custom product image" 
+                      className="product-image"
+                    />
                   </div>
-                  <img 
-                    src={formData.custom_image_url || formData.product_image} 
-                    alt="Product preview" 
-                    className="product-image"
-                  />
                 </div>
               )}
               
