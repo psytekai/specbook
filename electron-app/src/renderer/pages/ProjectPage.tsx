@@ -807,7 +807,7 @@ const ProjectPage: React.FC = () => {
                 )}
                 <div className="products-list">
                   <div className="table-container">
-                    <table>
+                    <table className="product-table">
                       <thead>
                         <tr>
                           {tableSettings.settings.columns.select?.visible && (

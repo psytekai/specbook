@@ -427,6 +427,10 @@
   width: 140px;
   min-width: 120px;
   max-width: 160px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  padding: 0.5rem;
 }
 
 /* Remove the old flex-based styles */
@@ -476,6 +480,24 @@
   font-family: 'Monaco', 'Menlo', monospace;
   font-size: 0.8rem;
   color: #6b7280;
+}
+
+/* Table layout fixes */
+.product-table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.product-table td,
+.product-table th {
+  vertical-align: top;
+  padding: 0.5rem;
+}
+
+.product-table .actions-cell {
+  text-align: center;
+  vertical-align: middle;
 }
 
 /* Enhanced scrollbar styling for the table container */
@@ -531,9 +553,15 @@
 
 /* Improved action buttons */
 .list-actions {
-  display: flex;
+  display: flex !important;
+  flex-direction: row !important;
   gap: 0.5rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  min-height: auto;
+  height: auto;
+  width: 100%;
 }
 
 .action-button {
@@ -545,6 +573,10 @@
   transition: all 0.15s ease;
   border: 1px solid transparent;
   cursor: pointer;
+  display: inline-block !important;
+  flex-shrink: 0;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 .action-button.primary {
