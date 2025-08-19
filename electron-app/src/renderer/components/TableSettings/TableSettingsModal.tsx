@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { TableSettingsModalProps, SettingsTab, TableSettings } from './types';
 import { SettingsTabs } from './components/SettingsTabs';
 import { ColumnSettings } from './tabs/ColumnSettings';
-import { DisplaySettings } from './tabs/DisplaySettings';
-import { DataSettings } from './tabs/DataSettings';
 import { ExportSettings } from './tabs/ExportSettings';
 import './TableSettingsModal.css';
 
@@ -113,20 +111,6 @@ export const TableSettingsModal: React.FC<TableSettingsModalProps> = ({
               onChange={(columns, columnOrder) => 
                 handleSettingsChange({ columns, columnOrder })
               }
-            />
-          )}
-          
-          {activeTab === 'display' && (
-            <DisplaySettings 
-              settings={localSettings.display}
-              onChange={(display) => handleSettingsChange({ display })}
-            />
-          )}
-          
-          {activeTab === 'data' && (
-            <DataSettings 
-              settings={localSettings.data}
-              onChange={(data) => handleSettingsChange({ data })}
             />
           )}
           

@@ -9,26 +9,6 @@ export interface ColumnConfig {
   essential?: boolean; // Cannot be hidden
 }
 
-export interface DisplaySettings {
-  rowDensity: 'compact' | 'regular' | 'comfortable';
-  enableZebraStriping: boolean;
-  imageSize: 'small' | 'medium' | 'large';
-  enableTextWrapping: boolean;
-  showRowNumbers: boolean;
-}
-
-export interface DataSettings {
-  itemsPerPage: 25 | 50 | 100 | 200;
-  defaultSort: {
-    column: string;
-    direction: 'asc' | 'desc';
-  };
-  autoRefresh: {
-    enabled: boolean;
-    interval: number; // in seconds
-  };
-}
-
 export interface ExportSettings {
   defaultFormat: 'csv' | 'excel' | 'pdf';
   includeHeaders: boolean;
@@ -60,12 +40,6 @@ export interface TableSettings {
   columns: Record<string, ColumnConfig>;
   columnOrder: string[];
   
-  // Display preferences
-  display: DisplaySettings;
-  
-  // Data preferences
-  data: DataSettings;
-  
   // Export preferences
   export: ExportSettings;
   
@@ -82,4 +56,4 @@ export interface TableSettingsModalProps {
   onReset?: () => void;
 }
 
-export type SettingsTab = 'columns' | 'display' | 'data' | 'export';
+export type SettingsTab = 'columns' | 'export';

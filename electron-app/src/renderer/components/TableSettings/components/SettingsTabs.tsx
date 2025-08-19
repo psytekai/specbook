@@ -19,26 +19,6 @@ const tabs: Array<{ key: SettingsTab; label: string; icon: React.ReactNode }> = 
     )
   },
   {
-    key: 'display',
-    label: 'Display',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <rect x="2" y="3" width="12" height="8" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-        <path d="M5 13h6M8 11v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      </svg>
-    )
-  },
-  {
-    key: 'data',
-    label: 'Data',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M8 2v12M2 6h12M2 10h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-      </svg>
-    )
-  },
-  {
     key: 'export',
     label: 'Export',
     icon: (

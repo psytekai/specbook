@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { TableSettings, ColumnConfig, DisplaySettings, DataSettings, ExportSettings } from '../types';
+import { TableSettings, ColumnConfig, ExportSettings } from '../types';
 
 // Default column configurations
 const createDefaultColumns = (): Record<string, ColumnConfig> => ({
@@ -93,25 +93,7 @@ const createDefaultColumns = (): Record<string, ColumnConfig> => ({
   }
 });
 
-const createDefaultDisplaySettings = (): DisplaySettings => ({
-  rowDensity: 'regular',
-  enableZebraStriping: true,
-  imageSize: 'medium',
-  enableTextWrapping: false,
-  showRowNumbers: false
-});
 
-const createDefaultDataSettings = (): DataSettings => ({
-  itemsPerPage: 25,
-  defaultSort: {
-    column: 'date',
-    direction: 'desc'
-  },
-  autoRefresh: {
-    enabled: false,
-    interval: 30
-  }
-});
 
 const createDefaultExportSettings = (): ExportSettings => ({
   defaultFormat: 'csv',
@@ -123,8 +105,6 @@ const createDefaultExportSettings = (): ExportSettings => ({
 const createDefaultSettings = (): TableSettings => ({
   columns: createDefaultColumns(),
   columnOrder: Object.keys(createDefaultColumns()),
-  display: createDefaultDisplaySettings(),
-  data: createDefaultDataSettings(),
   export: createDefaultExportSettings()
 });
 
@@ -151,8 +131,6 @@ export const useTableSettings = ({ projectId, initialSettings }: UseTableSetting
       return {
         columns: { ...defaults.columns, ...parsed.columns },
         columnOrder: parsed.columnOrder || defaults.columnOrder,
-        display: { ...defaults.display, ...parsed.display },
-        data: { ...defaults.data, ...parsed.data },
         export: { ...defaults.export, ...parsed.export },
         savedPresets: parsed.savedPresets || [],
         activePresetId: parsed.activePresetId
@@ -246,7 +224,7 @@ export const useTableSettings = ({ projectId, initialSettings }: UseTableSetting
     return {
       viewMode: 'list' as const,
       groupBy: 'none' as const,
-      sortBy: settings.data.defaultSort.column as 'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category',
+      sortBy: 'name' as const,
       visibleColumns: visibleColumnsMap,
       filters: {
         search: '',
@@ -268,8 +246,6 @@ export const useTableSettings = ({ projectId, initialSettings }: UseTableSetting
     toLegacyFormat,
     
     // Convenience getters
-    displaySettings: settings.display,
-    dataSettings: settings.data,
     exportSettings: settings.export,
     
     // Preset management (for future implementation)

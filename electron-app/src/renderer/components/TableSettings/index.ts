@@ -3,8 +3,6 @@ export { useTableSettings } from './hooks/useTableSettings';
 export type {
   TableSettings,
   ColumnConfig,
-  DisplaySettings,
-  DataSettings,
   ExportSettings,
   TableSettingsModalProps,
   SettingsTab
