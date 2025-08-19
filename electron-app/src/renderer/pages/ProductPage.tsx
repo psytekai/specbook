@@ -126,6 +126,28 @@ const ProductPage: React.FC = () => {
     }
   };
 
+  // Function to handle additional image uploads
+  const handleAdditionalImageUpload = async (file: File) => {
+    if (!product) return;
+
+    try {
+      // For now, create a mock URL for the uploaded file
+      // In a real implementation, you would upload to a server and get a URL back
+      const imageUrl = URL.createObjectURL(file);
+      
+      // Get current images array or create new one
+      const currentImages = product.images || [];
+      const updatedImages = [...currentImages, imageUrl];
+      
+      // Update the product with the new images array
+      await updateProductField('images', updatedImages);
+      
+      console.log('Additional image uploaded:', imageUrl);
+    } catch (err) {
+      throw new Error('Failed to upload additional image');
+    }
+  };
+
   if (!project) {
     return (
       <div className="page-container">
@@ -208,24 +230,26 @@ const ProductPage: React.FC = () => {
               {/* Current Image Display */}
               {(product.custom_image_url || product.image) ? (
                 <div className="main-image">
-                  <div className="image-header">
-                    <span className="image-label">
-                      {product.custom_image_url ? 'Custom Image' : 'Original Image'}
-                    </span>
-                    {product.custom_image_url && (
-                      <button
-                        type="button"
-                        className="button button-secondary button-small"
-                        onClick={() => updateProductField('custom_image_url', '')}
-                      >
-                        Remove Custom Image
-                      </button>
-                    )}
+                  <div className="image-container">
+                    <img 
+                      src={product.custom_image_url || product.image} 
+                      alt={product.description}
+                    />
+                    <button
+                      type="button"
+                      className="image-delete-btn"
+                      onClick={() => {
+                        if (product.custom_image_url) {
+                          updateProductField('custom_image_url', '');
+                        } else if (product.image) {
+                          updateProductField('image', '');
+                        }
+                      }}
+                      aria-label="Remove image"
+                    >
+✕
+                    </button>
                   </div>
-                  <img 
-                    src={product.custom_image_url || product.image} 
-                    alt={product.description}
-                  />
                 </div>
               ) : (
                 <div className="no-image-large">
@@ -246,18 +270,55 @@ const ProductPage: React.FC = () => {
             </div>
             
             {/* Additional Images Gallery */}
-            {product.images && product.images.length > 1 && (
-              <div className="image-gallery">
-                <h3>Additional Images</h3>
+            <div className="image-gallery">
+              <h3>Additional Images</h3>
+              {product.images && product.images.length > 1 ? (
                 <div className="gallery-grid">
                   {product.images.slice(1).map((image, index) => (
                     <div key={index} className="gallery-image">
-                      <img src={image} alt={`${product.description} ${index + 2}`} />
+                      <div className="gallery-image-container">
+                        <img src={image} alt={`${product.description} ${index + 2}`} />
+                        <button
+                          type="button"
+                          className="gallery-delete-btn"
+                          onClick={() => {
+                            // Remove the specific image from the images array
+                            const updatedImages = product.images.filter((_, imgIndex) => imgIndex !== index + 1);
+                            updateProductField('images', updatedImages);
+                          }}
+                          aria-label="Remove additional image"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="no-additional-images">
+                  <p>No additional images yet</p>
+                  <FileUpload
+                    onFileSelected={handleAdditionalImageUpload}
+                    accept="image/*"
+                    maxSize={5 * 1024 * 1024} // 5MB
+                  />
+                  <p className="upload-help">Upload additional images for this product (max 5MB each)</p>
+                </div>
+              )}
+              
+              {/* Upload Section for Additional Images */}
+              {product.images && product.images.length > 1 && (
+                <div className="additional-upload-section">
+                  <h4>Add More Images</h4>
+                  <FileUpload
+                    onFileSelected={handleAdditionalImageUpload}
+                    accept="image/*"
+                    maxSize={5 * 1024 * 1024} // 5MB
+                  />
+                  <p className="upload-help">Upload more images for this product (max 5MB each)</p>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="product-details">

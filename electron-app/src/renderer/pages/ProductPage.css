@@ -213,6 +213,12 @@
   transform: translateY(-2px);
 }
 
+.image-container {
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
 .main-image img {
   width: 100%;
   height: auto;
@@ -224,24 +230,44 @@
   transform: scale(1.02);
 }
 
-.image-header {
+.image-delete-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  background: #ff0000;
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  font-weight: bold;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  justify-content: center;
+  transition: all 0.2s var(--ease-smooth);
+  opacity: 0;
+  transform: scale(0.8);
+  z-index: 1000;
 }
 
-.image-label {
-  font-size: 0.875rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--text-muted);
-  padding: 0.25rem 0.75rem;
-  background: rgba(0, 122, 255, 0.1);
-  border-radius: 0.5rem;
-  border: 1px solid rgba(0, 122, 255, 0.2);
+.main-image:hover .image-delete-btn {
+  opacity: 1;
+  transform: scale(1);
 }
+
+.image-delete-btn:hover {
+  background: rgba(220, 38, 38, 1);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.image-delete-btn:active {
+  transform: scale(0.95);
+}
+
+
 
 .no-image-large {
   width: 100%;
@@ -368,6 +394,12 @@
   border-color: var(--accent-vibrant);
 }
 
+.gallery-image-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .gallery-image img {
   width: 100%;
   height: 100%;
@@ -377,6 +409,82 @@
 
 .gallery-image:hover img {
   transform: scale(1.05);
+}
+
+.gallery-delete-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: #ff0000;
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s var(--ease-smooth);
+  opacity: 0;
+  transform: scale(0.8);
+  z-index: 1000;
+}
+
+.gallery-image:hover .gallery-delete-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.gallery-delete-btn:hover {
+  background: #cc0000;
+  transform: scale(1.1);
+}
+
+.gallery-delete-btn:active {
+  transform: scale(0.95);
+}
+
+.no-additional-images {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px dashed rgba(0, 122, 255, 0.3);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.2s var(--ease-smooth);
+}
+
+.no-additional-images:hover {
+  border-color: var(--accent-vibrant);
+  background: rgba(0, 122, 255, 0.05);
+}
+
+.no-additional-images p:first-child {
+  margin: 0 0 1.5rem 0;
+  color: var(--text-muted);
+  font-weight: var(--font-weight-medium);
+  font-size: 1rem;
+}
+
+.additional-upload-section {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.additional-upload-section h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-premium);
 }
 
 /* Product Details */
