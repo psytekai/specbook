@@ -461,25 +461,101 @@
 /* Cell-specific styling */
 .select-cell {
   text-align: center;
+  vertical-align: middle;
 }
 
 .product-name-cell {
   font-weight: 500;
+  vertical-align: middle;
+}
+
+.product-name-cell .product-name {
+  display: flex;
+  align-items: center;
+  min-height: 1.5rem;
+  line-height: 1.3;
 }
 
 .manufacturer-cell {
   color: #6b7280;
+  vertical-align: middle;
+}
+
+.manufacturer-cell span {
+  display: flex;
+  align-items: center;
+  min-height: 1.5rem;
 }
 
 .price-cell {
   font-weight: 600;
   color: #059669;
+  vertical-align: middle;
+}
+
+.price-cell span {
+  display: flex;
+  align-items: center;
+  min-height: 1.5rem;
 }
 
 .tagid-cell {
   font-family: 'Monaco', 'Menlo', monospace;
   font-size: 0.8rem;
   color: #6b7280;
+  vertical-align: middle;
+}
+
+.tagid-cell span {
+  display: flex;
+  align-items: center;
+  min-height: 1.5rem;
+}
+
+.image-cell {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.image-cell .list-product-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.description-cell {
+  vertical-align: middle;
+}
+
+.description-cell .product-description {
+  display: flex;
+  align-items: center;
+  min-height: 2.5rem;
+  line-height: 1.4;
+}
+
+.category-cell {
+  vertical-align: middle;
+}
+
+.category-cell span {
+  display: flex;
+  align-items: center;
+  min-height: 1.5rem;
+}
+
+.location-cell {
+  vertical-align: middle;
+}
+
+.location-cell .table-location-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 2.5rem;
+  gap: 0.25rem;
 }
 
 /* Table layout fixes */
@@ -491,8 +567,17 @@
 
 .product-table td,
 .product-table th {
-  vertical-align: top;
-  padding: 0.5rem;
+  vertical-align: middle;
+  padding: 0.75rem 0.5rem;
+  line-height: 1.4;
+}
+
+.product-table th {
+  vertical-align: bottom;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+  font-weight: 600;
+  color: #374151;
 }
 
 .product-table .actions-cell {
@@ -519,9 +604,21 @@
   background: #a8a8a8;
 }
 
-/* Row hover background */
+/* Row styling and alignment */
+.table-row {
+  height: auto;
+  min-height: 3.5rem;
+}
+
 .table-row:hover {
   background-color: #f8fafc;
+}
+
+/* Ensure consistent cell heights */
+.product-table td {
+  height: 3.5rem;
+  max-height: 3.5rem;
+  overflow: hidden;
 }
 
 /* Status indicators */
