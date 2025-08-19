@@ -60,6 +60,9 @@ const ProductPage: React.FC = () => {
         if (!foundProduct) {
           setError('Product not found');
         } else {
+          console.log('Product loaded:', foundProduct);
+          console.log('Product images array:', foundProduct.images);
+          console.log('Product images length:', foundProduct.images?.length);
           setProduct(foundProduct);
         }
       } catch (err) {
@@ -160,18 +163,45 @@ const ProductPage: React.FC = () => {
     if (!product) return;
 
     try {
-      // For now, create a mock URL for the uploaded file
-      // In a real implementation, you would upload to a server and get a URL back
-      const imageUrl = URL.createObjectURL(file);
+      // Validate file size (5MB limit)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        console.error('Image file size must be less than 5MB');
+        return;
+      }
+
+      // Validate file type (must be an image)
+      if (!file.type.startsWith('image/')) {
+        console.error('Please select a valid image file');
+        return;
+      }
+
+      console.log('Starting additional image upload for file:', file.name);
+      console.log('Current product images:', product.images);
+
+      // Convert file to data URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        console.log('File converted to data URL:', imageUrl.substring(0, 100) + '...');
+        
+        // Get current images array or create new one
+        const currentImages = product.images || [];
+        const updatedImages = [...currentImages, imageUrl];
+        
+        console.log('Updated images array:', updatedImages);
+        
+        // Update the product with the new images array
+        updateProductField('images', updatedImages);
+        
+        console.log('Additional image uploaded and product updated');
+      };
       
-      // Get current images array or create new one
-      const currentImages = product.images || [];
-      const updatedImages = [...currentImages, imageUrl];
+      reader.onerror = () => {
+        console.error('Failed to read image file');
+      };
       
-      // Update the product with the new images array
-      await updateProductField('images', updatedImages);
-      
-      console.log('Additional image uploaded:', imageUrl);
+      reader.readAsDataURL(file);
     } catch (err) {
       throw new Error('Failed to upload additional image');
     }
@@ -304,8 +334,9 @@ const ProductPage: React.FC = () => {
               <h3>Additional Images</h3>
               {product.images && product.images.length > 1 ? (
                 <div className="gallery-grid">
+                  {/* Display all images except the first one (main image) */}
                   {product.images.slice(1).map((image, index) => (
-                    <div key={index} className="gallery-image">
+                    <div key={`additional-${index}`} className="gallery-image">
                       <div className="gallery-image-container">
                         <img src={image} alt={`${product.description} ${index + 2}`} />
                         <button
