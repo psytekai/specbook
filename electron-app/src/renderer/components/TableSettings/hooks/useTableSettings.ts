@@ -206,6 +206,16 @@ export const useTableSettings = ({ projectId, initialSettings }: UseTableSetting
     });
   }, [settings.columns, updateSettings]);
 
+  // Get visible columns
+  const visibleColumns = useMemo(() => {
+    return Object.entries(settings.columns)
+      .filter(([_, config]) => config.visible)
+      .map(([key, _]) => key);
+  }, [settings.columns]);
+
+  // Get visible columns count
+  const visibleColumnsCount = useMemo(() => visibleColumns.length, [visibleColumns]);
+
   const updateColumnOrder = useCallback((newOrder: string[]) => {
     // Validate that all columns are included
     const currentColumns = Object.keys(settings.columns);
@@ -219,12 +229,6 @@ export const useTableSettings = ({ projectId, initialSettings }: UseTableSetting
   }, [settings.columns, updateSettings]);
 
   // Computed values
-  const visibleColumns = useMemo(() => {
-    return settings.columnOrder.filter(key => 
-      settings.columns[key]?.visible
-    );
-  }, [settings.columns, settings.columnOrder]);
-
   const orderedColumns = useMemo(() => {
     return settings.columnOrder
       .map(key => settings.columns[key])

@@ -806,126 +806,122 @@ const ProjectPage: React.FC = () => {
                   </div>
                 )}
                 <div className="products-list">
-                  <table>
-                    <thead>
-                      <tr>
-                        {tableSettings.settings.columns.select?.visible && (
-                          <th>
-                            <input
-                              type="checkbox"
-                              className="row-checkbox"
-                              checked={selectAll}
-                              onChange={(e) => handleSelectAll(e.target.checked)}
-                            />
-                          </th>
-                        )}
-                        {tableSettings.settings.columns.image?.visible && <th>Image</th>}
-                        {tableSettings.settings.columns.productName?.visible && <th>Product Name</th>}
-                        {tableSettings.settings.columns.description?.visible && <th>Description</th>}
-                        {tableSettings.settings.columns.manufacturer?.visible && <th>Manufacturer</th>}
-                        {tableSettings.settings.columns.price?.visible && <th>Price</th>}
-                        {tableSettings.settings.columns.category?.visible && <th>Category</th>}
-                        {tableSettings.settings.columns.location?.visible && <th>Location</th>}
-                        {tableSettings.settings.columns.tagId?.visible && <th>Tag ID</th>}
-                        {tableSettings.settings.columns.actions?.visible && <th>Actions</th>}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {locationProducts.map(product => (
-                        <tr key={product.id} className="table-row">
-                          <td colSpan={tableSettings.visibleColumns.length} className="row-wrapper">
-                            <div className="row-scroll-container">
-                              <div className="row-content">
-                                {tableSettings.settings.columns.select?.visible && (
-                                  <div className="row-cell select-cell">
-                                    <input
-                                      type="checkbox"
-                                      className="row-checkbox"
-                                      checked={selectedProducts.has(product.id)}
-                                      onChange={(e) => handleSelectProduct(product.id, e.target.checked)}
-                                    />
-                                  </div>
-                                )}
-                                {tableSettings.settings.columns.image?.visible && (
-                                  <div className="row-cell image-cell">
-                                    <div className="list-product-image">
-                                      {product.image ? (
-                                        <img src={product.image} alt={product.description} />
-                                      ) : (
-                                        <div className="no-image-small">No Image</div>
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-                                {tableSettings.settings.columns.productName?.visible && (
-                                  <div className="row-cell product-name-cell">
-                                    <span className="product-name">{product.product_name || 'N/A'}</span>
-                                  </div>
-                                )}
-                                {tableSettings.settings.columns.description?.visible && (
-                                  <div className="row-cell description-cell">
-                                    <span className="product-description">{product.description}</span>
-                                  </div>
-                                )}
-                                {tableSettings.settings.columns.manufacturer?.visible && (
-                                  <div className="row-cell manufacturer-cell">
-                                    <span>{product.manufacturer || 'N/A'}</span>
-                                  </div>
-                                )}
-                                {tableSettings.settings.columns.price?.visible && (
-                                  <div className="row-cell price-cell">
-                                    <span>{formatPrice(product.price)}</span>
-                                  </div>
-                                )}
-                                {tableSettings.settings.columns.category?.visible && (
-                                  <div className="row-cell category-cell">
-                                    <span>{typeof product.category === 'string' ? product.category : formatArray(product.category)}</span>
-                                  </div>
-                                )}
-                                {tableSettings.settings.columns.location?.visible && (
-                                  <div className="row-cell location-cell">
-                                    <div className="table-location-info">
-                                      <span>{formatArray(product.location)}</span>
-                                      {isMultiLocationProduct(product) && groupBy === 'location' && (
-                                        <span className="multi-location-badge table-badge" title={`This product appears in ${getLocationCount(product)} locations`}>
-                                          📍 {getLocationCount(product)}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-                                {tableSettings.settings.columns.tagId?.visible && (
-                                  <div className="row-cell tagid-cell">
-                                    <span>{product.tagId}</span>
-                                  </div>
-                                )}
-                                {tableSettings.settings.columns.actions?.visible && (
-                                  <div className="row-cell actions-cell">
-                                    <div className="list-actions">
-                                      <button
-                                        className="action-button primary"
-                                        onClick={() => navigate(`/projects/${projectId}/products/${product.id}`)}
-                                      >
-                                        View
-                                      </button>
-                                      <a 
-                                        href={product.url} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="action-button secondary"
-                                      >
-                                        Source
-                                      </a>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </td>
+                  <div className="table-container">
+                    <table>
+                      <thead>
+                        <tr>
+                          {tableSettings.settings.columns.select?.visible && (
+                            <th className="select-header">
+                              <input
+                                type="checkbox"
+                                className="row-checkbox"
+                                checked={selectAll}
+                                onChange={(e) => handleSelectAll(e.target.checked)}
+                              />
+                            </th>
+                          )}
+                          {tableSettings.settings.columns.image?.visible && <th className="image-header">Image</th>}
+                          {tableSettings.settings.columns.productName?.visible && <th className="product-name-header">Product Name</th>}
+                          {tableSettings.settings.columns.description?.visible && <th className="description-header">Description</th>}
+                          {tableSettings.settings.columns.manufacturer?.visible && <th className="manufacturer-header">Manufacturer</th>}
+                          {tableSettings.settings.columns.price?.visible && <th className="price-header">Price</th>}
+                          {tableSettings.settings.columns.category?.visible && <th className="category-header">Category</th>}
+                          {tableSettings.settings.columns.location?.visible && <th className="location-header">Location</th>}
+                          {tableSettings.settings.columns.tagId?.visible && <th className="tagid-header">Tag ID</th>}
+                          {tableSettings.settings.columns.actions?.visible && <th className="actions-header">Actions</th>}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {locationProducts.map(product => (
+                          <tr key={product.id} className="table-row">
+                            {tableSettings.settings.columns.select?.visible && (
+                              <td className="select-cell">
+                                <input
+                                  type="checkbox"
+                                  className="row-checkbox"
+                                  checked={selectedProducts.has(product.id)}
+                                  onChange={(e) => handleSelectProduct(product.id, e.target.checked)}
+                                />
+                              </td>
+                            )}
+                            {tableSettings.settings.columns.image?.visible && (
+                              <td className="image-cell">
+                                <div className="list-product-image">
+                                  {product.image ? (
+                                    <img src={product.image} alt={product.description} />
+                                  ) : (
+                                    <div className="no-image-small">No Image</div>
+                                  )}
+                                </div>
+                              </td>
+                            )}
+                            {tableSettings.settings.columns.productName?.visible && (
+                              <td className="product-name-cell">
+                                <span className="product-name">{product.product_name || 'N/A'}</span>
+                              </td>
+                            )}
+                            {tableSettings.settings.columns.description?.visible && (
+                              <td className="description-cell">
+                                <span className="product-description">{product.description}</span>
+                              </td>
+                            )}
+                            {tableSettings.settings.columns.manufacturer?.visible && (
+                              <td className="manufacturer-cell">
+                                <span>{product.manufacturer || 'N/A'}</span>
+                              </td>
+                            )}
+                            {tableSettings.settings.columns.price?.visible && (
+                              <td className="price-cell">
+                                <span>{formatPrice(product.price)}</span>
+                              </td>
+                            )}
+                            {tableSettings.settings.columns.category?.visible && (
+                              <td className="category-cell">
+                                <span>{typeof product.category === 'string' ? product.category : formatArray(product.category)}</span>
+                              </td>
+                            )}
+                            {tableSettings.settings.columns.location?.visible && (
+                              <td className="location-cell">
+                                <div className="table-location-info">
+                                  <span>{formatArray(product.location)}</span>
+                                  {isMultiLocationProduct(product) && groupBy === 'location' && (
+                                    <span className="multi-location-badge table-badge" title={`This product appears in ${getLocationCount(product)} locations`}>
+                                      📍 {getLocationCount(product)}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                            )}
+                            {tableSettings.settings.columns.tagId?.visible && (
+                              <td className="tagid-cell">
+                                <span>{product.tagId}</span>
+                              </td>
+                            )}
+                            {tableSettings.settings.columns.actions?.visible && (
+                              <td className="actions-cell">
+                                <div className="list-actions">
+                                  <button
+                                    className="action-button primary"
+                                    onClick={() => navigate(`/projects/${projectId}/products/${product.id}`)}
+                                  >
+                                    View
+                                  </button>
+                                  <a 
+                                    href={product.url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="action-button secondary"
+                                  >
+                                    Source
+                                  </a>
+                                </div>
+                              </td>
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             ))}
