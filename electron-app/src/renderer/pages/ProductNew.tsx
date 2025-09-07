@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
 import { useToast } from '../hooks/useToast';
@@ -6,34 +6,37 @@ import {
   fetchProductDetails, 
   saveProduct, 
   handleApiError,
-  fetchProductLocations,
-  addProductLocation 
+  api
 } from '../services/api';
+import { LocationMultiSelect } from '../components/LocationMultiSelect';
+import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
+import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
 import './ProductNew.css';
 
 const ProductNew: React.FC = () => {
   const navigate = useNavigate();
   const { projectId } = useParams<{ projectId: string }>();
-  const { projects, addProduct } = useProjects();
+  const { projects, refreshProjects } = useProjects();
   const { showToast } = useToast();
   
   const [formData, setFormData] = useState({
     product_url: '',
     tag_id: '',
-    product_location: '',
+    product_location: [] as string[],
     product_image: '',
     product_images: [] as string[],
     product_description: '',
     specification_description: '',
-    category: '',
+    category: [] as string[],
+    custom_image_url: '',
   });
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasDetails, setHasDetails] = useState(false);
-  const [locations, setLocations] = useState<string[]>([]);
-  const [showAddLocation, setShowAddLocation] = useState(false);
-  const [newLocation, setNewLocation] = useState('');
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const currentProject = projects.find(p => p.id === projectId);
 
@@ -45,16 +48,20 @@ const ProductNew: React.FC = () => {
   }, [projectId, currentProject, navigate, showToast]);
 
   useEffect(() => {
-    // Fetch available locations when component mounts
-    const loadLocations = async () => {
+    // Fetch available locations and categories when component mounts
+    const loadData = async () => {
       try {
-        const availableLocations = await fetchProductLocations();
-        setLocations(availableLocations);
+        const [locationsResponse, categoriesResponse] = await Promise.all([
+          api.get<Location[]>('/api/locations'),
+          api.get<Category[]>('/api/categories')
+        ]);
+        setLocations(locationsResponse.data);
+        setCategories(categoriesResponse.data);
       } catch (error) {
-        console.error('Failed to fetch locations:', error);
+        console.error('Failed to fetch data:', error);
       }
     };
-    loadLocations();
+    loadData();
   }, []);
 
   if (!currentProject) {
@@ -68,22 +75,66 @@ const ProductNew: React.FC = () => {
     }));
   };
 
-  const handleAddLocation = async () => {
-    if (!newLocation.trim()) {
-      showToast('Please enter a location name', 'error');
-      return;
-    }
-
+  const handleAddLocation = async (locationName: string) => {
     try {
-      await addProductLocation(newLocation.trim());
-      setLocations(prev => [...prev, newLocation.trim()]);
-      setFormData(prev => ({ ...prev, product_location: newLocation.trim() }));
-      setNewLocation('');
-      setShowAddLocation(false);
+      const request: AddLocationRequest = { name: locationName };
+      const response = await api.post<Location>('/api/locations', request);
+      setLocations(prev => [...prev, response.data]);
       showToast('Location added successfully', 'success');
-    } catch (error) {
+    } catch (_error) {
       showToast('Failed to add location', 'error');
     }
+  };
+
+  const handleAddCategory = async (categoryName: string) => {
+    try {
+      const request: AddCategoryRequest = { name: categoryName };
+      const response = await api.post<Category>('/api/categories', request);
+      setCategories(prev => [...prev, response.data]);
+      showToast('Category added successfully', 'success');
+    } catch (_error) {
+      showToast('Failed to add category', 'error');
+    }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      // Validate file size (5MB limit)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        showToast('Image file size must be less than 5MB', 'error');
+        return;
+      }
+
+      // Validate file type (must be an image)
+      if (!file.type.startsWith('image/')) {
+        showToast('Please select a valid image file', 'error');
+        return;
+      }
+
+      // Convert file to data URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        setFormData(prev => ({
+          ...prev,
+          custom_image_url: imageUrl
+        }));
+        showToast('Custom image uploaded successfully', 'success');
+      };
+      
+      reader.onerror = () => {
+        showToast('Failed to read image file', 'error');
+      };
+      
+      reader.readAsDataURL(file);
+    } catch (error) {
+      showToast('Failed to upload image', 'error');
+    }
+  };
+
+  const handleCustomImageClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleFetchDetails = async (e: React.FormEvent) => {
@@ -91,7 +142,7 @@ const ProductNew: React.FC = () => {
     
     const { product_url, tag_id, product_location } = formData;
     
-    if (!product_url || !tag_id || !product_location) {
+    if (!product_url || !tag_id || !product_location.length) {
       showToast('Please fill in all required fields', 'error');
       return;
     }
@@ -102,7 +153,7 @@ const ProductNew: React.FC = () => {
       const details = await fetchProductDetails({
         product_url,
         tag_id,
-        product_location
+        product_location: product_location[0] // Use first location for API call
       });
       
       setFormData(prev => ({
@@ -128,6 +179,11 @@ const ProductNew: React.FC = () => {
       return;
     }
     
+    if (!formData.category || formData.category.length === 0) {
+      showToast('Please select at least one category', 'error');
+      return;
+    }
+    
     setIsSaving(true);
     
     try {
@@ -136,18 +192,8 @@ const ProductNew: React.FC = () => {
         project_id: currentProject.id
       });
       
-      // Add to local state
-      addProduct({
-        projectId: currentProject.id,
-        url: formData.product_url,
-        tagId: formData.tag_id,
-        location: formData.product_location,
-        image: formData.product_image,
-        images: formData.product_images,
-        description: formData.product_description,
-        specificationDescription: formData.specification_description,
-        category: formData.category,
-      });
+      // Refresh projects to get updated product count
+      await refreshProjects();
       
       showToast('Product saved successfully', 'success');
       navigate(`/projects/${projectId}`);
@@ -211,65 +257,16 @@ const ProductNew: React.FC = () => {
             </div>
             
             <div className="form-group">
-              <label htmlFor="product_location" className="label">
-                Product Location *
+              <label className="label">
+                Product Locations *
               </label>
-              {!showAddLocation ? (
-                <div className="location-dropdown-wrapper">
-                  <select
-                    id="product_location"
-                    name="product_location"
-                    className="input"
-                    value={formData.product_location}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">-- Select a location --</option>
-                    {locations.map(location => (
-                      <option key={location} value={location}>
-                        {location}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    className="button button-secondary button-small"
-                    onClick={() => setShowAddLocation(true)}
-                  >
-                    Add New
-                  </button>
-                </div>
-              ) : (
-                <div className="add-location-wrapper">
-                  <input
-                    type="text"
-                    className="input"
-                    value={newLocation}
-                    onChange={(e) => setNewLocation(e.target.value)}
-                    placeholder="Enter new location"
-                    autoFocus
-                  />
-                  <div className="add-location-actions">
-                    <button
-                      type="button"
-                      className="button button-primary button-small"
-                      onClick={handleAddLocation}
-                    >
-                      Add
-                    </button>
-                    <button
-                      type="button"
-                      className="button button-secondary button-small"
-                      onClick={() => {
-                        setShowAddLocation(false);
-                        setNewLocation('');
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
+              <LocationMultiSelect
+                selectedLocations={formData.product_location}
+                onSelectionChange={(locations: string[]) => setFormData(prev => ({ ...prev, product_location: locations }))}
+                availableLocations={locations}
+                onAddLocation={handleAddLocation}
+                required={true}
+              />
             </div>
             
             <button 
@@ -285,15 +282,40 @@ const ProductNew: React.FC = () => {
             <div className="form-section">
               <h2>Product Details</h2>
               
-              {formData.product_image && (
-                <div className="product-preview">
-                  <img 
-                    src={formData.product_image} 
-                    alt="Product preview" 
-                    className="product-image"
-                  />
+              {/* Image Display - Shows fetched image or custom image */}
+              {(formData.product_image || formData.custom_image_url) && (
+                <div className="form-group">
+                  <label className="label">Product Image</label>
+                  <div className="product-preview">
+                    <img 
+                      src={formData.custom_image_url || formData.product_image} 
+                      alt="Product image" 
+                      className="product-image"
+                    />
+                    <div className="image-actions">
+                      {formData.custom_image_url ? (
+                        <button
+                          type="button"
+                          className="button button-secondary"
+                          onClick={() => setFormData(prev => ({ ...prev, custom_image_url: '' }))}
+                        >
+                          Remove Custom Image
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="button button-secondary"
+                          onClick={handleCustomImageClick}
+                        >
+                          Add Custom Image
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
+              
+              {/* Remove the separate custom image preview section */}
               
               <div className="form-group">
                 <label htmlFor="product_description" className="label">
@@ -324,16 +346,15 @@ const ProductNew: React.FC = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="category" className="label">
-                  Category
+                <label className="label">
+                  Categories *
                 </label>
-                <input
-                  id="category"
-                  name="category"
-                  type="text"
-                  className="input"
-                  value={formData.category}
-                  onChange={handleInputChange}
+                <CategoryMultiSelect
+                  selectedCategories={formData.category}
+                  onSelectionChange={(categories) => setFormData(prev => ({ ...prev, category: categories }))}
+                  availableCategories={categories}
+                  onAddCategory={handleAddCategory}
+                  required={true}
                 />
               </div>
               
@@ -348,6 +369,22 @@ const ProductNew: React.FC = () => {
             </div>
           )}
         </form>
+        
+        {/* Hidden file input for custom image upload */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              handleImageUpload(file);
+              // Reset the input value so the same file can be selected again
+              e.target.value = '';
+            }
+          }}
+        />
       </div>
     </div>
   );

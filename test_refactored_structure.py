@@ -85,7 +85,7 @@ def test_prp_structure():
     """Test that PRP structure is correct"""
     print("Testing PRP structure...")
     
-    prp_dir = Path("prps/implementations/benchmarking_2025_07_07")
+    prp_dir = Path("AISPECS/implementations/benchmarking_2025_07_07")
     expected_files = [
         "README.md",
         "scripts/run_benchmarks.py",
@@ -134,7 +134,7 @@ def test_workspace_manager():
     print("Testing workspace manager...")
     
     try:
-        from tools.workspace_manager import WorkspaceManager
+        from workspace.workspace_manager import WorkspaceManager
         manager = WorkspaceManager()
         print("  ✅ WorkspaceManager imported and instantiated successfully")
         return True

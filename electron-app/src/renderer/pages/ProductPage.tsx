@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
 import { Product } from '../types';
 import { api } from '../services/api';
+import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
+import { EditableSection } from '../components/EditableSection';
+import { FileUpload } from '../components/FileUpload';
+import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
+import { LocationMultiSelect } from '../components/LocationMultiSelect';
+import { formatPrice } from '../utils/formatters';
 import './ProductPage.css';
 
 const ProductPage: React.FC = () => {
@@ -12,6 +18,31 @@ const ProductPage: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const additionalImageFileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Add handlers for multi-select components
+  const handleAddLocation = async (locationName: string) => {
+    try {
+      const request: AddLocationRequest = { name: locationName };
+      const response = await api.post<Location>('/api/locations', request);
+      setLocations(prev => [...prev, response.data]);
+    } catch (error) {
+      throw new Error('Failed to add location');
+    }
+  };
+
+  const handleAddCategory = async (categoryName: string) => {
+    try {
+      const request: AddCategoryRequest = { name: categoryName };
+      const response = await api.post<Category>('/api/categories', request);
+      setCategories(prev => [...prev, response.data]);
+    } catch (error) {
+      throw new Error('Failed to add category');
+    }
+  };
 
   const project = projects.find(p => p.id === projectId);
 
@@ -29,6 +60,9 @@ const ProductPage: React.FC = () => {
         if (!foundProduct) {
           setError('Product not found');
         } else {
+          console.log('Product loaded:', foundProduct);
+          console.log('Product images array:', foundProduct.images);
+          console.log('Product images length:', foundProduct.images?.length);
           setProduct(foundProduct);
         }
       } catch (err) {
@@ -41,6 +75,137 @@ const ProductPage: React.FC = () => {
 
     fetchProduct();
   }, [projectId, productId]);
+
+  // Load categories and locations for dropdowns
+  useEffect(() => {
+    const loadOptions = async () => {
+      try {
+        const [categoriesResponse, locationsResponse] = await Promise.all([
+          api.get<Category[]>('/api/categories'),
+          api.get<Location[]>('/api/locations')
+        ]);
+        setCategories(categoriesResponse.data);
+        setLocations(locationsResponse.data);
+      } catch (err) {
+        console.error('Failed to load options:', err);
+      }
+    };
+
+    loadOptions();
+  }, []);
+
+  // Function to update a single product field
+  const updateProductField = async (field: keyof Product, value: string | number | string[]) => {
+    if (!product) return;
+
+    try {
+      // For now, we'll update locally since there's no specific update API endpoint
+      // In a real app, this would make an API call to update the specific field
+      const updatedProduct = { ...product, [field]: value };
+      setProduct(updatedProduct);
+      
+      // Here you would typically make an API call like:
+      // await api.patch(`/projects/${projectId}/products/${productId}`, { [field]: value });
+      
+      console.log(`Updated ${field} to:`, value);
+    } catch (err) {
+      throw new Error(`Failed to update ${field}`);
+    }
+  };
+
+  // Function to handle image uploads
+  const handleImageUpload = async (file: File) => {
+    if (!product) return;
+
+    try {
+      // Validate file size (5MB limit)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        console.error('Image file size must be less than 5MB');
+        return;
+      }
+
+      // Validate file type (must be an image)
+      if (!file.type.startsWith('image/')) {
+        console.error('Please select a valid image file');
+        return;
+      }
+
+      // Convert file to data URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        // Update the product with the new image
+        updateProductField('custom_image_url', imageUrl);
+        console.log('Custom image uploaded:', imageUrl);
+      };
+      
+      reader.onerror = () => {
+        console.error('Failed to read image file');
+      };
+      
+      reader.readAsDataURL(file);
+    } catch (err) {
+      throw new Error('Failed to upload image');
+    }
+  };
+
+  const handleCustomImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAdditionalImageClick = () => {
+    additionalImageFileInputRef.current?.click();
+  };
+
+  // Function to handle additional image uploads
+  const handleAdditionalImageUpload = async (file: File) => {
+    if (!product) return;
+
+    try {
+      // Validate file size (5MB limit)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        console.error('Image file size must be less than 5MB');
+        return;
+      }
+
+      // Validate file type (must be an image)
+      if (!file.type.startsWith('image/')) {
+        console.error('Please select a valid image file');
+        return;
+      }
+
+      console.log('Starting additional image upload for file:', file.name);
+      console.log('Current product images:', product.images);
+
+      // Convert file to data URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        console.log('File converted to data URL:', imageUrl.substring(0, 100) + '...');
+        
+        // Get current images array or create new one
+        const currentImages = product.images || [];
+        const updatedImages = [...currentImages, imageUrl];
+        
+        console.log('Updated images array:', updatedImages);
+        
+        // Update the product with the new images array
+        updateProductField('images', updatedImages);
+        
+        console.log('Additional image uploaded and product updated');
+      };
+      
+      reader.onerror = () => {
+        console.error('Failed to read image file');
+      };
+      
+      reader.readAsDataURL(file);
+    } catch (err) {
+      throw new Error('Failed to upload additional image');
+    }
+  };
 
   if (!project) {
     return (
@@ -95,7 +260,7 @@ const ProductPage: React.FC = () => {
       <div className="product-page">
         <div className="page-header">
           <div>
-            <h1>{product.description}</h1>
+            <h1>{product.product_name || product.description || "Untitled Product"}</h1>
             <p className="project-breadcrumb">
               <span 
                 className="breadcrumb-link"
@@ -117,66 +282,198 @@ const ProductPage: React.FC = () => {
 
         <div className="product-content">
           <div className="product-images">
-            {product.image ? (
-              <div className="main-image">
-                <img src={product.image} alt={product.description} />
+            {/* Main Image Section */}
+            <div className="main-image-section">
+              <h3>Product Image</h3>
+              
+              {/* Current Image Display */}
+              {(product.custom_image_url || product.image) ? (
+                <div className="main-image">
+                  <div className="image-container">
+                    <img 
+                      src={product.custom_image_url || product.image} 
+                      alt={product.description}
+                    />
+                    <button
+                      type="button"
+                      className="image-delete-btn"
+                      onClick={() => {
+                        if (product.custom_image_url) {
+                          updateProductField('custom_image_url', '');
+                        } else if (product.image) {
+                          updateProductField('image', '');
+                        }
+                      }}
+                      aria-label="Remove image"
+                    >
+✕
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="no-image-large">
+                  <p>No Image Available</p>
+                </div>
+              )}
+              
+              {/* Image Upload Section */}
+              <div className="image-upload-section">
+                <button
+                  type="button"
+                  className="button button-secondary"
+                  onClick={handleCustomImageClick}
+                >
+                  Add Custom Image
+                </button>
+                <p className="upload-help">Upload a custom image to replace the current product image (max 5MB)</p>
               </div>
-            ) : (
-              <div className="no-image-large">
-                <p>No Image Available</p>
-              </div>
-            )}
+            </div>
             
-            {product.images && product.images.length > 1 && (
-              <div className="image-gallery">
-                <h3>Additional Images</h3>
+            {/* Additional Images Gallery */}
+            <div className="image-gallery">
+              <h3>Additional Images</h3>
+              {product.images && product.images.length > 1 ? (
                 <div className="gallery-grid">
+                  {/* Display all images except the first one (main image) */}
                   {product.images.slice(1).map((image, index) => (
-                    <div key={index} className="gallery-image">
-                      <img src={image} alt={`${product.description} ${index + 2}`} />
+                    <div key={`additional-${index}`} className="gallery-image">
+                      <div className="gallery-image-container">
+                        <img src={image} alt={`${product.description} ${index + 2}`} />
+                        <button
+                          type="button"
+                          className="gallery-delete-btn"
+                          onClick={() => {
+                            // Remove the specific image from the images array
+                            const updatedImages = product.images.filter((_, imgIndex) => imgIndex !== index + 1);
+                            updateProductField('images', updatedImages);
+                          }}
+                          aria-label="Remove additional image"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="no-additional-images">
+                  <p>No additional images yet</p>
+                  <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={handleAdditionalImageClick}
+                  >
+                    Add Custom Image
+                  </button>
+                  <p className="upload-help">Upload additional images for this product (max 5MB each)</p>
+                </div>
+              )}
+              
+              {/* Upload Section for Additional Images */}
+              {product.images && product.images.length > 1 && (
+                <div className="additional-upload-section">
+                  <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={handleAdditionalImageClick}
+                  >
+                    Add Custom Image
+                  </button>
+                  <p className="upload-help">Upload more images for this product (max 5MB each)</p>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="product-details">
             <div className="detail-section">
               <h2>Product Information</h2>
-              <div className="detail-grid">
-                <div className="detail-item">
-                  <label>Category:</label>
-                  <span>{product.category || 'Not specified'}</span>
+              <div className="editable-details">
+                <EditableSection
+                  label="Product Name"
+                  value={product.product_name}
+                  type="text"
+                  placeholder="Enter product name"
+                  onSave={(value) => updateProductField('product_name', value as string)}
+                />
+                
+                <EditableSection
+                  label="Manufacturer"
+                  value={product.manufacturer}
+                  type="text"
+                  placeholder="Enter manufacturer"
+                  onSave={(value) => updateProductField('manufacturer', value as string)}
+                />
+                
+                <EditableSection
+                  label="Price"
+                  value={product.price}
+                  type="number"
+                  placeholder="0.00"
+                  formatDisplay={(value) => value ? formatPrice(value as number) : 'Not specified'}
+                  onSave={(value) => updateProductField('price', value as number)}
+                />
+                
+                <div className="editable-field">
+                  <label className="editable-label">Categories</label>
+                  <CategoryMultiSelect
+                    selectedCategories={Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)}
+                    onSelectionChange={(categories) => updateProductField('category', categories)}
+                    availableCategories={categories}
+                    onAddCategory={handleAddCategory}
+                  />
                 </div>
-                <div className="detail-item">
-                  <label>Location:</label>
-                  <span>{product.location}</span>
+                
+                <div className="editable-field">
+                  <label className="editable-label">Locations</label>
+                  <LocationMultiSelect
+                    selectedLocations={Array.isArray(product.location) ? product.location : [product.location].filter(Boolean)}
+                    onSelectionChange={(locations: string[]) => updateProductField('location', locations)}
+                    availableLocations={locations}
+                    onAddLocation={handleAddLocation}
+                  />
                 </div>
-                <div className="detail-item">
-                  <label>Tag ID:</label>
-                  <span>{product.tagId}</span>
-                </div>
-                <div className="detail-item">
+
+                <EditableSection
+                  label="Tag ID"
+                  value={product.tagId}
+                  type="text"
+                  placeholder="Enter tag ID"
+                  onSave={(value) => updateProductField('tagId', value as string)}
+                />
+                
+                <div className="detail-item static">
                   <label>Added:</label>
                   <span>{new Date(product.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
 
-            {product.description && (
-              <div className="detail-section">
-                <h2>Description</h2>
-                <p className="description-text">{product.description}</p>
-              </div>
-            )}
+            <div className="detail-section">
+              <h2>Description</h2>
+              <EditableSection
+                label="Product Description"
+                value={product.description}
+                type="textarea"
+                placeholder="Enter product description"
+                multiline={true}
+                onSave={(value) => updateProductField('description', value as string)}
+                className="full-width"
+              />
+            </div>
 
-            {product.specificationDescription && (
-              <div className="detail-section">
-                <h2>Specifications</h2>
-                <p className="specification-text">{product.specificationDescription}</p>
-              </div>
-            )}
+            <div className="detail-section">
+              <h2>Specifications</h2>
+              <EditableSection
+                label="Specification Details"
+                value={product.specificationDescription}
+                type="textarea"
+                placeholder="Enter specification details"
+                multiline={true}
+                onSave={(value) => updateProductField('specificationDescription', value as string)}
+                className="full-width"
+              />
+            </div>
 
             <div className="detail-section">
               <h2>Source</h2>
@@ -192,6 +489,38 @@ const ProductPage: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Hidden file input for custom image upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleImageUpload(file);
+            // Reset the input value so the same file can be selected again
+            e.target.value = '';
+          }
+        }}
+      />
+      
+      {/* Hidden file input for additional images upload */}
+      <input
+        ref={additionalImageFileInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleAdditionalImageUpload(file);
+            // Reset the input value so the same file can be selected again
+            e.target.value = '';
+          }
+        }}
+      />
     </div>
   );
 };

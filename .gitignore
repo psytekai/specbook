@@ -1,4 +1,6 @@
+shared/cache/**
 .env
+.env.*
 .DS_Store
 .idea
 .venv
@@ -6,6 +8,7 @@ logs/**
 **/logs/**
 .ipynb_checkpoints/**
 **/__pycache__/**
+node_modules/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
