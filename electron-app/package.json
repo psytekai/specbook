@@ -24,9 +24,11 @@
   "description": "Architectural Product Management Desktop App",
   "devDependencies": {
     "@eslint/js": "^9.32.0",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^24.1.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "@vitejs/plugin-react": "^4.7.0",
@@ -42,10 +44,12 @@
     "wait-on": "^8.0.4"
   },
   "dependencies": {
+    "better-sqlite3": "^12.2.0",
     "electron-squirrel-startup": "^1.0.1",
     "puppeteer": "^24.16.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router-dom": "^6.30.1"
+    "react-router-dom": "^6.30.1",
+    "uuid": "^12.0.0"
   }
 }
