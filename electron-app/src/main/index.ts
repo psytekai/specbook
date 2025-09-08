@@ -1,5 +1,7 @@
 import { app, BrowserWindow, shell } from 'electron';
 import path from 'node:path';
+import { ApplicationMenu } from './menu/ApplicationMenu';
+import { setupProjectIPC } from './ipc/projectHandlers';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling
 if (require('electron-squirrel-startup')) {
@@ -7,6 +9,7 @@ if (require('electron-squirrel-startup')) {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let applicationMenu: ApplicationMenu | null = null;
 
 const createWindow = () => {
   // Create the browser window
@@ -48,10 +51,20 @@ const createWindow = () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  // Initialize application menu and project state
+  applicationMenu = ApplicationMenu.getInstance();
+  applicationMenu.setMainWindow(mainWindow);
+  applicationMenu.createApplicationMenu();
+
+  return mainWindow;
 };
 
 // This method will be called when Electron has finished initialization
 app.whenReady().then(() => {
+  // Set up IPC handlers first
+  setupProjectIPC();
+  
   createWindow();
 
   app.on('activate', () => {

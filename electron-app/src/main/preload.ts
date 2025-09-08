@@ -1,15 +1,58 @@
-import { contextBridge } from 'electron';
+import { contextBridge, ipcRenderer } from 'electron';
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
-  // For now, we don't need any specific APIs
-  // Add methods here as needed, for example:
-  // openFile: () => ipcRenderer.invoke('dialog:openFile'),
+  // System info
   platform: process.platform,
   versions: {
     node: process.versions.node,
     chrome: process.versions.chrome,
     electron: process.versions.electron,
   },
+
+  // Project operations
+  getCurrentProject: () => ipcRenderer.invoke('project:get-current'),
+  closeProject: () => ipcRenderer.invoke('project:close'),
+  saveProject: (updates?: any) => ipcRenderer.invoke('project:save', updates),
+  markProjectDirty: () => ipcRenderer.invoke('project:mark-dirty'),
+  getRecentProjects: () => ipcRenderer.invoke('project:get-recent'),
+  clearRecentProjects: () => ipcRenderer.invoke('project:clear-recent'),
+
+  // Menu operations
+  triggerNewProject: () => ipcRenderer.invoke('menu:new-project'),
+  triggerOpenProject: () => ipcRenderer.invoke('menu:open-project'),
+
+  // Event listeners
+  onProjectChanged: (callback: (projectInfo: any) => void) => {
+    ipcRenderer.on('project:changed', (_event, projectInfo) => callback(projectInfo));
+  },
+
+  removeProjectChangedListener: () => {
+    ipcRenderer.removeAllListeners('project:changed');
+  }
 });
+
+// Type definitions for TypeScript
+declare global {
+  interface Window {
+    electronAPI: {
+      platform: string;
+      versions: {
+        node: string;
+        chrome: string;
+        electron: string;
+      };
+      getCurrentProject: () => Promise<any>;
+      closeProject: () => Promise<{ success: boolean; reason?: string; error?: string }>;
+      saveProject: (updates?: any) => Promise<{ success: boolean; error?: string }>;
+      markProjectDirty: () => Promise<{ success: boolean; error?: string }>;
+      getRecentProjects: () => Promise<{ success: boolean; projects?: string[]; error?: string }>;
+      clearRecentProjects: () => Promise<{ success: boolean; error?: string }>;
+      triggerNewProject: () => Promise<{ success: boolean; error?: string }>;
+      triggerOpenProject: () => Promise<{ success: boolean; error?: string }>;
+      onProjectChanged: (callback: (projectInfo: any) => void) => void;
+      removeProjectChangedListener: () => void;
+    };
+  }
+}

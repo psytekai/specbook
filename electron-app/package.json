@@ -16,13 +16,15 @@
     "dist:win": "npm run build && electron-builder --win",
     "dist:linux": "npm run build && electron-builder --linux",
     "type-check": "tsc --noEmit",
-    "lint": "eslint . --ext .ts,.tsx --fix"
+    "lint": "eslint . --ext .ts,.tsx --fix",
+    "rebuild": "npx @electron/rebuild"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "Architectural Product Management Desktop App",
   "devDependencies": {
+    "@electron/rebuild": "^4.0.1",
     "@eslint/js": "^9.32.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^24.1.0",
@@ -36,6 +38,7 @@
     "cross-env": "^10.0.0",
     "electron": "^37.2.4",
     "electron-builder": "^26.0.12",
+    "electron-rebuild": "^3.2.9",
     "eslint": "^9.32.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
@@ -46,6 +49,7 @@
   "dependencies": {
     "better-sqlite3": "^12.2.0",
     "electron-squirrel-startup": "^1.0.1",
+    "electron-store": "^10.1.0",
     "puppeteer": "^24.16.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
