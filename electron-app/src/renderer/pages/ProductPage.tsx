@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useProject } from '../hooks/useProject';
+import { useElectronProject } from '../contexts/ElectronProjectContext';
 import { Product } from '../types';
 import { api } from '../services/apiIPC';
 import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
@@ -14,7 +14,7 @@ import './ProductPage.css';
 const ProductPage: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
-  const { project, isLoading: projectLoading } = useProject();
+  const { project, isLoading: projectLoading, isInitializing } = useElectronProject();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +47,19 @@ const ProductPage: React.FC = () => {
   // For the new file-based system, we only have one current project
   // Check if we have a project open (regardless of productId from URL)
   const currentProject = project && project.isOpen ? project : null;
+
+  // Don't redirect during initialization
+  if (isInitializing) {
+    return (
+      <div className="page-container">
+        <div className="product-page">
+          <div className="loading-state">
+            <p>Initializing...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Redirect to welcome page if no project is open
   useEffect(() => {
