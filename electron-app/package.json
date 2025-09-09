@@ -17,7 +17,11 @@
     "dist:linux": "npm run build && electron-builder --linux",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx --fix",
-    "rebuild": "npx @electron/rebuild"
+    "rebuild": "npx @electron/rebuild",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:main": "jest src/main"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +31,7 @@
     "@electron/rebuild": "^4.0.1",
     "@eslint/js": "^9.32.0",
     "@types/better-sqlite3": "^7.6.13",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.1.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
@@ -43,6 +48,8 @@
     "eslint": "^9.32.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "jest": "^30.1.3",
+    "ts-jest": "^29.4.1",
     "typescript": "^5.8.3",
     "vite": "^5.4.19",
     "wait-on": "^8.0.4"
