@@ -5,7 +5,6 @@ import { Product } from '../types';
 import { api } from '../services/apiIPC';
 import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
 import { EditableSection } from '../components/EditableSection';
-import { FileUpload } from '../components/FileUpload';
 import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
 import { LocationMultiSelect } from '../components/LocationMultiSelect';
 import { formatPrice } from '../utils/formatters';
@@ -46,7 +45,6 @@ const ProductPage: React.FC = () => {
 
   // For the new file-based system, we only have one current project
   // Check if we have a project open (regardless of productId from URL)
-  const currentProject = project && project.isOpen ? project : null;
 
   // Don't redirect during initialization
   if (isInitializing) {

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useElectronProject } from '../contexts/ElectronProjectContext';
 import { useToast } from '../hooks/useToast';
 import { 
-  saveProduct, 
   handleApiError,
   api
 } from '../services/apiIPC';
@@ -198,7 +197,7 @@ const ProductNew: React.FC = () => {
     setIsSaving(true);
     
     try {
-      await saveProduct({
+      await api.post('/api/products', {
         ...formData,
         project_id: 'current' // Use 'current' as the project ID for the new file-based system
       });

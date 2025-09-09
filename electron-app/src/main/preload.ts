@@ -62,6 +62,11 @@ declare global {
       triggerOpenProject: () => Promise<{ success: boolean; error?: string }>;
       onProjectChanged: (callback: (projectInfo: any) => void) => void;
       removeProjectChangedListener: () => void;
+      apiGet: (endpoint: string, params?: any) => Promise<any>;
+      apiPost: (endpoint: string, data?: any) => Promise<any>;
+      apiPut: (endpoint: string, data?: any) => Promise<any>;
+      apiDelete: (endpoint: string) => Promise<any>;
+      apiScrape: (request: any) => Promise<any>;
     };
   }
 }
