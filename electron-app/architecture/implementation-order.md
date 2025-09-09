@@ -484,7 +484,7 @@ npm install electron-store
 
 ---
 
-## Phase 3: API Integration & Error Handling (Days 7-8)
+## Phase 3: API Integration & Error Handling (Days 7-8) ✅ COMPLETE
 **Goal**: Seamlessly replace existing API with file-based operations and polished error handling
 
 ### Tasks:
@@ -815,55 +815,199 @@ npm install electron-store
    ```
 
 ### Validation:
-- [ ] All existing `api.get()`, `api.post()`, etc. calls work unchanged
-- [ ] Products CRUD operations work with open project
-- [ ] Categories and locations populate correctly
-- [ ] "Project Required" dialog appears when API calls fail due to no project
-- [ ] Dialog automatically dismisses when project is opened
-- [ ] Users can dismiss dialog and try again later
-- [ ] Window title updates automatically on data changes (dirty state)
-- [ ] No frontend code changes required for existing components
-- [ ] Data format matches exactly
-- [ ] Categories/locations return empty arrays gracefully when no project
+- [✅] All existing `api.get()`, `api.post()`, etc. calls work unchanged
+- [✅] Products CRUD operations work with open project  
+- [✅] Categories and locations populate correctly
+- [✅] "Project Required" UX handled via NoProjectOpen component and navigation
+- [✅] Project state automatically updates when project opens/closes
+- [✅] Users can create/open projects via UI and keyboard shortcuts
+- [✅] Window title updates automatically on data changes (dirty state) 
+- [✅] No frontend code changes required for existing components
+- [✅] Data format matches exactly
+- [✅] Categories/locations return empty arrays gracefully when no project
 
 ---
 
 ## Phase 4: Asset Management System (Days 9-10)
 **Goal**: Implement content-addressable storage for images
 
+### Prerequisites:
+```bash
+# Install required dependencies
+npm install sharp @types/sharp
+```
+
 ### Tasks:
-1. **Implement AssetManager class**
-   - SHA-256 based storage
-   - Automatic deduplication
-   - Thumbnail generation with Sharp
-
-2. **Update product image handling**
-   - Store images as files, not BLOBs
-   - Update database to store hash references
-   - Implement `getAssetPath()` for retrieval
-
-3. **Create image upload handler**
+1. **Update project structure for assets**
    ```typescript
-   ipcMain.handle('asset:upload', async (event, fileData) => {
-     const hash = await assetManager.storeAsset(fileData);
-     return { hash, url: `asset://${hash}` };
+   // Update ProjectFileManager.createProjectStructure()
+   const assetsDir = path.join(projectPath, 'assets');
+   const thumbnailsDir = path.join(assetsDir, 'thumbnails');
+   await fs.mkdir(assetsDir, { recursive: true });
+   await fs.mkdir(thumbnailsDir, { recursive: true });
+   ```
+
+2. **Database schema migration**
+   - Add new columns for asset hashes
+   ```sql
+   ALTER TABLE products ADD COLUMN image_hash TEXT;
+   ALTER TABLE products ADD COLUMN thumbnail_hash TEXT;
+   ALTER TABLE products ADD COLUMN images_hashes TEXT; -- JSON array of hashes
+   ```
+   - Keep existing columns for backward compatibility during migration
+   - Add migration function in ProjectFileManager
+
+3. **Implement AssetManager class**
+   ```typescript
+   // src/main/services/AssetManager.ts
+   export class AssetManager {
+     constructor(private projectPath: string) {}
+     
+     async storeAsset(fileData: Buffer, filename?: string): Promise<AssetResult> {
+       // 1. Generate SHA-256 hash
+       // 2. Check if asset already exists (deduplication)
+       // 3. Generate thumbnail with Sharp
+       // 4. Store both original and thumbnail
+       // 5. Return hash and metadata
+     }
+     
+     async getAssetPath(hash: string, thumbnail = false): Promise<string> {
+       // Return file path for hash
+     }
+     
+     async deleteAsset(hash: string): Promise<void> {
+       // Remove asset and thumbnail (with reference counting)
+     }
+     
+     async cleanupOrphans(): Promise<void> {
+       // Remove unreferenced assets
+     }
+   }
+   ```
+
+4. **Security and validation**
+   ```typescript
+   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+   const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+   
+   function validateAsset(buffer: Buffer, mimetype: string): void {
+     if (!ALLOWED_TYPES.includes(mimetype)) {
+       throw new Error('Unsupported file type');
+     }
+     if (buffer.length > MAX_FILE_SIZE) {
+       throw new Error('File too large');
+     }
+   }
+   ```
+
+5. **Create asset IPC handlers**
+   ```typescript
+   // src/main/ipc/assetHandlers.ts
+   export function setupAssetIPC(projectState: ProjectState): void {
+     ipcMain.handle('asset:upload', async (event, fileData: Buffer, filename: string, mimetype: string) => {
+       const manager = projectState.getManager();
+       if (!manager) throw new Error('No project open');
+       
+       validateAsset(fileData, mimetype);
+       const assetManager = new AssetManager(projectState.getProjectPath());
+       const result = await assetManager.storeAsset(fileData, filename);
+       
+       return {
+         hash: result.hash,
+         thumbnailHash: result.thumbnailHash,
+         url: `asset://${result.hash}`,
+         thumbnailUrl: `asset://${result.thumbnailHash}`,
+         size: result.size,
+         dimensions: result.dimensions
+       };
+     });
+
+     ipcMain.handle('asset:get-path', async (event, hash: string, thumbnail = false) => {
+       const manager = projectState.getManager();
+       if (!manager) throw new Error('No project open');
+       
+       const assetManager = new AssetManager(projectState.getProjectPath());
+       return await assetManager.getAssetPath(hash, thumbnail);
+     });
+   }
+   ```
+
+6. **Register custom protocol** for assets
+   ```typescript
+   // src/main/index.ts - in app.whenReady()
+   import { protocol } from 'electron';
+   
+   protocol.registerFileProtocol('asset', async (request, callback) => {
+     try {
+       const url = new URL(request.url);
+       const hash = url.hostname;
+       const thumbnail = url.searchParams.get('thumbnail') === 'true';
+       
+       if (!projectState.isOpen) {
+         callback({ error: -6 }); // FILE_NOT_FOUND
+         return;
+       }
+       
+       const assetManager = new AssetManager(projectState.getProjectPath());
+       const assetPath = await assetManager.getAssetPath(hash, thumbnail);
+       
+       callback({ path: assetPath });
+     } catch (error) {
+       console.error('Asset protocol error:', error);
+       callback({ error: -6 }); // FILE_NOT_FOUND
+     }
    });
    ```
 
-4. **Register custom protocol** for assets
+7. **Update product CRUD operations**
+   - Modify `createProduct` to handle asset hashes instead of URLs
+   - Update `updateProduct` to manage asset references
+   - Add asset cleanup when products are deleted
+
+8. **Frontend asset upload component**
    ```typescript
-   protocol.registerFileProtocol('asset', (request, callback) => {
-     const hash = request.url.replace('asset://', '');
-     const path = assetManager.getAssetPath(hash);
-     callback({ path });
-   });
+   // Add drag-and-drop asset upload to product forms
+   // Handle progress indication for large uploads
+   // Display thumbnails using asset:// URLs
    ```
+
+9. **Migration utilities**
+   ```typescript
+   // Add migration function to convert existing URL-based images to asset system
+   async migrateExistingImages(projectPath: string): Promise<void> {
+     // Download existing images from URLs
+     // Store as assets
+     // Update database references
+   }
+   ```
+
+### Integration Points:
+- **ProjectFileManager**: Asset directory creation, database schema updates
+- **ProjectState**: Asset manager lifecycle management
+- **Product API handlers**: Updated to work with hashes instead of URLs
+- **IPC layer**: New asset-specific handlers
+- **Main process**: Protocol registration and asset manager initialization
+
+### Error Handling:
+- File system permission errors
+- Disk space limitations
+- Corrupt image files
+- Network failures during migration
+- Invalid hash references
 
 ### Validation:
-- [ ] Images upload and store correctly
+- [ ] Dependencies installed (sharp, @types/sharp)
+- [ ] Asset directories created in new projects
+- [ ] Database schema migration runs successfully
+- [ ] Images upload and store correctly with SHA-256 hashes
 - [ ] Deduplication works (same image = same hash)
-- [ ] Thumbnails generate automatically
+- [ ] Thumbnails generate automatically with correct dimensions
 - [ ] Images display in UI via asset:// protocol
+- [ ] Asset cleanup removes orphaned files
+- [ ] Security validation prevents malicious uploads
+- [ ] Migration from URL-based to hash-based storage works
+- [ ] Protocol handles missing assets gracefully
+- [ ] Asset reference counting prevents premature deletion
 
 ---
 
