@@ -44,6 +44,7 @@ export class ProjectFileManager {
 
       // Create subdirectories
       await fs.mkdir(path.join(projectPath, 'assets'), { recursive: true });
+      await fs.mkdir(path.join(projectPath, 'assets', 'thumbnails'), { recursive: true });
       await fs.mkdir(path.join(projectPath, '.metadata'), { recursive: true });
 
       console.log(`Created project structure at: ${projectPath}`);

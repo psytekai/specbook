@@ -25,6 +25,11 @@ export interface Product {
   custom_image_url?: string;
   createdAt: Date;
   updatedAt: Date;
+  
+  // Asset management fields (Phase 4)
+  imageHash?: string;        // SHA-256 hash of primary image
+  thumbnailHash?: string;    // SHA-256 hash of thumbnail
+  imagesHashes?: string[];   // Array of SHA-256 hashes for additional images
 }
 
 export interface Category {
@@ -49,6 +54,12 @@ export interface Manifest {
     name: string;
     description?: string;
     productCount: number;
+  };
+  assets?: {
+    totalCount: number;
+    totalSize: number;
+    thumbnailCount: number;
+    lastCleanup?: string;
   };
 }
 
