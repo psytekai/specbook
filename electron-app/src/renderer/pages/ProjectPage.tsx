@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useProject } from '../hooks/useProject';
+import { useElectronProject } from '../contexts/ElectronProjectContext';
 import { Product } from '../types';
 import { api } from '../services/apiIPC';
 import { formatArray, formatPrice } from '../utils/formatters';
@@ -130,7 +130,7 @@ const saveState = (state: Partial<ProjectPageState>) => {
 
 const ProjectPage: React.FC = () => {
   const navigate = useNavigate();
-  const { project, isLoading: projectLoading } = useProject();
+  const { project, isLoading: projectLoading, isInitializing } = useElectronProject();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -171,10 +171,11 @@ const ProjectPage: React.FC = () => {
 
   // Redirect to welcome page if no project is open
   useEffect(() => {
-    if (!projectLoading && !project) {
+    // Don't redirect during initialization
+    if (!isInitializing && !projectLoading && !project) {
       navigate('/welcome');
     }
-  }, [project, projectLoading, navigate]);
+  }, [project, projectLoading, isInitializing, navigate]);
 
   // State update functions that persist to localStorage
   const updateViewMode = (mode: 'grid' | 'list') => {
@@ -482,12 +483,12 @@ const ProjectPage: React.FC = () => {
   }, [currentProject]);
 
   // Show loading state while checking for project
-  if (projectLoading || !currentProject) {
+  if (isInitializing || projectLoading || !currentProject) {
     return (
       <div className="page-container">
         <div className="project-page">
           <div className="loading-state">
-            <p>Loading project...</p>
+            <p>{isInitializing ? 'Initializing...' : 'Loading project...'}</p>
           </div>
         </div>
       </div>

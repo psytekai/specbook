@@ -1,13 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useProject } from '../hooks/useProject';
+import { useElectronProject } from '../contexts/ElectronProjectContext';
 import { NoProjectOpen } from '../components/NoProjectOpen';
 import { useToast } from '../hooks/useToast';
 import './ProjectsPage.css';
 
 const ProjectsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { project, isLoading, error, closeProject } = useProject();
+  const { project, isLoading, isInitializing, error, closeProject } = useElectronProject();
   const { showToast } = useToast();
 
   // Show error toast if there's an error
@@ -18,12 +18,12 @@ const ProjectsPage: React.FC = () => {
   }, [error, showToast]);
 
   // Show loading state
-  if (isLoading) {
+  if (isInitializing || isLoading) {
     return (
       <div className="page-container">
         <div className="projects-page">
           <div className="loading-state">
-            <p>Loading project...</p>
+            <p>{isInitializing ? 'Initializing...' : 'Loading project...'}</p>
           </div>
         </div>
       </div>

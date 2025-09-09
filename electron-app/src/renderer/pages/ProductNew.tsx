@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useProject } from '../hooks/useProject';
+import { useElectronProject } from '../contexts/ElectronProjectContext';
 import { useToast } from '../hooks/useToast';
 import { 
   saveProduct, 
@@ -15,7 +15,7 @@ import './ProductNew.css';
 const ProductNew: React.FC = () => {
   const navigate = useNavigate();
   // No projectId needed anymore since we only have one current project
-  const { project, isLoading: projectLoading } = useProject();
+  const { project, isLoading: projectLoading, isInitializing } = useElectronProject();
   const { showToast } = useToast();
   
   const [formData, setFormData] = useState({
@@ -36,43 +36,23 @@ const ProductNew: React.FC = () => {
   const [locations, setLocations] = useState<Location[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const hasShownError = useRef(false);
 
   // For the new file-based system, we only have one current project
   const currentProject = project && project.isOpen ? project : null;
 
   useEffect(() => {
-    console.log('🔄 ProductNew: useEffect triggered', {
-      project: project,
-      currentProject: currentProject,
-      projectLoading: projectLoading,
-      hasShownError: hasShownError.current
-    });
-    
-    
-    // Don't check project state while still loading
-    if (projectLoading) {
-      console.log('🔄 ProductNew: Still loading project state, waiting...');
+    // Don't check during initialization or loading
+    if (isInitializing || projectLoading) {
       return;
     }
     
-    // Only check project state if we're not loading and haven't shown error yet
-    if (!projectLoading && !hasShownError.current) {
-      if (!currentProject) {
-        console.log('❌ ProductNew: No current project, showing error');
-        hasShownError.current = true;
-        showToast('No project is currently open. Please open a project first.', 'error');
-        navigate('/welcome');
-      } else {
-        console.log('✅ ProductNew: Project is open, proceeding');
-        hasShownError.current = false; // Reset error flag when project is open
-      }
-    } else if (currentProject && hasShownError.current) {
-      // Reset error flag when project becomes available
-      console.log('✅ ProductNew: Project became available, resetting error flag');
-      hasShownError.current = false;
+    // Only redirect if definitively no project after initialization
+    if (!currentProject) {
+      console.log('❌ ProductNew: No project open, redirecting');
+      showToast('No project is currently open. Please open a project first.', 'error');
+      navigate('/welcome');
     }
-  }, [currentProject, projectLoading, navigate]);
+  }, [currentProject, isInitializing, projectLoading, navigate, showToast]);
 
   useEffect(() => {
     // Fetch available locations and categories when component mounts
@@ -234,12 +214,12 @@ const ProductNew: React.FC = () => {
   };
 
   // Show loading state while project state is being loaded
-  if (projectLoading) {
+  if (isInitializing || projectLoading) {
     return (
       <div className="page-container">
         <div className="product-new-page">
           <div className="loading-state">
-            <p>Loading project state...</p>
+            <p>{isInitializing ? 'Initializing...' : 'Loading project state...'}</p>
           </div>
         </div>
       </div>
