@@ -123,6 +123,113 @@ export class ProjectFileManager {
   }
 
   /**
+   * Check and apply database migrations for existing projects
+   */
+  async migrateDatabase(db: Database.Database): Promise<void> {
+    try {
+      // Check if asset columns exist
+      const tableInfo = db.prepare("PRAGMA table_info(products)").all() as Array<{name: string}>;
+      const columnNames = tableInfo.map(col => col.name);
+      
+      // Phase 4: Add asset management columns if they don't exist
+      const assetColumns = [
+        { name: 'image_hash', type: 'TEXT' },
+        { name: 'thumbnail_hash', type: 'TEXT' },
+        { name: 'images_hashes', type: 'TEXT' }  // JSON array of hashes
+      ];
+      
+      for (const column of assetColumns) {
+        if (!columnNames.includes(column.name)) {
+          console.log(`Adding column ${column.name} to products table...`);
+          db.exec(`ALTER TABLE products ADD COLUMN ${column.name} ${column.type}`);
+        }
+      }
+      
+      // Create assets metadata table for tracking
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS assets (
+          hash TEXT PRIMARY KEY,
+          original_name TEXT,
+          mimetype TEXT,
+          size INTEGER,
+          width INTEGER,
+          height INTEGER,
+          ref_count INTEGER DEFAULT 1,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      
+      // Create index for faster lookups
+      db.exec(`
+        CREATE INDEX IF NOT EXISTS idx_assets_ref_count ON assets(ref_count);
+        CREATE INDEX IF NOT EXISTS idx_assets_last_accessed ON assets(last_accessed);
+      `);
+      
+      console.log('Database migration completed successfully');
+    } catch (error) {
+      console.error('Database migration failed:', error);
+      throw new Error(`Failed to migrate database: ${error}`);
+    }
+  }
+
+  /**
+   * Get database schema version
+   */
+  getSchemaVersion(db: Database.Database): number {
+    try {
+      // Check if schema_version table exists
+      const tableExists = db.prepare(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'"
+      ).get();
+      
+      if (!tableExists) {
+        // Create schema version table
+        db.exec(`
+          CREATE TABLE schema_version (
+            version INTEGER PRIMARY KEY,
+            applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+        
+        // Insert initial version
+        db.prepare('INSERT INTO schema_version (version) VALUES (?)').run(1);
+        return 1;
+      }
+      
+      // Get current version
+      const result = db.prepare('SELECT MAX(version) as version FROM schema_version').get() as {version: number};
+      return result?.version || 1;
+    } catch (error) {
+      console.error('Error getting schema version:', error);
+      return 1;
+    }
+  }
+
+  /**
+   * Apply specific schema version migration
+   */
+  applyMigration(db: Database.Database, version: number): void {
+    const migrations: Record<number, () => void> = {
+      2: () => {
+        // Phase 4: Asset management columns
+        db.exec(`ALTER TABLE products ADD COLUMN image_hash TEXT`);
+        db.exec(`ALTER TABLE products ADD COLUMN thumbnail_hash TEXT`);
+        db.exec(`ALTER TABLE products ADD COLUMN images_hashes TEXT`);
+      },
+      // Future migrations can be added here
+    };
+    
+    if (migrations[version]) {
+      db.transaction(() => {
+        migrations[version]();
+        db.prepare('INSERT INTO schema_version (version) VALUES (?)').run(version);
+      })();
+      console.log(`Applied migration version ${version}`);
+    }
+  }
+
+  /**
    * Creates and saves manifest.json
    */
   async createManifest(projectPath: string, projectData: Partial<Project>): Promise<void> {
@@ -433,6 +540,9 @@ export class ProjectFileManager {
 
       // Initialize database
       this.db = await this.initializeDatabase(projectPath);
+      
+      // Apply latest schema (ensures new projects have all columns)
+      await this.migrateDatabase(this.db);
 
       // Set current project
       this.currentProject = project;
@@ -466,6 +576,9 @@ export class ProjectFileManager {
 
       // Initialize database (this will create tables if they don't exist)
       this.db = await this.initializeDatabase(projectPath);
+      
+      // Run migrations for existing projects
+      await this.migrateDatabase(this.db);
 
       // Create project object
       const project: Project = {
