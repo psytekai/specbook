@@ -38,7 +38,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
   apiPost: (endpoint: string, data?: any) => ipcRenderer.invoke('api:post', endpoint, data),
   apiPut: (endpoint: string, data?: any) => ipcRenderer.invoke('api:put', endpoint, data),
   apiDelete: (endpoint: string) => ipcRenderer.invoke('api:delete', endpoint),
-  apiScrape: (request: any) => ipcRenderer.invoke('api:scrape-product', request)
+  apiScrape: (request: any) => ipcRenderer.invoke('api:scrape-product', request),
+
+  // Asset management operations
+  assetUpload: (fileData: ArrayBuffer, filename: string, mimetype: string, options?: any) => 
+    ipcRenderer.invoke('asset:upload', fileData, filename, mimetype, options),
+  assetGetPath: (hash: string, thumbnail?: boolean) => 
+    ipcRenderer.invoke('asset:get-path', hash, thumbnail),
+  assetDelete: (hash: string) => 
+    ipcRenderer.invoke('asset:delete', hash),
+  assetCleanup: (options?: { removeOlderThan?: number; dryRun?: boolean }) => 
+    ipcRenderer.invoke('asset:cleanup', options),
+  assetImportBatch: (files: Array<{ data: ArrayBuffer; filename: string }>, options?: any) => 
+    ipcRenderer.invoke('asset:import-batch', files, options),
+  assetStatistics: () => 
+    ipcRenderer.invoke('asset:statistics')
 });
 
 // Type definitions for TypeScript
@@ -67,6 +81,12 @@ declare global {
       apiPut: (endpoint: string, data?: any) => Promise<any>;
       apiDelete: (endpoint: string) => Promise<any>;
       apiScrape: (request: any) => Promise<any>;
+      assetUpload: (fileData: ArrayBuffer, filename: string, mimetype: string, options?: any) => Promise<any>;
+      assetGetPath: (hash: string, thumbnail?: boolean) => Promise<any>;
+      assetDelete: (hash: string) => Promise<any>;
+      assetCleanup: (options?: { removeOlderThan?: number; dryRun?: boolean }) => Promise<any>;
+      assetImportBatch: (files: Array<{ data: ArrayBuffer; filename: string }>, options?: any) => Promise<any>;
+      assetStatistics: () => Promise<any>;
     };
   }
 }

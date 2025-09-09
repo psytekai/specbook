@@ -1,8 +1,12 @@
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell, protocol } from 'electron';
 import path from 'node:path';
+import * as fs from 'fs';
 import { ApplicationMenu } from './menu/ApplicationMenu';
 import { setupProjectIPC } from './ipc/projectHandlers';
 import { setupAPIIPC } from './ipc/apiHandlers';
+import { setupAssetIPC } from './ipc/assetHandlers';
+import { ProjectState } from './services/ProjectState';
+import { AssetManager } from './services/AssetManager';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling
 if (require('electron-squirrel-startup')) {
@@ -66,6 +70,48 @@ app.whenReady().then(() => {
   // Set up IPC handlers first
   setupProjectIPC();
   setupAPIIPC();
+  setupAssetIPC();
+  
+  // Register custom asset:// protocol for serving images
+  protocol.registerFileProtocol('asset', async (request, callback) => {
+    try {
+      const projectState = ProjectState.getInstance();
+      const state = projectState.getStateInfo();
+
+      if (!state.isOpen || !state.project?.path) {
+        console.warn('Asset protocol: No project open');
+        callback({ error: -6 }); // FILE_NOT_FOUND
+        return;
+      }
+
+      // Parse asset hash from URL (asset://hash or asset://hash?thumbnail=true)
+      const url = new URL(request.url);
+      const hash = url.hostname;
+      const thumbnail = url.searchParams.get('thumbnail') === 'true';
+
+      if (!hash) {
+        console.warn('Asset protocol: Invalid hash');
+        callback({ error: -6 }); // FILE_NOT_FOUND
+        return;
+      }
+
+      // Create AssetManager and get asset path
+      const assetManager = new AssetManager(state.project.path);
+      const assetPath = await assetManager.getAssetPath(hash, thumbnail);
+
+      // Verify file exists
+      if (!fs.existsSync(assetPath)) {
+        console.warn(`Asset protocol: File not found at ${assetPath}`);
+        callback({ error: -6 }); // FILE_NOT_FOUND
+        return;
+      }
+
+      callback({ path: assetPath });
+    } catch (error) {
+      console.error('Asset protocol error:', error);
+      callback({ error: -6 }); // FILE_NOT_FOUND
+    }
+  });
   
   createWindow();
 

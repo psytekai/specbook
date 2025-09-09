@@ -310,8 +310,9 @@ export class ProjectFileManager {
           id, projectId, url, tagId, location, image, images, 
           description, specificationDescription, category, 
           product_name, manufacturer, price, custom_image_url,
+          image_hash, thumbnail_hash, images_hashes,
           createdAt, updatedAt
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       stmt.run(
@@ -329,6 +330,9 @@ export class ProjectFileManager {
         productData.manufacturer || null,
         productData.price || null,
         productData.custom_image_url || null,
+        productData.imageHash || null,
+        productData.thumbnailHash || null,
+        JSON.stringify(productData.imagesHashes || []),
         now.toISOString(),
         now.toISOString()
       );
@@ -422,6 +426,20 @@ export class ProjectFileManager {
       if (updates.custom_image_url !== undefined) {
         updateFields.push('custom_image_url = ?');
         values.push(updates.custom_image_url);
+      }
+      
+      // Asset management fields (Phase 4)
+      if (updates.imageHash !== undefined) {
+        updateFields.push('image_hash = ?');
+        values.push(updates.imageHash);
+      }
+      if (updates.thumbnailHash !== undefined) {
+        updateFields.push('thumbnail_hash = ?');
+        values.push(updates.thumbnailHash);
+      }
+      if (updates.imagesHashes !== undefined) {
+        updateFields.push('images_hashes = ?');
+        values.push(JSON.stringify(updates.imagesHashes));
       }
 
       if (updateFields.length === 0) {
@@ -681,7 +699,12 @@ export class ProjectFileManager {
       price: row.price,
       custom_image_url: row.custom_image_url,
       createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt)
+      updatedAt: new Date(row.updatedAt),
+      
+      // Asset management fields (Phase 4)
+      imageHash: row.image_hash,
+      thumbnailHash: row.thumbnail_hash,
+      imagesHashes: row.images_hashes ? JSON.parse(row.images_hashes) : []
     };
   }
 
