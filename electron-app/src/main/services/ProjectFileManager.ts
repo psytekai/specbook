@@ -463,10 +463,8 @@ export class ProjectFileManager {
       const manifestData = await fs.readFile(manifestPath, 'utf-8');
       const manifest: Manifest = JSON.parse(manifestData);
 
-      // Open database
-      const dbPath = path.join(projectPath, 'project.db');
-      this.db = new Database(dbPath);
-      this.db.exec('PRAGMA foreign_keys = ON');
+      // Initialize database (this will create tables if they don't exist)
+      this.db = await this.initializeDatabase(projectPath);
 
       // Create project object
       const project: Project = {

@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useProjects } from '../hooks/useProjects';
+import { useProject } from '../hooks/useProject';
 import { Product } from '../types';
-import { api } from '../services/api';
+import { api } from '../services/apiIPC';
 import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
 import { EditableSection } from '../components/EditableSection';
 import { FileUpload } from '../components/FileUpload';
@@ -12,9 +12,9 @@ import { formatPrice } from '../utils/formatters';
 import './ProductPage.css';
 
 const ProductPage: React.FC = () => {
-  const { projectId, productId } = useParams<{ projectId: string; productId: string }>();
+  const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
-  const { projects } = useProjects();
+  const { project, isLoading: projectLoading } = useProject();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,17 +44,26 @@ const ProductPage: React.FC = () => {
     }
   };
 
-  const project = projects.find(p => p.id === projectId);
+  // For the new file-based system, we only have one current project
+  // Check if we have a project open (regardless of productId from URL)
+  const currentProject = project && project.isOpen ? project : null;
+
+  // Redirect to welcome page if no project is open
+  useEffect(() => {
+    if (!projectLoading && !project) {
+      navigate('/welcome');
+    }
+  }, [project, projectLoading, navigate]);
 
   useEffect(() => {
-    if (!projectId || !productId) return;
+    if (!productId) return;
 
     const fetchProduct = async () => {
       try {
         setLoading(true);
         setError(null);
-        // First get all products for the project, then find the specific one
-        const response = await api.get<Product[]>(`/projects/${projectId}/products`);
+        // First get all products for the current project, then find the specific one
+        const response = await api.get<Product[]>(`/api/projects/current/products`);
         const foundProduct = response.data.find(p => p.id === productId);
         
         if (!foundProduct) {
@@ -74,7 +83,7 @@ const ProductPage: React.FC = () => {
     };
 
     fetchProduct();
-  }, [projectId, productId]);
+  }, [productId]);
 
   // Load categories and locations for dropdowns
   useEffect(() => {
@@ -207,18 +216,13 @@ const ProductPage: React.FC = () => {
     }
   };
 
-  if (!project) {
+  // Show loading state while checking for project
+  if (projectLoading || !project) {
     return (
       <div className="page-container">
         <div className="product-page">
-          <div className="error-state">
-            <p>Project not found</p>
-            <button 
-              className="button button-secondary"
-              onClick={() => navigate('/projects')}
-            >
-              Back to Projects
-            </button>
+          <div className="loading-state">
+            <p>Loading...</p>
           </div>
         </div>
       </div>
@@ -245,7 +249,7 @@ const ProductPage: React.FC = () => {
             <p>{error || 'Product not found'}</p>
             <button 
               className="button button-secondary"
-              onClick={() => navigate(`/projects/${projectId}`)}
+              onClick={() => navigate('/project')}
             >
               Back to Project
             </button>
@@ -264,7 +268,7 @@ const ProductPage: React.FC = () => {
             <p className="project-breadcrumb">
               <span 
                 className="breadcrumb-link"
-                onClick={() => navigate(`/projects/${projectId}`)}
+                onClick={() => navigate('/project')}
               >
                 {project.name}
               </span>
@@ -274,7 +278,7 @@ const ProductPage: React.FC = () => {
           </div>
           <button 
             className="button button-secondary"
-            onClick={() => navigate(`/projects/${projectId}`)}
+            onClick={() => navigate('/project')}
           >
             Back to Project
           </button>

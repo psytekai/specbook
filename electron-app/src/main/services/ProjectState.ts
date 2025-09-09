@@ -110,21 +110,38 @@ export class ProjectState {
    * Close the current project
    */
   async closeProject(): Promise<void> {
+    console.log('🔄 ProjectState: closeProject called, current state:', {
+      isOpen: this.isOpen,
+      hasProject: !!this.project,
+      filePath: this.filePath,
+      isDirty: this.isDirty
+    });
+    
     try {
       if (this.manager) {
+        console.log('🔄 ProjectState: Closing project manager');
         await this.manager.closeProject();
       }
     } catch (error) {
-      console.error('Error closing project:', error);
+      console.error('❌ ProjectState: Error closing project:', error);
     } finally {
       // Always reset state, even if close failed
+      console.log('🔄 ProjectState: Resetting state');
       this.manager = null;
       this.project = null;
       this.filePath = null;
       this.isDirty = false;
       
+      console.log('🔄 ProjectState: Notifying state change');
       this.notifyStateChange();
       this.updateWindowTitle();
+      
+      console.log('✅ ProjectState: Project closed, new state:', {
+        isOpen: this.isOpen,
+        hasProject: !!this.project,
+        filePath: this.filePath,
+        isDirty: this.isDirty
+      });
     }
   }
 
@@ -198,6 +215,7 @@ export class ProjectState {
       hasUnsavedChanges: this.isDirty
     };
 
+    console.log('🔄 ProjectState: Notifying renderer of state change:', stateInfo);
     this.mainWindow.webContents.send('project:changed', stateInfo);
   }
 
@@ -232,6 +250,13 @@ export class ProjectState {
       isOpen: this.isOpen,
       hasUnsavedChanges: this.isDirty
     };
+  }
+
+  /**
+   * Get the current project manager instance
+   */
+  getManager(): ProjectFileManager | null {
+    return this.manager;
   }
 
   /**

@@ -18,6 +18,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   markProjectDirty: () => ipcRenderer.invoke('project:mark-dirty'),
   getRecentProjects: () => ipcRenderer.invoke('project:get-recent'),
   clearRecentProjects: () => ipcRenderer.invoke('project:clear-recent'),
+  openProjectFromPath: (filePath: string) => ipcRenderer.invoke('project:open-path', filePath),
 
   // Menu operations
   triggerNewProject: () => ipcRenderer.invoke('menu:new-project'),
@@ -30,7 +31,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   removeProjectChangedListener: () => {
     ipcRenderer.removeAllListeners('project:changed');
-  }
+  },
+
+  // API operations (replacing HTTP API with IPC)
+  apiGet: (endpoint: string, params?: any) => ipcRenderer.invoke('api:get', endpoint, params),
+  apiPost: (endpoint: string, data?: any) => ipcRenderer.invoke('api:post', endpoint, data),
+  apiPut: (endpoint: string, data?: any) => ipcRenderer.invoke('api:put', endpoint, data),
+  apiDelete: (endpoint: string) => ipcRenderer.invoke('api:delete', endpoint),
+  apiScrape: (request: any) => ipcRenderer.invoke('api:scrape-product', request)
 });
 
 // Type definitions for TypeScript
@@ -49,6 +57,7 @@ declare global {
       markProjectDirty: () => Promise<{ success: boolean; error?: string }>;
       getRecentProjects: () => Promise<{ success: boolean; projects?: string[]; error?: string }>;
       clearRecentProjects: () => Promise<{ success: boolean; error?: string }>;
+      openProjectFromPath: (filePath: string) => Promise<{ success: boolean; error?: string }>;
       triggerNewProject: () => Promise<{ success: boolean; error?: string }>;
       triggerOpenProject: () => Promise<{ success: boolean; error?: string }>;
       onProjectChanged: (callback: (projectInfo: any) => void) => void;

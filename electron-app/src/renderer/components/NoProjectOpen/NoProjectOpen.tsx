@@ -7,7 +7,7 @@ interface NoProjectOpenProps {
 }
 
 const NoProjectOpen: React.FC<NoProjectOpenProps> = ({ className = '' }) => {
-  const { createProject, openProject, recentProjects, isLoading } = useProject();
+  const { createProject, openProject, openProjectFromPath, recentProjects, isLoading } = useProject();
 
   const handleCreateProject = async () => {
     await createProject();
@@ -70,9 +70,7 @@ const NoProjectOpen: React.FC<NoProjectOpenProps> = ({ className = '' }) => {
                   key={index}
                   className="recent-project-item"
                   onClick={async () => {
-                    // Since we can't directly open a specific recent project through the current API,
-                    // we'll trigger the open dialog and let the user select from there
-                    await openProject();
+                    await openProjectFromPath(projectPath);
                   }}
                   disabled={isLoading}
                 >

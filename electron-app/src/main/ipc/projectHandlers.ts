@@ -21,15 +21,25 @@ export function setupProjectIPC(): void {
    */
   ipcMain.handle('project:close', async () => {
     try {
+      console.log('🔄 IPC: project:close called, project state:', {
+        isOpen: projectState.isOpen,
+        hasProject: !!projectState.currentProject,
+        filePath: projectState.currentFilePath
+      });
+      
       const canClose = await projectState.canCloseProject();
+      console.log('🔄 IPC: canCloseProject result:', canClose);
+      
       if (canClose) {
         await projectState.closeProject();
         applicationMenu.updateMenuState();
+        console.log('✅ IPC: Project closed successfully');
         return { success: true };
       }
+      console.log('❌ IPC: User cancelled close operation');
       return { success: false, reason: 'User cancelled' };
     } catch (error) {
-      console.error('Error closing project via IPC:', error);
+      console.error('❌ IPC: Error closing project:', error);
       return { success: false, error: String(error) };
     }
   });
@@ -83,6 +93,23 @@ export function setupProjectIPC(): void {
     } catch (error) {
       console.error('Error clearing recent projects via IPC:', error);
       return { success: false, error: String(error) };
+    }
+  });
+
+  /**
+   * Open a project from a specific file path
+   */
+  ipcMain.handle('project:open-path', async (_event, filePath: string) => {
+    try {
+      await projectState.openProject(filePath);
+      applicationMenu.updateMenuState();
+      return { success: true };
+    } catch (error) {
+      console.error('Error opening project from path:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
     }
   });
 

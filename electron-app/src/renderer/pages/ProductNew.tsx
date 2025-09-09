@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useProjects } from '../hooks/useProjects';
+import { useNavigate } from 'react-router-dom';
+import { useProject } from '../hooks/useProject';
 import { useToast } from '../hooks/useToast';
 import { 
-  fetchProductDetails, 
   saveProduct, 
   handleApiError,
   api
-} from '../services/api';
+} from '../services/apiIPC';
 import { LocationMultiSelect } from '../components/LocationMultiSelect';
 import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
 import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
@@ -15,8 +14,8 @@ import './ProductNew.css';
 
 const ProductNew: React.FC = () => {
   const navigate = useNavigate();
-  const { projectId } = useParams<{ projectId: string }>();
-  const { projects, refreshProjects } = useProjects();
+  // No projectId needed anymore since we only have one current project
+  const { project, isLoading: projectLoading } = useProject();
   const { showToast } = useToast();
   
   const [formData, setFormData] = useState({
@@ -37,15 +36,43 @@ const ProductNew: React.FC = () => {
   const [locations, setLocations] = useState<Location[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const hasShownError = useRef(false);
 
-  const currentProject = projects.find(p => p.id === projectId);
+  // For the new file-based system, we only have one current project
+  const currentProject = project && project.isOpen ? project : null;
 
   useEffect(() => {
-    if (!projectId || !currentProject) {
-      showToast('No project selected', 'error');
-      navigate('/projects');
+    console.log('🔄 ProductNew: useEffect triggered', {
+      project: project,
+      currentProject: currentProject,
+      projectLoading: projectLoading,
+      hasShownError: hasShownError.current
+    });
+    
+    
+    // Don't check project state while still loading
+    if (projectLoading) {
+      console.log('🔄 ProductNew: Still loading project state, waiting...');
+      return;
     }
-  }, [projectId, currentProject, navigate, showToast]);
+    
+    // Only check project state if we're not loading and haven't shown error yet
+    if (!projectLoading && !hasShownError.current) {
+      if (!currentProject) {
+        console.log('❌ ProductNew: No current project, showing error');
+        hasShownError.current = true;
+        showToast('No project is currently open. Please open a project first.', 'error');
+        navigate('/welcome');
+      } else {
+        console.log('✅ ProductNew: Project is open, proceeding');
+        hasShownError.current = false; // Reset error flag when project is open
+      }
+    } else if (currentProject && hasShownError.current) {
+      // Reset error flag when project becomes available
+      console.log('✅ ProductNew: Project became available, resetting error flag');
+      hasShownError.current = false;
+    }
+  }, [currentProject, projectLoading, navigate]);
 
   useEffect(() => {
     // Fetch available locations and categories when component mounts
@@ -150,15 +177,19 @@ const ProductNew: React.FC = () => {
     setIsLoading(true);
     
     try {
-      const details = await fetchProductDetails({
-        product_url,
+      const response = await api.scrape({
+        url: product_url,
         tag_id,
         product_location: product_location[0] // Use first location for API call
       });
       
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to fetch product details');
+      }
+      
       setFormData(prev => ({
         ...prev,
-        ...details
+        ...response.data
       }));
       
       setHasDetails(true);
@@ -189,14 +220,11 @@ const ProductNew: React.FC = () => {
     try {
       await saveProduct({
         ...formData,
-        project_id: currentProject.id
+        project_id: 'current' // Use 'current' as the project ID for the new file-based system
       });
       
-      // Refresh projects to get updated product count
-      await refreshProjects();
-      
       showToast('Product saved successfully', 'success');
-      navigate(`/projects/${projectId}`);
+      navigate('/project');
     } catch (error) {
       const apiError = handleApiError(error);
       showToast(apiError.message, 'error');
@@ -205,6 +233,19 @@ const ProductNew: React.FC = () => {
     }
   };
 
+  // Show loading state while project state is being loaded
+  if (projectLoading) {
+    return (
+      <div className="page-container">
+        <div className="product-new-page">
+          <div className="loading-state">
+            <p>Loading project state...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page-container">
       <div className="product-new-page">
@@ -212,13 +253,13 @@ const ProductNew: React.FC = () => {
           <h1>Add New Product</h1>
           <button 
             className="button button-secondary"
-            onClick={() => navigate(`/projects/${projectId}`)}
+            onClick={() => navigate('/project')}
           >
             Back
           </button>
         </div>
         
-        <p className="current-project">Project: {currentProject.name}</p>
+        <p className="current-project">Project: {currentProject?.name}</p>
         
         <form onSubmit={handleFetchDetails} className="product-form">
           <div className="form-section">
