@@ -283,7 +283,11 @@ class APIRouter {
       product_name: data.product_name,
       manufacturer: data.manufacturer,
       price: data.price,
-      custom_image_url: data.custom_image_url
+      custom_image_url: data.custom_image_url,
+      // Asset hash fields for content-addressable storage
+      imageHash: data.image_hash,
+      thumbnailHash: data.thumbnail_hash,
+      imagesHashes: data.images_hashes
     });
 
     this.projectState.markDirty();
@@ -298,7 +302,38 @@ class APIRouter {
       throw new Error('No project open');
     }
 
-    const product = await manager.updateProduct(productId, data);
+    // Map API field names to internal field names, including asset hash fields
+    const fieldMapping: Record<string, string> = {
+      product_url: 'url',
+      tag_id: 'tagId',
+      product_location: 'location',
+      product_image: 'image',
+      product_images: 'images',
+      product_description: 'description',
+      specification_description: 'specificationDescription',
+      image_hash: 'imageHash',
+      thumbnail_hash: 'thumbnailHash',
+      images_hashes: 'imagesHashes'
+    };
+
+    const updateData: Record<string, any> = {};
+    
+    // Map fields that need name conversion
+    for (const [apiField, dbField] of Object.entries(fieldMapping)) {
+      if (data[apiField] !== undefined) {
+        updateData[dbField] = data[apiField];
+      }
+    }
+
+    // Add fields that don't need mapping
+    const directFields = ['category', 'product_name', 'manufacturer', 'price', 'custom_image_url'];
+    for (const field of directFields) {
+      if (data[field] !== undefined) {
+        updateData[field] = data[field];
+      }
+    }
+
+    const product = await manager.updateProduct(productId, updateData);
 
     this.projectState.markDirty();
     return { success: true, data: product };

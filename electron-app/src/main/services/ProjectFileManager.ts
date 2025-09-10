@@ -2,6 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import Database from 'better-sqlite3';
 import { v4 as uuidv4 } from 'uuid';
+import { AssetManager } from './AssetManager';
 import type { 
   Project, 
   Product, 
@@ -460,7 +461,7 @@ export class ProjectFileManager {
   }
 
   /**
-   * Deletes a product
+   * Deletes a product and cleans up associated assets
    */
   async deleteProduct(id: string): Promise<boolean> {
     if (!this.db) {
@@ -468,10 +469,48 @@ export class ProjectFileManager {
     }
 
     try {
-      const stmt = this.db.prepare('DELETE FROM products WHERE id = ?');
-      const result = stmt.run(id);
+      // First, get the product to retrieve asset hashes before deletion
+      const getStmt = this.db.prepare('SELECT image_hash, thumbnail_hash, images_hashes FROM products WHERE id = ?');
+      const product = getStmt.get(id) as { image_hash?: string; thumbnail_hash?: string; images_hashes?: string } | undefined;
+
+      // Delete the product from database
+      const deleteStmt = this.db.prepare('DELETE FROM products WHERE id = ?');
+      const result = deleteStmt.run(id);
 
       if (result.changes > 0) {
+        // Clean up associated assets if they exist
+        if (product && this.projectPath) {
+          const assetManager = new AssetManager(this.projectPath, this.db);
+
+          // Delete main image asset
+          if (product.image_hash) {
+            try {
+              await assetManager.deleteAsset(product.image_hash);
+            } catch (error) {
+              console.warn(`Failed to delete main image asset ${product.image_hash}:`, error);
+            }
+          }
+
+          // Delete additional image assets
+          if (product.images_hashes) {
+            try {
+              const imageHashes = JSON.parse(product.images_hashes) as string[];
+              for (const hash of imageHashes) {
+                try {
+                  await assetManager.deleteAsset(hash);
+                } catch (error) {
+                  console.warn(`Failed to delete image asset ${hash}:`, error);
+                }
+              }
+            } catch (error) {
+              console.warn('Failed to parse images_hashes for cleanup:', error);
+            }
+          }
+
+          // Note: thumbnail_hash cleanup is handled automatically by AssetManager.deleteAsset()
+          // when the main asset is deleted, as thumbnails are linked to their parent assets
+        }
+
         await this.updateProductCount();
         return true;
       }
