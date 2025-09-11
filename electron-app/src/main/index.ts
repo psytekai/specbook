@@ -124,7 +124,16 @@ app.whenReady().then(() => {
       
       // Create AssetManager and get asset path
       const assetManager = new AssetManager(state.project.path);
-      const assetPath = await assetManager.getAssetPath(hash);
+      
+      // Try thumbnail first (most common case), then main asset
+      let assetPath: string;
+      try {
+        assetPath = await assetManager.getAssetPath(hash, true);  // thumbnail
+        console.log(`Asset protocol: Found thumbnail for hash: ${hash}`);
+      } catch {
+        assetPath = await assetManager.getAssetPath(hash, false); // main asset
+        console.log(`Asset protocol: Found main asset for hash: ${hash}`);
+      }
 
       console.log(`Asset protocol: Resolved path: ${assetPath}`);
 
