@@ -17,12 +17,24 @@ export function setupAssetIPC(): void {
       const state = projectState.getStateInfo();
       const manager = projectState.getManager();
 
+      console.log('🔄 Asset upload starting:', {
+        filename,
+        fileSize: fileData.byteLength,
+        hasState: !!state,
+        isOpen: state.isOpen,
+        hasManager: !!manager,
+        projectPath: state.project?.path
+      });
+
       if (!state.isOpen || !manager || !state.project?.path) {
+        const errorMsg = `No project open - isOpen: ${state.isOpen}, hasManager: ${!!manager}, projectPath: ${state.project?.path}`;
+        console.error('❌ Asset upload failed:', errorMsg);
         throw new Error('No project open');
       }
 
       // Convert ArrayBuffer to Buffer
       const buffer = Buffer.from(fileData);
+      console.log('🔄 Converted ArrayBuffer to Buffer, size:', buffer.length);
 
       // Create AssetManager for current project
       const assetManager = new AssetManager(
@@ -30,8 +42,21 @@ export function setupAssetIPC(): void {
         manager.getDatabase() || undefined
       );
 
+      console.log('🔄 Created AssetManager for project path:', state.project.path);
+      console.log('🔄 Assets will be stored in:', `${state.project.path}/assets`);
+      console.log('🔄 Thumbnails will be stored in:', `${state.project.path}/assets/thumbnails`);
+
       // Store the asset
+      console.log('🔄 Calling assetManager.storeAsset()...');
       const result = await assetManager.storeAsset(buffer, filename, options);
+      
+      console.log('✅ Asset stored successfully:', {
+        hash: result.hash,
+        thumbnailHash: result.thumbnailHash,
+        filename: result.filename,
+        size: result.size,
+        storedAt: result.storedAt
+      });
 
       // Mark project as dirty
       projectState.markDirty();
@@ -51,7 +76,8 @@ export function setupAssetIPC(): void {
         }
       };
     } catch (error) {
-      console.error('Asset upload failed:', error);
+      console.error('❌ Asset upload failed with error:', error);
+      console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Upload failed'

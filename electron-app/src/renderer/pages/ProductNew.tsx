@@ -113,6 +113,12 @@ const ProductNew: React.FC = () => {
     setUploadProgress(0);
     
     try {
+      console.log('🔄 Starting image upload:', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type
+      });
+      
       // Validate file size (5MB limit)
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
@@ -129,20 +135,26 @@ const ProductNew: React.FC = () => {
       setUploadProgress(25);
       
       // Convert File to ArrayBuffer for AssetManager
+      console.log('🔄 Converting file to ArrayBuffer...');
       const arrayBuffer = await file.arrayBuffer();
+      console.log('🔄 ArrayBuffer created, size:', arrayBuffer.byteLength);
       
       setUploadProgress(50);
       
       // Upload via AssetManager IPC
+      console.log('🔄 Calling electronAPI.assetUpload...');
       const response = await window.electronAPI.assetUpload(
         arrayBuffer, 
         file.name, 
         file.type
       );
       
+      console.log('🔄 Upload response received:', response);
       setUploadProgress(75);
       
       if (response.success) {
+        console.log('✅ Upload successful:', response.data);
+        
         // Store asset hashes instead of data URL
         setFormData(prev => ({
           ...prev,
@@ -152,13 +164,14 @@ const ProductNew: React.FC = () => {
           custom_image_url: ''
         }));
         setUploadProgress(100);
-        showToast('Image uploaded successfully', 'success');
+        showToast(`Image uploaded successfully to project assets directory`, 'success');
       } else {
+        console.error('❌ Upload failed:', response.error);
         throw new Error(response.error || 'Upload failed');
       }
     } catch (error) {
-      showToast('Failed to upload image', 'error');
-      console.error('Image upload error:', error);
+      console.error('❌ Image upload error:', error);
+      showToast(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
     } finally {
       setTimeout(() => {
         setIsUploading(false);

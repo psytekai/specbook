@@ -73,21 +73,36 @@ export class AssetManager {
   /**
    * Store an asset with content-addressable storage
    */
+  /**
+   * Store an asset with content-addressable storage
+   */
   async storeAsset(
     fileData: Buffer,
     filename?: string,
     options?: AssetStorageOptions
   ): Promise<AssetResult> {
     try {
+      console.log('🔄 AssetManager.storeAsset() called with:', {
+        fileDataSize: fileData.length,
+        filename,
+        options
+      });
+
       // Validate the asset
+      console.log('🔄 Validating asset...');
       await this.validateAsset(fileData, filename);
+      console.log('✅ Asset validation passed');
       
       // Generate SHA-256 hash
+      console.log('🔄 Generating SHA-256 hash...');
       const hash = this.generateHash(fileData);
+      console.log('✅ Hash generated:', hash);
       
       // Check if asset already exists (deduplication)
+      console.log('🔄 Checking for existing asset...');
       const existingAsset = await this.getAssetMetadata(hash);
       if (existingAsset) {
+        console.log('ℹ️ Asset already exists, incrementing ref count');
         // Increment reference count
         await this.incrementRefCount(hash);
         
@@ -105,27 +120,43 @@ export class AssetManager {
           storedAt: existingAsset.createdAt
         };
       }
+      console.log('ℹ️ Asset is new, proceeding with storage');
       
       // Get image metadata
+      console.log('🔄 Getting image metadata...');
       const metadata = await sharp(fileData).metadata();
       const mimetype = this.getMimeType(metadata.format || 'unknown', filename);
+      console.log('✅ Image metadata:', { 
+        width: metadata.width, 
+        height: metadata.height, 
+        format: metadata.format,
+        mimetype 
+      });
       
       // Store original asset
+      console.log('🔄 Storing original asset file...');
       await this.saveAssetFile(hash, fileData);
+      console.log('✅ Original asset file stored');
       
       // Generate and store thumbnail if requested
       let thumbnailHash = '';
       if (options?.generateThumbnail !== false) {
+        console.log('🔄 Generating thumbnail...');
         const thumbnailBuffer = await this.generateThumbnail(
           fileData,
           options?.thumbnailSize || this.config.defaultOptions?.thumbnailSize || DEFAULT_THUMBNAIL_SIZE,
           options?.quality || this.config.defaultOptions?.quality || DEFAULT_QUALITY
         );
         thumbnailHash = this.generateHash(thumbnailBuffer);
+        console.log('✅ Thumbnail generated, hash:', thumbnailHash);
+        
+        console.log('🔄 Storing thumbnail file...');
         await this.saveAssetFile(thumbnailHash, thumbnailBuffer, true);
+        console.log('✅ Thumbnail file stored');
       }
       
       // Store metadata in database
+      console.log('🔄 Storing asset metadata in database...');
       if (this.db) {
         await this.storeAssetMetadata({
           hash,
@@ -139,9 +170,12 @@ export class AssetManager {
           createdAt: new Date(),
           lastAccessed: new Date()
         });
+        console.log('✅ Asset metadata stored in database');
+      } else {
+        console.warn('⚠️ No database connection, skipping metadata storage');
       }
       
-      return {
+      const result = {
         hash,
         thumbnailHash,
         filename,
@@ -153,7 +187,11 @@ export class AssetManager {
         } : undefined,
         storedAt: new Date()
       };
+      
+      console.log('✅ Asset storage completed:', result);
+      return result;
     } catch (error) {
+      console.error('❌ AssetManager.storeAsset() failed:', error);
       if (error instanceof AssetError) {
         throw error;
       }
@@ -471,15 +509,30 @@ export class AssetManager {
   /**
    * Save asset file to disk
    */
+  /**
+   * Save asset file to disk
+   */
   private async saveAssetFile(hash: string, data: Buffer, isThumbnail = false): Promise<string> {
     const dir = isThumbnail ? this.thumbnailsPath : this.assetsPath;
     const filePath = path.join(dir, isThumbnail ? hash : hash);
     
+    console.log(`🔄 Saving ${isThumbnail ? 'thumbnail' : 'asset'} file:`, {
+      hash,
+      dir,
+      filePath,
+      fileSize: data.length,
+      isThumbnail
+    });
+    
     // Ensure directory exists
+    console.log('🔄 Creating directory if needed:', dir);
     await fs.mkdir(dir, { recursive: true });
     
     // Write file
+    console.log('🔄 Writing file to:', filePath);
     await fs.writeFile(filePath, data);
+    
+    console.log('✅ File written successfully:', filePath);
     
     return filePath;
   }
