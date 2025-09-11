@@ -94,7 +94,7 @@ export class AssetManager {
         // Return existing asset info
         return {
           hash,
-          thumbnailHash: existingAsset.hash + '_thumb', // Convention for thumbnail hash
+          thumbnailHash: existingAsset.thumbnailHash || '', // Use stored thumbnail hash
           filename,
           size: existingAsset.size,
           mimetype: existingAsset.mimetype,
@@ -134,6 +134,7 @@ export class AssetManager {
           size: fileData.length,
           width: metadata.width,
           height: metadata.height,
+          thumbnailHash,
           refCount: 1,
           createdAt: new Date(),
           lastAccessed: new Date()
@@ -214,9 +215,11 @@ export class AssetManager {
       ).get(hash) as { ref_count: number } | undefined;
       
       if (asset && asset.ref_count <= 0) {
+        // Get full asset metadata to find thumbnail hash
+        const fullAssetInfo = await this.getAssetMetadata(hash);
+        
         // Delete physical files
         const assetPath = path.join(this.assetsPath, hash);
-        const thumbnailPath = path.join(this.thumbnailsPath, hash + '_thumb');
         
         try {
           await fs.unlink(assetPath);
@@ -224,10 +227,14 @@ export class AssetManager {
           // File might not exist
         }
         
-        try {
-          await fs.unlink(thumbnailPath);
-        } catch {
-          // Thumbnail might not exist
+        // Delete thumbnail using stored hash (not convention)
+        if (fullAssetInfo?.thumbnailHash) {
+          const thumbnailPath = path.join(this.thumbnailsPath, fullAssetInfo.thumbnailHash);
+          try {
+            await fs.unlink(thumbnailPath);
+          } catch {
+            // Thumbnail might not exist
+          }
         }
         
         // Delete from database
@@ -500,6 +507,7 @@ export class AssetManager {
       size: result.size,
       width: result.width,
       height: result.height,
+      thumbnailHash: result.thumbnail_hash,
       refCount: result.ref_count,
       createdAt: new Date(result.created_at),
       lastAccessed: new Date(result.last_accessed)
@@ -509,7 +517,7 @@ export class AssetManager {
   /**
    * Store asset metadata in database
    */
-  private async storeAssetMetadata(metadata: AssetMetadata): Promise<void> {
+  private async storeAssetMetadata(metadata: AssetMetadata & { thumbnailHash?: string }): Promise<void> {
     if (!this.db) {
       return;
     }
@@ -517,8 +525,8 @@ export class AssetManager {
     const stmt = this.db.prepare(`
       INSERT INTO assets (
         hash, original_name, mimetype, size, width, height,
-        ref_count, created_at, last_accessed
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        thumbnail_hash, ref_count, created_at, last_accessed
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     
     stmt.run(
@@ -528,6 +536,7 @@ export class AssetManager {
       metadata.size,
       metadata.width || null,
       metadata.height || null,
+      metadata.thumbnailHash || null,
       metadata.refCount,
       metadata.createdAt.toISOString(),
       metadata.lastAccessed.toISOString()

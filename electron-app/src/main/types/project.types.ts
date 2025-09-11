@@ -14,22 +14,19 @@ export interface Product {
   url: string;
   tagId?: string;
   location: string[];
-  image?: string;
-  images: string[];
   description?: string;
   specificationDescription?: string;
   category: string[];
   product_name: string;
   manufacturer?: string;
   price?: number;
-  custom_image_url?: string;
   createdAt: Date;
   updatedAt: Date;
   
   // Asset management fields (Phase 4)
-  imageHash?: string;        // SHA-256 hash of primary image
-  thumbnailHash?: string;    // SHA-256 hash of thumbnail
-  imagesHashes?: string[];   // Array of SHA-256 hashes for additional images
+  primaryImageHash?: string;        // SHA-256 hash of primary image
+  primaryThumbnailHash?: string;    // SHA-256 hash of primary thumbnail
+  additionalImagesHashes?: string[];   // Array of SHA-256 hashes for additional images
 }
 
 export interface Category {

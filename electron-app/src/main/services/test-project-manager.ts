@@ -92,7 +92,6 @@ async function testProjectFileManager() {
       price: 1299.99,
       location: ['Living Room', 'First Floor'],
       category: ['Furniture', 'Seating'],
-      images: ['sofa1.jpg', 'sofa2.jpg'],
       description: 'A comfortable modern sofa',
       specificationDescription: 'Dimensions: 84" W x 36" D x 32" H'
     };
@@ -112,7 +111,6 @@ async function testProjectFileManager() {
       price: 599.99,
       location: ['Living Room'],
       category: ['Furniture', 'Tables'],
-      images: [],
       description: 'Solid wood coffee table'
     };
     
@@ -127,7 +125,6 @@ async function testProjectFileManager() {
       price: 149.99,
       location: ['Living Room', 'Corner'],
       category: ['Lighting'],
-      images: ['lamp.jpg'],
       description: 'Modern LED floor lamp'
     };
     
@@ -230,7 +227,7 @@ async function testProjectFileManager() {
     
     const testProduct = persistedProducts[0];
     logTest('location is array', Array.isArray(testProduct.location));
-    logTest('images is array', Array.isArray(testProduct.images));
+    logTest('additionalImagesHashes is array', Array.isArray(testProduct.additionalImagesHashes));
     logTest('category is array', Array.isArray(testProduct.category));
     logTest('createdAt is Date', testProduct.createdAt instanceof Date);
     logTest('updatedAt is Date', testProduct.updatedAt instanceof Date);

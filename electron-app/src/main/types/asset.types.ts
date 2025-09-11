@@ -52,6 +52,9 @@ export interface AssetMetadata {
   width?: number;
   height?: number;
   
+  /** SHA-256 hash of thumbnail */
+  thumbnailHash?: string;
+  
   /** Reference count (how many products use this asset) */
   refCount: number;
   

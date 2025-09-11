@@ -275,19 +275,16 @@ class APIRouter {
       url: data.product_url,
       tagId: data.tag_id,
       location: data.product_location,
-      image: data.product_image,
-      images: data.product_images,
       description: data.product_description,
       specificationDescription: data.specification_description,
       category: data.category,
       product_name: data.product_name,
       manufacturer: data.manufacturer,
       price: data.price,
-      custom_image_url: data.custom_image_url,
       // Asset hash fields for content-addressable storage
-      imageHash: data.image_hash,
-      thumbnailHash: data.thumbnail_hash,
-      imagesHashes: data.images_hashes
+      primaryImageHash: data.primary_image_hash,
+      primaryThumbnailHash: data.primary_thumbnail_hash,
+      additionalImagesHashes: data.additional_images_hashes
     });
 
     this.projectState.markDirty();

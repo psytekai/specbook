@@ -75,15 +75,15 @@ export class ProjectFileManager {
           url TEXT NOT NULL,
           tagId TEXT,
           location TEXT,
-          image TEXT,
-          images TEXT,
           description TEXT,
           specificationDescription TEXT,
           category TEXT,
           product_name TEXT,
           manufacturer TEXT,
           price REAL,
-          custom_image_url TEXT,
+          primary_image_hash TEXT,
+          primary_thumbnail_hash TEXT,
+          additional_images_hashes TEXT,
           createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -134,9 +134,9 @@ export class ProjectFileManager {
       
       // Phase 4: Add asset management columns if they don't exist
       const assetColumns = [
-        { name: 'image_hash', type: 'TEXT' },
-        { name: 'thumbnail_hash', type: 'TEXT' },
-        { name: 'images_hashes', type: 'TEXT' }  // JSON array of hashes
+        { name: 'primary_image_hash', type: 'TEXT' },
+        { name: 'primary_thumbnail_hash', type: 'TEXT' },
+        { name: 'additional_images_hashes', type: 'TEXT' }  // JSON array of hashes
       ];
       
       for (const column of assetColumns) {
@@ -155,6 +155,7 @@ export class ProjectFileManager {
           size INTEGER,
           width INTEGER,
           height INTEGER,
+          thumbnail_hash TEXT,
           ref_count INTEGER DEFAULT 1,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -212,12 +213,6 @@ export class ProjectFileManager {
    */
   applyMigration(db: Database.Database, version: number): void {
     const migrations: Record<number, () => void> = {
-      2: () => {
-        // Phase 4: Asset management columns
-        db.exec(`ALTER TABLE products ADD COLUMN image_hash TEXT`);
-        db.exec(`ALTER TABLE products ADD COLUMN thumbnail_hash TEXT`);
-        db.exec(`ALTER TABLE products ADD COLUMN images_hashes TEXT`);
-      },
       // Future migrations can be added here
     };
     
@@ -308,12 +303,12 @@ export class ProjectFileManager {
 
       const stmt = this.db.prepare(`
         INSERT INTO products (
-          id, projectId, url, tagId, location, image, images, 
+          id, projectId, url, tagId, location, 
           description, specificationDescription, category, 
-          product_name, manufacturer, price, custom_image_url,
-          image_hash, thumbnail_hash, images_hashes,
+          product_name, manufacturer, price,
+          primary_image_hash, primary_thumbnail_hash, additional_images_hashes,
           createdAt, updatedAt
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       stmt.run(
@@ -322,18 +317,15 @@ export class ProjectFileManager {
         productData.url,
         productData.tagId || null,
         JSON.stringify(productData.location || []),
-        productData.image || null,
-        JSON.stringify(productData.images || []),
         productData.description || null,
         productData.specificationDescription || null,
         JSON.stringify(productData.category || []),
         productData.product_name,
         productData.manufacturer || null,
         productData.price || null,
-        productData.custom_image_url || null,
-        productData.imageHash || null,
-        productData.thumbnailHash || null,
-        JSON.stringify(productData.imagesHashes || []),
+        productData.primaryImageHash || null,
+        productData.primaryThumbnailHash || null,
+        JSON.stringify(productData.additionalImagesHashes || []),
         now.toISOString(),
         now.toISOString()
       );
@@ -391,14 +383,6 @@ export class ProjectFileManager {
         values.push(JSON.stringify(updates.location));
         await this.extractAndStoreLocations(updates.location);
       }
-      if (updates.image !== undefined) {
-        updateFields.push('image = ?');
-        values.push(updates.image);
-      }
-      if (updates.images !== undefined) {
-        updateFields.push('images = ?');
-        values.push(JSON.stringify(updates.images));
-      }
       if (updates.description !== undefined) {
         updateFields.push('description = ?');
         values.push(updates.description);
@@ -424,23 +408,18 @@ export class ProjectFileManager {
         updateFields.push('price = ?');
         values.push(updates.price);
       }
-      if (updates.custom_image_url !== undefined) {
-        updateFields.push('custom_image_url = ?');
-        values.push(updates.custom_image_url);
-      }
-      
       // Asset management fields (Phase 4)
-      if (updates.imageHash !== undefined) {
-        updateFields.push('image_hash = ?');
-        values.push(updates.imageHash);
+      if (updates.primaryImageHash !== undefined) {
+        updateFields.push('primary_image_hash = ?');
+        values.push(updates.primaryImageHash);
       }
-      if (updates.thumbnailHash !== undefined) {
-        updateFields.push('thumbnail_hash = ?');
-        values.push(updates.thumbnailHash);
+      if (updates.primaryThumbnailHash !== undefined) {
+        updateFields.push('primary_thumbnail_hash = ?');
+        values.push(updates.primaryThumbnailHash);
       }
-      if (updates.imagesHashes !== undefined) {
-        updateFields.push('images_hashes = ?');
-        values.push(JSON.stringify(updates.imagesHashes));
+      if (updates.additionalImagesHashes !== undefined) {
+        updateFields.push('additional_images_hashes = ?');
+        values.push(JSON.stringify(updates.additionalImagesHashes));
       }
 
       if (updateFields.length === 0) {
@@ -470,8 +449,8 @@ export class ProjectFileManager {
 
     try {
       // First, get the product to retrieve asset hashes before deletion
-      const getStmt = this.db.prepare('SELECT image_hash, thumbnail_hash, images_hashes FROM products WHERE id = ?');
-      const product = getStmt.get(id) as { image_hash?: string; thumbnail_hash?: string; images_hashes?: string } | undefined;
+      const getStmt = this.db.prepare('SELECT primary_image_hash, primary_thumbnail_hash, additional_images_hashes FROM products WHERE id = ?');
+      const product = getStmt.get(id) as { primary_image_hash?: string; primary_thumbnail_hash?: string; additional_images_hashes?: string } | undefined;
 
       // Delete the product from database
       const deleteStmt = this.db.prepare('DELETE FROM products WHERE id = ?');
@@ -482,19 +461,19 @@ export class ProjectFileManager {
         if (product && this.projectPath) {
           const assetManager = new AssetManager(this.projectPath, this.db);
 
-          // Delete main image asset
-          if (product.image_hash) {
+          // Delete primary image asset
+          if (product.primary_image_hash) {
             try {
-              await assetManager.deleteAsset(product.image_hash);
+              await assetManager.deleteAsset(product.primary_image_hash);
             } catch (error) {
-              console.warn(`Failed to delete main image asset ${product.image_hash}:`, error);
+              console.warn(`Failed to delete primary image asset ${product.primary_image_hash}:`, error);
             }
           }
 
           // Delete additional image assets
-          if (product.images_hashes) {
+          if (product.additional_images_hashes) {
             try {
-              const imageHashes = JSON.parse(product.images_hashes) as string[];
+              const imageHashes = JSON.parse(product.additional_images_hashes) as string[];
               for (const hash of imageHashes) {
                 try {
                   await assetManager.deleteAsset(hash);
@@ -503,7 +482,7 @@ export class ProjectFileManager {
                 }
               }
             } catch (error) {
-              console.warn('Failed to parse images_hashes for cleanup:', error);
+              console.warn('Failed to parse additional_images_hashes for cleanup:', error);
             }
           }
 
@@ -728,22 +707,19 @@ export class ProjectFileManager {
       url: row.url,
       tagId: row.tagId,
       location: row.location ? JSON.parse(row.location) : [],
-      image: row.image,
-      images: row.images ? JSON.parse(row.images) : [],
       description: row.description,
       specificationDescription: row.specificationDescription,
       category: row.category ? JSON.parse(row.category) : [],
       product_name: row.product_name,
       manufacturer: row.manufacturer,
       price: row.price,
-      custom_image_url: row.custom_image_url,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
       
       // Asset management fields (Phase 4)
-      imageHash: row.image_hash,
-      thumbnailHash: row.thumbnail_hash,
-      imagesHashes: row.images_hashes ? JSON.parse(row.images_hashes) : []
+      primaryImageHash: row.primary_image_hash,
+      primaryThumbnailHash: row.primary_thumbnail_hash,
+      additionalImagesHashes: row.additional_images_hashes ? JSON.parse(row.additional_images_hashes) : []
     };
   }
 
