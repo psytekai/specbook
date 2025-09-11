@@ -13,6 +13,19 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
+// Register the asset protocol as a standard scheme before app is ready
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'asset',
+    privileges: {
+      secure: true,
+      standard: true,
+      supportFetchAPI: true,
+      corsEnabled: false
+    }
+  }
+]);
+
 let mainWindow: BrowserWindow | null = null;
 let applicationMenu: ApplicationMenu | null = null;
 
@@ -73,7 +86,9 @@ app.whenReady().then(() => {
   setupAssetIPC();
   
   // Register custom asset:// protocol for serving images
+  console.log('🎯 Registering asset:// protocol handler');
   protocol.registerFileProtocol('asset', async (request, callback) => {
+    console.log(`🔍 Asset protocol request: ${request.url}`);
     try {
       const projectState = ProjectState.getInstance();
       const state = projectState.getStateInfo();
@@ -84,10 +99,20 @@ app.whenReady().then(() => {
         return;
       }
 
-      // Parse asset hash from URL (asset://hash or asset://hash?thumbnail=true)
-      const url = new URL(request.url);
-      const hash = url.hostname;
-      const thumbnail = url.searchParams.get('thumbnail') === 'true';
+      // Parse asset hash from URL (asset://hash)
+      // Extract hash directly from URL string since asset://hash creates invalid URL format
+      const urlString = request.url;
+      const assetPrefix = 'asset://';
+      
+      if (!urlString.startsWith(assetPrefix)) {
+        console.warn('Asset protocol: Invalid URL format');
+        callback({ error: -6 }); // FILE_NOT_FOUND
+        return;
+      }
+      
+      // Extract everything after asset:// and remove trailing slashes
+      const urlSuffix = urlString.substring(assetPrefix.length);
+      const hash = urlSuffix.replace(/\/+$/, '');
 
       if (!hash) {
         console.warn('Asset protocol: Invalid hash');
@@ -95,9 +120,13 @@ app.whenReady().then(() => {
         return;
       }
 
+      console.log(`Asset protocol: Requesting asset for hash: ${hash}`);
+      
       // Create AssetManager and get asset path
       const assetManager = new AssetManager(state.project.path);
-      const assetPath = await assetManager.getAssetPath(hash, thumbnail);
+      const assetPath = await assetManager.getAssetPath(hash);
+
+      console.log(`Asset protocol: Resolved path: ${assetPath}`);
 
       // Verify file exists
       if (!fs.existsSync(assetPath)) {
@@ -106,6 +135,7 @@ app.whenReady().then(() => {
         return;
       }
 
+      console.log(`Asset protocol: Successfully serving file: ${assetPath}`);
       callback({ path: assetPath });
     } catch (error) {
       console.error('Asset protocol error:', error);
