@@ -303,11 +303,11 @@ export class ProjectFileManager {
 
       const stmt = this.db.prepare(`
         INSERT INTO products (
-          id, projectId, url, tagId, location, 
-          description, specificationDescription, category, 
+          id, project_id, url, tag_id, location, 
+          description, specification_description, category, 
           product_name, manufacturer, price,
           primary_image_hash, primary_thumbnail_hash, additional_images_hashes,
-          createdAt, updatedAt
+          created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
@@ -375,7 +375,7 @@ export class ProjectFileManager {
         values.push(updates.url);
       }
       if (updates.tagId !== undefined) {
-        updateFields.push('tagId = ?');
+        updateFields.push('tag_id = ?');
         values.push(updates.tagId);
       }
       if (updates.location !== undefined) {
@@ -388,7 +388,7 @@ export class ProjectFileManager {
         values.push(updates.description);
       }
       if (updates.specificationDescription !== undefined) {
-        updateFields.push('specificationDescription = ?');
+        updateFields.push('specification_description = ?');
         values.push(updates.specificationDescription);
       }
       if (updates.category !== undefined) {
@@ -703,18 +703,18 @@ export class ProjectFileManager {
   private parseProductRow(row: any): Product {
     return {
       id: row.id,
-      projectId: row.projectId,
+      projectId: row.project_id,
       url: row.url,
-      tagId: row.tagId,
+      tagId: row.tag_id,
       location: row.location ? JSON.parse(row.location) : [],
       description: row.description,
-      specificationDescription: row.specificationDescription,
+      specificationDescription: row.specification_description,
       category: row.category ? JSON.parse(row.category) : [],
       product_name: row.product_name,
       manufacturer: row.manufacturer,
       price: row.price,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt),
+      createdAt: new Date(row.created_at),
+      updatedAt: new Date(row.updated_at),
       
       // Asset management fields (Phase 4)
       primaryImageHash: row.primary_image_hash,
