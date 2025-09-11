@@ -14,15 +14,16 @@ export interface Product {
   url: string;
   tagId: string;
   location: string[];           // CHANGED: multi-select
-  image: string;
-  images: string[];
   description: string;
   specificationDescription: string;
   category: string | string[];  // FLEXIBLE: can be string or array
   product_name?: string;        // NEW
   manufacturer?: string;        // NEW  
   price?: number;              // NEW
-  custom_image_url?: string;   // NEW
+  // Asset management fields (Phase 4)
+  primaryImageHash?: string;    // Content-addressable hash for primary image
+  primaryThumbnailHash?: string; // Hash for thumbnail of primary image
+  additionalImagesHashes?: string[]; // Array of hashes for additional images
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,29 +40,32 @@ export interface FetchProductDetailsRequest {
 }
 
 export interface FetchProductDetailsResponse {
-  product_image: string;
-  product_images: string[];
   product_description: string;
   specification_description: string;
   category: string[];
   product_name?: string;        // NEW
   manufacturer?: string;        // NEW
   price?: number;              // NEW
+  // Asset management fields (Phase 4)
+  primaryImageHash?: string;    // Content-addressable hash for primary image
+  primaryThumbnailHash?: string; // Hash for thumbnail of primary image
+  additionalImagesHashes?: string[]; // Array of hashes for additional images
 }
 
 export interface SaveProductRequest {
   product_url: string;
   tag_id: string;
   product_location: string[];   // CHANGED: multi-select
-  product_image: string;
-  product_images: string[];
   product_description: string;
   specification_description: string;
   category: string[];
   product_name?: string;        // NEW
   manufacturer?: string;        // NEW
   price?: number;              // NEW
-  custom_image_url?: string;   // NEW
+  // Asset management fields (Phase 4)
+  primaryImageHash?: string;    // Content-addressable hash for primary image
+  primaryThumbnailHash?: string; // Hash for thumbnail of primary image
+  additionalImagesHashes?: string[]; // Array of hashes for additional images
   project_id: string;
 }
 

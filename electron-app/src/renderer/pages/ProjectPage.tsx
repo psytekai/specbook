@@ -142,14 +142,7 @@ const ProjectPage: React.FC = () => {
   const tableSettings = useTableSettings({ 
     projectId: 'current',
     initialSettings: {
-      // Convert legacy state to new format if needed
-      display: {
-        rowDensity: 'regular',
-        enableZebraStriping: true,
-        imageSize: 'medium',
-        enableTextWrapping: false,
-        showRowNumbers: false
-      }
+      // Use default settings for now
     }
   });
 
@@ -739,8 +732,10 @@ const ProjectPage: React.FC = () => {
                   {locationProducts.map(product => (
                     <div key={product.id} className="product-card">
                       <div className="product-image">
-                        {product.image ? (
-                          <img src={product.image} alt={product.description} />
+                        {product.primaryThumbnailHash ? (
+                          <img src={`asset://${product.primaryThumbnailHash}`} alt={product.description} />
+                        ) : product.primaryImageHash ? (
+                          <img src={`asset://${product.primaryImageHash}`} alt={product.description} />
                         ) : (
                           <div className="no-image">No Image</div>
                         )}
@@ -844,8 +839,10 @@ const ProjectPage: React.FC = () => {
                             {tableSettings.settings.columns.image?.visible && (
                               <td className="image-cell">
                                 <div className="list-product-image">
-                                  {product.image ? (
-                                    <img src={product.image} alt={product.description} />
+                                  {product.primaryThumbnailHash ? (
+                                    <img src={`asset://${product.primaryThumbnailHash}`} alt={product.description} />
+                                  ) : product.primaryImageHash ? (
+                                    <img src={`asset://${product.primaryImageHash}`} alt={product.description} />
                                   ) : (
                                     <div className="no-image-small">No Image</div>
                                   )}

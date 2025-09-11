@@ -240,9 +240,9 @@ const ProductNew: React.FC = () => {
     try {
       await api.post('/api/products', {
         ...formData,
-        image_hash: formData.image_hash || undefined,
-        thumbnail_hash: formData.thumbnail_hash || undefined,
-        images_hashes: formData.images_hashes.length > 0 ? formData.images_hashes : undefined,
+        primary_image_hash: formData.image_hash || undefined,
+        primary_thumbnail_hash: formData.thumbnail_hash || undefined,
+        additional_images_hashes: formData.images_hashes.length > 0 ? formData.images_hashes : undefined,
         project_id: 'current' // Use 'current' as the project ID for the new file-based system
       });
       
