@@ -71,12 +71,12 @@ export class ProjectFileManager {
       db.exec(`
         CREATE TABLE IF NOT EXISTS products (
           id TEXT PRIMARY KEY,
-          projectId TEXT NOT NULL,
+          project_id TEXT NOT NULL,
           url TEXT NOT NULL,
-          tagId TEXT,
+          tag_id TEXT,
           location TEXT,
           description TEXT,
-          specificationDescription TEXT,
+          specification_description TEXT,
           category TEXT,
           product_name TEXT,
           manufacturer TEXT,
@@ -84,8 +84,8 @@ export class ProjectFileManager {
           primary_image_hash TEXT,
           primary_thumbnail_hash TEXT,
           additional_images_hashes TEXT,
-          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
 
@@ -94,7 +94,7 @@ export class ProjectFileManager {
         CREATE TABLE IF NOT EXISTS categories (
           id TEXT PRIMARY KEY,
           name TEXT UNIQUE NOT NULL,
-          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
 
@@ -103,7 +103,7 @@ export class ProjectFileManager {
         CREATE TABLE IF NOT EXISTS locations (
           id TEXT PRIMARY KEY,
           name TEXT UNIQUE NOT NULL,
-          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
 
@@ -112,7 +112,7 @@ export class ProjectFileManager {
         CREATE TRIGGER IF NOT EXISTS update_products_timestamp 
         AFTER UPDATE ON products
         BEGIN
-          UPDATE products SET updatedAt = CURRENT_TIMESTAMP WHERE id = NEW.id;
+          UPDATE products SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
         END
       `);
 
@@ -515,7 +515,7 @@ export class ProjectFileManager {
       return rows.map(row => ({
         id: row.id,
         name: row.name,
-        createdAt: new Date(row.createdAt)
+        createdAt: new Date(row.created_at)
       }));
     } catch (error) {
       throw new Error(`Failed to get categories: ${error}`);
@@ -537,7 +537,7 @@ export class ProjectFileManager {
       return rows.map(row => ({
         id: row.id,
         name: row.name,
-        createdAt: new Date(row.createdAt)
+        createdAt: new Date(row.created_at)
       }));
     } catch (error) {
       throw new Error(`Failed to get locations: ${error}`);
