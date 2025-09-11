@@ -27,6 +27,9 @@ const ProductNew: React.FC = () => {
     specification_description: '',
     category: [] as string[],
     custom_image_url: '',
+    image_hash: '',
+    thumbnail_hash: '',
+    images_hashes: [] as string[],
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +38,8 @@ const ProductNew: React.FC = () => {
   const [locations, setLocations] = useState<Location[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   // For the new file-based system, we only have one current project
   const currentProject = project && project.isOpen ? project : null;
@@ -104,6 +109,9 @@ const ProductNew: React.FC = () => {
   };
 
   const handleImageUpload = async (file: File) => {
+    setIsUploading(true);
+    setUploadProgress(0);
+    
     try {
       // Validate file size (5MB limit)
       const maxSize = 5 * 1024 * 1024; // 5MB
@@ -118,24 +126,44 @@ const ProductNew: React.FC = () => {
         return;
       }
 
-      // Convert file to data URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
+      setUploadProgress(25);
+      
+      // Convert File to ArrayBuffer for AssetManager
+      const arrayBuffer = await file.arrayBuffer();
+      
+      setUploadProgress(50);
+      
+      // Upload via AssetManager IPC
+      const response = await window.electronAPI.assetUpload(
+        arrayBuffer, 
+        file.name, 
+        file.type
+      );
+      
+      setUploadProgress(75);
+      
+      if (response.success) {
+        // Store asset hashes instead of data URL
         setFormData(prev => ({
           ...prev,
-          custom_image_url: imageUrl
+          image_hash: response.data.hash,
+          thumbnail_hash: response.data.thumbnailHash,
+          // Clear old data URL field
+          custom_image_url: ''
         }));
-        showToast('Custom image uploaded successfully', 'success');
-      };
-      
-      reader.onerror = () => {
-        showToast('Failed to read image file', 'error');
-      };
-      
-      reader.readAsDataURL(file);
+        setUploadProgress(100);
+        showToast('Image uploaded successfully', 'success');
+      } else {
+        throw new Error(response.error || 'Upload failed');
+      }
     } catch (error) {
       showToast('Failed to upload image', 'error');
+      console.error('Image upload error:', error);
+    } finally {
+      setTimeout(() => {
+        setIsUploading(false);
+        setUploadProgress(0);
+      }, 500);
     }
   };
 
@@ -199,6 +227,9 @@ const ProductNew: React.FC = () => {
     try {
       await api.post('/api/products', {
         ...formData,
+        image_hash: formData.image_hash || undefined,
+        thumbnail_hash: formData.thumbnail_hash || undefined,
+        images_hashes: formData.images_hashes.length > 0 ? formData.images_hashes : undefined,
         project_id: 'current' // Use 'current' as the project ID for the new file-based system
       });
       
@@ -303,21 +334,31 @@ const ProductNew: React.FC = () => {
               <h2>Product Details</h2>
               
               {/* Image Display - Shows fetched image or custom image */}
-              {(formData.product_image || formData.custom_image_url) && (
+              {(formData.product_image || formData.custom_image_url || formData.thumbnail_hash) && (
                 <div className="form-group">
                   <label className="label">Product Image</label>
                   <div className="product-preview">
                     <img 
-                      src={formData.custom_image_url || formData.product_image} 
+                      src={
+                        formData.thumbnail_hash 
+                          ? `asset://${formData.thumbnail_hash}`        // Use optimized thumbnail
+                          : formData.custom_image_url                   // Fallback to data URL
+                          || formData.product_image                     // Fallback to scraped image
+                      } 
                       alt="Product image" 
                       className="product-image"
                     />
                     <div className="image-actions">
-                      {formData.custom_image_url ? (
+                      {(formData.custom_image_url || formData.thumbnail_hash) ? (
                         <button
                           type="button"
                           className="button button-secondary"
-                          onClick={() => setFormData(prev => ({ ...prev, custom_image_url: '' }))}
+                          onClick={() => setFormData(prev => ({ 
+                            ...prev, 
+                            custom_image_url: '',
+                            image_hash: '',
+                            thumbnail_hash: ''
+                          }))}
                         >
                           Remove Custom Image
                         </button>
@@ -326,8 +367,9 @@ const ProductNew: React.FC = () => {
                           type="button"
                           className="button button-secondary"
                           onClick={handleCustomImageClick}
+                          disabled={isUploading}
                         >
-                          Add Custom Image
+                          {isUploading ? `Uploading... ${uploadProgress}%` : 'Add Custom Image'}
                         </button>
                       )}
                     </div>
