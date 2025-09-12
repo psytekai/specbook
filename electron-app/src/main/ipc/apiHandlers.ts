@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron';
 import { ProjectState } from '../services/ProjectState';
+import { transformApiToInternal, transformInternalToApi } from '../../shared/mappings/apiFieldMappings';
 
 /**
  * Set up IPC handlers that replace the existing API service
@@ -270,25 +271,42 @@ class APIRouter {
       throw new Error('No project open');
     }
 
-    const product = await manager.createProduct({
-      projectId: 'current',
-      url: data.product_url,
-      tagId: data.tag_id,
-      location: data.product_location,
-      description: data.product_description,
-      specificationDescription: data.specification_description,
-      category: data.category,
-      productName: data.product_name,
-      manufacturer: data.manufacturer,
-      price: data.price,
-      // Asset hash fields for content-addressable storage
-      primaryImageHash: data.primary_image_hash,
-      primaryThumbnailHash: data.primary_thumbnail_hash,
-      additionalImagesHashes: data.additional_images_hashes
-    });
-
-    this.projectState.markDirty();
-    return { success: true, data: product };
+    try {
+      // Transform API fields to internal format
+      const transformedData = transformApiToInternal(data);
+      
+      // Ensure required fields have defaults
+      const productData = {
+        projectId: 'current',
+        url: transformedData.url || '',
+        tagId: transformedData.tagId,
+        location: transformedData.location || [],
+        description: transformedData.description,
+        specificationDescription: transformedData.specificationDescription,
+        category: transformedData.category || [],
+        productName: transformedData.productName || '',
+        manufacturer: transformedData.manufacturer,
+        price: transformedData.price,
+        primaryImageHash: transformedData.primaryImageHash,
+        primaryThumbnailHash: transformedData.primaryThumbnailHash,
+        additionalImagesHashes: transformedData.additionalImagesHashes || []
+      };
+      
+      const product = await manager.createProduct(productData);
+      this.projectState.markDirty();
+      
+      // Transform back to API format for response
+      return { 
+        success: true, 
+        data: transformInternalToApi(product)
+      };
+    } catch (error) {
+      console.error('Failed to create product:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to create product'
+      };
+    }
   }
 
   private async updateProduct(productId: string, data: any) {
@@ -299,41 +317,30 @@ class APIRouter {
       throw new Error('No project open');
     }
 
-    // Map API field names to internal field names, including asset hash fields
-    const fieldMapping: Record<string, string> = {
-      product_url: 'url',
-      tag_id: 'tagId',
-      product_location: 'location',
-      product_image: 'image',
-      product_images: 'images',
-      product_description: 'description',
-      specification_description: 'specificationDescription',
-      image_hash: 'imageHash',
-      thumbnail_hash: 'thumbnailHash',
-      images_hashes: 'imagesHashes'
-    };
-
-    const updateData: Record<string, any> = {};
-    
-    // Map fields that need name conversion
-    for (const [apiField, dbField] of Object.entries(fieldMapping)) {
-      if (data[apiField] !== undefined) {
-        updateData[dbField] = data[apiField];
-      }
+    try {
+      // Transform API fields to internal format
+      const transformedData = transformApiToInternal(data);
+      
+      // Remove any null values from deprecated fields
+      const cleanedData = Object.fromEntries(
+        Object.entries(transformedData).filter(([_, v]) => v !== null)
+      );
+      
+      const product = await manager.updateProduct(productId, cleanedData);
+      this.projectState.markDirty();
+      
+      // Transform back to API format for response
+      return { 
+        success: true, 
+        data: transformInternalToApi(product)
+      };
+    } catch (error) {
+      console.error('Failed to update product:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to update product'
+      };
     }
-
-    // Add fields that don't need mapping
-    const directFields = ['category', 'product_name', 'manufacturer', 'price', 'custom_image_url'];
-    for (const field of directFields) {
-      if (data[field] !== undefined) {
-        updateData[field] = data[field];
-      }
-    }
-
-    const product = await manager.updateProduct(productId, updateData);
-
-    this.projectState.markDirty();
-    return { success: true, data: product };
   }
 
   private async deleteProduct(productId: string) {
