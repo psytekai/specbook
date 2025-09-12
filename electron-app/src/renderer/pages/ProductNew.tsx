@@ -17,19 +17,32 @@ const ProductNew: React.FC = () => {
   const { project, isLoading: projectLoading, isInitializing } = useElectronProject();
   const { showToast } = useToast();
   
-  const [formData, setFormData] = useState({
-    product_url: '',
-    tag_id: '',
-    product_location: [] as string[],
-    product_image: '',
-    product_images: [] as string[],
-    product_description: '',
-    specification_description: '',
-    category: [] as string[],
-    custom_image_url: '',
-    image_hash: '',
-    thumbnail_hash: '',
-    images_hashes: [] as string[],
+  // API field names interface using camelCase
+  interface ProductFormData {
+    productUrl: string;
+    tagId: string;
+    productLocation: string[];
+    productDescription: string;
+    specificationDescription: string;
+    category: string[];
+    productName?: string;
+    manufacturer?: string;
+    price?: number;
+    
+    // Asset management - correct field names
+    primaryImageHash?: string;
+    primaryThumbnailHash?: string;
+    additionalImagesHashes: string[];
+  }
+
+  const [formData, setFormData] = useState<ProductFormData>({
+    productUrl: '',
+    tagId: '',
+    productLocation: [],
+    productDescription: '',
+    specificationDescription: '',
+    category: [],
+    additionalImagesHashes: []
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -155,13 +168,11 @@ const ProductNew: React.FC = () => {
       if (response.success) {
         console.log('✅ Upload successful:', response.data);
         
-        // Store asset hashes instead of data URL
+        // Store asset hashes using correct field names
         setFormData(prev => ({
           ...prev,
-          image_hash: response.data.hash,
-          thumbnail_hash: response.data.thumbnailHash,
-          // Clear old data URL field
-          custom_image_url: ''
+          primaryImageHash: response.data.hash,
+          primaryThumbnailHash: response.data.thumbnailHash
         }));
         setUploadProgress(100);
         showToast(`Image uploaded successfully to project assets directory`, 'success');
@@ -187,9 +198,9 @@ const ProductNew: React.FC = () => {
   const handleFetchDetails = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const { product_url, tag_id, product_location } = formData;
+    const { productUrl, tagId, productLocation } = formData;
     
-    if (!product_url || !tag_id || !product_location.length) {
+    if (!productUrl || !tagId || !productLocation.length) {
       showToast('Please fill in all required fields', 'error');
       return;
     }
@@ -198,19 +209,29 @@ const ProductNew: React.FC = () => {
     
     try {
       const response = await api.scrape({
-        url: product_url,
-        tagId: tag_id,
-        productLocation: product_location[0] // Use first location for API call
+        url: productUrl,
+        tagId: tagId,
+        productLocation: productLocation[0] // Use first location for API call
       });
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch product details');
       }
       
-      setFormData(prev => ({
-        ...prev,
-        ...response.data
-      }));
+      if (response.data) {
+        const data = response.data;
+        setFormData(prev => ({
+          ...prev,
+          productDescription: data.productDescription || '',
+          specificationDescription: data.specificationDescription || '',
+          category: data.category || [],
+          productName: data.productName || '',
+          manufacturer: Array.isArray(data.manufacturer) 
+            ? data.manufacturer.join(', ') 
+            : data.manufacturer || '',
+          price: data.price
+        }));
+      }
       
       setHasDetails(true);
       showToast('Product details fetched successfully', 'success');
@@ -225,25 +246,18 @@ const ProductNew: React.FC = () => {
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!hasDetails) {
-      showToast('Please fetch product details first', 'error');
+    if (!formData.productUrl) {
+      showToast('Product URL is required', 'error');
       return;
     }
-    
-    if (!formData.category || formData.category.length === 0) {
-      showToast('Please select at least one category', 'error');
-      return;
-    }
-    
-    setIsSaving(true);
     
     try {
+      setIsSaving(true);
+      
+      // Submit with correct field names - no manual mapping needed
       await api.post('/api/products', {
         ...formData,
-        primary_image_hash: formData.image_hash || undefined,
-        primary_thumbnail_hash: formData.thumbnail_hash || undefined,
-        additional_images_hashes: formData.images_hashes.length > 0 ? formData.images_hashes : undefined,
-        project_id: 'current' // Use 'current' as the project ID for the new file-based system
+        projectId: 'current'
       });
       
       showToast('Product saved successfully', 'success');
@@ -289,15 +303,15 @@ const ProductNew: React.FC = () => {
             <h2>Product Information</h2>
             
             <div className="form-group">
-              <label htmlFor="product_url" className="label">
+              <label htmlFor="productUrl" className="label">
                 Product URL *
               </label>
               <input
-                id="product_url"
-                name="product_url"
+                id="productUrl"
+                name="productUrl"
                 type="url"
                 className="input"
-                value={formData.product_url}
+                value={formData.productUrl}
                 onChange={handleInputChange}
                 placeholder="https://example.com/product"
                 required
@@ -305,15 +319,15 @@ const ProductNew: React.FC = () => {
             </div>
             
             <div className="form-group">
-              <label htmlFor="tag_id" className="label">
+              <label htmlFor="tagId" className="label">
                 Tag ID *
               </label>
               <input
-                id="tag_id"
-                name="tag_id"
+                id="tagId"
+                name="tagId"
                 type="text"
                 className="input"
-                value={formData.tag_id}
+                value={formData.tagId}
                 onChange={handleInputChange}
                 placeholder="Enter tag ID"
                 required
@@ -325,8 +339,8 @@ const ProductNew: React.FC = () => {
                 Product Locations *
               </label>
               <LocationMultiSelect
-                selectedLocations={formData.product_location}
-                onSelectionChange={(locations: string[]) => setFormData(prev => ({ ...prev, product_location: locations }))}
+                selectedLocations={formData.productLocation}
+                onSelectionChange={(locations: string[]) => setFormData(prev => ({ ...prev, productLocation: locations }))}
                 availableLocations={locations}
                 onAddLocation={handleAddLocation}
                 required={true}
@@ -347,74 +361,67 @@ const ProductNew: React.FC = () => {
               <h2>Product Details</h2>
               
               {/* Image Display - Shows fetched image or custom image */}
-              {(formData.product_image || formData.custom_image_url || formData.thumbnail_hash) && (
+              {formData.primaryThumbnailHash && (
                 <div className="form-group">
                   <label className="label">Product Image</label>
                   <div className="product-preview">
                     <img 
-                      src={
-                        formData.thumbnail_hash 
-                          ? `asset://${formData.thumbnail_hash}`        // Use optimized thumbnail
-                          : formData.custom_image_url                   // Fallback to data URL
-                          || formData.product_image                     // Fallback to scraped image
-                      } 
+                      src={`asset://${formData.primaryThumbnailHash}`}
                       alt="Product image" 
                       className="product-image"
                     />
                     <div className="image-actions">
-                      {(formData.custom_image_url || formData.thumbnail_hash) ? (
-                        <button
-                          type="button"
-                          className="button button-secondary"
-                          onClick={() => setFormData(prev => ({ 
-                            ...prev, 
-                            custom_image_url: '',
-                            image_hash: '',
-                            thumbnail_hash: ''
-                          }))}
-                        >
-                          Remove Custom Image
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="button button-secondary"
-                          onClick={handleCustomImageClick}
-                          disabled={isUploading}
-                        >
-                          {isUploading ? `Uploading... ${uploadProgress}%` : 'Add Custom Image'}
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        className="button button-secondary"
+                        onClick={() => setFormData(prev => ({ 
+                          ...prev, 
+                          primaryImageHash: undefined,
+                          primaryThumbnailHash: undefined
+                        }))}
+                      >
+                        Remove Image
+                      </button>
                     </div>
                   </div>
                 </div>
               )}
-              
-              {/* Remove the separate custom image preview section */}
+
+              {/* Image Upload Button */}
+              <div className="form-group">
+                <button
+                  type="button"
+                  className="button button-secondary"
+                  onClick={handleCustomImageClick}
+                  disabled={isUploading}
+                >
+                  {isUploading ? `Uploading... ${uploadProgress}%` : 'Upload Image'}
+                </button>
+              </div>
               
               <div className="form-group">
-                <label htmlFor="product_description" className="label">
+                <label htmlFor="productDescription" className="label">
                   Description
                 </label>
                 <textarea
-                  id="product_description"
-                  name="product_description"
+                  id="productDescription"
+                  name="productDescription"
                   className="input textarea"
-                  value={formData.product_description}
+                  value={formData.productDescription}
                   onChange={handleInputChange}
                   rows={4}
                 />
               </div>
               
               <div className="form-group">
-                <label htmlFor="specification_description" className="label">
+                <label htmlFor="specificationDescription" className="label">
                   Specifications
                 </label>
                 <textarea
-                  id="specification_description"
-                  name="specification_description"
+                  id="specificationDescription"
+                  name="specificationDescription"
                   className="input textarea"
-                  value={formData.specification_description}
+                  value={formData.specificationDescription}
                   onChange={handleInputChange}
                   rows={4}
                 />
