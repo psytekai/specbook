@@ -23,6 +23,12 @@ export interface ElectronAPI {
   apiPut: (endpoint: string, data?: any) => Promise<any>;
   apiDelete: (endpoint: string) => Promise<any>;
   apiScrape: (request: any) => Promise<any>;
+  assetUpload: (fileData: ArrayBuffer, filename: string, mimetype: string, options?: any) => Promise<any>;
+  assetGetPath: (hash: string, thumbnail?: boolean) => Promise<any>;
+  assetDelete: (hash: string) => Promise<any>;
+  assetCleanup: (options?: { removeOlderThan?: number; dryRun?: boolean }) => Promise<any>;
+  assetImportBatch: (files: Array<{ data: ArrayBuffer; filename: string }>, options?: any) => Promise<any>;
+  assetStatistics: () => Promise<any>;
 }
 
 declare global {
