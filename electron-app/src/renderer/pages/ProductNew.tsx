@@ -9,6 +9,7 @@ import {
 import { LocationMultiSelect } from '../components/LocationMultiSelect';
 import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
 import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
+import { getAssetUrl } from '../../shared/utils/assetUtils';
 import './ProductNew.css';
 
 const ProductNew: React.FC = () => {
@@ -366,7 +367,7 @@ const ProductNew: React.FC = () => {
                   <label className="label">Product Image</label>
                   <div className="product-preview">
                     <img 
-                      src={`asset://${formData.primaryThumbnailHash}`}
+                      src={getAssetUrl(formData.primaryThumbnailHash)!}
                       alt="Product image" 
                       className="product-image"
                     />

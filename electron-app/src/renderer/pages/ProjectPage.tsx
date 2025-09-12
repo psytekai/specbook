@@ -5,6 +5,7 @@ import { Product } from '../types';
 import { api } from '../services/apiIPC';
 import { formatArray, formatPrice } from '../utils/formatters';
 import { TableSettingsModal, useTableSettings } from '../components/TableSettings';
+import { getProductImageUrl, getPlaceholderImage } from '../../shared/utils/assetUtils';
 import './ProjectPage.css';
 
 // Types for persisted state
@@ -732,13 +733,11 @@ const ProjectPage: React.FC = () => {
                   {locationProducts.map(product => (
                     <div key={product.id} className="product-card">
                       <div className="product-image">
-                        {product.primaryThumbnailHash ? (
-                          <img src={`asset://${product.primaryThumbnailHash}`} alt={product.description} />
-                        ) : product.primaryImageHash ? (
-                          <img src={`asset://${product.primaryImageHash}`} alt={product.description} />
-                        ) : (
-                          <div className="no-image">No Image</div>
-                        )}
+                        <img 
+                          src={getProductImageUrl(product) || getPlaceholderImage()} 
+                          alt={product.description || 'Product image'}
+                          className="w-full h-48 object-cover"
+                        />
                       </div>
                       <div className="product-info">
                         <h3 className="product-title">{product.productName || product.description}</h3>
@@ -839,13 +838,10 @@ const ProjectPage: React.FC = () => {
                             {tableSettings.settings.columns.image?.visible && (
                               <td className="image-cell">
                                 <div className="list-product-image">
-                                  {product.primaryThumbnailHash ? (
-                                    <img src={`asset://${product.primaryThumbnailHash}`} alt={product.description} />
-                                  ) : product.primaryImageHash ? (
-                                    <img src={`asset://${product.primaryImageHash}`} alt={product.description} />
-                                  ) : (
-                                    <div className="no-image-small">No Image</div>
-                                  )}
+                                  <img 
+                                    src={getProductImageUrl(product) || getPlaceholderImage()} 
+                                    alt={product.description || 'Product image'}
+                                  />
                                 </div>
                               </td>
                             )}

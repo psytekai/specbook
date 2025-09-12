@@ -8,6 +8,7 @@ import { EditableSection } from '../components/EditableSection';
 import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
 import { LocationMultiSelect } from '../components/LocationMultiSelect';
 import { formatPrice } from '../utils/formatters';
+import { getProductImageUrl, getPlaceholderImage } from '../../shared/utils/assetUtils';
 import './ProductPage.css';
 
 const ProductPage: React.FC = () => {
@@ -257,12 +258,12 @@ const ProductPage: React.FC = () => {
               <h3>Product Image</h3>
               
               {/* Current Image Display */}
-              {(product.primaryThumbnailHash || product.primaryImageHash) ? (
+              {getProductImageUrl(product) ? (
                 <div className="main-image">
                   <div className="image-container">
                     <img 
-                      src={product.primaryThumbnailHash ? `asset://${product.primaryThumbnailHash}` : `asset://${product.primaryImageHash}`} 
-                      alt={product.description}
+                      src={getProductImageUrl(product)!} 
+                      alt={product.description || 'Product image'}
                     />
                     <button
                       type="button"
@@ -278,8 +279,13 @@ const ProductPage: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="no-image-large">
-                  <p>No Image Available</p>
+                <div className="main-image">
+                  <div className="image-container">
+                    <img 
+                      src={getPlaceholderImage()} 
+                      alt="No image available"
+                    />
+                  </div>
                 </div>
               )}
               
