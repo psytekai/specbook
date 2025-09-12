@@ -12,18 +12,20 @@ export interface Product {
   id: string;
   projectId: string;
   url: string;
-  tagId: string;
-  location: string[];           // CHANGED: multi-select
-  description: string;
-  specificationDescription: string;
-  category: string | string[];  // FLEXIBLE: can be string or array
-  product_name?: string;        // NEW
-  manufacturer?: string;        // NEW  
-  price?: number;              // NEW
-  // Asset management fields (Phase 4)
-  primaryImageHash?: string;    // Content-addressable hash for primary image
-  primaryThumbnailHash?: string; // Hash for thumbnail of primary image
-  additionalImagesHashes?: string[]; // Array of hashes for additional images
+  tagId?: string;  // Make optional
+  location: string[];  // Keep as array
+  description?: string;  // Make optional
+  specificationDescription?: string;  // Make optional
+  category: string[];  // Change from string | string[] to just string[]
+  productName: string;
+  manufacturer?: string;
+  price?: number;
+  
+  // Asset fields - ensure camelCase
+  primaryImageHash?: string;
+  primaryThumbnailHash?: string;
+  additionalImagesHashes?: string[];
+  
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,39 +36,39 @@ export interface ApiError {
 }
 
 export interface FetchProductDetailsRequest {
-  product_url: string;
-  tag_id: string;
-  product_location: string;
+  productUrl: string;
+  tagId: string;
+  productLocation: string;
 }
 
 export interface FetchProductDetailsResponse {
-  product_description: string;
-  specification_description: string;
+  productDescription: string;
+  specificationDescription: string;
   category: string[];
-  product_name?: string;        // NEW
-  manufacturer?: string;        // NEW
-  price?: number;              // NEW
+  productName?: string;
+  manufacturer?: string;
+  price?: number;
   // Asset management fields (Phase 4)
-  primaryImageHash?: string;    // Content-addressable hash for primary image
-  primaryThumbnailHash?: string; // Hash for thumbnail of primary image
-  additionalImagesHashes?: string[]; // Array of hashes for additional images
+  primaryImageHash?: string;
+  primaryThumbnailHash?: string;
+  additionalImagesHashes?: string[];
 }
 
 export interface SaveProductRequest {
-  product_url: string;
-  tag_id: string;
-  product_location: string[];   // CHANGED: multi-select
-  product_description: string;
-  specification_description: string;
+  productUrl: string;
+  tagId: string;
+  productLocation: string[];
+  productDescription: string;
+  specificationDescription: string;
   category: string[];
-  product_name?: string;        // NEW
-  manufacturer?: string;        // NEW
-  price?: number;              // NEW
+  productName?: string;
+  manufacturer?: string;
+  price?: number;
   // Asset management fields (Phase 4)
-  primaryImageHash?: string;    // Content-addressable hash for primary image
-  primaryThumbnailHash?: string; // Hash for thumbnail of primary image
-  additionalImagesHashes?: string[]; // Array of hashes for additional images
-  project_id: string;
+  primaryImageHash?: string;
+  primaryThumbnailHash?: string;
+  additionalImagesHashes?: string[];
+  projectId: string;
 }
 
 // Reference Data Types

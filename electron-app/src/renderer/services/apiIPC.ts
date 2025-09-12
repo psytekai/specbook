@@ -53,17 +53,17 @@ export const handleApiError = (error: unknown): { message: string; code: string 
  */
 export const scrapeProduct = async (request: {
   url: string;
-  tag_id: string;
-  product_location: string;
+  tagId: string;
+  productLocation: string;
 }): Promise<{ 
   success: boolean; 
   data?: {
-    product_image: string;
-    product_images: string[];
-    product_description: string;
-    specification_description: string;
+    productImage: string;
+    productImages: string[];
+    productDescription: string;
+    specificationDescription: string;
     category: string[];
-    product_name: string;
+    productName: string;
     manufacturer: string[];
     price: number;
   };
@@ -178,8 +178,8 @@ export const api = {
   // Scraping endpoint maintained for compatibility
   scrape: async (request: {
     url: string;
-    tag_id: string;
-    product_location: string;
+    tagId: string;
+    productLocation: string;
   }) => {
     return await scrapeProduct(request);
   }

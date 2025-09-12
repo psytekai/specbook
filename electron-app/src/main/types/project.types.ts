@@ -12,21 +12,22 @@ export interface Product {
   id: string;
   projectId: string;
   url: string;
-  tagId?: string;
-  location: string[];
-  description?: string;
-  specificationDescription?: string;
-  category: string[];
+  tagId?: string;  // Optional to match DB
+  location: string[];  // Always array
+  description?: string;  // Optional to match DB
+  specificationDescription?: string;  // Optional to match DB
+  category: string[];  // Always array, never string
   productName: string;
   manufacturer?: string;
   price?: number;
+  
+  // Asset management fields - camelCase
+  primaryImageHash?: string;
+  primaryThumbnailHash?: string;
+  additionalImagesHashes?: string[];  // Optional array
+  
   createdAt: Date;
   updatedAt: Date;
-  
-  // Asset management fields (Phase 4)
-  primaryImageHash?: string;        // SHA-256 hash of primary image
-  primaryThumbnailHash?: string;    // SHA-256 hash of primary thumbnail
-  additionalImagesHashes?: string[];   // Array of SHA-256 hashes for additional images
 }
 
 export interface Category {

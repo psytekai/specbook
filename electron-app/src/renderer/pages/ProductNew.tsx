@@ -199,8 +199,8 @@ const ProductNew: React.FC = () => {
     try {
       const response = await api.scrape({
         url: product_url,
-        tag_id,
-        product_location: product_location[0] // Use first location for API call
+        tagId: tag_id,
+        productLocation: product_location[0] // Use first location for API call
       });
       
       if (!response.success) {
