@@ -260,6 +260,9 @@ export class ProjectFileManager {
   /**
    * Gets all products with optional filtering
    */
+  /**
+   * Gets all products with optional filtering
+   */
   async getProducts(filters?: { category?: string; location?: string }): Promise<Product[]> {
     if (!this.db) {
       throw new Error('No project is currently open');
@@ -279,7 +282,8 @@ export class ProjectFileManager {
         params.push(`%${filters.location}%`);
       }
 
-      query += ' ORDER BY createdAt DESC';
+      // Fix: Use snake_case column name in SQL query
+      query += ' ORDER BY created_at DESC';
 
       const stmt = this.db.prepare(query);
       const rows = stmt.all(...params) as any[];
