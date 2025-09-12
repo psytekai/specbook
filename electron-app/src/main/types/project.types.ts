@@ -17,7 +17,7 @@ export interface Product {
   description?: string;
   specificationDescription?: string;
   category: string[];
-  product_name: string;
+  productName: string;
   manufacturer?: string;
   price?: number;
   createdAt: Date;

@@ -3,6 +3,7 @@ import * as path from 'path';
 import Database from 'better-sqlite3';
 import { v4 as uuidv4 } from 'uuid';
 import { AssetManager } from './AssetManager';
+import { mapDbRowToInterface, mapInterfaceToDb } from '../../shared/mappings/fieldMappings';
 import type { 
   Project, 
   Product, 
@@ -299,35 +300,43 @@ export class ProjectFileManager {
 
     try {
       const id = uuidv4();
-      const now = new Date();
-
+      const now = new Date().toISOString();
+      
+      // Map interface fields to database column names
+      const dbData = mapInterfaceToDb({
+        ...productData,
+        id,
+        createdAt: now,
+        updatedAt: now
+      });
+      
       const stmt = this.db.prepare(`
         INSERT INTO products (
-          id, project_id, url, tag_id, location, 
+          id, project_id, url, tag_id, location,
           description, specification_description, category, 
           product_name, manufacturer, price,
           primary_image_hash, primary_thumbnail_hash, additional_images_hashes,
           created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
-
+      
       stmt.run(
-        id,
-        productData.projectId || this.currentProject.id,
-        productData.url,
-        productData.tagId || null,
+        dbData.id,
+        dbData.project_id || this.currentProject.id,
+        dbData.url,
+        dbData.tag_id || null,
         JSON.stringify(productData.location || []),
-        productData.description || null,
-        productData.specificationDescription || null,
+        dbData.description || null,
+        dbData.specification_description || null,
         JSON.stringify(productData.category || []),
-        productData.product_name,
-        productData.manufacturer || null,
-        productData.price || null,
-        productData.primaryImageHash || null,
-        productData.primaryThumbnailHash || null,
+        dbData.product_name,
+        dbData.manufacturer || null,
+        dbData.price || null,
+        dbData.primary_image_hash || null,
+        dbData.primary_thumbnail_hash || null,
         JSON.stringify(productData.additionalImagesHashes || []),
-        now.toISOString(),
-        now.toISOString()
+        dbData.created_at,
+        dbData.updated_at
       );
 
       // Update product count in manifest
@@ -337,15 +346,9 @@ export class ProjectFileManager {
       await this.extractAndStoreCategories(productData.category || []);
       await this.extractAndStoreLocations(productData.location || []);
 
-      const product: Product = {
-        ...productData,
-        id,
-        projectId: productData.projectId || this.currentProject.id,
-        createdAt: now,
-        updatedAt: now
-      };
-
-      return product;
+      // Get the created product using the same parsing logic
+      const createdRow = this.db.prepare('SELECT * FROM products WHERE id = ?').get(id) as any;
+      return this.parseProductRow(createdRow);
     } catch (error) {
       throw new Error(`Failed to create product: ${error}`);
     }
@@ -396,9 +399,9 @@ export class ProjectFileManager {
         values.push(JSON.stringify(updates.category));
         await this.extractAndStoreCategories(updates.category);
       }
-      if (updates.product_name !== undefined) {
+      if (updates.productName !== undefined) {
         updateFields.push('product_name = ?');
-        values.push(updates.product_name);
+        values.push(updates.productName);
       }
       if (updates.manufacturer !== undefined) {
         updateFields.push('manufacturer = ?');
@@ -701,26 +704,42 @@ export class ProjectFileManager {
    * Parses a database row into a Product object
    */
   private parseProductRow(row: any): Product {
+    // First apply field name mappings
+    const mappedRow = mapDbRowToInterface(row);
+    
+    // Then parse JSON fields and ensure correct types
     return {
-      id: row.id,
-      projectId: row.project_id,
-      url: row.url,
-      tagId: row.tag_id,
-      location: row.location ? JSON.parse(row.location) : [],
-      description: row.description,
-      specificationDescription: row.specification_description,
-      category: row.category ? JSON.parse(row.category) : [],
-      product_name: row.product_name,
-      manufacturer: row.manufacturer,
-      price: row.price,
-      createdAt: new Date(row.created_at),
-      updatedAt: new Date(row.updated_at),
+      id: mappedRow.id,
+      projectId: mappedRow.projectId,
+      url: mappedRow.url,
+      tagId: mappedRow.tagId || undefined,
+      location: this.parseJsonArray(mappedRow.location),
+      description: mappedRow.description || undefined,
+      specificationDescription: mappedRow.specificationDescription || undefined,
+      category: this.parseJsonArray(mappedRow.category),
+      productName: mappedRow.productName,
+      manufacturer: mappedRow.manufacturer || undefined,
+      price: mappedRow.price || undefined,
       
-      // Asset management fields (Phase 4)
-      primaryImageHash: row.primary_image_hash,
-      primaryThumbnailHash: row.primary_thumbnail_hash,
-      additionalImagesHashes: row.additional_images_hashes ? JSON.parse(row.additional_images_hashes) : []
+      // Asset fields now properly mapped from snake_case
+      primaryImageHash: mappedRow.primaryImageHash || undefined,
+      primaryThumbnailHash: mappedRow.primaryThumbnailHash || undefined,
+      additionalImagesHashes: this.parseJsonArray(mappedRow.additionalImagesHashes),
+      
+      createdAt: new Date(mappedRow.createdAt),
+      updatedAt: new Date(mappedRow.updatedAt)
     };
+  }
+
+  private parseJsonArray(jsonField: string | null | undefined): string[] {
+    if (!jsonField) return [];
+    try {
+      const parsed = JSON.parse(jsonField);
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch (error) {
+      console.error('Failed to parse JSON array:', jsonField, error);
+      return [];
+    }
   }
 
   /**

@@ -278,7 +278,7 @@ class APIRouter {
       description: data.product_description,
       specificationDescription: data.specification_description,
       category: data.category,
-      product_name: data.product_name,
+      productName: data.product_name,
       manufacturer: data.manufacturer,
       price: data.price,
       // Asset hash fields for content-addressable storage
