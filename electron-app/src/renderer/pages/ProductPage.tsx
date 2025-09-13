@@ -117,19 +117,21 @@ const ProductPage: React.FC = () => {
     if (!product) return;
 
     try {
-      // For now, we'll update locally since there's no specific update API endpoint
-      // In a real app, this would make an API call to update the specific field
-      const updatedProduct = { ...product, [field]: value };
-      setProduct(updatedProduct);
+      // Update the product via API
+      const response = await api.put<Product>(`/api/products/${product.id}`, { [field]: value });
       
-      // Here you would typically make an API call like:
-      // await api.patch(`/projects/${projectId}/products/${productId}`, { [field]: value });
-      
-      console.log(`Updated ${field} to:`, value);
+      if (response.success && response.data) {
+        // Update local state with the response from backend
+        setProduct(response.data);
+        console.log(`Updated ${field} to:`, value);
+      } else {
+        throw new Error(response.error || 'Failed to update product');
+      }
     } catch (err) {
+      console.error(`Failed to update ${field}:`, err);
       throw new Error(`Failed to update ${field}`);
     }
-  };
+  };;
 
   // Function to handle image uploads using AssetManager
   const handleImageUpload = async (file: File) => {
