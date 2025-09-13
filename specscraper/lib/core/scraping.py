@@ -6,13 +6,6 @@ import json
 import os
 from typing import Optional, Dict, Any, List, Tuple, Set
 from urllib.parse import urljoin, urlparse
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-import undetected_chromedriver as uc
 import math
 from firecrawl import FirecrawlApp
 from dotenv import load_dotenv
@@ -233,12 +226,17 @@ class StealthScraper:
 
         Args:
             url: URL to scrape
-            method: "requests", "selenium", "auto", or "firecrawl"
+            method: "requests", "firecrawl", or "auto"
             **kwargs: Additional arguments
 
         Returns:
             ScrapeResult: Standardized result object containing success status, content, and metadata
         """
+        # Validate method
+        valid_methods = ["requests", "firecrawl", "auto"]
+        if method not in valid_methods:
+            raise ValueError(f"Invalid method '{method}'. Valid methods are: {', '.join(valid_methods)}")
+            
         start_time = time.time()
         all_methods_tried = set()
         all_page_issues = []

@@ -8,8 +8,8 @@ from enum import Enum
 class ScrapeMethod(Enum):
     """Methods available for scraping"""
     REQUESTS = "requests"
-    SELENIUM = "selenium"
     FIRECRAWL = "firecrawl"
+    AUTO = "auto"
 
 
 class ScrapeResult(BaseModel):
