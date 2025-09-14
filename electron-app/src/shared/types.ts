@@ -29,6 +29,12 @@ export interface ElectronAPI {
   assetCleanup: (options?: { removeOlderThan?: number; dryRun?: boolean }) => Promise<any>;
   assetImportBatch: (files: Array<{ data: ArrayBuffer; filename: string }>, options?: any) => Promise<any>;
   assetStatistics: () => Promise<any>;
+  
+  // Python bridge operations
+  checkPythonAvailability: () => Promise<any>;
+  scrapeProduct: (url: string, options?: any) => Promise<any>;
+  getPythonStatus: () => Promise<any>;
+  onScrapeProgress: (callback: (progress: any) => void) => () => void;
 }
 
 declare global {
