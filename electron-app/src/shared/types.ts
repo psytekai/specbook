@@ -22,7 +22,7 @@ export interface ElectronAPI {
   apiPost: (endpoint: string, data?: any) => Promise<any>;
   apiPut: (endpoint: string, data?: any) => Promise<any>;
   apiDelete: (endpoint: string) => Promise<any>;
-  apiScrape: (request: any) => Promise<any>;
+
   assetUpload: (fileData: ArrayBuffer, filename: string, mimetype: string, options?: any) => Promise<any>;
   assetGetPath: (hash: string, thumbnail?: boolean) => Promise<any>;
   assetDelete: (hash: string) => Promise<any>;

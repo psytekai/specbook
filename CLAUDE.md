@@ -234,3 +234,4 @@ monitor.record_metric("scrape", results)
 - **Electron App**: Jest with TypeScript support
 - **End-to-End**: Manual validation UI for pipeline results
 - **Coverage**: Available via `npm run test:coverage` for Electron
+- Always remove legacy code, do not migrate. This is a net new project.

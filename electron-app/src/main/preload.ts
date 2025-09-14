@@ -38,7 +38,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   apiPost: (endpoint: string, data?: any) => ipcRenderer.invoke('api:post', endpoint, data),
   apiPut: (endpoint: string, data?: any) => ipcRenderer.invoke('api:put', endpoint, data),
   apiDelete: (endpoint: string) => ipcRenderer.invoke('api:delete', endpoint),
-  apiScrape: (request: any) => ipcRenderer.invoke('api:scrape-product', request),
+
 
   // Asset management operations
   assetUpload: (fileData: ArrayBuffer, filename: string, mimetype: string, options?: any) => 

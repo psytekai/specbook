@@ -6,6 +6,7 @@ import {
   handleApiError,
   api
 } from '../services/apiIPC';
+import { usePythonScraper } from '../hooks/usePythonScraper';
 import { LocationMultiSelect } from '../components/LocationMultiSelect';
 import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
 import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
@@ -54,6 +55,15 @@ const ProductNew: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Python scraper hook
+  const { 
+    scrapeProduct, 
+    isLoading: isScrapingLoading, 
+    progress: scrapingProgress,
+    error: scrapingError,
+    isAvailable: isPythonAvailable
+  } = usePythonScraper();
 
   // For the new file-based system, we only have one current project
   const currentProject = project && project.isOpen ? project : null;
@@ -199,38 +209,40 @@ const ProductNew: React.FC = () => {
   const handleFetchDetails = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const { productUrl, tagId, productLocation } = formData;
+    const { productUrl } = formData;
     
-    if (!productUrl || !tagId || !productLocation.length) {
-      showToast('Please fill in all required fields', 'error');
+    if (!productUrl) {
+      showToast('Product URL is required', 'error');
+      return;
+    }
+
+    if (!isPythonAvailable) {
+      showToast('Python scraper is not available', 'error');
       return;
     }
     
     setIsLoading(true);
     
     try {
-      const response = await api.scrape({
-        url: productUrl,
-        tagId: tagId,
-        productLocation: productLocation[0] // Use first location for API call
+      const result = await scrapeProduct(productUrl, {
+        method: 'auto',
+        llm_model: 'gpt-4o-mini'
       });
       
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to fetch product details');
+      if (!result?.success) {
+        throw new Error(result?.error || 'Failed to fetch product details');
       }
       
-      if (response.data) {
-        const data = response.data;
+      if (result.data) {
+        const data = result.data;
         setFormData(prev => ({
           ...prev,
-          productDescription: data.productDescription || '',
-          specificationDescription: data.specificationDescription || '',
-          category: data.category || [],
-          productName: data.productName || '',
-          manufacturer: Array.isArray(data.manufacturer) 
-            ? data.manufacturer.join(', ') 
-            : data.manufacturer || '',
-          price: data.price
+          productDescription: data.description || '',
+          specificationDescription: data.description || '', // Map description to both fields
+          category: data.type ? [data.type] : [], // Map type to category
+          productName: data.model_no || '', // Use model_no as product name fallback
+          manufacturer: '', // Not provided by Python scraper
+          price: undefined // Not provided by Python scraper
         }));
       }
       
@@ -351,10 +363,47 @@ const ProductNew: React.FC = () => {
             <button 
               type="submit" 
               className="button button-primary"
-              disabled={isLoading}
+              disabled={isLoading || isScrapingLoading || !isPythonAvailable}
             >
-              {isLoading ? 'Fetching...' : 'Fetch Product Details'}
+              {isLoading || isScrapingLoading ? 'Fetching...' : 'Fetch Product Details'}
             </button>
+            
+            {/* Show scraping progress */}
+            {scrapingProgress && (
+              <div className="progress-info" style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
+                <div style={{ marginBottom: '5px' }}>
+                  {scrapingProgress.message} ({scrapingProgress.progress}%)
+                </div>
+                <div className="progress-bar" style={{ 
+                  width: '100%', 
+                  height: '4px', 
+                  backgroundColor: '#e0e0e0', 
+                  borderRadius: '2px',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    width: `${scrapingProgress.progress}%`,
+                    height: '100%',
+                    backgroundColor: '#007bff',
+                    transition: 'width 0.3s ease'
+                  }} />
+                </div>
+              </div>
+            )}
+            
+            {/* Show Python availability status */}
+            {!isPythonAvailable && (
+              <div style={{ marginTop: '10px', padding: '8px', backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '4px', fontSize: '14px' }}>
+                Python scraper is not available. Please check the installation.
+              </div>
+            )}
+            
+            {/* Show scraping errors */}
+            {scrapingError && (
+              <div style={{ marginTop: '10px', padding: '8px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', fontSize: '14px', color: '#721c24' }}>
+                {scrapingError}
+              </div>
+            )}
           </div>
           
           {hasDetails && (
