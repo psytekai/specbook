@@ -17,6 +17,7 @@ interface ApiResponse<T> {
   success: boolean;
   data: T;
   pagination?: PaginationInfo;
+  error?: string;
 }
 
 interface PaginationInfo {

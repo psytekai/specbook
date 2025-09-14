@@ -52,7 +52,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
   assetImportBatch: (files: Array<{ data: ArrayBuffer; filename: string }>, options?: any) => 
     ipcRenderer.invoke('asset:import-batch', files, options),
   assetStatistics: () => 
-    ipcRenderer.invoke('asset:statistics')
+    ipcRenderer.invoke('asset:statistics'),
+
+  // Python bridge operations
+  checkPythonAvailability: () => ipcRenderer.invoke('python:check-availability'),
+  scrapeProduct: (url: string, options?: any) => 
+    ipcRenderer.invoke('python:scrape-product', url, options),
+  getPythonStatus: () => ipcRenderer.invoke('python:get-status'),
+  
+  onScrapeProgress: (callback: (progress: any) => void) => {
+    const handler = (_event: any, progress: any) => callback(progress);
+    ipcRenderer.on('python:scrape-progress', handler);
+    // Return cleanup function
+    return () => {
+      ipcRenderer.removeListener('python:scrape-progress', handler);
+    };
+  }
 });
 
 // Types are defined in shared/types.ts

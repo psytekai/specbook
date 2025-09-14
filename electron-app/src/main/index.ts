@@ -5,6 +5,8 @@ import { ApplicationMenu } from './menu/ApplicationMenu';
 import { setupProjectIPC } from './ipc/projectHandlers';
 import { setupAPIIPC } from './ipc/apiHandlers';
 import { setupAssetIPC } from './ipc/assetHandlers';
+import { setupPythonIPC } from './ipc/pythonHandlers';
+import { pythonBridge } from './services/PythonBridge';
 import { ProjectState } from './services/ProjectState';
 import { AssetManager } from './services/AssetManager';
 
@@ -85,6 +87,12 @@ app.whenReady().then(() => {
   setupAPIIPC();
   setupAssetIPC();
   
+  // Create window first to pass to Python IPC
+  const mainWindow = createWindow();
+  
+  // Set up Python IPC with window reference for progress updates
+  setupPythonIPC(mainWindow);
+  
   // Register custom asset:// protocol for serving images
   console.log('🎯 Registering asset:// protocol handler');
   protocol.registerFileProtocol('asset', async (request, callback) => {
@@ -151,8 +159,6 @@ app.whenReady().then(() => {
       callback({ error: -6 }); // FILE_NOT_FOUND
     }
   });
-  
-  createWindow();
 
   app.on('activate', () => {
     // On macOS, re-create a window when the dock icon is clicked
@@ -175,4 +181,20 @@ app.on('web-contents-created', (_, contents) => {
     shell.openExternal(url);
     return { action: 'deny' };
   });
+});
+
+// Graceful shutdown - cleanup Python processes
+app.on('before-quit', async (event) => {
+  event.preventDefault();
+  
+  try {
+    console.log('🐍 Shutting down Python bridge processes...');
+    await pythonBridge.shutdown();
+    console.log('✅ Python bridge shutdown complete');
+  } catch (error) {
+    console.error('❌ Error during Python bridge shutdown:', error);
+  }
+  
+  // Allow app to quit after cleanup
+  setImmediate(() => app.quit());
 });
