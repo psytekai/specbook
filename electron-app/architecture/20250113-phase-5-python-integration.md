@@ -1,14 +1,14 @@
 # Phase 5: Python Integration Implementation Guide
 
 ## Overview
-This document provides step-by-step instructions for integrating the Python specscraper backend with the Electron desktop application using **Option 3: Minimal Core + Cloud Fallback** bundling strategy. The integration uses a CLI-based approach with embedded Python runtime for cross-platform compatibility.
+This document provides step-by-step instructions for integrating the Python specscraper backend with the Electron desktop application using **PyInstaller bundling strategy**. The integration uses a CLI-based approach with PyInstaller to create a standalone executable for cross-platform compatibility.
 
 ## Architecture Summary
 - **Communication**: JSON via stdin/stdout
 - **Progress Updates**: JSON via stderr  
 - **Error Handling**: Structured JSON responses
 - **Process Model**: Spawn per request (stateless)
-- **Bundle Strategy**: Embedded Python runtime (~65-80MB total)
+- **Bundle Strategy**: PyInstaller standalone executable (~40-60MB total)
 - **Scraping Flow**: requests → Firecrawl API fallback
 - **Dependencies**: Minimal core packages only (no Selenium/Chrome)
 
@@ -18,18 +18,151 @@ This document provides step-by-step instructions for integrating the Python spec
 electron-app/
 ├── app.asar
 ├── resources/
-│   └── python/                    # Embedded Python environment
-│       ├── python(.exe)           # Python 3.11 interpreter (~30MB)
-│       ├── Lib/                   # Python standard library (~25MB)  
-│       └── site-packages/         # Minimal packages (~15MB)
-│           ├── openai/
-│           ├── requests/
-│           ├── beautifulsoup4/
-│           ├── pydantic/
-│           ├── firecrawl_py/
-│           └── python_dotenv/
-└── specscraper/
-    └── electron_bridge.py         # CLI bridge script
+│   └── python/
+│       └── electron_bridge/       # PyInstaller bundle directory
+│           ├── electron_bridge    # Standalone executable (macOS/Linux)
+│           ├── electron_bridge.exe # Standalone executable (Windows)
+│           └── _internal/         # PyInstaller dependencies
+│               ├── python311.dll
+│               ├── base_library.zip
+│               ├── openai/
+│               ├── requests/
+│               ├── beautifulsoup4/
+│               ├── pydantic/
+│               ├── firecrawl/
+│               └── python_dotenv/
+```
+
+## PyInstaller Integration
+
+### Why PyInstaller?
+- ✅ **Standalone executable**: No Python installation required on target machines
+- ✅ **Automatic dependency resolution**: Finds all imports automatically
+- ✅ **Cross-platform**: Works on Windows, macOS, Linux
+- ✅ **Smaller bundle**: Only includes required packages (~40-60MB vs 100MB+)
+- ✅ **Simpler integration**: Single executable vs complex Python environment
+- ✅ **Better reliability**: No venv configuration issues
+
+### Bundle Script (scripts/bundle-python.sh)
+```bash
+#!/bin/bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+SPEC_DIR="$PROJECT_DIR/../specscraper"
+OUT_DIR="$SPEC_DIR/dist/electron_bridge"
+BUNDLE_DIR="$PROJECT_DIR/resources/python/electron_bridge"
+
+echo "Creating PyInstaller bundle..."
+
+case "$(uname -s | tr '[:upper:]' '[:lower:]')" in
+  darwin)
+    cd "$SPEC_DIR"
+    python3 -m venv .venv
+    source .venv/bin/activate
+    python -m pip install --upgrade pip wheel
+    [ -f requirements-minimal.txt ] && python -m pip install -r requirements-minimal.txt
+    python -m pip install pyinstaller
+    pyinstaller --noconfirm --clean --onedir --noconsole --name electron_bridge electron_bridge.py
+    deactivate
+
+    rm -rf "$BUNDLE_DIR"
+    mkdir -p "$(dirname "$BUNDLE_DIR")"
+    cp -R "$OUT_DIR" "$BUNDLE_DIR"
+    echo "✅ Python bundle created at: $BUNDLE_DIR"
+    echo "Bundle size: $(du -sh "$BUNDLE_DIR" | cut -f1)"
+    ;;
+  *)
+    echo "Build this on the target OS (use CI runners)."
+    exit 1
+    ;;
+esac
+```
+
+### Electron Integration
+```typescript
+import path from "path";
+import { app } from "electron";
+import { spawn } from "child_process";
+
+/**
+ * Get the path to the PyInstaller-bundled Python bridge executable
+ */
+function bridgePath(): string {
+  const base = app.isPackaged ? process.resourcesPath : path.join(process.cwd(), "dist");
+  const exe = process.platform === "win32" ? "electron_bridge.exe" : "electron_bridge";
+  return path.join(base, "python", "electron_bridge", exe);
+}
+
+/**
+ * Run the Python bridge with optional arguments and options
+ */
+export function runBridge(args: string[] = [], opts: any = {}) {
+  const bridgeExecutable = bridgePath();
+  
+  // Optional: Check if executable exists in dev mode
+  if (!app.isPackaged && !require('fs').existsSync(bridgeExecutable)) {
+    console.warn(`Bridge executable not found at ${bridgeExecutable}. Run 'npm run bundle-python' first.`);
+  }
+  
+  return spawn(bridgeExecutable, args, { 
+    stdio: ["ignore","pipe","pipe"], 
+    windowsHide: true, 
+    ...opts 
+  });
+}
+```
+
+### Usage Examples
+
+```typescript
+// Basic usage
+const bridge = runBridge();
+bridge.stdin.write('{"url": "https://example.com"}');
+bridge.stdin.end();
+
+// With error handling
+const bridge = runBridge();
+bridge.on('error', (error) => {
+  console.error('Bridge failed:', error);
+});
+
+bridge.on('exit', (code) => {
+  console.log(`Bridge exited with code ${code}`);
+});
+
+// With data handling
+let output = '';
+bridge.stdout.on('data', (data) => {
+  output += data.toString();
+});
+
+bridge.on('close', () => {
+  const result = JSON.parse(output);
+  console.log('Bridge result:', result);
+});
+```
+
+### Package.json Configuration
+
+```json
+{
+  "scripts": {
+    "bundle-python": "bash scripts/bundle-python.sh",
+    "dist": "npm run bundle-python && npm run build && electron-builder",
+    "dist:mac": "npm run bundle-python && npm run build && electron-builder --mac"
+  },
+  "build": {
+    "extraResources": [
+      {
+        "from": "resources/python/electron_bridge",
+        "to": "python/electron_bridge",
+        "filter": ["**/*"]
+      }
+    ]
+  }
+}
 ```
 
 ## Dependencies
@@ -638,50 +771,55 @@ export interface ScrapeResult {
   error: string | null;
 }
 
+import path from "path";
+import { app } from "electron";
+import { spawn } from "child_process";
+
+/**
+ * Get the path to the PyInstaller-bundled Python bridge executable
+ */
+function bridgePath(): string {
+  const base = app.isPackaged ? process.resourcesPath : path.join(process.cwd(), "dist");
+  const exe = process.platform === "win32" ? "electron_bridge.exe" : "electron_bridge";
+  return path.join(base, "python", "electron_bridge", exe);
+}
+
+/**
+ * Run the Python bridge with optional arguments and options
+ */
+export function runBridge(args: string[] = [], opts: any = {}) {
+  const bridgeExecutable = bridgePath();
+  
+  // Optional: Check if executable exists in dev mode
+  if (!app.isPackaged && !require('fs').existsSync(bridgeExecutable)) {
+    console.warn(`Bridge executable not found at ${bridgeExecutable}. Run 'npm run bundle-python' first.`);
+  }
+  
+  return spawn(bridgeExecutable, args, { 
+    stdio: ["ignore","pipe","pipe"], 
+    windowsHide: true, 
+    ...opts 
+  });
+}
+
 export class PythonBridge {
-  private pythonPath: string;
-  private scriptPath: string;
   private isAvailable: boolean = false;
   private lastError: string | null = null;
   
-  constructor() {
-    const isDev = !app.isPackaged;
-    
-    if (isDev) {
-      // Development: Use system Python and sibling directory
-      this.pythonPath = process.env.PYTHON_PATH || 'python3';
-      this.scriptPath = path.join(__dirname, '../../../../specscraper/electron_bridge.py');
-    } else {
-      // Production: Use bundled Python and bundled script
-      if (process.platform === 'win32') {
-        this.pythonPath = path.join(process.resourcesPath, 'python', 'python.exe');
-      } else {
-        this.pythonPath = path.join(process.resourcesPath, 'python', 'bin', 'python');
-      }
-      this.scriptPath = path.join(process.resourcesPath, 'specscraper', 'electron_bridge.py');
-    }
-  }
-  
   /**
-   * Check if Python and the bridge script are available
+   * Check if the PyInstaller bridge executable is available
    */
   async checkAvailability(): Promise<boolean> {
     try {
-      // Check if Python is installed
-      const pythonVersion = await this.getPythonVersion();
-      if (!pythonVersion) {
-        this.lastError = 'Python not found';
-        this.isAvailable = false;
-        return false;
-      }
+      const executablePath = bridgePath();
       
-      // Check if script exists
-      await fs.access(this.scriptPath, fs.constants.R_OK);
+      // Check if executable exists
+      await fs.access(executablePath, fs.constants.R_OK);
       
-      // Check if required packages are installed
-      const packagesOk = await this.checkRequiredPackages();
-      if (!packagesOk) {
-        this.lastError = 'Required Python packages not installed';
+      // Test if executable runs (basic health check)
+      const testResult = await this.testBridge();
+      if (!testResult.success) {
+        this.lastError = `Bridge executable failed health check: ${testResult.error}`;
         this.isAvailable = false;
         return false;
       }
@@ -697,66 +835,57 @@ export class PythonBridge {
   }
   
   /**
-   * Get Python version
+   * Test if the bridge executable works (basic health check)
    */
-  private async getPythonVersion(): Promise<string | null> {
+  private async testBridge(): Promise<{success: boolean, error?: string}> {
     return new Promise((resolve) => {
-      const child = spawn(this.pythonPath, ['--version']);
+      const child = runBridge();
       let output = '';
+      let errorOutput = '';
+      
+      // Send a simple test request
+      const testInput = JSON.stringify({
+        url: "https://httpbin.org/json",
+        options: { method: "requests" }
+      });
       
       child.stdout.on('data', (data) => {
         output += data.toString();
       });
       
       child.stderr.on('data', (data) => {
-        output += data.toString();
+        errorOutput += data.toString();
       });
       
       child.on('close', (code) => {
-        if (code === 0 && output.includes('Python')) {
-          resolve(output.trim());
+        if (code === 0) {
+          try {
+            const result = JSON.parse(output);
+            if (result.success !== undefined) {
+              resolve({ success: true });
+            } else {
+              resolve({ success: false, error: 'Invalid response format' });
+            }
+          } catch (e) {
+            resolve({ success: false, error: `Failed to parse response: ${e}` });
+          }
         } else {
-          resolve(null);
+          resolve({ success: false, error: `Process exited with code ${code}: ${errorOutput}` });
         }
       });
       
-      child.on('error', () => {
-        resolve(null);
+      child.on('error', (error) => {
+        resolve({ success: false, error: `Process error: ${error.message}` });
       });
+      
+      // Send test input
+      child.stdin.write(testInput);
+      child.stdin.end();
     });
   }
   
   /**
-   * Check if required Python packages are installed
-   */
-  private async checkRequiredPackages(): Promise<boolean> {
-    const requiredPackages = ['openai', 'beautifulsoup4', 'pydantic', 'requests', 'firecrawl_py', 'python_dotenv'];
-    
-    return new Promise((resolve) => {
-      const checkScript = `
-import sys
-try:
-    ${requiredPackages.map(pkg => `    import ${pkg.replace('-', '_').split('[')[0]}`).join('\n')}
-    print("OK")
-except ImportError as e:
-    print(f"Missing: {e}", file=sys.stderr)
-    sys.exit(1)
-`;
-      
-      const child = spawn(this.pythonPath, ['-c', checkScript]);
-      
-      child.on('close', (code) => {
-        resolve(code === 0);
-      });
-      
-      child.on('error', () => {
-        resolve(false);
-      });
-    });
-  }
-  
-  /**
-   * Scrape a product URL using the Python bridge
+   * Scrape a product URL using the PyInstaller bridge
    */
   async scrapeProduct(
     url: string,
@@ -776,9 +905,7 @@ except ImportError as e:
     }
     
     return new Promise((resolve, reject) => {
-      const child = spawn(this.pythonPath, [this.scriptPath], {
-        cwd: path.dirname(this.scriptPath)
-      });
+      const child = runBridge();
       
       let stdout = '';
       let stderr = '';
