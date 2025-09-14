@@ -531,367 +531,215 @@ echo "✅ mac bundle staged at: $BUNDLE_DIR"
 
 ---
 
-## Step 3: Create Node.js Python Bridge Service
+## Step 3: Create Node.js Python Bridge Service ✅ **Completed**
 **Goal**: Create TypeScript service in Electron app to interface with Python
 
-### 3.1 Create PythonBridge service
+### 3.1 Create PythonBridge service ✅ **Completed**
 **File**: `electron-app/src/main/services/PythonBridge.ts`
 
+**Status**: ✅ **Completed** - Full implementation with advanced features
+
+**Key Features Implemented**:
+- ✅ **Process Management**: Concurrent process limiting (max 3 processes)
+- ✅ **Security Validation**: URL validation, options sanitization
+- ✅ **Caching**: Availability check caching (1 hour)
+- ✅ **Resource Management**: Output size limits (10MB), proper cleanup
+- ✅ **Error Handling**: Comprehensive error handling and timeout management
+- ✅ **Graceful Shutdown**: Process cleanup on app exit
+
+**Implementation Highlights**:
+
 ```typescript
-import { spawn, ChildProcess } from 'child_process';
-import * as path from 'path';
-import * as fs from 'fs/promises';
-import { app } from 'electron';
-
-export interface ScrapeOptions {
-  method?: 'auto' | 'requests' | 'firecrawl';
-  llm_model?: string;
-  temperature?: number;
-  max_tokens?: number;
-}
-
-export interface ScrapeProgress {
-  type: 'progress';
-  stage: 'init' | 'scraping' | 'processing' | 'extraction' | 'complete';
-  progress: number;
-  message: string;
-  timestamp: number;
-}
-
-export interface ScrapeResult {
-  success: boolean;
-  data: {
-    image_url: string;
-    type: string;
-    description: string;
-    model_no: string;
-    product_link: string;
-  } | null;
-  metadata: {
-    scrape_method?: string;
-    processing_time?: number;
-    scrape_time?: number;
-    llm_model?: string;
-    status_code?: number;
-    html_length?: number;
-    processed_length?: number;
-    prompt_tokens?: number;
-    execution_time?: number;
-  };
-  error: string | null;
-}
-
-import path from "path";
-import { app } from "electron";
-import { spawn } from "child_process";
-
-/**
- * Get the path to the PyInstaller-bundled Python bridge executable
- */
-function bridgePath(): string {
-  const base = app.isPackaged ? process.resourcesPath : path.join(process.cwd(), "dist");
-  const exe = process.platform === "win32" ? "electron_bridge.exe" : "electron_bridge";
-  return path.join(base, "python", "electron_bridge", exe);
-}
-
-/**
- * Run the Python bridge with optional arguments and options
- */
-export function runBridge(args: string[] = [], opts: any = {}) {
-  const bridgeExecutable = bridgePath();
-  
-  // Optional: Check if executable exists in dev mode
-  if (!app.isPackaged && !require('fs').existsSync(bridgeExecutable)) {
-    console.warn(`Bridge executable not found at ${bridgeExecutable}. Run 'npm run bundle-python' first.`);
-  }
-  
-  return spawn(bridgeExecutable, args, { 
-    stdio: ["ignore","pipe","pipe"], 
-    windowsHide: true, 
-    ...opts 
-  });
-}
-
 export class PythonBridge {
-  private isAvailable: boolean = false;
-  private lastError: string | null = null;
+  private activeProcesses = new Set<ChildProcess>();
+  private readonly MAX_CONCURRENT_PROCESSES = 3;
+  private queue: Array<() => void> = [];
+  private availabilityCache: { 
+    checked: number; 
+    available: boolean; 
+  error: string | null;
+  } | null = null;
+  private readonly CACHE_DURATION = 3.6e+6; // 1 hour
   
   /**
-   * Check if the PyInstaller bridge executable is available
+   * Security validation for URLs
    */
-  async checkAvailability(): Promise<boolean> {
-    try {
-      const executablePath = bridgePath();
-      
-      // Check if executable exists
-      await fs.access(executablePath, fs.constants.R_OK);
-      
-      // Test if executable runs (basic health check)
-      const testResult = await this.testBridge();
-      if (!testResult.success) {
-        this.lastError = `Bridge executable failed health check: ${testResult.error}`;
-        this.isAvailable = false;
-        return false;
-      }
-      
-      this.isAvailable = true;
-      this.lastError = null;
-      return true;
-    } catch (error) {
-      this.lastError = `Bridge not available: ${error}`;
-      this.isAvailable = false;
-      return false;
-    }
+  private validateUrl(url: string): { valid: boolean; error?: string } {
+    // Blocks local networks, validates protocol
   }
   
   /**
-   * Test if the bridge executable works (basic health check)
+   * Sanitizes options to prevent injection
    */
-  private async testBridge(): Promise<{success: boolean, error?: string}> {
-    return new Promise((resolve) => {
-      const child = runBridge();
-      let output = '';
-      let errorOutput = '';
-      
-      // Send a simple test request
-      const testInput = JSON.stringify({
-        url: "https://httpbin.org/json",
-        options: { method: "requests" }
-      });
-      
-      child.stdout.on('data', (data) => {
-        output += data.toString();
-      });
-      
-      child.stderr.on('data', (data) => {
-        errorOutput += data.toString();
-      });
-      
-      child.on('close', (code) => {
-        if (code === 0) {
-          try {
-            const result = JSON.parse(output);
-            if (result.success !== undefined) {
-              resolve({ success: true });
-            } else {
-              resolve({ success: false, error: 'Invalid response format' });
-            }
-          } catch (e) {
-            resolve({ success: false, error: `Failed to parse response: ${e}` });
-          }
-        } else {
-          resolve({ success: false, error: `Process exited with code ${code}: ${errorOutput}` });
-        }
-      });
-      
-      child.on('error', (error) => {
-        resolve({ success: false, error: `Process error: ${error.message}` });
-      });
-      
-      // Send test input
-      child.stdin.write(testInput);
-      child.stdin.end();
-    });
+  private sanitizeOptions(options: any): ScrapeOptions {
+    // Whitelist approach with bounds checking
   }
   
   /**
-   * Scrape a product URL using the PyInstaller bridge
+   * Process slot management for concurrency control
    */
-  async scrapeProduct(
-    url: string,
-    options: ScrapeOptions = {},
-    onProgress?: (progress: ScrapeProgress) => void
-  ): Promise<ScrapeResult> {
-    if (!this.isAvailable) {
-      await this.checkAvailability();
-      if (!this.isAvailable) {
-        return {
-          success: false,
-          data: null,
-          metadata: {},
-          error: this.lastError || 'Python bridge not available'
-        };
-      }
-    }
-    
-    return new Promise((resolve, reject) => {
-      const child = runBridge();
-      
-      let stdout = '';
-      let stderr = '';
-      let timeout: NodeJS.Timeout;
-      
-      // Set timeout (2 minutes)
-      timeout = setTimeout(() => {
-        child.kill();
-        resolve({
-          success: false,
-          data: null,
-          metadata: {},
-          error: 'Scraping timeout (120 seconds)'
-        });
-      }, 120000);
-      
-      // Send input
-      const input = JSON.stringify({ url, options });
-      child.stdin.write(input);
-      child.stdin.end();
-      
-      // Capture stdout
-      child.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-      
-      // Capture and parse stderr for progress updates
-      child.stderr.on('data', (data) => {
-        const lines = data.toString().split('\n').filter(Boolean);
-        lines.forEach(line => {
-          stderr += line + '\n';
-          try {
-            const parsed = JSON.parse(line);
-            if (parsed.type === 'progress' && onProgress) {
-              onProgress(parsed as ScrapeProgress);
-            }
-          } catch (e) {
-            // Not JSON, probably a log message
-          }
-        });
-      });
-      
-      // Handle process exit
-      child.on('close', (code) => {
-        clearTimeout(timeout);
-        
-        if (code === null) {
-          // Process was killed (timeout)
-          return;
-        }
-        
-        try {
-          const result = JSON.parse(stdout) as ScrapeResult;
-          resolve(result);
-        } catch (e) {
-          // Failed to parse output
-          resolve({
-            success: false,
-            data: null,
-            metadata: {},
-            error: `Failed to parse output: ${e}. stdout: ${stdout.slice(0, 200)}`
-          });
-        }
-      });
-      
-      // Handle process errors
-      child.on('error', (error) => {
-        clearTimeout(timeout);
-        resolve({
-          success: false,
-          data: null,
-          metadata: {},
-          error: `Process error: ${error.message}`
-        });
-      });
-    });
+  private async waitForSlot(): Promise<void> {
+    // Queue management for process limits
   }
   
   /**
-   * Get availability status
+   * Graceful shutdown with SIGTERM/SIGKILL
    */
-  getStatus(): { available: boolean; error: string | null; pythonPath: string; scriptPath: string } {
-    return {
-      available: this.isAvailable,
-      error: this.lastError,
-      pythonPath: this.pythonPath,
-      scriptPath: this.scriptPath
-    };
+  async shutdown(): Promise<void> {
+    // Clean process termination
   }
 }
-
-// Export singleton instance
-export const pythonBridge = new PythonBridge();
 ```
 
-## Step 4: Create IPC Handlers for Renderer Communication
+**Key Differences from Original Plan**:
+- ✅ **Enhanced Security**: URL validation, options sanitization
+- ✅ **Process Management**: Concurrent process limiting and queuing
+- ✅ **Resource Protection**: Output size limits, memory management
+- ✅ **Caching**: Availability check caching for performance
+- ✅ **Robust Cleanup**: Proper process cleanup and error handling
+- ✅ **Production Ready**: Comprehensive error handling and logging
+
+## Step 4: Create IPC Handlers for Renderer Communication ✅ **Completed**
 **Goal**: Set up IPC handlers so the renderer can call Python scraping
 
-### 4.1 Create IPC handlers
-**File**: `electron-app/src/main/handlers/pythonHandlers.ts`
+### 4.1 Create IPC handlers ✅ **Completed**
+**File**: `electron-app/src/main/ipc/pythonHandlers.ts`
+
+**Status**: ✅ **Completed** - Full IPC implementation with comprehensive handlers
+
+**Implementation Highlights**:
 
 ```typescript
-import { ipcMain, BrowserWindow } from 'electron';
-import { pythonBridge, ScrapeOptions, ScrapeProgress } from '../services/PythonBridge';
+export function setupPythonIPC(mainWindow?: BrowserWindow): void {
+  /**
+   * Check Python bridge availability
+   */
+  ipcMain.handle('python:check-availability', async () => {
+    // Returns availability status with caching
+  });
 
-export function setupPythonHandlers(mainWindow: BrowserWindow) {
-  // Scrape product
-  ipcMain.handle('python:scrape-product', async (event, url: string, options?: ScrapeOptions) => {
-    try {
-      const result = await pythonBridge.scrapeProduct(
-        url,
-        options || {},
-        (progress: ScrapeProgress) => {
-          // Send progress updates to renderer
-          mainWindow.webContents.send('python:scrape-progress', progress);
-        }
-      );
-      
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        data: null,
-        metadata: {},
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
+  /**
+   * Scrape product using Python bridge
+   */
+  ipcMain.handle('python:scrape-product', async (_event, url: string, options?: ScrapeOptions) => {
+    // Progress updates sent to renderer via mainWindow.webContents.send
+  });
+
+  /**
+   * Get Python bridge status
+   */
+  ipcMain.handle('python:get-status', async () => {
+    // Returns current bridge status
   });
 }
 ```
 
-### 4.2 Update preload script
-**File**: `electron-app/src/main/preload.ts` (add to existing)
+**Key Features Implemented**:
+- ✅ **Three IPC Handlers**: `check-availability`, `scrape-product`, `get-status`
+- ✅ **Progress Updates**: Real-time progress sent to renderer via `mainWindow.webContents.send`
+- ✅ **Comprehensive Logging**: Detailed console logging for debugging
+- ✅ **Error Handling**: Structured error responses
+- ✅ **Window Integration**: Progress updates require mainWindow reference
+
+### 4.2 Update preload script ✅ **Completed**
+**File**: `electron-app/src/main/preload.ts`
+
+**Status**: ✅ **Completed** - Python API exposed to renderer
+
+**Implementation Highlights**:
 
 ```typescript
-// Add to existing electronAPI exposure
 contextBridge.exposeInMainWorld('electronAPI', {
   // ... existing API ...
 
+  // Python bridge operations
+  checkPythonAvailability: () => ipcRenderer.invoke('python:check-availability'),
   scrapeProduct: (url: string, options?: any) => 
     ipcRenderer.invoke('python:scrape-product', url, options),
+  getPythonStatus: () => ipcRenderer.invoke('python:get-status'),
   
   onScrapeProgress: (callback: (progress: any) => void) => {
-    ipcRenderer.on('python:scrape-progress', (event, progress) => callback(progress));
-  },
-  
-  removeScrapeProgressListener: () => {
-    ipcRenderer.removeAllListeners('python:scrape-progress');
-  },
-  
+    const handler = (_event: any, progress: any) => callback(progress);
+    ipcRenderer.on('python:scrape-progress', handler);
+    // Return cleanup function
+    return () => {
+      ipcRenderer.removeListener('python:scrape-progress', handler);
+    };
+  }
 });
 ```
 
-### 4.3 Register handlers in main process
-**File**: `electron-app/src/main/index.ts` (modify existing)
+**Key Features Implemented**:
+- ✅ **Three Python APIs**: `checkPythonAvailability`, `scrapeProduct`, `getPythonStatus`
+- ✅ **Progress Listener**: `onScrapeProgress` with cleanup function
+- ✅ **Proper Cleanup**: Returns cleanup function to prevent memory leaks
+- ✅ **Type Safety**: Proper TypeScript integration
+
+### 4.3 Register handlers in main process ✅ **Completed**
+**File**: `electron-app/src/main/index.ts`
+
+**Status**: ✅ **Completed** - Python IPC handlers registered with graceful shutdown
+
+**Implementation Highlights**:
 
 ```typescript
-import { setupPythonHandlers } from './handlers/pythonHandlers';
+import { setupPythonIPC } from './ipc/pythonHandlers';
+import { pythonBridge } from './services/PythonBridge';
 
-// In the app.whenReady() block, after creating mainWindow:
-setupPythonHandlers(mainWindow);
+app.whenReady().then(() => {
+  // ... existing setup ...
+  
+  // Create window first to pass to Python IPC
+  const mainWindow = createWindow();
+  
+  // Set up Python IPC with window reference for progress updates
+  setupPythonIPC(mainWindow);
+  
+  // ... rest of setup ...
+});
+
+// Graceful shutdown - cleanup Python processes
+app.on('before-quit', async (event) => {
+  event.preventDefault();
+  
+  try {
+    console.log('🐍 Shutting down Python bridge processes...');
+    await pythonBridge.shutdown();
+    console.log('✅ Python bridge shutdown complete');
+  } catch (error) {
+    console.error('❌ Error during Python bridge shutdown:', error);
+  }
+  
+  // Allow app to quit after cleanup
+  setImmediate(() => app.quit());
+});
 ```
 
+**Key Features Implemented**:
+- ✅ **Proper Initialization Order**: Window created before Python IPC setup
+- ✅ **Graceful Shutdown**: Python processes cleaned up on app exit
+- ✅ **Error Handling**: Comprehensive error handling during shutdown
+- ✅ **Process Management**: Proper cleanup prevents zombie processes
+
 **Validation**:
-- [ ] IPC handlers compile without errors
-- [ ] Handlers are registered in main process
-- [ ] Preload script exposes Python API to renderer
-- [ ] Type definitions are correct
+- [x] IPC handlers compile without errors
+- [x] Handlers are registered in main process
+- [x] Preload script exposes Python API to renderer
+- [x] Type definitions are correct
+- [x] Graceful shutdown implemented
+- [x] Window reference passed for progress updates
 
 ---
 
-## Step 5: Create Renderer Hook for Python Scraping
+## Step 5: Create Renderer Hook for Python Scraping ⏳ **Pending**
 **Goal**: Create React hook for easy Python scraping from components
 
-### 5.1 Create the hook
+### 5.1 Create the hook ⏳ **Pending**
 **File**: `electron-app/src/renderer/hooks/usePythonScraper.ts`
+
+**Status**: ⏳ **Pending** - Not yet implemented
+
+**Required Implementation**:
 
 ```typescript
 import { useState, useEffect, useCallback } from 'react';
@@ -918,8 +766,7 @@ export interface ScrapeResult {
 export interface PythonStatus {
   available: boolean;
   error: string | null;
-  pythonPath: string;
-  scriptPath: string;
+  bridgePath: string;
 }
 
 export function usePythonScraper() {
@@ -933,16 +780,12 @@ export function usePythonScraper() {
   useEffect(() => {
     checkAvailability();
     
-    // Set up progress listener
-    const handleProgress = (progress: ScrapeProgress) => {
+    // Set up progress listener with cleanup
+    const cleanup = window.electronAPI.onScrapeProgress((progress: ScrapeProgress) => {
       setProgress(progress);
-    };
+    });
     
-    window.electronAPI.onScrapeProgress(handleProgress);
-    
-    return () => {
-      window.electronAPI.removeScrapeProgressListener();
-    };
+    return cleanup; // Cleanup function returned from preload
   }, []);
   
   const checkAvailability = async () => {
@@ -987,32 +830,6 @@ export function usePythonScraper() {
     }
   }, [isAvailable]);
   
-  const batchScrape = useCallback(async (
-    urls: string[],
-    options?: any
-  ): Promise<ScrapeResult[]> => {
-    if (!isAvailable) {
-      setError('Python scraper not available');
-      return [];
-    }
-    
-    setIsLoading(true);
-    setError(null);
-    setProgress(null);
-    
-    try {
-      const results = await window.electronAPI.batchScrapeProducts(urls, options);
-      return results;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-      setError(errorMsg);
-      return [];
-    } finally {
-      setIsLoading(false);
-      setProgress(null);
-    }
-  }, [isAvailable]);
-  
   return {
     isAvailable,
     pythonStatus,
@@ -1020,8 +837,79 @@ export function usePythonScraper() {
     progress,
     error,
     scrapeProduct,
-    batchScrape,
     checkAvailability
   };
 }
 ```
+
+**Key Features to Implement**:
+- ✅ **Availability Checking**: Check Python bridge on mount
+- ✅ **Progress Tracking**: Real-time progress updates from Python
+- ✅ **Error Handling**: Comprehensive error state management
+- ✅ **Cleanup**: Proper cleanup of progress listeners
+- ✅ **Type Safety**: Full TypeScript integration
+
+**Note**: The `batchScrape` function was removed from the plan as it's not implemented in the current IPC handlers.
+
+---
+
+## Implementation Plan Updates Required
+
+Based on the latest code changes in commit `095977e0`, the following areas of the implementation plan need updates:
+
+### ✅ **Completed Beyond Original Plan**
+
+1. **Enhanced Security Features**:
+   - URL validation (blocks local networks)
+   - Options sanitization with bounds checking
+   - Output size limits (10MB protection)
+
+2. **Advanced Process Management**:
+   - Concurrent process limiting (max 3 processes)
+   - Process queuing system
+   - Graceful shutdown with SIGTERM/SIGKILL
+
+3. **Performance Optimizations**:
+   - Availability check caching (1 hour)
+   - Resource management improvements
+   - Memory leak prevention
+
+4. **Production-Ready Features**:
+   - Comprehensive error handling
+   - Detailed logging for debugging
+   - Proper cleanup functions
+
+### ⚠️ **Areas Requiring Implementation Plan Updates**
+
+1. **Missing Renderer Hook** (Step 5):
+   - The `usePythonScraper` hook is not yet implemented
+   - This is required for React components to use Python scraping
+   - **Priority**: High - needed for UI integration
+
+2. **API Integration**:
+   - The `apiIPC.ts` file was modified but the integration isn't documented
+   - Need to understand how Python scraping integrates with existing API services
+   - **Priority**: Medium - affects overall architecture
+
+3. **Testing Strategy**:
+   - No testing approach documented for the Python bridge
+   - Need unit tests for PythonBridge service
+   - Need integration tests for IPC handlers
+   - **Priority**: Medium - affects reliability
+
+4. **Error Handling Documentation**:
+   - The implementation has comprehensive error handling
+   - Need to document error scenarios and recovery strategies
+   - **Priority**: Low - documentation only
+
+5. **Performance Monitoring**:
+   - The implementation includes process management
+   - Need to document monitoring and metrics collection
+   - **Priority**: Low - operational concern
+
+### 🔄 **Next Steps**
+
+1. **Immediate**: Implement the `usePythonScraper` hook (Step 5)
+2. **Short-term**: Document API integration patterns
+3. **Medium-term**: Add comprehensive testing strategy
+4. **Long-term**: Add monitoring and performance documentation
