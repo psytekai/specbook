@@ -5,12 +5,16 @@ Provides CLI interface for Electron app to perform product scraping
 """
 
 import sys
+import os
 import json
 import logging
 import time
 from typing import Dict, Any
+
+# PyInstaller handles all path setup automatically - no manual configuration needed
+
 from lib.core.scraping import StealthScraper
-from lib.core.html_processor import HTMLProcessor  
+from lib.core.html_processor import HTMLProcessor
 from lib.core.llm import PromptTemplator, LLMInvocator
 
 # Configure logging to stderr so it doesn't interfere with JSON output

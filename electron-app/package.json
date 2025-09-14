@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "dist/main/index.js",
   "scripts": {
+    "bundle-python": "bash scripts/bundle-python.sh",
+    "bundle-python:windows": "echo 'Windows Python builds handled by CI/CD. Download from GitHub Actions artifacts.'",
     "dev": "npm run build:main && concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:vite": "vite --port 5173",
     "dev:electron": "wait-on tcp:5173 && cross-env NODE_ENV=development electron .",
@@ -12,12 +14,12 @@
     "preview": "vite preview",
     "electron": "electron .",
     "dist": "npm run build && electron-builder",
-    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:mac": "npm run bundle-python && npm run build && electron-builder --mac",
     "dist:win": "npm run build && electron-builder --win",
     "dist:linux": "npm run build && electron-builder --linux",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx --fix",
-    "rebuild": "npx @electron/rebuild",
+    "rebuild": "electron-builder install-app-deps",
     "postinstall": "npm run rebuild",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -29,7 +31,6 @@
   "license": "ISC",
   "description": "Architectural Product Management Desktop App",
   "devDependencies": {
-    "@electron/rebuild": "^4.0.1",
     "@eslint/js": "^9.32.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/jest": "^30.0.0",
@@ -65,5 +66,14 @@
     "react-router-dom": "^6.30.1",
     "sharp": "^0.33.5",
     "uuid": "^12.0.0"
+  },
+  "build": {
+    "extraResources": [
+      {
+        "from": "resources/python/electron_bridge",
+        "to": "python/electron_bridge",
+        "filter": ["**/*"]
+      }
+    ]
   }
 }
