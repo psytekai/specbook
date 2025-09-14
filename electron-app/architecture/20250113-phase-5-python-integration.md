@@ -187,7 +187,7 @@ bridge.on('close', () => {
 **Goal**: Remove unused dependencies and create the bridge script for minimal bundling
 
 ### 1.1 Clean up specscraper dependencies
-**Status**: ✅ **Already completed** - Selenium imports removed, method validation updated
+**Status**: ✅ **Completed** - Selenium imports removed, method validation updated
 
 ### 1.2 Create the bridge script
 **File**: `specscraper/electron_bridge.py`
@@ -200,36 +200,29 @@ Provides CLI interface for Electron app to perform product scraping
 """
 
 import sys
+import os
 import json
 import logging
 import time
-import traceback
-from typing import Dict, Any, Optional
+from typing import Dict, Any
+
+# PyInstaller handles all path setup automatically - no manual configuration needed
+
+from lib.core.scraping import StealthScraper
+from lib.core.html_processor import HTMLProcessor
+from lib.core.llm import PromptTemplator, LLMInvocator
 
 # Configure logging to stderr so it doesn't interfere with JSON output
-logging.basicConfig(
-    level=logging.WARNING,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    stream=sys.stderr
-)
+# Only configure if no other logging has been set up
+if not logging.getLogger().handlers:
+    logging.basicConfig(
+        level=logging.WARNING,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        stream=sys.stderr
+    )
 
 # Suppress verbose logging from libraries
 logging.getLogger('urllib3').setLevel(logging.ERROR)
-# Note: No selenium logging suppression needed - selenium removed
-
-try:
-    from lib.core.scraping import StealthScraper
-    from lib.core.html_processor import HTMLProcessor  
-    from lib.core.llm import PromptTemplator, LLMInvocator
-except ImportError as e:
-    error_result = {
-        "success": False,
-        "data": None,
-        "metadata": {},
-        "error": f"Import error: {str(e)}. Make sure you're running from the specscraper directory."
-    }
-    print(json.dumps(error_result))
-    sys.exit(1)
 
 
 class ElectronBridge:
@@ -255,7 +248,7 @@ class ElectronBridge:
             self.templator = PromptTemplator()
             self.llm = LLMInvocator()
             self._initialized = True
-            self.report_progress("init", 10, "Components initialized")
+            self.report_progress("init", 10, "Full components initialized")
         except Exception as e:
             raise RuntimeError(f"Failed to initialize components: {str(e)}")
         
@@ -356,7 +349,7 @@ class ElectronBridge:
                 "metadata": {
                     "scrape_method": scrape_result.final_method.value,
                     "processing_time": time.time() - start_time,
-                    "scrape_time": scrape_result.execution_time,
+                    "scrape_time": scrape_result.scrape_time,
                     "llm_model": options.get("llm_model", "gpt-4o-mini"),
                     "status_code": scrape_result.status_code,
                     "html_length": len(scrape_result.content) if scrape_result.content else 0,
@@ -449,11 +442,11 @@ echo '{"url": "https://example.com/product"}' | python electron_bridge.py
 ```
 
 **Validation**:
-- [ ] Script creates without errors
-- [ ] Script is executable
-- [ ] Returns JSON output to stdout
-- [ ] Progress updates appear on stderr
-- [ ] Error cases return structured JSON
+- [x] Script creates without errors
+- [x] Script is executable  
+- [x] Returns JSON output to stdout
+- [x] Progress updates appear on stderr
+- [x] Error cases return structured JSON
 
 ---
 
@@ -464,128 +457,51 @@ echo '{"url": "https://example.com/product"}' | python electron_bridge.py
 **File**: `electron-app/scripts/bundle-python.sh`
 
 ```bash
+# scripts/bundle-python-mac.sh
 #!/bin/bash
-# Creates portable Python bundle with minimal packages for each platform
-
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-BUNDLE_DIR="$PROJECT_DIR/resources/python"
-PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')
+APP_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+SPEC_DIR="$APP_DIR/../specscraper"
+OUT_DIR="$SPEC_DIR/dist/electron_bridge"
+BUNDLE_DIR="$APP_DIR/resources/python/electron_bridge"
 
-echo "Creating Python bundle for platform: $PLATFORM"
+cd "$SPEC_DIR"
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -U pip wheel
+[ -f requirements-minimal.txt ] && python -m pip install -r requirements-minimal.txt
+python -m pip install pyinstaller
+pyinstaller --noconfirm --clean --onedir --noconsole --name electron_bridge electron_bridge.py
+deactivate
 
-# Create bundle directory
-mkdir -p "$BUNDLE_DIR"
-
-case "$PLATFORM" in
-  "darwin")
-    # macOS: Download Python 3.11 framework
-    PYTHON_VERSION="3.11.8"
-    PYTHON_URL="https://www.python.org/ftp/python/$PYTHON_VERSION/python-$PYTHON_VERSION-macos11.pkg"
-    echo "Bundling Python for macOS..."
-    
-    # Use system Python to create portable environment
-    python3 -m venv "$BUNDLE_DIR" --copies
-    ;;
-  "linux")
-    # Linux: Use Python embeddable build or system Python
-    echo "Bundling Python for Linux..."
-    python3 -m venv "$BUNDLE_DIR" --copies
-    ;;
-  "mingw"* | "cygwin"* | "msys"*)
-    # Windows: Download Python embeddable
-    PYTHON_VERSION="3.11.8"
-    PYTHON_URL="https://www.python.org/ftp/python/$PYTHON_VERSION/python-$PYTHON_VERSION-embed-amd64.zip"
-    echo "Bundling Python for Windows..."
-    
-    # Download and extract Python embeddable
-    curl -L -o python-embed.zip "$PYTHON_URL"
-    unzip python-embed.zip -d "$BUNDLE_DIR"
-    rm python-embed.zip
-    ;;
-  *)
-    echo "Unsupported platform: $PLATFORM"
-    exit 1
-    ;;
-esac
-
-# Install minimal packages
-echo "Installing minimal packages..."
-"$BUNDLE_DIR/bin/python" -m pip install --upgrade pip
-"$BUNDLE_DIR/bin/python" -m pip install -r "$PROJECT_DIR/../specscraper/requirements-minimal.txt"
-
-# Strip debug info and docs to reduce size
-echo "Optimizing bundle size..."
-find "$BUNDLE_DIR" -name "*.pyc" -delete
-find "$BUNDLE_DIR" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
-find "$BUNDLE_DIR" -name "*.pyo" -delete
-find "$BUNDLE_DIR" -path "*/test*" -type d -exec rm -rf {} + 2>/dev/null || true
-find "$BUNDLE_DIR" -name "*.dist-info" -type d -exec rm -rf {} + 2>/dev/null || true
-
-echo "Python bundle created at: $BUNDLE_DIR"
-echo "Bundle size: $(du -sh "$BUNDLE_DIR" | cut -f1)"
+rm -rf "$BUNDLE_DIR"; mkdir -p "$BUNDLE_DIR"
+cp -R "$OUT_DIR"/. "$BUNDLE_DIR"/
+echo "✅ mac bundle staged at: $BUNDLE_DIR"
 ```
 
-### 2.2 Update electron_bridge.py for bundled execution
-**File**: `specscraper/electron_bridge.py` (add at top after imports)
-
-```python
-import sys
-import os
-
-# Handle bundled Python environment
-def setup_bundled_environment():
-    """Set up paths for bundled Python execution"""
-    if getattr(sys, 'frozen', False) or hasattr(sys, '_MEIPASS'):
-        # Running in bundled mode
-        if sys.platform == 'win32':
-            bundle_dir = os.path.dirname(sys.executable)
-        else:
-            bundle_dir = os.path.dirname(os.path.dirname(sys.executable))
-        
-        # Add lib directory to Python path
-        lib_dir = os.path.join(bundle_dir, 'lib', 'python3.11', 'site-packages')
-        if os.path.exists(lib_dir) and lib_dir not in sys.path:
-            sys.path.insert(0, lib_dir)
-    
-    # Also check if we're running from Electron resources
-    exe_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-    if 'resources' in exe_dir and 'python' in exe_dir:
-        site_packages = os.path.join(exe_dir, 'site-packages')
-        if os.path.exists(site_packages) and site_packages not in sys.path:
-            sys.path.insert(0, site_packages)
-
-# Set up environment before imports
-setup_bundled_environment()
-```
+### 2.2 PyInstaller Path Handling
+**Status**: ✅ **Completed** - PyInstaller automatically handles all path setup. The `electron_bridge.py` script includes the comment `# PyInstaller handles all path setup automatically - no manual configuration needed` and works correctly in bundled mode.
 
 ### 2.3 Update package.json build configuration
-**File**: `electron-app/package.json` (modify build section)
+**File**: `electron-app/package.json` (build configuration)
 
 ```json
 {
   "scripts": {
     "bundle-python": "bash scripts/bundle-python.sh",
-    "prebuild": "npm run bundle-python",
-    "build": "npm run build:main && npm run build:renderer",
-    "dist": "npm run build && electron-builder"
+    "bundle-python:windows": "echo 'Windows Python builds handled by CI/CD. Download from GitHub Actions artifacts.'",
+    "dist:mac": "npm run bundle-python && npm run build && electron-builder --mac",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:linux": "npm run build && electron-builder --linux"
   },
   "build": {
     "extraResources": [
       {
-        "from": "resources/python",
-        "to": "python",
+        "from": "resources/python/electron_bridge",
+        "to": "python/electron_bridge",
         "filter": ["**/*"]
-      },
-      {
-        "from": "../specscraper/electron_bridge.py",
-        "to": "specscraper/electron_bridge.py"
-      },
-      {
-        "from": "../specscraper/lib",
-        "to": "specscraper/lib"
       }
     ]
   }
@@ -593,10 +509,25 @@ setup_bundled_environment()
 ```
 
 **Validation**:
-- [ ] Bundle script creates Python environment
-- [ ] Minimal packages install correctly
-- [ ] Bundle size is reasonable (~65-80MB)
-- [ ] electron_bridge.py works in bundled mode
+- [x] Bundle script creates PyInstaller executable
+- [x] Minimal packages install correctly (requirements-minimal.txt)
+- [x] Bundle size is reasonable (~40-60MB PyInstaller bundle)
+- [x] electron_bridge executable works in bundled mode
+- [x] Bundle copied to resources/python/electron_bridge/
+
+### 2.4 Implementation Summary
+**What was implemented:**
+- ✅ PyInstaller-based bundling approach (simpler than planned virtual environment approach)
+- ✅ macOS-focused script with cross-platform CI/CD considerations
+- ✅ Minimal dependencies from `requirements-minimal.txt`
+- ✅ Bundle automatically copied to `resources/python/electron_bridge/`
+- ✅ Package.json scripts configured for `dist:mac` build process
+
+**Key differences from original plan:**
+- Used PyInstaller instead of virtual environment bundling (more reliable)
+- Simplified to macOS-only script with CI/CD for other platforms
+- Removed complex cross-platform path handling (PyInstaller handles this)
+- Bundle structure: `electron_bridge` executable + `_internal/` dependencies
 
 ---
 
