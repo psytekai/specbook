@@ -7,6 +7,7 @@ Provides CLI interface for Electron app using principle-first logging architectu
 import sys
 import json
 import time
+import select
 from typing import Dict, Any
 
 # Import the principle-first logging system
@@ -180,11 +181,28 @@ class ElectronBridge:
             }
 
 
+def read_stdin_with_timeout(timeout_seconds=5):
+    """Read from stdin with timeout to prevent hanging"""
+    if select.select([sys.stdin], [], [], timeout_seconds)[0]:
+        return sys.stdin.read()
+    else:
+        raise TimeoutError(f"No input received within {timeout_seconds} seconds")
+
 def main():
     """Main entry point for CLI usage"""
     try:
-        # Read input from stdin
-        input_raw = sys.stdin.read()
+        # Read input from stdin with timeout
+        try:
+            input_raw = read_stdin_with_timeout(timeout_seconds=5)
+        except TimeoutError as e:
+            stderr_sink = StreamSink(sys.stderr)
+            logger, _ = create_bridge_logger(stderr_sink, capture_stdlib_logs=False)
+            logger.error("Input timeout",
+                        error=str(e),
+                        help="Pipe JSON input to this process: echo '{\"url\":\"...\"}' | electron_bridge")
+            logger.flush()
+            sys.stderr.flush()
+            sys.exit(1)
 
         if not input_raw.strip():
             raise ValueError("No input provided")
