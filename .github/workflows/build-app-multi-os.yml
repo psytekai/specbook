@@ -192,10 +192,10 @@ jobs:
           test -f dist/main/index.js || { echo "❌ dist/main/index.js missing!"; exit 1; }
           echo "✅ Build verification passed"
 
-      # # Rebuild native modules against Electron 37 for Apple Silicon
-      # - name: Rebuild native modules for Electron
-      #   working-directory: electron-app
-      #   run: npx @electron/rebuild --version=37.2.4 --arch=-x64
+      # Rebuild native modules against Electron 37 for macOS x64
+      - name: Rebuild native modules for Electron
+        working-directory: electron-app
+        run: npx @electron/rebuild --version=37.2.4 --arch=x64
 
       - name: Package macOS app (unsigned)
         working-directory: electron-app
