@@ -98,6 +98,13 @@ jobs:
         working-directory: electron-app
         run: |
           npm ci
+        env:
+          npm_config_target_platform: win32
+          npm_config_target_arch: x64
+          npm_config_disturl: https://electronjs.org/headers
+          npm_config_runtime: electron
+          npm_config_cache: /tmp/.npm
+          npm_config_target: 37.2.4
 
       - name: Build renderer/main
         working-directory: electron-app
@@ -131,6 +138,7 @@ jobs:
           path: |
             electron-app/dist/win-*/**
             electron-app/dist/*.zip
+            electron-app/dist/*.exe
           if-no-files-found: error
 
   mac-build-electron:
