@@ -88,10 +88,16 @@ jobs:
           name: electron_bridge-win-x64
           path: electron-app/resources/python/electron_bridge
 
+      # Sanity-check the bridge is really there (path must match extraResources.from)
+      - name: Verify downloaded bridge
+        run: |
+          echo "Listing electron bridge contents:"
+          ls -laR electron-app/resources/python/electron_bridge || true
+
       - name: Install deps
         working-directory: electron-app
         run: |
-          npm ci --ignore-scripts
+          npm ci
 
       - name: Build renderer/main
         working-directory: electron-app
@@ -107,6 +113,7 @@ jobs:
           test -f dist/main/index.js || { echo "❌ dist/main/index.js missing!"; exit 1; }
           echo "✅ Build verification passed"
 
+      # Rebuild native modules against Electron 37 for Windows x64
       - name: Rebuild native modules for Electron
         working-directory: electron-app
         run: npx @electron/rebuild --version=37.2.4 --arch=x64
@@ -121,7 +128,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: electron-windows-dist
-          path: electron-app/dist/win-*/**
+          path: |
+            electron-app/dist/win-*/**
+            electron-app/dist/*.zip
           if-no-files-found: error
 
   mac-build-electron:
@@ -143,24 +152,22 @@ jobs:
           name: electron_bridge-mac
           path: electron-app/resources/python/electron_bridge
 
+      # Quick sanity check so we fail early if the artifact path is wrong/empty
+      - name: Verify downloaded bridge
+        run: |
+          echo "Listing electron bridge contents:"
+          ls -laR electron-app/resources/python/electron_bridge || true
+
       - name: Install deps
         working-directory: electron-app
-        run: |
-          npm ci --ignore-scripts
-        env:
-          npm_config_target_platform: darwin
-          npm_config_target_arch: arm64
-          npm_config_disturl: https://electronjs.org/headers
-          npm_config_runtime: electron
-          npm_config_cache: /tmp/.npm
-          npm_config_target: 37.2.4
-          
+        run: npm ci
+
       - name: Build renderer/main
         working-directory: electron-app
         run: |
           npm run build:main
           npm run build:renderer
-
+          
       - name: Verify build output
         working-directory: electron-app
         run: |
@@ -169,6 +176,7 @@ jobs:
           test -f dist/main/index.js || { echo "❌ dist/main/index.js missing!"; exit 1; }
           echo "✅ Build verification passed"
 
+      # Rebuild native modules against Electron 37 for Apple Silicon
       - name: Rebuild native modules for Electron
         working-directory: electron-app
         run: npx @electron/rebuild --version=37.2.4 --arch=arm64
@@ -184,6 +192,7 @@ jobs:
         with:
           name: electron-macos-dist
           path: |
-            electron-app/dist/mac/**     # zipped app
             electron-app/dist/*.dmg      # if DMG configured
+            electron-app/dist/mac/*.zip
+            electron-app/dist/mac-*/**/*.app
           if-no-files-found: warn
