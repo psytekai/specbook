@@ -67,7 +67,8 @@ export function setupPythonIPC(mainWindow?: BrowserWindow): void {
         success: false,
         data: null,
         metadata: {},
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
+        diagnostics: []
       };
     }
   });

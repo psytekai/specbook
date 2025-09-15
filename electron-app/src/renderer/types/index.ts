@@ -117,6 +117,16 @@ export interface ScrapeOptions {
   max_tokens?: number;
 }
 
+export interface StructuredLogEvent {
+  schema: string;
+  ts: string;
+  event_id: number;
+  level: 'debug' | 'info' | 'warn' | 'error';
+  component: string;
+  message: string;
+  ctx?: Record<string, any>;
+}
+
 export interface ScrapeResult {
   success: boolean;
   data: {
@@ -136,8 +146,11 @@ export interface ScrapeResult {
     processed_length?: number;
     prompt_tokens?: number;
     execution_time?: number;
+    partial_output?: string;
+    [key: string]: any;
   };
   error: string | null;
+  diagnostics?: StructuredLogEvent[];
 }
 
 export interface PythonStatus {

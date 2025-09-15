@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { ScrapeProgress, ScrapeResult, ScrapeOptions, PythonStatus } from '../types';
+import type { ScrapeProgress, ScrapeResult, ScrapeOptions, PythonStatus, StructuredLogEvent } from '../types';
 
 export function usePythonScraper() {
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
@@ -152,4 +152,4 @@ export function usePythonScraper() {
   };
 }
 
-export type { ScrapeProgress, ScrapeResult, ScrapeOptions, PythonStatus };
+export type { ScrapeProgress, ScrapeResult, ScrapeOptions, PythonStatus, StructuredLogEvent };
