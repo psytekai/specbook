@@ -145,9 +145,6 @@ jobs:
     name: Build Electron App (macOS)
     runs-on: macos-latest
     needs: [mac-build-bridge]
-    strategy:
-      matrix:
-        arch: [ arm64, x64 ]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -202,7 +199,7 @@ jobs:
 
       - name: Package macOS app (unsigned)
         working-directory: electron-app
-        run: npx electron-builder --mac --${{ matrix.arch }}
+        run: npx electron-builder --mac --universal
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
 
