@@ -372,7 +372,7 @@ const ProductNew: React.FC = () => {
             {scrapingProgress && (
               <div className="progress-info" style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
                 <div style={{ marginBottom: '5px' }}>
-                  {scrapingProgress.message} ({scrapingProgress.progress}%)
+                  {scrapingProgress.message} ({scrapingProgress.progress * 100}%)
                 </div>
                 <div className="progress-bar" style={{ 
                   width: '100%', 
@@ -382,7 +382,7 @@ const ProductNew: React.FC = () => {
                   overflow: 'hidden'
                 }}>
                   <div style={{
-                    width: `${scrapingProgress.progress}%`,
+                    width: `${scrapingProgress.progress * 100}%`,
                     height: '100%',
                     backgroundColor: '#007bff',
                     transition: 'width 0.3s ease'
