@@ -184,8 +184,15 @@ app.on('web-contents-created', (_, contents) => {
 });
 
 // Graceful shutdown - cleanup Python processes
+let isQuitting = false;
+
 app.on('before-quit', async (event) => {
+  if (isQuitting) {
+    return; // Allow quit to proceed if we're already shutting down
+  }
+  
   event.preventDefault();
+  isQuitting = true;
   
   try {
     console.log('🐍 Shutting down Python bridge processes...');
@@ -193,8 +200,8 @@ app.on('before-quit', async (event) => {
     console.log('✅ Python bridge shutdown complete');
   } catch (error) {
     console.error('❌ Error during Python bridge shutdown:', error);
+  } finally {
+    // Force exit after cleanup - this bypasses event handlers
+    app.exit(0);
   }
-  
-  // Allow app to quit after cleanup
-  setImmediate(() => app.quit());
 });
