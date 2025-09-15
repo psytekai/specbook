@@ -70,6 +70,17 @@
     "uuid": "^12.0.0"
   },
   "build": {
+    "files": [
+      "dist/**",
+      "package.json",
+      "node_modules/**",
+      "resources/**",
+      "!src/**",
+      "!**/*.map"
+    ],
+    "directories": {
+      "buildResources": "public/icons"
+    },
     "extraResources": [
       {
         "from": "resources/python/electron_bridge",
