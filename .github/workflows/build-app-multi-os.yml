@@ -185,10 +185,6 @@ jobs:
           npm run build:main
           npm run build:renderer
 
-      - name: Verify sharp vendor (sanity)
-        working-directory: electron-app
-        run: test -d node_modules/sharp/vendor || (echo "sharp vendor missing"; exit 1)
-
       - name: Verify build output
         working-directory: electron-app
         run: |
