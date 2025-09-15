@@ -238,7 +238,7 @@ const ProductNew: React.FC = () => {
         setFormData(prev => ({
           ...prev,
           productDescription: data.description || '',
-          specificationDescription: data.description || '', // Map description to both fields
+          specificationDescription: data.type || '',
           
           productName: data.model_no || '', // Use model_no as product name fallback
           manufacturer: '', // Not provided by Python scraper
