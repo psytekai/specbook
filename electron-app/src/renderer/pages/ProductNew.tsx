@@ -235,14 +235,52 @@ const ProductNew: React.FC = () => {
       
       if (result.data) {
         const data = result.data;
+
+        // Handle image URL if provided
+        let imageHash: string | undefined;
+        let thumbnailHash: string | undefined;
+
+        if (data.image_url) {
+          try {
+            console.log('🔄 Downloading scraped image:', data.image_url);
+            showToast('Downloading product image...', 'info');
+
+            // Generate filename from URL or use timestamp
+            const urlParts = data.image_url.split('/');
+            const originalName = urlParts[urlParts.length - 1] || 'scraped-image';
+            const fileName = originalName.includes('.') ? originalName : `scraped-image-${Date.now()}.jpg`;
+
+            // Download and store via main process (bypasses CSP restrictions)
+            const downloadResult = await window.electronAPI.assetDownloadFromUrl(data.image_url, fileName);
+
+            if (downloadResult.success) {
+              imageHash = downloadResult.data.hash;
+              thumbnailHash = downloadResult.data.thumbnailHash;
+              console.log('✅ Scraped image downloaded and stored successfully:', downloadResult.data);
+              showToast('Product image downloaded and processed successfully', 'success');
+            } else {
+              console.error('❌ Failed to download scraped image:', downloadResult.error);
+              showToast('Failed to download product image', 'error');
+            }
+          } catch (error) {
+            console.error('❌ Failed to download scraped image:', error);
+            showToast('Failed to download product image - continuing without image', 'error');
+            // Continue without image - not a blocking error
+          }
+        }
+
         setFormData(prev => ({
           ...prev,
           productDescription: data.description || '',
           specificationDescription: data.type || '',
-          
+
           productName: data.model_no || '', // Use model_no as product name fallback
           manufacturer: '', // Not provided by Python scraper
-          price: undefined // Not provided by Python scraper
+          price: undefined, // Not provided by Python scraper
+
+          // Set image hashes if successfully downloaded
+          primaryImageHash: imageHash,
+          primaryThumbnailHash: thumbnailHash
         }));
       }
       

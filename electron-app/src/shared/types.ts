@@ -29,7 +29,8 @@ export interface ElectronAPI {
   assetCleanup: (options?: { removeOlderThan?: number; dryRun?: boolean }) => Promise<any>;
   assetImportBatch: (files: Array<{ data: ArrayBuffer; filename: string }>, options?: any) => Promise<any>;
   assetStatistics: () => Promise<any>;
-  
+  assetDownloadFromUrl: (imageUrl: string, filename?: string) => Promise<any>;
+
   // Python bridge operations
   checkPythonAvailability: () => Promise<any>;
   scrapeProduct: (url: string, options?: any) => Promise<any>;

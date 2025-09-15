@@ -51,8 +51,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('asset:cleanup', options),
   assetImportBatch: (files: Array<{ data: ArrayBuffer; filename: string }>, options?: any) => 
     ipcRenderer.invoke('asset:import-batch', files, options),
-  assetStatistics: () => 
+  assetStatistics: () =>
     ipcRenderer.invoke('asset:statistics'),
+  assetDownloadFromUrl: (imageUrl: string, filename?: string) =>
+    ipcRenderer.invoke('asset:download-from-url', imageUrl, filename),
 
   // Python bridge operations
   checkPythonAvailability: () => ipcRenderer.invoke('python:check-availability'),
