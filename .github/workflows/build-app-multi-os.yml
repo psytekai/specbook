@@ -113,6 +113,12 @@ jobs:
       - name: Install deps
         working-directory: electron-app
         run: npm ci
+        env:
+          npm_config_runtime: electron
+          npm_config_target: 37.2.4
+          npm_config_disturl: https://electronjs.org/headers
+          npm_config_arch: x64
+          npm_config_build_from_source: true
 
       - name: Build renderer/main
         working-directory: electron-app
@@ -165,7 +171,13 @@ jobs:
 
       - name: Install deps
         working-directory: electron-app
-        run: npm ci   # <-- do NOT use --ignore-scripts
+        run: npm ci
+        env:
+          npm_config_runtime: electron
+          npm_config_target: 37.2.4         # keep in sync with devDependency "electron"
+          npm_config_disturl: https://electronjs.org/headers
+          npm_config_arch: x64
+          npm_config_build_from_source: true # optional: forces a local build if no prebuild exists
 
       - name: Build renderer/main
         working-directory: electron-app
