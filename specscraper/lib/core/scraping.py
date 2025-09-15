@@ -17,25 +17,8 @@ import threading
 # Load environment variables
 load_dotenv()
 
-# Create logs directory if it doesn't exist
-os.makedirs('logs', exist_ok=True)
-
-# Generate timestamped log filename
-log_filename = os.path.join('logs', f'stealth_scraper.log')
-
-# Configure logging with detailed format, but only to file
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    handlers=[
-        logging.FileHandler(log_filename),
-        logging.StreamHandler()
-    ]
-)
-
-# Create logger for this module
-logger = logging.getLogger('StealthScraper')
+# Create standard logger - no configuration
+logger = logging.getLogger(__name__)
 
 class ScrapingMethod(str, Enum):
     """Enumeration of available scraping methods"""
