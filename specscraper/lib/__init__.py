@@ -15,43 +15,44 @@ from .core.models import (
     ScrapeMethod
 )
 
-# Monitoring components
-from .monitoring.pipeline_monitor import PipelineMonitor
-from .monitoring.metrics_collector import MetricsCollector
-from .monitoring.error_analyzer import ErrorAnalyzer
-from .monitoring.models import (
-    PipelineExecution, PipelineMetric, PipelineError,
-    PipelineStage, MetricType, ErrorCategory
-)
+# Monitoring components (removed to reduce bundle size for electron_bridge)
+# from .monitoring.pipeline_monitor import PipelineMonitor
+# from .monitoring.metrics_collector import MetricsCollector
+# from .monitoring.error_analyzer import ErrorAnalyzer
+# from .monitoring.models import (
+#     PipelineExecution, PipelineMetric, PipelineError,
+#     PipelineStage, MetricType, ErrorCategory
+# )
 
-# Benchmarking components
-from .benchmarking.experiment_runner import ExperimentRunner
-from .benchmarking.cache_manager import CacheManager
-from .benchmarking.report_generator import ReportGenerator
-from .benchmarking.models import (
-    ExperimentConfig, ExperimentResult, ExperimentSummary,
-    QualityMetrics, ModelProvider
-)
+# Benchmarking components (removed to reduce bundle size for electron_bridge)
+# from .benchmarking.experiment_runner import ExperimentRunner
+# from .benchmarking.cache_manager import CacheManager
+# from .benchmarking.report_generator import ReportGenerator
+# from .benchmarking.models import (
+#     ExperimentConfig, ExperimentResult, ExperimentSummary,
+#     QualityMetrics, ModelProvider
+# )
 
 # Utilities
 from .utils.openai_rate_limiter import OpenAIRateLimiter
 
 __version__ = "1.0.0"
 __all__ = [
-    # Core
+    # Core (only what's needed for electron_bridge)
     "StealthScraper", "HTMLProcessor", "LLMInvocator", "PromptTemplator",
-    "ProductExtractionEvaluator", "ScrapeResult", "ProcessedHTML",
+    # "ProductExtractionEvaluator",  # Removed to reduce bundle size
+    "ScrapeResult", "ProcessedHTML",
     "ProductExtractionResult", "ScrapeMethod",
     
-    # Monitoring
-    "PipelineMonitor", "MetricsCollector", "ErrorAnalyzer",
-    "PipelineExecution", "PipelineMetric", "PipelineError",
-    "PipelineStage", "MetricType", "ErrorCategory",
+    # Monitoring (removed to reduce bundle size)
+    # "PipelineMonitor", "MetricsCollector", "ErrorAnalyzer",
+    # "PipelineExecution", "PipelineMetric", "PipelineError",
+    # "PipelineStage", "MetricType", "ErrorCategory",
     
-    # Benchmarking
-    "ExperimentRunner", "CacheManager", "ReportGenerator",
-    "ExperimentConfig", "ExperimentResult", "ExperimentSummary",
-    "QualityMetrics", "ModelProvider",
+    # Benchmarking (removed to reduce bundle size)
+    # "ExperimentRunner", "CacheManager", "ReportGenerator",
+    # "ExperimentConfig", "ExperimentResult", "ExperimentSummary",
+    # "QualityMetrics", "ModelProvider",
     
     # Utils
     "OpenAIRateLimiter"

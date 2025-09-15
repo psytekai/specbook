@@ -22,7 +22,20 @@ export interface ElectronAPI {
   apiPost: (endpoint: string, data?: any) => Promise<any>;
   apiPut: (endpoint: string, data?: any) => Promise<any>;
   apiDelete: (endpoint: string) => Promise<any>;
-  apiScrape: (request: any) => Promise<any>;
+
+  assetUpload: (fileData: ArrayBuffer, filename: string, mimetype: string, options?: any) => Promise<any>;
+  assetGetPath: (hash: string, thumbnail?: boolean) => Promise<any>;
+  assetDelete: (hash: string) => Promise<any>;
+  assetCleanup: (options?: { removeOlderThan?: number; dryRun?: boolean }) => Promise<any>;
+  assetImportBatch: (files: Array<{ data: ArrayBuffer; filename: string }>, options?: any) => Promise<any>;
+  assetStatistics: () => Promise<any>;
+  assetDownloadFromUrl: (imageUrl: string, filename?: string) => Promise<any>;
+
+  // Python bridge operations
+  checkPythonAvailability: () => Promise<any>;
+  scrapeProduct: (url: string, options?: any) => Promise<any>;
+  getPythonStatus: () => Promise<any>;
+  onScrapeProgress: (callback: (progress: any) => void) => () => void;
 }
 
 declare global {

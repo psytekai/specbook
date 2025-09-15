@@ -1,13 +1,32 @@
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell, protocol } from 'electron';
 import path from 'node:path';
+import * as fs from 'fs';
 import { ApplicationMenu } from './menu/ApplicationMenu';
 import { setupProjectIPC } from './ipc/projectHandlers';
 import { setupAPIIPC } from './ipc/apiHandlers';
+import { setupAssetIPC } from './ipc/assetHandlers';
+import { setupPythonIPC } from './ipc/pythonHandlers';
+import { pythonBridge } from './services/PythonBridge';
+import { ProjectState } from './services/ProjectState';
+import { AssetManager } from './services/AssetManager';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
+
+// Register the asset protocol as a standard scheme before app is ready
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'asset',
+    privileges: {
+      secure: true,
+      standard: true,
+      supportFetchAPI: true,
+      corsEnabled: false
+    }
+  }
+]);
 
 let mainWindow: BrowserWindow | null = null;
 let applicationMenu: ApplicationMenu | null = null;
@@ -66,8 +85,80 @@ app.whenReady().then(() => {
   // Set up IPC handlers first
   setupProjectIPC();
   setupAPIIPC();
+  setupAssetIPC();
   
-  createWindow();
+  // Create window first to pass to Python IPC
+  const mainWindow = createWindow();
+  
+  // Set up Python IPC with window reference for progress updates
+  setupPythonIPC(mainWindow);
+  
+  // Register custom asset:// protocol for serving images
+  console.log('🎯 Registering asset:// protocol handler');
+  protocol.registerFileProtocol('asset', async (request, callback) => {
+    console.log(`🔍 Asset protocol request: ${request.url}`);
+    try {
+      const projectState = ProjectState.getInstance();
+      const state = projectState.getStateInfo();
+
+      if (!state.isOpen || !state.project?.path) {
+        console.warn('Asset protocol: No project open');
+        callback({ error: -6 }); // FILE_NOT_FOUND
+        return;
+      }
+
+      // Parse asset hash from URL (asset://hash)
+      // Extract hash directly from URL string since asset://hash creates invalid URL format
+      const urlString = request.url;
+      const assetPrefix = 'asset://';
+      
+      if (!urlString.startsWith(assetPrefix)) {
+        console.warn('Asset protocol: Invalid URL format');
+        callback({ error: -6 }); // FILE_NOT_FOUND
+        return;
+      }
+      
+      // Extract everything after asset:// and remove trailing slashes
+      const urlSuffix = urlString.substring(assetPrefix.length);
+      const hash = urlSuffix.replace(/\/+$/, '');
+
+      if (!hash) {
+        console.warn('Asset protocol: Invalid hash');
+        callback({ error: -6 }); // FILE_NOT_FOUND
+        return;
+      }
+
+      console.log(`Asset protocol: Requesting asset for hash: ${hash}`);
+      
+      // Create AssetManager and get asset path
+      const assetManager = new AssetManager(state.project.path);
+      
+      // Try thumbnail first (most common case), then main asset
+      let assetPath: string;
+      try {
+        assetPath = await assetManager.getAssetPath(hash, true);  // thumbnail
+        console.log(`Asset protocol: Found thumbnail for hash: ${hash}`);
+      } catch {
+        assetPath = await assetManager.getAssetPath(hash, false); // main asset
+        console.log(`Asset protocol: Found main asset for hash: ${hash}`);
+      }
+
+      console.log(`Asset protocol: Resolved path: ${assetPath}`);
+
+      // Verify file exists
+      if (!fs.existsSync(assetPath)) {
+        console.warn(`Asset protocol: File not found at ${assetPath}`);
+        callback({ error: -6 }); // FILE_NOT_FOUND
+        return;
+      }
+
+      console.log(`Asset protocol: Successfully serving file: ${assetPath}`);
+      callback({ path: assetPath });
+    } catch (error) {
+      console.error('Asset protocol error:', error);
+      callback({ error: -6 }); // FILE_NOT_FOUND
+    }
+  });
 
   app.on('activate', () => {
     // On macOS, re-create a window when the dock icon is clicked
@@ -90,4 +181,27 @@ app.on('web-contents-created', (_, contents) => {
     shell.openExternal(url);
     return { action: 'deny' };
   });
+});
+
+// Graceful shutdown - cleanup Python processes
+let isQuitting = false;
+
+app.on('before-quit', async (event) => {
+  if (isQuitting) {
+    return; // Allow quit to proceed if we're already shutting down
+  }
+  
+  event.preventDefault();
+  isQuitting = true;
+  
+  try {
+    console.log('🐍 Shutting down Python bridge processes...');
+    await pythonBridge.shutdown();
+    console.log('✅ Python bridge shutdown complete');
+  } catch (error) {
+    console.error('❌ Error during Python bridge shutdown:', error);
+  } finally {
+    // Force exit after cleanup - this bypasses event handlers
+    app.exit(0);
+  }
 });

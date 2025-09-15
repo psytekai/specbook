@@ -5,10 +5,10 @@ import { Product } from '../types';
 import { api } from '../services/apiIPC';
 import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
 import { EditableSection } from '../components/EditableSection';
-import { FileUpload } from '../components/FileUpload';
 import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
 import { LocationMultiSelect } from '../components/LocationMultiSelect';
 import { formatPrice } from '../utils/formatters';
+import { getProductImageUrl, getPlaceholderImage } from '../../shared/utils/assetUtils';
 import './ProductPage.css';
 
 const ProductPage: React.FC = () => {
@@ -21,7 +21,6 @@ const ProductPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const additionalImageFileInputRef = useRef<HTMLInputElement>(null);
   
   // Add handlers for multi-select components
   const handleAddLocation = async (locationName: string) => {
@@ -46,7 +45,6 @@ const ProductPage: React.FC = () => {
 
   // For the new file-based system, we only have one current project
   // Check if we have a project open (regardless of productId from URL)
-  const currentProject = project && project.isOpen ? project : null;
 
   // Don't redirect during initialization
   if (isInitializing) {
@@ -83,8 +81,6 @@ const ProductPage: React.FC = () => {
           setError('Product not found');
         } else {
           console.log('Product loaded:', foundProduct);
-          console.log('Product images array:', foundProduct.images);
-          console.log('Product images length:', foundProduct.images?.length);
           setProduct(foundProduct);
         }
       } catch (err) {
@@ -117,25 +113,27 @@ const ProductPage: React.FC = () => {
   }, []);
 
   // Function to update a single product field
-  const updateProductField = async (field: keyof Product, value: string | number | string[]) => {
+  const updateProductField = async (field: keyof Product, value: string | number | string[] | null | undefined) => {
     if (!product) return;
 
     try {
-      // For now, we'll update locally since there's no specific update API endpoint
-      // In a real app, this would make an API call to update the specific field
-      const updatedProduct = { ...product, [field]: value };
-      setProduct(updatedProduct);
+      // Update the product via API
+      const response = await api.put<Product>(`/api/products/${product.id}`, { [field]: value });
       
-      // Here you would typically make an API call like:
-      // await api.patch(`/projects/${projectId}/products/${productId}`, { [field]: value });
-      
-      console.log(`Updated ${field} to:`, value);
+      if (response.success && response.data) {
+        // Update local state with the response from backend
+        setProduct(response.data);
+        console.log(`Updated ${field} to:`, value);
+      } else {
+        throw new Error(response.error || 'Failed to update product');
+      }
     } catch (err) {
+      console.error(`Failed to update ${field}:`, err);
       throw new Error(`Failed to update ${field}`);
     }
-  };
+  };;
 
-  // Function to handle image uploads
+  // Function to handle image uploads using AssetManager
   const handleImageUpload = async (file: File) => {
     if (!product) return;
 
@@ -153,21 +151,31 @@ const ProductPage: React.FC = () => {
         return;
       }
 
-      // Convert file to data URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        // Update the product with the new image
-        updateProductField('custom_image_url', imageUrl);
-        console.log('Custom image uploaded:', imageUrl);
-      };
+      console.log('Starting asset upload for file:', file.name);
+
+      // Convert file to ArrayBuffer for asset manager
+      const arrayBuffer = await file.arrayBuffer();
       
-      reader.onerror = () => {
-        console.error('Failed to read image file');
-      };
-      
-      reader.readAsDataURL(file);
+      // Upload to asset manager
+      const result = await window.electronAPI.assetUpload(arrayBuffer, file.name, file.type, {
+        generateThumbnail: true,
+        quality: 85,
+        thumbnailSize: { width: 200, height: 200 }
+      });
+
+      if (result.success && result.data) {
+        console.log('Asset uploaded successfully:', result.data);
+        
+        // Update product with new asset hashes
+        await updateProductField('primaryImageHash', result.data.hash);
+        await updateProductField('primaryThumbnailHash', result.data.thumbnailHash);
+        
+        console.log('Product updated with asset hashes');
+      } else {
+        console.error('Asset upload failed:', result.error);
+      }
     } catch (err) {
+      console.error('Failed to upload image:', err);
       throw new Error('Failed to upload image');
     }
   };
@@ -176,58 +184,6 @@ const ProductPage: React.FC = () => {
     fileInputRef.current?.click();
   };
 
-  const handleAdditionalImageClick = () => {
-    additionalImageFileInputRef.current?.click();
-  };
-
-  // Function to handle additional image uploads
-  const handleAdditionalImageUpload = async (file: File) => {
-    if (!product) return;
-
-    try {
-      // Validate file size (5MB limit)
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        console.error('Image file size must be less than 5MB');
-        return;
-      }
-
-      // Validate file type (must be an image)
-      if (!file.type.startsWith('image/')) {
-        console.error('Please select a valid image file');
-        return;
-      }
-
-      console.log('Starting additional image upload for file:', file.name);
-      console.log('Current product images:', product.images);
-
-      // Convert file to data URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        console.log('File converted to data URL:', imageUrl.substring(0, 100) + '...');
-        
-        // Get current images array or create new one
-        const currentImages = product.images || [];
-        const updatedImages = [...currentImages, imageUrl];
-        
-        console.log('Updated images array:', updatedImages);
-        
-        // Update the product with the new images array
-        updateProductField('images', updatedImages);
-        
-        console.log('Additional image uploaded and product updated');
-      };
-      
-      reader.onerror = () => {
-        console.error('Failed to read image file');
-      };
-      
-      reader.readAsDataURL(file);
-    } catch (err) {
-      throw new Error('Failed to upload additional image');
-    }
-  };
 
   // Show loading state while checking for project
   if (projectLoading || !project) {
@@ -277,7 +233,7 @@ const ProductPage: React.FC = () => {
       <div className="product-page">
         <div className="page-header">
           <div>
-            <h1>{product.product_name || product.description || "Untitled Product"}</h1>
+            <h1>{product.productName || product.description || "Untitled Product"}</h1>
             <p className="project-breadcrumb">
               <span 
                 className="breadcrumb-link"
@@ -304,22 +260,19 @@ const ProductPage: React.FC = () => {
               <h3>Product Image</h3>
               
               {/* Current Image Display */}
-              {(product.custom_image_url || product.image) ? (
+              {getProductImageUrl(product) ? (
                 <div className="main-image">
                   <div className="image-container">
                     <img 
-                      src={product.custom_image_url || product.image} 
-                      alt={product.description}
+                      src={getProductImageUrl(product)!} 
+                      alt={product.description || 'Product image'}
                     />
                     <button
                       type="button"
                       className="image-delete-btn"
                       onClick={() => {
-                        if (product.custom_image_url) {
-                          updateProductField('custom_image_url', '');
-                        } else if (product.image) {
-                          updateProductField('image', '');
-                        }
+                        updateProductField('primaryImageHash', null);
+                        updateProductField('primaryThumbnailHash', null);
                       }}
                       aria-label="Remove image"
                     >
@@ -328,8 +281,13 @@ const ProductPage: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="no-image-large">
-                  <p>No Image Available</p>
+                <div className="main-image">
+                  <div className="image-container">
+                    <img 
+                      src={getPlaceholderImage()} 
+                      alt="No image available"
+                    />
+                  </div>
                 </div>
               )}
               
@@ -340,66 +298,12 @@ const ProductPage: React.FC = () => {
                   className="button button-secondary"
                   onClick={handleCustomImageClick}
                 >
-                  Add Custom Image
+                  Upload Image
                 </button>
-                <p className="upload-help">Upload a custom image to replace the current product image (max 5MB)</p>
+                <p className="upload-help">Upload an image for this product (max 5MB)</p>
               </div>
             </div>
             
-            {/* Additional Images Gallery */}
-            <div className="image-gallery">
-              <h3>Additional Images</h3>
-              {product.images && product.images.length > 1 ? (
-                <div className="gallery-grid">
-                  {/* Display all images except the first one (main image) */}
-                  {product.images.slice(1).map((image, index) => (
-                    <div key={`additional-${index}`} className="gallery-image">
-                      <div className="gallery-image-container">
-                        <img src={image} alt={`${product.description} ${index + 2}`} />
-                        <button
-                          type="button"
-                          className="gallery-delete-btn"
-                          onClick={() => {
-                            // Remove the specific image from the images array
-                            const updatedImages = product.images.filter((_, imgIndex) => imgIndex !== index + 1);
-                            updateProductField('images', updatedImages);
-                          }}
-                          aria-label="Remove additional image"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="no-additional-images">
-                  <p>No additional images yet</p>
-                  <button
-                    type="button"
-                    className="button button-secondary"
-                    onClick={handleAdditionalImageClick}
-                  >
-                    Add Custom Image
-                  </button>
-                  <p className="upload-help">Upload additional images for this product (max 5MB each)</p>
-                </div>
-              )}
-              
-              {/* Upload Section for Additional Images */}
-              {product.images && product.images.length > 1 && (
-                <div className="additional-upload-section">
-                  <button
-                    type="button"
-                    className="button button-secondary"
-                    onClick={handleAdditionalImageClick}
-                  >
-                    Add Custom Image
-                  </button>
-                  <p className="upload-help">Upload more images for this product (max 5MB each)</p>
-                </div>
-              )}
-            </div>
           </div>
 
           <div className="product-details">
@@ -408,10 +312,10 @@ const ProductPage: React.FC = () => {
               <div className="editable-details">
                 <EditableSection
                   label="Product Name"
-                  value={product.product_name}
+                  value={product.productName}
                   type="text"
                   placeholder="Enter product name"
-                  onSave={(value) => updateProductField('product_name', value as string)}
+                  onSave={(value) => updateProductField('productName', value as string)}
                 />
                 
                 <EditableSection
@@ -523,21 +427,6 @@ const ProductPage: React.FC = () => {
         }}
       />
       
-      {/* Hidden file input for additional images upload */}
-      <input
-        ref={additionalImageFileInputRef}
-        type="file"
-        accept="image/*"
-        style={{ display: 'none' }}
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) {
-            handleAdditionalImageUpload(file);
-            // Reset the input value so the same file can be selected again
-            e.target.value = '';
-          }
-        }}
-      />
     </div>
   );
 };

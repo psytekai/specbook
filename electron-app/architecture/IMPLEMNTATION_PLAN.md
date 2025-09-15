@@ -964,22 +964,333 @@ npm install sharp @types/sharp
    - Update `updateProduct` to manage asset references
    - Add asset cleanup when products are deleted
 
-8. **Frontend asset upload component**
+## Phase 4.8: Frontend Asset Upload Integration
+**Goal**: Replace data URL uploads with asset management system
+
+### Tasks:
+1. **Update ProductNew.tsx image upload**
    ```typescript
-   // Add drag-and-drop asset upload to product forms
-   // Handle progress indication for large uploads
-   // Display thumbnails using asset:// URLs
+   // src/renderer/pages/ProductNew.tsx
+   const handleImageUpload = async (file: File) => {
+     try {
+       // Validate file (already implemented)
+       if (file.size > 5 * 1024 * 1024) throw new Error('File too large');
+       if (!file.type.startsWith('image/')) throw new Error('Invalid file type');
+
+       // Convert File to ArrayBuffer
+       const arrayBuffer = await file.arrayBuffer();
+       
+       // Upload via AssetManager
+       const response = await window.electronAPI.assetUpload(
+         arrayBuffer, 
+         file.name, 
+         file.type
+       );
+       
+       if (response.success) {
+         // Store asset hashes instead of data URL
+         setFormData(prev => ({
+           ...prev,
+           image_hash: response.data.hash,
+           thumbnail_hash: response.data.thumbnailHash,
+           // Clear old data URL field
+           custom_image_url: ''
+         }));
+         showToast('Image uploaded successfully', 'success');
+       } else {
+         throw new Error(response.error || 'Upload failed');
+       }
+     } catch (error) {
+       showToast('Failed to upload image', 'error');
+     }
+   };
    ```
 
-9. **Migration utilities**
+2. **Update ProductPage.tsx image uploads**
    ```typescript
-   // Add migration function to convert existing URL-based images to asset system
-   async migrateExistingImages(projectPath: string): Promise<void> {
-     // Download existing images from URLs
-     // Store as assets
-     // Update database references
-   }
+   // src/renderer/pages/ProductPage.tsx
+   
+   // Main image upload
+   const handleImageUpload = async (file: File) => {
+     if (!product) return;
+     
+     try {
+       const arrayBuffer = await file.arrayBuffer();
+       const response = await window.electronAPI.assetUpload(
+         arrayBuffer, file.name, file.type
+       );
+       
+       if (response.success) {
+         // Update with asset hash instead of data URL
+         updateProductField('image_hash', response.data.hash);
+         updateProductField('thumbnail_hash', response.data.thumbnailHash);
+         // Clear old data URL field
+         updateProductField('custom_image_url', null);
+       }
+     } catch (error) {
+       console.error('Failed to upload image:', error);
+     }
+   };
+
+   // Additional images upload
+   const handleAdditionalImageUpload = async (file: File) => {
+     if (!product) return;
+
+     try {
+       const arrayBuffer = await file.arrayBuffer();
+       const response = await window.electronAPI.assetUpload(
+         arrayBuffer, file.name, file.type
+       );
+       
+       if (response.success) {
+         // Add to images_hashes array instead of images data URL array
+         const currentHashes = product.imagesHashes || [];
+         const updatedHashes = [...currentHashes, response.data.hash];
+         updateProductField('images_hashes', updatedHashes);
+         
+         // Clear old data URL images array
+         updateProductField('images', []);
+       }
+     } catch (error) {
+       console.error('Failed to upload additional image:', error);
+     }
+   };
    ```
+
+3. **Add progress indication for uploads**
+   ```typescript
+   const [uploadProgress, setUploadProgress] = useState<number>(0);
+   const [isUploading, setIsUploading] = useState(false);
+
+   const handleImageUpload = async (file: File) => {
+     setIsUploading(true);
+     setUploadProgress(0);
+     
+     try {
+       // Show upload progress (AssetManager operations are fast, but good UX)
+       setUploadProgress(50);
+       const arrayBuffer = await file.arrayBuffer();
+       
+       setUploadProgress(75);
+       const response = await window.electronAPI.assetUpload(/*...*/);
+       
+       setUploadProgress(100);
+       // Handle success...
+     } finally {
+       setTimeout(() => {
+         setIsUploading(false);
+         setUploadProgress(0);
+       }, 500);
+     }
+   };
+   ```
+
+4. **Add drag-and-drop functionality**
+   ```typescript
+   const [isDragOver, setIsDragOver] = useState(false);
+
+   const handleDragOver = (e: React.DragEvent) => {
+     e.preventDefault();
+     setIsDragOver(true);
+   };
+
+   const handleDragLeave = () => {
+     setIsDragOver(false);
+   };
+
+   const handleDrop = async (e: React.DragEvent) => {
+     e.preventDefault();
+     setIsDragOver(false);
+     
+     const files = Array.from(e.dataTransfer.files);
+     const imageFile = files.find(file => file.type.startsWith('image/'));
+     
+     if (imageFile) {
+       await handleImageUpload(imageFile);
+     }
+   };
+
+   // Add to image upload areas:
+   <div 
+     className={`image-upload-area ${isDragOver ? 'drag-over' : ''}`}
+     onDragOver={handleDragOver}
+     onDragLeave={handleDragLeave}
+     onDrop={handleDrop}
+   >
+     Drop image here or click to select
+   </div>
+   ```
+
+### Validation:
+- [ ] ProductNew.tsx uploads images via AssetManager
+- [ ] ProductPage.tsx main image upload uses asset hashes  
+- [ ] ProductPage.tsx additional images use asset hashes array
+- [ ] Upload progress indication works
+- [ ] Drag-and-drop functionality works
+- [ ] Old data URL fields are cleared on successful upload
+- [ ] Form submission includes asset hash fields
+- [ ] Error handling displays user-friendly messages
+
+---
+
+## Phase 4.9: Asset Display Integration  
+**Goal**: Replace data URL display with asset:// protocol
+
+### Tasks:
+1. **Update ProductNew.tsx image display**
+   ```typescript
+   // Replace data URL display with asset protocol
+   {(formData.image_hash || formData.custom_image_url) && (
+     <div className="form-group">
+       <label className="label">Product Image</label>
+       <div className="product-preview">
+         <img 
+           src={
+             formData.thumbnail_hash 
+               ? `asset://${formData.thumbnail_hash}`
+               : formData.custom_image_url  // Fallback for legacy data
+           }
+           alt="Product image" 
+           className="product-image"
+         />
+       </div>
+     </div>
+   )}
+   ```
+
+2. **Update ProductPage.tsx image display**
+   ```typescript
+   // Main image display with asset protocol
+   const getMainImageUrl = () => {
+     if (product.imageHash) {
+       return `asset://${product.imageHash}`;
+     }
+     // Fallback to legacy fields during transition
+     return product.custom_image_url || product.image || '/placeholder-image.png';
+   };
+
+   const getThumbnailUrl = () => {
+     if (product.imageHash) {
+       return `asset://${product.thumbnailHash}`;
+     }
+     return getMainImageUrl(); // Use main image as fallback
+   };
+
+   // Additional images gallery
+   const getAdditionalImages = () => {
+     // Prioritize asset hashes over legacy data URLs
+     if (product.imagesHashes && product.imagesHashes.length > 0) {
+       return product.imagesHashes.map(hash => `asset://${hash}`);
+     }
+     // Fallback to legacy images array (excluding first main image)
+     return product.images?.slice(1) || [];
+   };
+
+   // Gallery component
+   <div className="gallery-grid">
+     {getAdditionalImages().map((imageUrl, index) => (
+       <div key={imageUrl.includes('asset://') ? imageUrl : `legacy-${index}`} className="gallery-image">
+         <img src={imageUrl} alt={`Additional image ${index + 1}`} />
+         <button
+           onClick={() => {
+             if (imageUrl.startsWith('asset://')) {
+               // Remove from imagesHashes array
+               const hash = imageUrl.replace('asset://', '');
+               const updatedHashes = product.imagesHashes.filter(h => h !== hash);
+               updateProductField('images_hashes', updatedHashes);
+             } else {
+               // Remove from legacy images array
+               const updatedImages = product.images.filter((_, i) => i !== index + 1);
+               updateProductField('images', updatedImages);
+             }
+           }}
+         >
+           Remove
+         </button>
+       </div>
+     ))}
+   </div>
+   ```
+
+3. **Add image loading states and error handling**
+   ```typescript
+   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+   const [imageLoading, setImageLoading] = useState<Set<string>>(new Set());
+
+   const handleImageLoad = (imageUrl: string) => {
+     setImageLoading(prev => {
+       const next = new Set(prev);
+       next.delete(imageUrl);
+       return next;
+     });
+   };
+
+   const handleImageError = (imageUrl: string) => {
+     setImageErrors(prev => new Set([...prev, imageUrl]));
+     setImageLoading(prev => {
+       const next = new Set(prev);
+       next.delete(imageUrl);
+       return next;
+     });
+   };
+
+   // Image component with error handling
+   <img 
+     src={imageUrl}
+     alt="Product image"
+     onLoad={() => handleImageLoad(imageUrl)}
+     onError={() => handleImageError(imageUrl)}
+     style={{ 
+       opacity: imageLoading.has(imageUrl) ? 0.5 : 1,
+       display: imageErrors.has(imageUrl) ? 'none' : 'block'
+     }}
+   />
+   {imageErrors.has(imageUrl) && (
+     <div className="image-error">
+       <span>⚠️ Image not found</span>
+     </div>
+   )}
+   ```
+
+4. **Add lazy loading for performance**
+   ```typescript
+   const [imageInView, setImageInView] = useState(false);
+   const imageRef = useRef<HTMLImageElement>(null);
+
+   useEffect(() => {
+     const observer = new IntersectionObserver(
+       ([entry]) => setImageInView(entry.isIntersecting),
+       { threshold: 0.1 }
+     );
+
+     if (imageRef.current) {
+       observer.observe(imageRef.current);
+     }
+
+     return () => observer.disconnect();
+   }, []);
+
+   // Only load image when in view
+   <img 
+     ref={imageRef}
+     src={imageInView ? imageUrl : '/placeholder.png'}
+     alt="Product image"
+     loading="lazy"
+   />
+   ```
+
+### Validation:
+- [ ] ProductNew.tsx displays images via asset:// protocol
+- [ ] ProductPage.tsx main image uses asset:// protocol
+- [ ] ProductPage.tsx gallery displays asset-based images
+- [ ] Image loading states work correctly
+- [ ] Image error handling shows fallback content
+- [ ] Lazy loading improves performance
+- [ ] Legacy data URL images still display during transition
+- [ ] Image removal works for both asset hashes and legacy URLs
+- [ ] Thumbnails display correctly using content-addressable hashes
+
+---
 
 ### Integration Points:
 - **ProjectFileManager**: Asset directory creation, database schema updates
@@ -995,23 +1306,49 @@ npm install sharp @types/sharp
 - Network failures during migration
 - Invalid hash references
 
-### Validation:
-- [ ] Dependencies installed (sharp, @types/sharp)
-- [ ] Asset directories created in new projects
-- [ ] Database schema migration runs successfully
-- [ ] Images upload and store correctly with SHA-256 hashes
-- [ ] Deduplication works (same image = same hash)
-- [ ] Thumbnails generate automatically with correct dimensions
-- [ ] Images display in UI via asset:// protocol
-- [ ] Asset cleanup removes orphaned files
-- [ ] Security validation prevents malicious uploads
-- [ ] Migration from URL-based to hash-based storage works
-- [ ] Protocol handles missing assets gracefully
-- [ ] Asset reference counting prevents premature deletion
+### Phase 4 Complete Validation Checklist:
+
+#### Backend Infrastructure (Phases 4.1-4.5) ✅ COMPLETED:
+- [✅] Dependencies installed (sharp, @types/sharp)
+- [✅] Asset directories created in new projects
+- [✅] Database schema migration runs successfully
+- [✅] AssetManager class implemented with all core methods
+- [✅] IPC handlers registered for asset operations
+- [✅] Custom asset:// protocol registered and working
+- [✅] Images upload and store correctly with SHA-256 hashes
+- [✅] Deduplication works (same image = same hash)
+- [✅] Thumbnails generate automatically with correct dimensions
+- [✅] Asset cleanup removes orphaned files
+- [✅] Security validation prevents malicious uploads
+- [✅] Protocol handles missing assets gracefully
+- [✅] Asset reference counting prevents premature deletion
+- [✅] Product CRUD operations support asset hash fields
+- [✅] Asset cleanup on product deletion implemented
+
+#### Frontend Integration (Phases 4.8-4.9) ⚠️ NOT YET IMPLEMENTED:
+- [ ] ProductNew.tsx uploads images via AssetManager (Phase 4.8)
+- [ ] ProductNew.tsx displays images via asset:// protocol (Phase 4.9)
+- [ ] ProductPage.tsx main image upload uses asset hashes (Phase 4.8)
+- [ ] ProductPage.tsx additional images use asset hashes array (Phase 4.8)
+- [ ] ProductPage.tsx displays asset-based images in gallery (Phase 4.9)
+- [ ] Upload progress indication works (Phase 4.8)
+- [ ] Drag-and-drop functionality works (Phase 4.8)
+- [ ] Image loading states and error handling work (Phase 4.9)
+- [ ] Lazy loading improves performance (Phase 4.9)
+- [ ] Legacy data URL images display during transition (Phase 4.9)
+- [ ] Image removal works for both asset hashes and legacy URLs (Phase 4.9)
+- [ ] Thumbnails display correctly using content-addressable hashes (Phase 4.9)
+- [ ] Form submissions include asset hash fields instead of data URLs (Phase 4.8)
+- [ ] Old data URL fields are cleared on successful upload (Phase 4.8)
+
+#### Phase 4 Status: ~75% Complete
+✅ **Backend Foundation**: Complete and tested  
+❌ **Frontend Integration**: Not yet implemented  
+❌ **End-to-end Asset Workflow**: Blocked by frontend work
 
 ---
 
-## Phase 6: Python Integration (Days 12-13)
+## Phase 5: Python Integration (Days 12-13)
 **Goal**: Connect Python scraping without server
 
 ### Tasks:
@@ -1042,7 +1379,7 @@ npm install sharp @types/sharp
 
 ---
 
-## Phase 7: Migration & Cleanup (Days 14-15)
+## Phase 6: Migration & Cleanup (Days 14-15)
 **Goal**: Switch fully to new system and clean up
 
 ### Tasks:
@@ -1061,7 +1398,7 @@ npm install sharp @types/sharp
 
 ---
 
-## Phase 8: Polish & Optimization (Days 16-17)
+## Phase 7: Polish & Optimization (Days 16-17)
 **Goal**: Production-ready features
 
 ### Tasks:

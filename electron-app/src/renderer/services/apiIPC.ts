@@ -3,18 +3,6 @@
  * Maintains exact same interface for zero-breaking-change migration
  */
 
-// Re-export types from existing API for compatibility
-import {
-  FetchProductDetailsRequest,
-  FetchProductDetailsResponse,
-  SaveProductRequest,
-  Product,
-  Project,
-  Location,
-  Category,
-  AddLocationRequest,
-  AddCategoryRequest
-} from '../types';
 
 // Custom API Error class (same as original)
 class ApiError extends Error {
@@ -29,6 +17,7 @@ interface ApiResponse<T> {
   success: boolean;
   data: T;
   pagination?: PaginationInfo;
+  error?: string;
 }
 
 interface PaginationInfo {
@@ -38,29 +27,6 @@ interface PaginationInfo {
   pages: number;
 }
 
-/**
- * Legacy functions - maintained for compatibility
- */
-export const fetchProductDetails = async (
-  request: FetchProductDetailsRequest
-): Promise<FetchProductDetailsResponse> => {
-  // This function isn't used in current codebase but maintained for compatibility
-  throw new Error('fetchProductDetails is deprecated, use api.scrape() instead');
-};
-
-export const saveProduct = async (
-  request: SaveProductRequest
-): Promise<{ success: boolean; productId: string }> => {
-  // This function isn't used in current codebase but maintained for compatibility
-  const result = await api.post('/api/products', request);
-  if (!result.success) {
-    throw new Error(result.error || 'Failed to save product');
-  }
-  return {
-    success: true,
-    productId: result.data.id
-  };
-};
 
 export const handleApiError = (error: unknown): { message: string; code: string } => {
   if (error instanceof ApiError) {
@@ -83,43 +49,7 @@ export const handleApiError = (error: unknown): { message: string; code: string 
   };
 };
 
-/**
- * Scraping function - maintained for compatibility
- */
-export const scrapeProduct = async (request: {
-  url: string;
-  tag_id: string;
-  product_location: string;
-}): Promise<{ 
-  success: boolean; 
-  data?: {
-    product_image: string;
-    product_images: string[];
-    product_description: string;
-    specification_description: string;
-    category: string[];
-    product_name: string;
-    manufacturer: string[];
-    price: number;
-  };
-  error?: string;
-}> => {
-  if (!window.electronAPI) {
-    return {
-      success: false,
-      error: 'Electron API not available'
-    };
-  }
 
-  try {
-    return await window.electronAPI.apiScrape(request);
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Scraping failed'
-    };
-  }
-};
 
 /**
  * Main API object - replaces HTTP calls with IPC calls
@@ -208,17 +138,9 @@ export const api = {
       }
       throw new ApiError('Internal client error', 'INTERNAL_ERROR');
     }
-  },
-
-  // Scraping endpoint maintained for compatibility
-  scrape: async (request: {
-    url: string;
-    tag_id: string;
-    product_location: string;
-  }) => {
-    return await scrapeProduct(request);
   }
 };
 
 // Export everything for compatibility
-export { ApiError, ApiResponse, PaginationInfo };
+export type { ApiResponse, PaginationInfo };
+export { ApiError };
