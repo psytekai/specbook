@@ -100,3 +100,63 @@ export interface Toast {
   type: ToastType;
   duration?: number;
 }
+
+// Python Scraping Types
+export interface ScrapeProgress {
+  type: 'progress';
+  stage: 'init' | 'scraping' | 'processing' | 'extraction' | 'complete';
+  progress: number;
+  message: string;
+  timestamp: number;
+}
+
+export interface ScrapeOptions {
+  method?: 'auto' | 'requests' | 'firecrawl';
+  llm_model?: string;
+  temperature?: number;
+  max_tokens?: number;
+}
+
+export interface StructuredLogEvent {
+  schema: string;
+  ts: string;
+  event_id: number;
+  level: 'debug' | 'info' | 'warn' | 'error';
+  component: string;
+  message: string;
+  ctx?: Record<string, any>;
+}
+
+export interface ScrapeResult {
+  success: boolean;
+  data: {
+    image_url: string;
+    type: string;
+    description: string;
+    model_no: string;
+    product_link: string;
+  } | null;
+  metadata: {
+    scrape_method?: string;
+    processing_time?: number;
+    scrape_time?: number;
+    llm_model?: string;
+    status_code?: number;
+    html_length?: number;
+    processed_length?: number;
+    prompt_tokens?: number;
+    execution_time?: number;
+    partial_output?: string;
+    [key: string]: any;
+  };
+  error: string | null;
+  diagnostics?: StructuredLogEvent[];
+}
+
+export interface PythonStatus {
+  available: boolean;
+  error: string | null;
+  bridgePath: string;
+  activeProcesses?: number;
+  maxProcesses?: number;
+}

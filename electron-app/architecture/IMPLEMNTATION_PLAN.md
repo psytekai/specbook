@@ -1348,7 +1348,7 @@ npm install sharp @types/sharp
 
 ---
 
-## Phase 6: Python Integration (Days 12-13)
+## Phase 5: Python Integration (Days 12-13)
 **Goal**: Connect Python scraping without server
 
 ### Tasks:
@@ -1379,7 +1379,7 @@ npm install sharp @types/sharp
 
 ---
 
-## Phase 7: Migration & Cleanup (Days 14-15)
+## Phase 6: Migration & Cleanup (Days 14-15)
 **Goal**: Switch fully to new system and clean up
 
 ### Tasks:
@@ -1398,7 +1398,7 @@ npm install sharp @types/sharp
 
 ---
 
-## Phase 8: Polish & Optimization (Days 16-17)
+## Phase 7: Polish & Optimization (Days 16-17)
 **Goal**: Production-ready features
 
 ### Tasks:

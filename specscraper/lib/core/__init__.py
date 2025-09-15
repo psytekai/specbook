@@ -2,7 +2,8 @@
 from .scraping import StealthScraper
 from .html_processor import HTMLProcessor
 from .llm import LLMInvocator, PromptTemplator
-from .evaluation import ProductExtractionEvaluator
+# Removed evaluation import to reduce bundle size - not needed for electron_bridge
+# from .evaluation import ProductExtractionEvaluator
 from .models import (
     ScrapeResult, ProcessedHTML, ProductExtractionResult,
     ScrapeMethod
@@ -10,6 +11,7 @@ from .models import (
 
 __all__ = [
     "StealthScraper", "HTMLProcessor", "LLMInvocator", "PromptTemplator",
-    "ProductExtractionEvaluator", "ScrapeResult", "ProcessedHTML",
+    # "ProductExtractionEvaluator",  # Removed to reduce bundle size
+    "ScrapeResult", "ProcessedHTML",
     "ProductExtractionResult", "ScrapeMethod"
 ]

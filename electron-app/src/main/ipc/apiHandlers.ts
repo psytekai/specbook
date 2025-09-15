@@ -469,52 +469,7 @@ export function setupAPIIPC(): void {
     return await router.routeDelete(endpoint);
   });
 
-  /**
-   * Web Scraping API - used by ProductNew component
-   */
-  ipcMain.handle('api:scrape-product', async (_event, request) => {
-    try {
-      // For now, return mock data to maintain compatibility
-      // TODO: Integrate with Python scraping pipeline
-      
-      const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-      await delay(2000); // Simulate scraping time
-      
-      // Simulate random success/failure (10% failure rate)
-      if (Math.random() < 0.1) {
-        return {
-          success: false,
-          error: 'Unable to extract product information from the provided URL'
-        };
-      }
 
-      // Return mock scraped data matching expected format
-      const randomId = Date.now();
-      return {
-        success: true,
-        data: {
-          product_image: `https://picsum.photos/400/300?random=${randomId}`,
-          product_images: [
-            `https://picsum.photos/400/300?random=${randomId}`,
-            `https://picsum.photos/400/300?random=${randomId + 1}`,
-            `https://picsum.photos/400/300?random=${randomId + 2}`,
-          ],
-          product_description: `High-quality architectural product suitable for modern buildings. This product is designed for ${request.product_location} and offers excellent durability and aesthetic appeal.`,
-          specification_description: `Dimensions: 24" x 36" x 2". Material: Stainless steel with powder coating. Weather resistant and suitable for ${request.product_location}. Tag ID: ${request.tag_id}`,
-          category: [],
-          product_name: `Premium Product`,
-          manufacturer: ['Acme Corp', 'BuildPro', 'QualityFirst', 'TechBuilder', 'ModernDesign'][Math.floor(Math.random() * 5)],
-          price: Math.floor(Math.random() * 500) + 50,
-        }
-      };
-    } catch (error) {
-      console.error('Error scraping product:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Scraping failed'
-      };
-    }
-  });
 
   console.log('✅ API IPC handlers registered');
 }

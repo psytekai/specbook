@@ -17,6 +17,7 @@ interface ApiResponse<T> {
   success: boolean;
   data: T;
   pagination?: PaginationInfo;
+  error?: string;
 }
 
 interface PaginationInfo {
@@ -48,43 +49,7 @@ export const handleApiError = (error: unknown): { message: string; code: string 
   };
 };
 
-/**
- * Scraping function - maintained for compatibility
- */
-export const scrapeProduct = async (request: {
-  url: string;
-  tagId: string;
-  productLocation: string;
-}): Promise<{ 
-  success: boolean; 
-  data?: {
-    productImage: string;
-    productImages: string[];
-    productDescription: string;
-    specificationDescription: string;
-    category: string[];
-    productName: string;
-    manufacturer: string[];
-    price: number;
-  };
-  error?: string;
-}> => {
-  if (!window.electronAPI) {
-    return {
-      success: false,
-      error: 'Electron API not available'
-    };
-  }
 
-  try {
-    return await window.electronAPI.apiScrape(request);
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Scraping failed'
-    };
-  }
-};
 
 /**
  * Main API object - replaces HTTP calls with IPC calls
@@ -173,15 +138,6 @@ export const api = {
       }
       throw new ApiError('Internal client error', 'INTERNAL_ERROR');
     }
-  },
-
-  // Scraping endpoint maintained for compatibility
-  scrape: async (request: {
-    url: string;
-    tagId: string;
-    productLocation: string;
-  }) => {
-    return await scrapeProduct(request);
   }
 };
 
