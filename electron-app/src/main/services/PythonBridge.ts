@@ -19,6 +19,16 @@ export interface ScrapeProgress {
   timestamp: number;
 }
 
+export interface StructuredLogEvent {
+  schema: string;
+  ts: string;
+  event_id: number;
+  level: 'debug' | 'info' | 'warn' | 'error';
+  component: string;
+  message: string;
+  ctx?: Record<string, any>;
+}
+
 export interface ScrapeResult {
   success: boolean;
   data: {
@@ -38,8 +48,11 @@ export interface ScrapeResult {
     processed_length?: number;
     prompt_tokens?: number;
     execution_time?: number;
+    partial_output?: string;
+    [key: string]: any;
   };
   error: string | null;
+  diagnostics?: StructuredLogEvent[];
 }
 
 /**
@@ -289,15 +302,20 @@ export class PythonBridge {
     return new Promise(async (resolve) => {
       // Wait for available process slot
       await this.waitForSlot();
-      
+
       const child = runBridge();
       this.activeProcesses.add(child);
-      
+
       const stdoutChunks: Buffer[] = [];
       const stderrChunks: Buffer[] = [];
+      const diagnosticLogs: StructuredLogEvent[] = [];
       let timeout: NodeJS.Timeout;
-      let outputSize = 0;
-      const MAX_OUTPUT_SIZE = 10 * 1024 * 1024; // 10MB
+      
+      // Buffer size limits with critical fixes
+      const MAX_STDOUT_SIZE = 10 * 1024 * 1024; // 10MB
+      const MAX_STDERR_SIZE = 1024 * 1024; // 1MB
+      let stdoutSize = 0;
+      let stderrSize = 0;
       
       // Cleanup function
       const cleanup = () => {
@@ -324,7 +342,8 @@ export class PythonBridge {
           success: false,
           data: null,
           metadata: {},
-          error: 'Scraping timeout (120 seconds)'
+          error: 'Scraping timeout (120 seconds)',
+          diagnostics: diagnosticLogs
         });
       }, 120000);
       
@@ -337,7 +356,8 @@ export class PythonBridge {
           success: false,
           data: null,
           metadata: {},
-          error: 'Process stdin not available'
+          error: 'Process stdin not available',
+          diagnostics: diagnosticLogs
         });
         return;
       }
@@ -351,66 +371,111 @@ export class PythonBridge {
           success: false,
           data: null,
           metadata: {},
-          error: `Failed to write to process: ${error}`
+          error: `Failed to write to process: ${error}`,
+          diagnostics: diagnosticLogs
         });
         return;
       }
       
       // Capture stdout with size limit
       child.stdout!.on('data', (data: Buffer) => {
-        outputSize += data.length;
-        if (outputSize > MAX_OUTPUT_SIZE) {
+        stdoutSize += data.length;
+        if (stdoutSize > MAX_STDOUT_SIZE) {
           cleanup();
           child.kill();
           resolve({
             success: false,
             data: null,
             metadata: {},
-            error: 'Output size exceeded 10MB limit'
+            error: 'Output size exceeded 10MB limit',
+            diagnostics: diagnosticLogs
           });
           return;
         }
         stdoutChunks.push(data);
       });
       
-      // Capture and parse stderr for progress updates
+      // Capture and parse stderr with structured logging support
       child.stderr!.on('data', (data: Buffer) => {
+        stderrSize += data.length;
+        if (stderrSize > MAX_STDERR_SIZE) {
+          // Stop accumulating stderr to prevent memory issues
+          return;
+        }
         stderrChunks.push(data);
+
         const lines = data.toString().split('\n').filter(Boolean);
         lines.forEach((line: string) => {
           try {
-            const parsed = JSON.parse(line);
-            if (parsed.type === 'progress' && onProgress) {
-              onProgress(parsed as ScrapeProgress);
+            const event = JSON.parse(line) as StructuredLogEvent;
+
+            // Collect all structured events for diagnostics
+            diagnosticLogs.push(event);
+
+            // Handle progress events specifically (correct schema)
+            if (event.ctx?.type === 'progress' && onProgress) {
+              onProgress({
+                type: 'progress',
+                stage: event.ctx.stage,
+                progress: event.ctx.progress,
+                message: event.message,
+                timestamp: Date.now()
+              });
             }
           } catch (e) {
-            // Not JSON, probably a log message
+            // Not JSON, probably a fallback log message - ignore silently
           }
         });
       });
       
-      // Handle process exit
+      // Handle process exit with partial output detection
       child.on('close', (code) => {
         cleanup();
         
         if (code === null) {
-          // Process was killed (timeout already handled)
           return;
         }
         
         try {
           const stdout = Buffer.concat(stdoutChunks).toString();
+          
+          // Validate JSON before parsing
+          if (!stdout.trim()) {
+            resolve({
+              success: false,
+              data: null,
+              metadata: {},
+              error: 'No output received from Python process',
+              diagnostics: diagnosticLogs
+            });
+            return;
+          }
+          
           const result = JSON.parse(stdout) as ScrapeResult;
+          // Include diagnostics in successful results
+          result.diagnostics = diagnosticLogs;
           resolve(result);
         } catch (e) {
-          // Failed to parse output
           const stdout = Buffer.concat(stdoutChunks).toString();
-          resolve({
-            success: false,
-            data: null,
-            metadata: {},
-            error: `Failed to parse output: ${e}. stdout: ${stdout.slice(0, 200)}`
-          });
+          
+          // Check if output looks like partial JSON
+          if (stdout.trim().startsWith('{') && !stdout.includes('}')) {
+            resolve({
+              success: false,
+              data: null,
+              metadata: { partial_output: stdout.slice(0, 500) },
+              error: 'Process terminated unexpectedly (partial output detected)',
+              diagnostics: diagnosticLogs
+            });
+          } else {
+            resolve({
+              success: false,
+              data: null,
+              metadata: {},
+              error: `Failed to parse output: ${e}. stdout: ${stdout.slice(0, 200)}`,
+              diagnostics: diagnosticLogs
+            });
+          }
         }
       });
       
@@ -421,7 +486,8 @@ export class PythonBridge {
           success: false,
           data: null,
           metadata: {},
-          error: `Process error: ${error.message}`
+          error: `Process error: ${error.message}`,
+          diagnostics: diagnosticLogs
         });
       });
     });
