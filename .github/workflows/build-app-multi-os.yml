@@ -90,9 +90,11 @@ jobs:
 
       - name: Install deps
         working-directory: electron-app
-        run: |
-          npm ci
-          npx @electron/rebuild
+        run: npm ci
+        
+      - name: Rebuild native modules for Electron
+        working-directory: electron-app
+        run: npx @electron/rebuild --version=37.2.4 --arch=x64
 
       - name: Build renderer/main
         working-directory: electron-app
@@ -134,14 +136,17 @@ jobs:
         working-directory: electron-app
         run: |
           npm ci
-          npx @electron/rebuild
         env:
           npm_config_target_platform: electron
           npm_config_target_arch: arm64
           npm_config_disturl: https://electronjs.org/headers
           npm_config_runtime: electron
           npm_config_cache: /tmp/.npm
-          npm_config_build_from_source: true
+          npm_config_target: 37.2.4
+          
+      - name: Rebuild native modules for Electron
+        working-directory: electron-app
+        run: npx @electron/rebuild --version=37.2.4 --arch=arm64
 
       - name: Build renderer/main
         working-directory: electron-app

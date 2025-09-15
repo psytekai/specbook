@@ -22,7 +22,7 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx --fix",
     "rebuild": "electron-builder install-app-deps",
-    "postinstall": "npx @electron/rebuild",
+    "postinstall": "echo 'Native modules will be rebuilt separately'",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
