@@ -7,7 +7,7 @@ import os
 from typing import Optional, Dict, Any, List, Tuple, Set
 from urllib.parse import urljoin, urlparse
 import math
-from firecrawl import FirecrawlApp
+# Removed firecrawl SDK import - using direct API calls
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from datetime import datetime
@@ -133,6 +133,78 @@ class StealthConfig:
             'pixel_ratio': random.choice(self.pixel_ratios)
         }
 
+
+class FirecrawlApiClient:
+    """Direct API client for Firecrawl service - replaces SDK to eliminate stdout pollution"""
+
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.base_url = "https://api.firecrawl.dev/v1"
+
+    def scrape_url(self, url: str, formats: List[str] = None, only_main_content: bool = False,
+                   timeout: int = 60000, parse_pdf: bool = False, max_age: int = 14400000):
+        """
+        Direct API call to Firecrawl scrape endpoint
+        Returns object with .success, .rawHtml, .error attributes to match SDK interface
+        """
+        if formats is None:
+            formats = ['html']
+
+        # Map parameters to API format
+        payload = {
+            'url': url,
+            'formats': formats,
+            'onlyMainContent': only_main_content,
+            'timeout': timeout,
+            'parsePDF': parse_pdf,
+            'maxAge': max_age
+        }
+
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+            'Content-Type': 'application/json'
+        }
+
+        try:
+            response = requests.post(
+                f"{self.base_url}/scrape",
+                headers=headers,
+                json=payload,
+                timeout=timeout/1000  # Convert ms to seconds for requests timeout
+            )
+
+            return FirecrawlResponse(response)
+
+        except Exception as e:
+            # Return error response that matches SDK interface
+            return FirecrawlResponse(None, error=str(e))
+
+
+class FirecrawlResponse:
+    """Response wrapper to match FirecrawlApp SDK interface"""
+
+    def __init__(self, response=None, error=None):
+        if error:
+            self.success = False
+            self.rawHtml = ''
+            self.error = error
+        elif response and response.status_code == 200:
+            try:
+                data = response.json()
+                self.success = data.get('success', False)
+                # API returns 'html' in data object, map to rawHtml for SDK compatibility
+                self.rawHtml = data.get('data', {}).get('html', '')
+                self.error = data.get('error')
+            except (json.JSONDecodeError, KeyError) as e:
+                self.success = False
+                self.rawHtml = ''
+                self.error = f"Failed to parse API response: {str(e)}"
+        else:
+            self.success = False
+            self.rawHtml = ''
+            self.error = f"HTTP {response.status_code}: {response.text}" if response else "No response"
+
+
 class StealthScraper:
     """Web scraper with anti-bot detection measures"""
     
@@ -156,7 +228,7 @@ class StealthScraper:
         if not self.firecrawl_api_key:
             self.logger.warning("FIRECRAWL_API_KEY not found in environment variables")
         else:
-            self.firecrawl = FirecrawlApp(api_key=self.firecrawl_api_key)
+            self.firecrawl = FirecrawlApiClient(api_key=self.firecrawl_api_key)
         
         # Initialize stealth configuration
         self.stealth_config = StealthConfig()
@@ -588,7 +660,7 @@ class StealthScraper:
                 self.logger.info(f"Calling Firecrawl API with timeout=30000ms for {url}")
                 firecrawl_result = self.firecrawl.scrape_url(
                     url,
-                    formats=['rawHtml'],
+                    formats=['html'],  # Changed from 'rawHtml' to 'html' for API
                     only_main_content=False,
                     timeout=60000,  # Increased timeout to 60 seconds
                     parse_pdf=False,
