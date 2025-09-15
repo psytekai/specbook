@@ -22,7 +22,7 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx --fix",
     "rebuild": "electron-builder install-app-deps",
-    "postinstall": "npm run rebuild",
+    "postinstall": "npx @electron/rebuild",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -48,7 +48,7 @@
     "cross-env": "^10.0.0",
     "electron": "^37.2.4",
     "electron-builder": "^26.0.12",
-    "electron-rebuild": "^3.2.9",
+    "@electron/rebuild": "^3.6.0",
     "eslint": "^9.32.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
@@ -79,5 +79,9 @@
         ]
       }
     ]
+  },
+  "electronVersion": "37.2.4",
+  "npm": {
+    "rebuild": true
   }
 }
