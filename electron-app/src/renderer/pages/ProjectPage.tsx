@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useProjects } from '../hooks/useProjects';
+import { useNavigate } from 'react-router-dom';
+import { useElectronProject } from '../contexts/ElectronProjectContext';
 import { Product } from '../types';
-import { api } from '../services/api';
+import { api } from '../services/apiIPC';
 import { formatArray, formatPrice } from '../utils/formatters';
 import { TableSettingsModal, useTableSettings } from '../components/TableSettings';
+import { getProductImageUrl, getPlaceholderImage } from '../../shared/utils/assetUtils';
 import './ProjectPage.css';
 
 // Types for persisted state
@@ -129,9 +130,8 @@ const saveState = (state: Partial<ProjectPageState>) => {
 };
 
 const ProjectPage: React.FC = () => {
-  const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
-  const { projects } = useProjects();
+  const { project, isLoading: projectLoading, isInitializing } = useElectronProject();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -141,16 +141,9 @@ const ProjectPage: React.FC = () => {
 
   // Initialize TableSettings hook
   const tableSettings = useTableSettings({ 
-    projectId: projectId || 'default',
+    projectId: 'current',
     initialSettings: {
-      // Convert legacy state to new format if needed
-      display: {
-        rowDensity: 'regular',
-        enableZebraStriping: true,
-        imageSize: 'medium',
-        enableTextWrapping: false,
-        showRowNumbers: false
-      }
+      // Use default settings for now
     }
   });
 
@@ -167,7 +160,16 @@ const ProjectPage: React.FC = () => {
   });
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
 
-  const project = projects.find(p => p.id === projectId);
+  // For the new file-based system, we only have one current project
+  const currentProject = project;
+
+  // Redirect to welcome page if no project is open
+  useEffect(() => {
+    // Don't redirect during initialization
+    if (!isInitializing && !projectLoading && !project) {
+      navigate('/welcome');
+    }
+  }, [project, projectLoading, isInitializing, navigate]);
 
   // State update functions that persist to localStorage
   const updateViewMode = (mode: 'grid' | 'list') => {
@@ -219,8 +221,8 @@ const ProjectPage: React.FC = () => {
       // Search filter - searches across product name, description, manufacturer
       if (filters.search.trim()) {
         const searchTerm = filters.search.toLowerCase().trim();
-        const productName = (product.product_name || '').toLowerCase();
-        const description = product.description.toLowerCase();
+        const productName = (product.productName || '').toLowerCase();
+        const description = (product.description || '').toLowerCase();
         const manufacturer = (product.manufacturer || '').toLowerCase();
         
         if (!productName.includes(searchTerm) && 
@@ -268,8 +270,8 @@ const ProjectPage: React.FC = () => {
     return [...products].sort((a, b) => {
       switch (sortBy) {
         case 'name': {
-          const aName = a.product_name || a.description;
-          const bName = b.product_name || b.description;
+          const aName = a.productName || a.description || '';
+          const bName = b.productName || b.description || '';
           return aName.localeCompare(bName);
         }
         case 'manufacturer': {
@@ -455,13 +457,13 @@ const ProjectPage: React.FC = () => {
   }, [viewMode, groupBy, sortBy, isInitialized]);
 
   useEffect(() => {
-    if (!projectId) return;
+    if (!currentProject) return;
 
     const fetchProducts = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await api.get<Product[]>(`/api/projects/${projectId}/products`);
+        const response = await api.get<Product[]>(`/api/projects/current/products`);
         setProducts(response.data);
       } catch (err) {
         setError('Failed to load products');
@@ -472,20 +474,15 @@ const ProjectPage: React.FC = () => {
     };
 
     fetchProducts();
-  }, [projectId]);
+  }, [currentProject]);
 
-  if (!project) {
+  // Show loading state while checking for project
+  if (isInitializing || projectLoading || !currentProject) {
     return (
       <div className="page-container">
         <div className="project-page">
-          <div className="error-state">
-            <p>Project not found</p>
-            <button 
-              className="button button-secondary"
-              onClick={() => navigate('/projects')}
-            >
-              Back to Projects
-            </button>
+          <div className="loading-state">
+            <p>{isInitializing ? 'Initializing...' : 'Loading project...'}</p>
           </div>
         </div>
       </div>
@@ -497,24 +494,18 @@ const ProjectPage: React.FC = () => {
       <div className="project-page">
         <div className="page-header">
           <div>
-            <h1>{project.name}</h1>
+            <h1>{currentProject.name}</h1>
             <p className="project-meta">
-              Created: {new Date(project.createdAt).toLocaleDateString()} | 
-              Updated: {new Date(project.updatedAt).toLocaleDateString()}
+              Created: {new Date(currentProject.createdAt || new Date()).toLocaleDateString()} | 
+              Updated: {new Date(currentProject.updatedAt || new Date()).toLocaleDateString()}
             </p>
           </div>
           <div className="header-actions">
             <button 
               className="button button-primary"
-              onClick={() => navigate(`/projects/${projectId}/products/new`)}
+              onClick={() => navigate('/project/products/new')}
             >
               Add Product
-            </button>
-            <button 
-              className="button button-secondary"
-              onClick={() => navigate('/projects')}
-            >
-              Back to Projects
             </button>
           </div>
         </div>
@@ -713,7 +704,7 @@ const ProjectPage: React.FC = () => {
             <p>No products in this project yet.</p>
             <button 
               className="button button-primary"
-              onClick={() => navigate(`/projects/${projectId}/products/new`)}
+              onClick={() => navigate('/project/products/new')}
             >
               Add First Product
             </button>
@@ -742,14 +733,14 @@ const ProjectPage: React.FC = () => {
                   {locationProducts.map(product => (
                     <div key={product.id} className="product-card">
                       <div className="product-image">
-                        {product.image ? (
-                          <img src={product.image} alt={product.description} />
-                        ) : (
-                          <div className="no-image">No Image</div>
-                        )}
+                        <img 
+                          src={getProductImageUrl(product) || getPlaceholderImage()} 
+                          alt={product.description || 'Product image'}
+                          className="w-full h-48 object-cover"
+                        />
                       </div>
                       <div className="product-info">
-                        <h3 className="product-title">{product.product_name || product.description}</h3>
+                        <h3 className="product-title">{product.productName || product.description}</h3>
                         <p className="product-description">{product.description}</p>
                         {product.manufacturer && <p className="product-manufacturer">By: {product.manufacturer}</p>}
                         {product.price && <p className="product-price">{formatPrice(product.price)}</p>}
@@ -765,7 +756,7 @@ const ProjectPage: React.FC = () => {
                         <div className="product-actions">
                           <button
                             className="product-link button-link"
-                            onClick={() => navigate(`/projects/${projectId}/products/${product.id}`)}
+                            onClick={() => navigate(`/project/products/${product.id}`)}
                           >
                             View Details →
                           </button>
@@ -847,17 +838,16 @@ const ProjectPage: React.FC = () => {
                             {tableSettings.settings.columns.image?.visible && (
                               <td className="image-cell">
                                 <div className="list-product-image">
-                                  {product.image ? (
-                                    <img src={product.image} alt={product.description} />
-                                  ) : (
-                                    <div className="no-image-small">No Image</div>
-                                  )}
+                                  <img 
+                                    src={getProductImageUrl(product) || getPlaceholderImage()} 
+                                    alt={product.description || 'Product image'}
+                                  />
                                 </div>
                               </td>
                             )}
                             {tableSettings.settings.columns.productName?.visible && (
                               <td className="product-name-cell">
-                                <span className="product-name">{product.product_name || 'N/A'}</span>
+                                <span className="product-name">{product.productName || 'N/A'}</span>
                               </td>
                             )}
                             {tableSettings.settings.columns.description?.visible && (
@@ -902,7 +892,7 @@ const ProjectPage: React.FC = () => {
                                 <div className="list-actions">
                                   <button
                                     className="action-button primary"
-                                    onClick={() => navigate(`/projects/${projectId}/products/${product.id}`)}
+                                    onClick={() => navigate(`/project/products/${product.id}`)}
                                   >
                                     View
                                   </button>

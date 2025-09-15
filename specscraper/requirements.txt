@@ -3,13 +3,11 @@ pandas==2.2.0
 numpy==1.26.2
 Werkzeug==3.0.1 
 requests~=2.32.4
-undetected-chromedriver~=3.5.5
-selenium~=4.34.0
 beautifulsoup4~=4.13.4
 langchain~=0.3.26
 python-dotenv~=1.1.0
 langchain-core~=0.3.66
-firecrawl-py==2.15.0
+# firecrawl-py==2.15.0  # Removed - using direct API calls instead
 pydantic~=2.11.7
 matplotlib==3.10.3
 seaborn==0.13.2

@@ -1,175 +1,131 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useProjects } from '../hooks/useProjects';
+import { useElectronProject } from '../contexts/ElectronProjectContext';
+import { NoProjectOpen } from '../components/NoProjectOpen';
 import { useToast } from '../hooks/useToast';
 import './ProjectsPage.css';
 
 const ProjectsPage: React.FC = () => {
-  const { projects, updateProject, createProject } = useProjects();
-  const { showToast } = useToast();
   const navigate = useNavigate();
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState('');
-  const [isCreatingProject, setIsCreatingProject] = useState(false);
-  const [newProjectName, setNewProjectName] = useState('');
+  const { project, isLoading, isInitializing, error, closeProject } = useElectronProject();
+  const { showToast } = useToast();
 
-  const handleEdit = (projectId: string, currentName: string) => {
-    setEditingId(projectId);
-    setEditName(currentName);
-  };
-
-  const handleSave = () => {
-    if (editingId && editName.trim()) {
-      updateProject(editingId, editName.trim());
-      showToast('Project updated successfully', 'success');
-      setEditingId(null);
-      setEditName('');
+  // Show error toast if there's an error
+  React.useEffect(() => {
+    if (error) {
+      showToast(error, 'error');
     }
-  };
+  }, [error, showToast]);
 
-  const handleCancel = () => {
-    setEditingId(null);
-    setEditName('');
-  };
+  // Show loading state
+  if (isInitializing || isLoading) {
+    return (
+      <div className="page-container">
+        <div className="projects-page">
+          <div className="loading-state">
+            <p>{isInitializing ? 'Initializing...' : 'Loading project...'}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSave();
-    } else if (e.key === 'Escape') {
-      handleCancel();
-    }
-  };
+  // Show NoProjectOpen component when no project is open
+  if (!project || !project.isOpen) {
+    return (
+      <div className="page-container">
+        <div className="projects-page">
+          <NoProjectOpen />
+        </div>
+      </div>
+    );
+  }
 
-  const handleCreateProject = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newProjectName.trim()) {
-      createProject(newProjectName.trim());
-      setNewProjectName('');
-      setIsCreatingProject(false);
-      showToast('Project created successfully', 'success');
-    }
-  };
-
+  // Show current project info when a project is open
   return (
     <div className="page-container">
       <div className="projects-page">
         <div className="page-header">
-          <h1>Projects</h1>
-          <button 
-            className="button button-primary"
-            onClick={() => setIsCreatingProject(true)}
-          >
-            Add Project
-          </button>
+          <h1>Current Project</h1>
+          <div className="project-actions">
+            <button 
+              className="button button-secondary"
+              onClick={async () => {
+                // This will be handled by the File menu, but we can also trigger it here
+                if (window.electronAPI) {
+                  await window.electronAPI.triggerNewProject();
+                }
+              }}
+            >
+              New Project
+            </button>
+            <button 
+              className="button button-secondary"
+              onClick={async () => {
+                // This will be handled by the File menu, but we can also trigger it here
+                if (window.electronAPI) {
+                  await window.electronAPI.triggerOpenProject();
+                }
+              }}
+            >
+              Open Project
+            </button>
+          </div>
         </div>
 
-        {isCreatingProject && (
-          <form onSubmit={handleCreateProject} className="create-project-form">
-            <div className="form-group">
-              <label htmlFor="project-name" className="label">
-                Project Name
-              </label>
-              <input
-                id="project-name"
-                type="text"
-                className="input"
-                value={newProjectName}
-                onChange={(e) => setNewProjectName(e.target.value)}
-                placeholder="Enter project name"
-                autoFocus
-              />
+        <div className="current-project-info">
+          <div className="project-card">
+            <h2>{project.name || 'Untitled Project'}</h2>
+            <div className="project-details">
+              <p><strong>Status:</strong> {project.isDirty ? 'Modified' : 'Saved'}</p>
+              <p><strong>Path:</strong> {project.path || 'Unknown'}</p>
+              {project.createdAt && (
+                <p><strong>Created:</strong> {new Date(project.createdAt).toLocaleDateString()}</p>
+              )}
+              {project.updatedAt && (
+                <p><strong>Updated:</strong> {new Date(project.updatedAt).toLocaleDateString()}</p>
+              )}
             </div>
-            <div className="form-actions">
-              <button type="submit" className="button button-primary">
-                Create Project
+            <div className="project-actions">
+              <button 
+                className="button button-primary"
+                onClick={() => navigate('/project')}
+              >
+                View Products
               </button>
               <button 
-                type="button" 
                 className="button button-secondary"
-                onClick={() => {
-                  setIsCreatingProject(false);
-                  setNewProjectName('');
+                onClick={async () => {
+                  if (window.electronAPI) {
+                    const result = await window.electronAPI.saveProject();
+                    if (result.success) {
+                      showToast('Project saved successfully', 'success');
+                    } else {
+                      showToast(result.error || 'Failed to save project', 'error');
+                    }
+                  }
                 }}
+                disabled={!project.isDirty}
               >
-                Cancel
+                Save Project
+              </button>
+              <button 
+                className="button button-danger"
+                onClick={async () => {
+                  const result = await closeProject();
+                  if (result) {
+                    showToast('Project closed successfully', 'success');
+                  } else {
+                    showToast('Failed to close project', 'error');
+                  }
+                }}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Closing...' : 'Close Project'}
               </button>
             </div>
-          </form>
-        )}
-
-        {projects.length === 0 && !isCreatingProject ? (
-          <div className="empty-state">
-            <p>No projects yet. Click "Add Project" to create your first project.</p>
           </div>
-        ) : !isCreatingProject && projects.length > 0 ? (
-          <div className="projects-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Project Name</th>
-                  <th>Products</th>
-                  <th>Created</th>
-                  <th>Updated</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {projects.map(project => (
-                  <tr key={project.id}>
-                    <td>
-                      {editingId === project.id ? (
-                        <input
-                          type="text"
-                          className="input inline-edit"
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          onKeyDown={handleKeyDown}
-                          onBlur={handleSave}
-                          autoFocus
-                        />
-                      ) : (
-                        <span 
-                          className="project-name"
-                          onClick={() => navigate(`/projects/${project.id}`)}
-                        >
-                          {project.name}
-                        </span>
-                      )}
-                    </td>
-                    <td>{project.productCount}</td>
-                    <td>{new Date(project.createdAt).toLocaleDateString()}</td>
-                    <td>{new Date(project.updatedAt).toLocaleDateString()}</td>
-                    <td>
-                      {editingId === project.id ? (
-                        <div className="edit-actions">
-                          <button 
-                            className="button button-small button-primary"
-                            onClick={handleSave}
-                          >
-                            Save
-                          </button>
-                          <button 
-                            className="button button-small button-secondary"
-                            onClick={handleCancel}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <button 
-                          className="button button-small button-secondary"
-                          onClick={() => handleEdit(project.id, project.name)}
-                        >
-                          Edit
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : null}
+        </div>
       </div>
     </div>
   );
