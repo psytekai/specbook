@@ -363,7 +363,7 @@ const ProductNew: React.FC = () => {
             <button 
               type="submit" 
               className="button button-primary"
-              disabled={isLoading || isScrapingLoading || !isPythonAvailable}
+              disabled={isLoading || isScrapingLoading || isPythonAvailable !== true}
             >
               {isLoading || isScrapingLoading ? 'Fetching...' : 'Fetch Product Details'}
             </button>
@@ -392,9 +392,15 @@ const ProductNew: React.FC = () => {
             )}
             
             {/* Show Python availability status */}
-            {!isPythonAvailable && (
+            {isPythonAvailable === null && (
+              <div style={{ marginTop: '10px', padding: '8px', backgroundColor: '#e3f2fd', border: '1px solid #90caf9', borderRadius: '4px', fontSize: '14px' }}>
+                🔍 Checking Python bridge availability...
+              </div>
+            )}
+            
+            {isPythonAvailable === false && (
               <div style={{ marginTop: '10px', padding: '8px', backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '4px', fontSize: '14px' }}>
-                Python scraper is not available. Please check the installation.
+                ⚠️ Python scraper is not available. Please check the installation.
               </div>
             )}
             
