@@ -211,45 +211,75 @@ def main():
             options=input_data.get("options", {})
         )
 
-        # Output ONLY the result to stdout (no other output)
-        print(json.dumps(result, indent=2))
+        # Contract compliance: stdout only on success, stderr for all failures
+        if result["success"]:
+            # Success: exactly one JSON result to stdout (compact format)
+            print(json.dumps(result))
+            bridge.logger.info("Request completed successfully",
+                              processing_time=result.get("metadata", {}).get("processing_time"))
 
-        # Log completion
-        bridge.logger.info("Request completed",
-                          success=result["success"],
-                          processing_time=result.get("metadata", {}).get("processing_time"))
+            # Flush guarantees
+            sys.stdout.flush()
+            bridge.logger.flush()
+            sys.stderr.flush()
 
-        sys.exit(0 if result["success"] else 1)
+            sys.exit(0)
+        else:
+            # Failure: no stdout output, error info to stderr only
+            bridge.logger.error("Request failed",
+                               error=result["error"],
+                               metadata=result.get("metadata", {}))
+
+            # Flush guarantees
+            bridge.logger.flush()
+            sys.stderr.flush()
+
+            sys.exit(1)
 
     except json.JSONDecodeError as e:
-        # Create minimal logger for error reporting
+        # Contract compliance: no stdout on failure, error to stderr only
         stderr_sink = StreamSink(sys.stderr)
         logger, _ = create_bridge_logger(stderr_sink, capture_stdlib_logs=False)
 
-        logger.error("Invalid JSON input", error=str(e))
-        error_result = {
-            "success": False,
-            "data": None,
-            "metadata": {},
-            "error": f"Invalid JSON input: {str(e)}"
-        }
-        print(json.dumps(error_result, indent=2))
+        logger.error("Invalid JSON input",
+                    error=str(e),
+                    input_preview=input_raw[:100] if 'input_raw' in locals() else "unknown")
+
+        # Flush and exit with failure code (no stdout output)
+        logger.flush()
+        sys.stderr.flush()
         sys.exit(1)
 
     except Exception as e:
-        # Create minimal logger for error reporting
-        stderr_sink = StreamSink(sys.stderr)
-        logger, _ = create_bridge_logger(stderr_sink, capture_stdlib_logs=False)
+        # Contract compliance: no stdout on failure, error to stderr only
+        try:
+            # Try to use existing bridge logger if available
+            if 'bridge' in locals() and bridge.logger:
+                bridge.logger.error("Unhandled exception",
+                                   error=str(e),
+                                   error_type=type(e).__name__)
+                bridge.logger.flush()
+            else:
+                # Create minimal logger for error reporting
+                stderr_sink = StreamSink(sys.stderr)
+                logger, _ = create_bridge_logger(stderr_sink, capture_stdlib_logs=False)
+                logger.error("Bridge initialization or execution failed",
+                           error=str(e),
+                           error_type=type(e).__name__)
+                logger.flush()
 
-        logger.error("Bridge error", error=str(e), error_type=type(e).__name__)
-        error_result = {
-            "success": False,
-            "data": None,
-            "metadata": {},
-            "error": str(e)
-        }
-        print(json.dumps(error_result, indent=2))
-        sys.exit(1)
+            # Flush and exit with failure code (no stdout output)
+            sys.stderr.flush()
+            sys.exit(1)
+
+        except Exception:
+            # Last resort: write minimal error info and exit
+            try:
+                sys.stderr.write(f"FATAL_ERROR: {str(e)}\n")
+                sys.stderr.flush()
+            except Exception:
+                pass
+            sys.exit(1)
 
 
 if __name__ == "__main__":
