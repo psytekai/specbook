@@ -74,7 +74,9 @@
       {
         "from": "resources/python/electron_bridge",
         "to": "python/electron_bridge",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ]
   }
