@@ -90,15 +90,26 @@ jobs:
 
       - name: Install deps
         working-directory: electron-app
-        run: npm ci
-        
-      - name: Rebuild native modules for Electron
-        working-directory: electron-app
-        run: npx @electron/rebuild --version=37.2.4 --arch=x64
+        run: |
+          npm ci --ignore-scripts
 
       - name: Build renderer/main
         working-directory: electron-app
-        run: npm run build
+        run: |
+          npm run build:main
+          npm run build:renderer
+
+      - name: Verify build output
+        working-directory: electron-app
+        run: |
+          ls -la dist/
+          ls -la dist/main/
+          test -f dist/main/index.js || { echo "❌ dist/main/index.js missing!"; exit 1; }
+          echo "✅ Build verification passed"
+
+      - name: Rebuild native modules for Electron
+        working-directory: electron-app
+        run: npx @electron/rebuild --version=37.2.4 --arch=x64
 
       - name: Package Windows app (unsigned)
         working-directory: electron-app
@@ -135,22 +146,32 @@ jobs:
       - name: Install deps
         working-directory: electron-app
         run: |
-          npm ci
+          npm ci --ignore-scripts
         env:
-          npm_config_target_platform: electron
+          npm_config_target_platform: darwin
           npm_config_target_arch: arm64
           npm_config_disturl: https://electronjs.org/headers
           npm_config_runtime: electron
           npm_config_cache: /tmp/.npm
           npm_config_target: 37.2.4
           
+      - name: Build renderer/main
+        working-directory: electron-app
+        run: |
+          npm run build:main
+          npm run build:renderer
+
+      - name: Verify build output
+        working-directory: electron-app
+        run: |
+          ls -la dist/
+          ls -la dist/main/
+          test -f dist/main/index.js || { echo "❌ dist/main/index.js missing!"; exit 1; }
+          echo "✅ Build verification passed"
+
       - name: Rebuild native modules for Electron
         working-directory: electron-app
         run: npx @electron/rebuild --version=37.2.4 --arch=arm64
-
-      - name: Build renderer/main
-        working-directory: electron-app
-        run: npm run build
 
       - name: Package macOS app (unsigned)
         working-directory: electron-app
