@@ -208,7 +208,7 @@ jobs:
         with:
           name: electron-macos-dist
           path: |
-            electron-app/dist/*.dmg      # if DMG configured
-            electron-app/dist/mac/*.zip
-            electron-app/dist/mac-*/**/*.app
+            electron-app/dist/*.dmg
+            electron-app/dist/*.zip
+            electron-app/dist/mac/**
           if-no-files-found: warn
