@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { Project, Product } from '../types';
-import { api } from '../services/api';
+import { api } from '../services/apiIPC';
 
 interface ProjectState {
   projects: Project[];
