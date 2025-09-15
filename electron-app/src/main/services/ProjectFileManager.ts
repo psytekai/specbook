@@ -2,6 +2,8 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import Database from 'better-sqlite3';
 import { v4 as uuidv4 } from 'uuid';
+import { AssetManager } from './AssetManager';
+import { mapDbRowToInterface, mapInterfaceToDb } from '../../shared/mappings/fieldMappings';
 import type { 
   Project, 
   Product, 
@@ -44,6 +46,7 @@ export class ProjectFileManager {
 
       // Create subdirectories
       await fs.mkdir(path.join(projectPath, 'assets'), { recursive: true });
+      await fs.mkdir(path.join(projectPath, 'assets', 'thumbnails'), { recursive: true });
       await fs.mkdir(path.join(projectPath, '.metadata'), { recursive: true });
 
       console.log(`Created project structure at: ${projectPath}`);
@@ -69,21 +72,21 @@ export class ProjectFileManager {
       db.exec(`
         CREATE TABLE IF NOT EXISTS products (
           id TEXT PRIMARY KEY,
-          projectId TEXT NOT NULL,
+          project_id TEXT NOT NULL,
           url TEXT NOT NULL,
-          tagId TEXT,
+          tag_id TEXT,
           location TEXT,
-          image TEXT,
-          images TEXT,
           description TEXT,
-          specificationDescription TEXT,
+          specification_description TEXT,
           category TEXT,
           product_name TEXT,
           manufacturer TEXT,
           price REAL,
-          custom_image_url TEXT,
-          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          primary_image_hash TEXT,
+          primary_thumbnail_hash TEXT,
+          additional_images_hashes TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
 
@@ -92,7 +95,7 @@ export class ProjectFileManager {
         CREATE TABLE IF NOT EXISTS categories (
           id TEXT PRIMARY KEY,
           name TEXT UNIQUE NOT NULL,
-          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
 
@@ -101,7 +104,7 @@ export class ProjectFileManager {
         CREATE TABLE IF NOT EXISTS locations (
           id TEXT PRIMARY KEY,
           name TEXT UNIQUE NOT NULL,
-          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
 
@@ -110,7 +113,7 @@ export class ProjectFileManager {
         CREATE TRIGGER IF NOT EXISTS update_products_timestamp 
         AFTER UPDATE ON products
         BEGIN
-          UPDATE products SET updatedAt = CURRENT_TIMESTAMP WHERE id = NEW.id;
+          UPDATE products SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
         END
       `);
 
@@ -118,6 +121,108 @@ export class ProjectFileManager {
       return db;
     } catch (error) {
       throw new Error(`Failed to initialize database: ${error}`);
+    }
+  }
+
+  /**
+   * Check and apply database migrations for existing projects
+   */
+  async migrateDatabase(db: Database.Database): Promise<void> {
+    try {
+      // Check if asset columns exist
+      const tableInfo = db.prepare("PRAGMA table_info(products)").all() as Array<{name: string}>;
+      const columnNames = tableInfo.map(col => col.name);
+      
+      // Phase 4: Add asset management columns if they don't exist
+      const assetColumns = [
+        { name: 'primary_image_hash', type: 'TEXT' },
+        { name: 'primary_thumbnail_hash', type: 'TEXT' },
+        { name: 'additional_images_hashes', type: 'TEXT' }  // JSON array of hashes
+      ];
+      
+      for (const column of assetColumns) {
+        if (!columnNames.includes(column.name)) {
+          console.log(`Adding column ${column.name} to products table...`);
+          db.exec(`ALTER TABLE products ADD COLUMN ${column.name} ${column.type}`);
+        }
+      }
+      
+      // Create assets metadata table for tracking
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS assets (
+          hash TEXT PRIMARY KEY,
+          original_name TEXT,
+          mimetype TEXT,
+          size INTEGER,
+          width INTEGER,
+          height INTEGER,
+          thumbnail_hash TEXT,
+          ref_count INTEGER DEFAULT 1,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      
+      // Create index for faster lookups
+      db.exec(`
+        CREATE INDEX IF NOT EXISTS idx_assets_ref_count ON assets(ref_count);
+        CREATE INDEX IF NOT EXISTS idx_assets_last_accessed ON assets(last_accessed);
+      `);
+      
+      console.log('Database migration completed successfully');
+    } catch (error) {
+      console.error('Database migration failed:', error);
+      throw new Error(`Failed to migrate database: ${error}`);
+    }
+  }
+
+  /**
+   * Get database schema version
+   */
+  getSchemaVersion(db: Database.Database): number {
+    try {
+      // Check if schema_version table exists
+      const tableExists = db.prepare(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'"
+      ).get();
+      
+      if (!tableExists) {
+        // Create schema version table
+        db.exec(`
+          CREATE TABLE schema_version (
+            version INTEGER PRIMARY KEY,
+            applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+        
+        // Insert initial version
+        db.prepare('INSERT INTO schema_version (version) VALUES (?)').run(1);
+        return 1;
+      }
+      
+      // Get current version
+      const result = db.prepare('SELECT MAX(version) as version FROM schema_version').get() as {version: number};
+      return result?.version || 1;
+    } catch (error) {
+      console.error('Error getting schema version:', error);
+      return 1;
+    }
+  }
+
+  /**
+   * Apply specific schema version migration
+   */
+  applyMigration(db: Database.Database, version: number): void {
+    const migrations: Record<number, () => void> = {
+      // Future migrations can be added here
+    };
+    
+    if (migrations[version]) {
+      db.transaction(() => {
+        migrations[version]();
+        db.prepare('INSERT INTO schema_version (version) VALUES (?)').run(version);
+      })();
+      console.log(`Applied migration version ${version}`);
     }
   }
 
@@ -155,6 +260,9 @@ export class ProjectFileManager {
   /**
    * Gets all products with optional filtering
    */
+  /**
+   * Gets all products with optional filtering
+   */
   async getProducts(filters?: { category?: string; location?: string }): Promise<Product[]> {
     if (!this.db) {
       throw new Error('No project is currently open');
@@ -174,7 +282,8 @@ export class ProjectFileManager {
         params.push(`%${filters.location}%`);
       }
 
-      query += ' ORDER BY createdAt DESC';
+      // Fix: Use snake_case column name in SQL query
+      query += ' ORDER BY created_at DESC';
 
       const stmt = this.db.prepare(query);
       const rows = stmt.all(...params) as any[];
@@ -195,34 +304,43 @@ export class ProjectFileManager {
 
     try {
       const id = uuidv4();
-      const now = new Date();
-
+      const now = new Date().toISOString();
+      
+      // Map interface fields to database column names
+      const dbData = mapInterfaceToDb({
+        ...productData,
+        id,
+        createdAt: now,
+        updatedAt: now
+      });
+      
       const stmt = this.db.prepare(`
         INSERT INTO products (
-          id, projectId, url, tagId, location, image, images, 
-          description, specificationDescription, category, 
-          product_name, manufacturer, price, custom_image_url,
-          createdAt, updatedAt
+          id, project_id, url, tag_id, location,
+          description, specification_description, category, 
+          product_name, manufacturer, price,
+          primary_image_hash, primary_thumbnail_hash, additional_images_hashes,
+          created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
-
+      
       stmt.run(
-        id,
-        productData.projectId || this.currentProject.id,
-        productData.url,
-        productData.tagId || null,
+        dbData.id,
+        dbData.project_id || this.currentProject.id,
+        dbData.url,
+        dbData.tag_id || null,
         JSON.stringify(productData.location || []),
-        productData.image || null,
-        JSON.stringify(productData.images || []),
-        productData.description || null,
-        productData.specificationDescription || null,
+        dbData.description || null,
+        dbData.specification_description || null,
         JSON.stringify(productData.category || []),
-        productData.product_name,
-        productData.manufacturer || null,
-        productData.price || null,
-        productData.custom_image_url || null,
-        now.toISOString(),
-        now.toISOString()
+        dbData.product_name,
+        dbData.manufacturer || null,
+        dbData.price || null,
+        dbData.primary_image_hash || null,
+        dbData.primary_thumbnail_hash || null,
+        JSON.stringify(productData.additionalImagesHashes || []),
+        dbData.created_at,
+        dbData.updated_at
       );
 
       // Update product count in manifest
@@ -232,15 +350,9 @@ export class ProjectFileManager {
       await this.extractAndStoreCategories(productData.category || []);
       await this.extractAndStoreLocations(productData.location || []);
 
-      const product: Product = {
-        ...productData,
-        id,
-        projectId: productData.projectId || this.currentProject.id,
-        createdAt: now,
-        updatedAt: now
-      };
-
-      return product;
+      // Get the created product using the same parsing logic
+      const createdRow = this.db.prepare('SELECT * FROM products WHERE id = ?').get(id) as any;
+      return this.parseProductRow(createdRow);
     } catch (error) {
       throw new Error(`Failed to create product: ${error}`);
     }
@@ -270,7 +382,7 @@ export class ProjectFileManager {
         values.push(updates.url);
       }
       if (updates.tagId !== undefined) {
-        updateFields.push('tagId = ?');
+        updateFields.push('tag_id = ?');
         values.push(updates.tagId);
       }
       if (updates.location !== undefined) {
@@ -278,20 +390,12 @@ export class ProjectFileManager {
         values.push(JSON.stringify(updates.location));
         await this.extractAndStoreLocations(updates.location);
       }
-      if (updates.image !== undefined) {
-        updateFields.push('image = ?');
-        values.push(updates.image);
-      }
-      if (updates.images !== undefined) {
-        updateFields.push('images = ?');
-        values.push(JSON.stringify(updates.images));
-      }
       if (updates.description !== undefined) {
         updateFields.push('description = ?');
         values.push(updates.description);
       }
       if (updates.specificationDescription !== undefined) {
-        updateFields.push('specificationDescription = ?');
+        updateFields.push('specification_description = ?');
         values.push(updates.specificationDescription);
       }
       if (updates.category !== undefined) {
@@ -299,9 +403,9 @@ export class ProjectFileManager {
         values.push(JSON.stringify(updates.category));
         await this.extractAndStoreCategories(updates.category);
       }
-      if (updates.product_name !== undefined) {
+      if (updates.productName !== undefined) {
         updateFields.push('product_name = ?');
-        values.push(updates.product_name);
+        values.push(updates.productName);
       }
       if (updates.manufacturer !== undefined) {
         updateFields.push('manufacturer = ?');
@@ -311,9 +415,18 @@ export class ProjectFileManager {
         updateFields.push('price = ?');
         values.push(updates.price);
       }
-      if (updates.custom_image_url !== undefined) {
-        updateFields.push('custom_image_url = ?');
-        values.push(updates.custom_image_url);
+      // Asset management fields (Phase 4)
+      if (updates.primaryImageHash !== undefined) {
+        updateFields.push('primary_image_hash = ?');
+        values.push(updates.primaryImageHash);
+      }
+      if (updates.primaryThumbnailHash !== undefined) {
+        updateFields.push('primary_thumbnail_hash = ?');
+        values.push(updates.primaryThumbnailHash);
+      }
+      if (updates.additionalImagesHashes !== undefined) {
+        updateFields.push('additional_images_hashes = ?');
+        values.push(JSON.stringify(updates.additionalImagesHashes));
       }
 
       if (updateFields.length === 0) {
@@ -334,7 +447,7 @@ export class ProjectFileManager {
   }
 
   /**
-   * Deletes a product
+   * Deletes a product and cleans up associated assets
    */
   async deleteProduct(id: string): Promise<boolean> {
     if (!this.db) {
@@ -342,10 +455,48 @@ export class ProjectFileManager {
     }
 
     try {
-      const stmt = this.db.prepare('DELETE FROM products WHERE id = ?');
-      const result = stmt.run(id);
+      // First, get the product to retrieve asset hashes before deletion
+      const getStmt = this.db.prepare('SELECT primary_image_hash, primary_thumbnail_hash, additional_images_hashes FROM products WHERE id = ?');
+      const product = getStmt.get(id) as { primary_image_hash?: string; primary_thumbnail_hash?: string; additional_images_hashes?: string } | undefined;
+
+      // Delete the product from database
+      const deleteStmt = this.db.prepare('DELETE FROM products WHERE id = ?');
+      const result = deleteStmt.run(id);
 
       if (result.changes > 0) {
+        // Clean up associated assets if they exist
+        if (product && this.projectPath) {
+          const assetManager = new AssetManager(this.projectPath, this.db);
+
+          // Delete primary image asset
+          if (product.primary_image_hash) {
+            try {
+              await assetManager.deleteAsset(product.primary_image_hash);
+            } catch (error) {
+              console.warn(`Failed to delete primary image asset ${product.primary_image_hash}:`, error);
+            }
+          }
+
+          // Delete additional image assets
+          if (product.additional_images_hashes) {
+            try {
+              const imageHashes = JSON.parse(product.additional_images_hashes) as string[];
+              for (const hash of imageHashes) {
+                try {
+                  await assetManager.deleteAsset(hash);
+                } catch (error) {
+                  console.warn(`Failed to delete image asset ${hash}:`, error);
+                }
+              }
+            } catch (error) {
+              console.warn('Failed to parse additional_images_hashes for cleanup:', error);
+            }
+          }
+
+          // Note: thumbnail_hash cleanup is handled automatically by AssetManager.deleteAsset()
+          // when the main asset is deleted, as thumbnails are linked to their parent assets
+        }
+
         await this.updateProductCount();
         return true;
       }
@@ -371,7 +522,7 @@ export class ProjectFileManager {
       return rows.map(row => ({
         id: row.id,
         name: row.name,
-        createdAt: new Date(row.createdAt)
+        createdAt: new Date(row.created_at)
       }));
     } catch (error) {
       throw new Error(`Failed to get categories: ${error}`);
@@ -393,7 +544,7 @@ export class ProjectFileManager {
       return rows.map(row => ({
         id: row.id,
         name: row.name,
-        createdAt: new Date(row.createdAt)
+        createdAt: new Date(row.created_at)
       }));
     } catch (error) {
       throw new Error(`Failed to get locations: ${error}`);
@@ -432,6 +583,9 @@ export class ProjectFileManager {
 
       // Initialize database
       this.db = await this.initializeDatabase(projectPath);
+      
+      // Apply latest schema (ensures new projects have all columns)
+      await this.migrateDatabase(this.db);
 
       // Set current project
       this.currentProject = project;
@@ -465,6 +619,9 @@ export class ProjectFileManager {
 
       // Initialize database (this will create tables if they don't exist)
       this.db = await this.initializeDatabase(projectPath);
+      
+      // Run migrations for existing projects
+      await this.migrateDatabase(this.db);
 
       // Create project object
       const project: Project = {
@@ -551,24 +708,42 @@ export class ProjectFileManager {
    * Parses a database row into a Product object
    */
   private parseProductRow(row: any): Product {
+    // First apply field name mappings
+    const mappedRow = mapDbRowToInterface(row);
+    
+    // Then parse JSON fields and ensure correct types
     return {
-      id: row.id,
-      projectId: row.projectId,
-      url: row.url,
-      tagId: row.tagId,
-      location: row.location ? JSON.parse(row.location) : [],
-      image: row.image,
-      images: row.images ? JSON.parse(row.images) : [],
-      description: row.description,
-      specificationDescription: row.specificationDescription,
-      category: row.category ? JSON.parse(row.category) : [],
-      product_name: row.product_name,
-      manufacturer: row.manufacturer,
-      price: row.price,
-      custom_image_url: row.custom_image_url,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt)
+      id: mappedRow.id,
+      projectId: mappedRow.projectId,
+      url: mappedRow.url,
+      tagId: mappedRow.tagId || undefined,
+      location: this.parseJsonArray(mappedRow.location),
+      description: mappedRow.description || undefined,
+      specificationDescription: mappedRow.specificationDescription || undefined,
+      category: this.parseJsonArray(mappedRow.category),
+      productName: mappedRow.productName,
+      manufacturer: mappedRow.manufacturer || undefined,
+      price: mappedRow.price || undefined,
+      
+      // Asset fields now properly mapped from snake_case
+      primaryImageHash: mappedRow.primaryImageHash || undefined,
+      primaryThumbnailHash: mappedRow.primaryThumbnailHash || undefined,
+      additionalImagesHashes: this.parseJsonArray(mappedRow.additionalImagesHashes),
+      
+      createdAt: new Date(mappedRow.createdAt),
+      updatedAt: new Date(mappedRow.updatedAt)
     };
+  }
+
+  private parseJsonArray(jsonField: string | null | undefined): string[] {
+    if (!jsonField) return [];
+    try {
+      const parsed = JSON.parse(jsonField);
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch (error) {
+      console.error('Failed to parse JSON array:', jsonField, error);
+      return [];
+    }
   }
 
   /**

@@ -12,17 +12,20 @@ export interface Product {
   id: string;
   projectId: string;
   url: string;
-  tagId?: string;
-  location: string[];
-  image?: string;
-  images: string[];
-  description?: string;
-  specificationDescription?: string;
-  category: string[];
-  product_name: string;
+  tagId?: string;  // Optional to match DB
+  location: string[];  // Always array
+  description?: string;  // Optional to match DB
+  specificationDescription?: string;  // Optional to match DB
+  category: string[];  // Always array, never string
+  productName: string;
   manufacturer?: string;
   price?: number;
-  custom_image_url?: string;
+  
+  // Asset management fields - camelCase
+  primaryImageHash?: string;
+  primaryThumbnailHash?: string;
+  additionalImagesHashes?: string[];  // Optional array
+  
   createdAt: Date;
   updatedAt: Date;
 }
@@ -49,6 +52,12 @@ export interface Manifest {
     name: string;
     description?: string;
     productCount: number;
+  };
+  assets?: {
+    totalCount: number;
+    totalSize: number;
+    thumbnailCount: number;
+    lastCleanup?: string;
   };
 }
 

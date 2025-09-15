@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron';
 import { ProjectState } from '../services/ProjectState';
+import { transformApiToInternal, transformInternalToApi } from '../../shared/mappings/apiFieldMappings';
 
 /**
  * Set up IPC handlers that replace the existing API service
@@ -270,24 +271,42 @@ class APIRouter {
       throw new Error('No project open');
     }
 
-    const product = await manager.createProduct({
-      projectId: 'current',
-      url: data.product_url,
-      tagId: data.tag_id,
-      location: data.product_location,
-      image: data.product_image,
-      images: data.product_images,
-      description: data.product_description,
-      specificationDescription: data.specification_description,
-      category: data.category,
-      product_name: data.product_name,
-      manufacturer: data.manufacturer,
-      price: data.price,
-      custom_image_url: data.custom_image_url
-    });
-
-    this.projectState.markDirty();
-    return { success: true, data: product };
+    try {
+      // Transform API fields to internal format
+      const transformedData = transformApiToInternal(data);
+      
+      // Ensure required fields have defaults
+      const productData = {
+        projectId: 'current',
+        url: transformedData.url || '',
+        tagId: transformedData.tagId,
+        location: transformedData.location || [],
+        description: transformedData.description,
+        specificationDescription: transformedData.specificationDescription,
+        category: transformedData.category || [],
+        productName: transformedData.productName || '',
+        manufacturer: transformedData.manufacturer,
+        price: transformedData.price,
+        primaryImageHash: transformedData.primaryImageHash,
+        primaryThumbnailHash: transformedData.primaryThumbnailHash,
+        additionalImagesHashes: transformedData.additionalImagesHashes || []
+      };
+      
+      const product = await manager.createProduct(productData);
+      this.projectState.markDirty();
+      
+      // Transform back to API format for response
+      return { 
+        success: true, 
+        data: transformInternalToApi(product)
+      };
+    } catch (error) {
+      console.error('Failed to create product:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to create product'
+      };
+    }
   }
 
   private async updateProduct(productId: string, data: any) {
@@ -298,10 +317,30 @@ class APIRouter {
       throw new Error('No project open');
     }
 
-    const product = await manager.updateProduct(productId, data);
-
-    this.projectState.markDirty();
-    return { success: true, data: product };
+    try {
+      // Transform API fields to internal format
+      const transformedData = transformApiToInternal(data);
+      
+      // Remove any null values from deprecated fields
+      const cleanedData = Object.fromEntries(
+        Object.entries(transformedData).filter(([_, v]) => v !== null)
+      );
+      
+      const product = await manager.updateProduct(productId, cleanedData);
+      this.projectState.markDirty();
+      
+      // Transform back to API format for response
+      return { 
+        success: true, 
+        data: transformInternalToApi(product)
+      };
+    } catch (error) {
+      console.error('Failed to update product:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to update product'
+      };
+    }
   }
 
   private async deleteProduct(productId: string) {
@@ -430,52 +469,7 @@ export function setupAPIIPC(): void {
     return await router.routeDelete(endpoint);
   });
 
-  /**
-   * Web Scraping API - used by ProductNew component
-   */
-  ipcMain.handle('api:scrape-product', async (_event, request) => {
-    try {
-      // For now, return mock data to maintain compatibility
-      // TODO: Integrate with Python scraping pipeline
-      
-      const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-      await delay(2000); // Simulate scraping time
-      
-      // Simulate random success/failure (10% failure rate)
-      if (Math.random() < 0.1) {
-        return {
-          success: false,
-          error: 'Unable to extract product information from the provided URL'
-        };
-      }
 
-      // Return mock scraped data matching expected format
-      const randomId = Date.now();
-      return {
-        success: true,
-        data: {
-          product_image: `https://picsum.photos/400/300?random=${randomId}`,
-          product_images: [
-            `https://picsum.photos/400/300?random=${randomId}`,
-            `https://picsum.photos/400/300?random=${randomId + 1}`,
-            `https://picsum.photos/400/300?random=${randomId + 2}`,
-          ],
-          product_description: `High-quality architectural product suitable for modern buildings. This product is designed for ${request.product_location} and offers excellent durability and aesthetic appeal.`,
-          specification_description: `Dimensions: 24" x 36" x 2". Material: Stainless steel with powder coating. Weather resistant and suitable for ${request.product_location}. Tag ID: ${request.tag_id}`,
-          category: [],
-          product_name: `Premium Product`,
-          manufacturer: ['Acme Corp', 'BuildPro', 'QualityFirst', 'TechBuilder', 'ModernDesign'][Math.floor(Math.random() * 5)],
-          price: Math.floor(Math.random() * 500) + 50,
-        }
-      };
-    } catch (error) {
-      console.error('Error scraping product:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Scraping failed'
-      };
-    }
-  });
 
   console.log('✅ API IPC handlers registered');
 }
