@@ -191,8 +191,8 @@ export const useTableSettings = ({ projectId, initialSettings }: UseTableSetting
       .map(([key, _]) => key);
   }, [settings.columns]);
 
-  // Get visible columns count
-  const visibleColumnsCount = useMemo(() => visibleColumns.length, [visibleColumns]);
+  // Get visible columns count (currently unused but may be needed for future features)
+  // const visibleColumnsCount = useMemo(() => visibleColumns.length, [visibleColumns]);
 
   const updateColumnOrder = useCallback((newOrder: string[]) => {
     // Validate that all columns are included

@@ -7,6 +7,7 @@ import logging
 from pydantic import BaseModel, Field
 from lib.utils.openai_rate_limiter import OpenAIRateLimiter
 
+# Create standard logger - no configuration
 logger = logging.getLogger(__name__)
 
 

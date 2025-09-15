@@ -18,6 +18,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   markProjectDirty: () => ipcRenderer.invoke('project:mark-dirty'),
   getRecentProjects: () => ipcRenderer.invoke('project:get-recent'),
   clearRecentProjects: () => ipcRenderer.invoke('project:clear-recent'),
+  openProjectFromPath: (filePath: string) => ipcRenderer.invoke('project:open-path', filePath),
 
   // Menu operations
   triggerNewProject: () => ipcRenderer.invoke('menu:new-project'),
@@ -30,29 +31,45 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   removeProjectChangedListener: () => {
     ipcRenderer.removeAllListeners('project:changed');
+  },
+
+  // API operations (replacing HTTP API with IPC)
+  apiGet: (endpoint: string, params?: any) => ipcRenderer.invoke('api:get', endpoint, params),
+  apiPost: (endpoint: string, data?: any) => ipcRenderer.invoke('api:post', endpoint, data),
+  apiPut: (endpoint: string, data?: any) => ipcRenderer.invoke('api:put', endpoint, data),
+  apiDelete: (endpoint: string) => ipcRenderer.invoke('api:delete', endpoint),
+
+
+  // Asset management operations
+  assetUpload: (fileData: ArrayBuffer, filename: string, mimetype: string, options?: any) => 
+    ipcRenderer.invoke('asset:upload', fileData, filename, mimetype, options),
+  assetGetPath: (hash: string, thumbnail?: boolean) => 
+    ipcRenderer.invoke('asset:get-path', hash, thumbnail),
+  assetDelete: (hash: string) => 
+    ipcRenderer.invoke('asset:delete', hash),
+  assetCleanup: (options?: { removeOlderThan?: number; dryRun?: boolean }) => 
+    ipcRenderer.invoke('asset:cleanup', options),
+  assetImportBatch: (files: Array<{ data: ArrayBuffer; filename: string }>, options?: any) => 
+    ipcRenderer.invoke('asset:import-batch', files, options),
+  assetStatistics: () =>
+    ipcRenderer.invoke('asset:statistics'),
+  assetDownloadFromUrl: (imageUrl: string, filename?: string) =>
+    ipcRenderer.invoke('asset:download-from-url', imageUrl, filename),
+
+  // Python bridge operations
+  checkPythonAvailability: () => ipcRenderer.invoke('python:check-availability'),
+  scrapeProduct: (url: string, options?: any) => 
+    ipcRenderer.invoke('python:scrape-product', url, options),
+  getPythonStatus: () => ipcRenderer.invoke('python:get-status'),
+  
+  onScrapeProgress: (callback: (progress: any) => void) => {
+    const handler = (_event: any, progress: any) => callback(progress);
+    ipcRenderer.on('python:scrape-progress', handler);
+    // Return cleanup function
+    return () => {
+      ipcRenderer.removeListener('python:scrape-progress', handler);
+    };
   }
 });
 
-// Type definitions for TypeScript
-declare global {
-  interface Window {
-    electronAPI: {
-      platform: string;
-      versions: {
-        node: string;
-        chrome: string;
-        electron: string;
-      };
-      getCurrentProject: () => Promise<any>;
-      closeProject: () => Promise<{ success: boolean; reason?: string; error?: string }>;
-      saveProject: (updates?: any) => Promise<{ success: boolean; error?: string }>;
-      markProjectDirty: () => Promise<{ success: boolean; error?: string }>;
-      getRecentProjects: () => Promise<{ success: boolean; projects?: string[]; error?: string }>;
-      clearRecentProjects: () => Promise<{ success: boolean; error?: string }>;
-      triggerNewProject: () => Promise<{ success: boolean; error?: string }>;
-      triggerOpenProject: () => Promise<{ success: boolean; error?: string }>;
-      onProjectChanged: (callback: (projectInfo: any) => void) => void;
-      removeProjectChangedListener: () => void;
-    };
-  }
-}
+// Types are defined in shared/types.ts

@@ -10,11 +10,11 @@ const Router: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<Navigate to="/projects" replace />} />
-        <Route path="projects" element={<ProjectsPage />} />
-        <Route path="projects/:projectId" element={<ProjectPage />} />
-        <Route path="projects/:projectId/products/:productId" element={<ProductPage />} />
-        <Route path="projects/:projectId/products/new" element={<ProductNew />} />
+        <Route index element={<Navigate to="/welcome" replace />} />
+        <Route path="welcome" element={<ProjectsPage />} />
+        <Route path="project" element={<ProjectPage />} />
+        <Route path="project/products/:productId" element={<ProductPage />} />
+        <Route path="project/products/new" element={<ProductNew />} />
       </Route>
     </Routes>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useProject } from '../../hooks/useProject';
+import { useElectronProject } from '../../contexts/ElectronProjectContext';
 import './NoProjectOpen.css';
 
 interface NoProjectOpenProps {
@@ -7,7 +7,20 @@ interface NoProjectOpenProps {
 }
 
 const NoProjectOpen: React.FC<NoProjectOpenProps> = ({ className = '' }) => {
-  const { createProject, openProject, recentProjects, isLoading } = useProject();
+  const { createProject, openProject, openProjectFromPath, recentProjects, isLoading, isInitializing } = useElectronProject();
+
+  // Show initialization loading state
+  if (isInitializing) {
+    return (
+      <div className={`no-project-open ${className}`}>
+        <div className="no-project-content">
+          <div className="loading-state">
+            <p>Initializing...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleCreateProject = async () => {
     await createProject();
@@ -70,9 +83,7 @@ const NoProjectOpen: React.FC<NoProjectOpenProps> = ({ className = '' }) => {
                   key={index}
                   className="recent-project-item"
                   onClick={async () => {
-                    // Since we can't directly open a specific recent project through the current API,
-                    // we'll trigger the open dialog and let the user select from there
-                    await openProject();
+                    await openProjectFromPath(projectPath);
                   }}
                   disabled={isLoading}
                 >

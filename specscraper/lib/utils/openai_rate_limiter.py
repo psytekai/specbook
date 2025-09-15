@@ -4,7 +4,9 @@ from typing import Dict, Any
 from dataclasses import dataclass
 from collections import defaultdict
 import logging
+import os
 
+# Create standard logger - no configuration
 logger = logging.getLogger(__name__)
 
 @dataclass
