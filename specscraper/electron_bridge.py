@@ -1,111 +1,88 @@
 #!/usr/bin/env python3
 """
-Electron Bridge for Specscraper
-Provides CLI interface for Electron app to perform product scraping
+Electron Bridge for Specscraper - Phase 3 Implementation
+Provides CLI interface for Electron app using principle-first logging architecture
 """
 
 import sys
-import os
 import json
-import logging
 import time
 from typing import Dict, Any
 
-# PyInstaller handles all path setup automatically - no manual configuration needed
+# Import the principle-first logging system
+from lib.utils.logging_contracts import StreamSink, create_bridge_logger
 
+# Import core modules (they'll use standard logging.getLogger())
 from lib.core.scraping import StealthScraper
 from lib.core.html_processor import HTMLProcessor
 from lib.core.llm import PromptTemplator, LLMInvocator
 
-# Configure logging to stderr so it doesn't interfere with JSON output
-# Only configure if no other logging has been set up
-if not logging.getLogger().handlers:
-    logging.basicConfig(
-        level=logging.WARNING,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        stream=sys.stderr
-    )
-
-# Suppress verbose logging from libraries
-logging.getLogger('urllib3').setLevel(logging.ERROR)
-
 
 class ElectronBridge:
-    """Bridge between Electron app and specscraper library"""
-    
+    """Bridge between Electron app and specscraper library using principle-first logging."""
+
     def __init__(self):
-        """Initialize the bridge with all required components"""
+        # Create stderr sink for structured logging
+        stderr_sink = StreamSink(sys.stderr)
+
+        # Create logger with all enhancements
+        self.logger, self.stdlib_capture = create_bridge_logger(
+            sink=stderr_sink,
+            component="bridge",
+            level="info",
+            enable_rate_limiting=True,
+            enable_pii_redaction=True,
+            capture_stdlib_logs=True
+        )
+
+        # Initialize components lazily
         self.scraper = None
         self.processor = None
         self.templator = None
         self.llm = None
         self._initialized = False
-        
+
     def initialize(self):
         """Lazy initialization of components"""
         if self._initialized:
             return
-            
+
         try:
-            self.report_progress("init", 0, "Initializing components...")
-            
+            self.logger.progress("init", 0.0, "Initializing components...")
+
             self.scraper = StealthScraper()
             self.processor = HTMLProcessor()
             self.templator = PromptTemplator()
             self.llm = LLMInvocator()
-            self.report_progress("init", 10, "Full components initialized")
-                
+
+            self.logger.progress("init", 1.0, "Components initialized successfully")
             self._initialized = True
+
         except Exception as e:
+            self.logger.error("Failed to initialize components", error=str(e))
             raise RuntimeError(f"Failed to initialize components: {str(e)}")
-        
-    def report_progress(self, stage: str, progress: int, message: str):
-        """
-        Send progress update to stderr for Electron to capture
-        
-        Args:
-            stage: Current stage (init, scraping, processing, extraction, complete)
-            progress: Progress percentage (0-100)
-            message: Human-readable status message
-        """
-        progress_data = {
-            "type": "progress",
-            "stage": stage,
-            "progress": progress,
-            "message": message,
-            "timestamp": time.time()
-        }
-        print(json.dumps(progress_data), file=sys.stderr, flush=True)
-    
+
     def scrape_product(self, url: str, options: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Complete end-to-end product scraping pipeline
-        
-        Args:
-            url: Product URL to scrape
-            options: Scraping and LLM options
-                - method: "auto" | "requests" | "firecrawl"
-                - llm_model: Model name (default: "gpt-4o-mini")
-                - temperature: LLM temperature (default: 0.7)
-                - max_tokens: Max response tokens (default: 1000)
-            
-        Returns:
-            Dictionary with success status, extracted data, and metadata
-        """
+        """Complete end-to-end product scraping pipeline"""
         start_time = time.time()
-        
+
         try:
             # Initialize components if needed
             if not self._initialized:
                 self.initialize()
-            
+
             # Step 1: Scrape URL
-            self.report_progress("scraping", 15, f"Starting scrape of {url}")
-            
+            self.logger.progress("scraping", 0.15, f"Starting scrape of {url}")
+            self.logger.info("Scraping URL", url=url, method=options.get("method", "auto"))
+
             method = options.get("method", "auto")
             scrape_result = self.scraper.scrape_url(url, method=method)
-            
+
             if not scrape_result.success:
+                self.logger.error("Scraping failed",
+                                url=url,
+                                method=scrape_result.final_method.value if scrape_result.final_method else "unknown",
+                                error=scrape_result.error_reason)
                 return {
                     "success": False,
                     "data": None,
@@ -116,28 +93,39 @@ class ElectronBridge:
                     },
                     "error": f"Scraping failed: {scrape_result.error_reason}"
                 }
-            
-            self.report_progress("scraping", 50, "Page loaded successfully")
-            
+
+            self.logger.progress("scraping", 0.5, "Page loaded successfully")
+            self.logger.info("Page scraped successfully",
+                           method=scrape_result.final_method.value,
+                           status_code=scrape_result.status_code,
+                           content_length=len(scrape_result.content) if scrape_result.content else 0)
+
             # Step 2: Process HTML
-            self.report_progress("processing", 60, "Cleaning and structuring HTML...")
-            
+            self.logger.progress("processing", 0.6, "Cleaning and structuring HTML...")
+
             processed = self.processor.clean_html(scrape_result.content)
             processed_json = processed.model_dump_json()
-            
-            # Calculate word count from text and image count from images list
+
             word_count = len(processed.text.split()) if processed.text else 0
             image_count = len(processed.images) if processed.images else 0
-            self.report_progress("processing", 70, f"HTML processed: {word_count} words, {image_count} images")
-            
+
+            self.logger.progress("processing", 0.7, f"HTML processed: {word_count} words, {image_count} images")
+            self.logger.info("HTML processing complete",
+                           word_count=word_count,
+                           image_count=image_count,
+                           processed_length=len(processed_json))
+
             # Step 3: Generate prompt and extract data
-            self.report_progress("extraction", 80, "Preparing LLM prompt...")
-            
+            self.logger.progress("extraction", 0.8, "Preparing LLM prompt...")
+
             prompt = self.templator.product_extraction(url, processed_json)
             prompt_tokens = len(prompt) // 4  # Rough estimate
-            
-            self.report_progress("extraction", 85, f"Calling LLM ({options.get('llm_model', 'gpt-4o-mini')})...")
-            
+
+            self.logger.progress("extraction", 0.85, f"Calling LLM ({options.get('llm_model', 'gpt-4o-mini')})...")
+            self.logger.info("Invoking LLM",
+                           model=options.get("llm_model", "gpt-4o-mini"),
+                           estimated_tokens=prompt_tokens)
+
             llm_response = self.llm.invoke_llm(
                 model_provider="openai",
                 llm_model_name=options.get("llm_model", "gpt-4o-mini"),
@@ -145,20 +133,25 @@ class ElectronBridge:
                 temperature=options.get("temperature", 0.7),
                 max_tokens=options.get("max_tokens", 1000)
             )
-            
-            self.report_progress("extraction", 95, "Parsing LLM response...")
-            
-            # Parse and validate response
+
+            self.logger.progress("extraction", 0.95, "Parsing LLM response...")
+
             extracted = PromptTemplator.ProductExtractionOutput.model_validate_json(llm_response)
-            
-            self.report_progress("complete", 100, "Extraction complete")
-            
+
+            self.logger.progress("complete", 1.0, "Extraction complete")
+            self.logger.info("Product extraction successful",
+                           extracted_type=extracted.type,
+                           has_image=bool(extracted.image_url),
+                           has_model_no=bool(extracted.model_no))
+
+            execution_time = time.time() - start_time
+
             return {
                 "success": True,
                 "data": extracted.model_dump(),
                 "metadata": {
                     "scrape_method": scrape_result.final_method.value,
-                    "processing_time": time.time() - start_time,
+                    "processing_time": execution_time,
                     "scrape_time": scrape_result.scrape_time,
                     "llm_model": options.get("llm_model", "gpt-4o-mini"),
                     "status_code": scrape_result.status_code,
@@ -168,8 +161,9 @@ class ElectronBridge:
                 },
                 "error": None
             }
-            
+
         except json.JSONDecodeError as e:
+            self.logger.error("Failed to parse LLM response", error=str(e))
             return {
                 "success": False,
                 "data": None,
@@ -177,6 +171,7 @@ class ElectronBridge:
                 "error": f"Failed to parse LLM response: {str(e)}"
             }
         except Exception as e:
+            self.logger.error("Scraping pipeline failed", error=str(e), error_type=type(e).__name__)
             return {
                 "success": False,
                 "data": None,
@@ -190,50 +185,101 @@ def main():
     try:
         # Read input from stdin
         input_raw = sys.stdin.read()
-        
+
         if not input_raw.strip():
             raise ValueError("No input provided")
-            
+
         input_data = json.loads(input_raw)
-        
+
         # Validate input
         if "url" not in input_data:
             raise ValueError("Missing required field: url")
-        
+
         if not input_data["url"].startswith(("http://", "https://")):
             raise ValueError("Invalid URL format")
-        
+
         # Create bridge and scrape
         bridge = ElectronBridge()
+
+        # Log the start of processing
+        bridge.logger.info("Processing scrape request",
+                          url=input_data["url"],
+                          options=input_data.get("options", {}))
+
         result = bridge.scrape_product(
             url=input_data["url"],
             options=input_data.get("options", {})
         )
-        
-        # Output result as JSON to stdout
-        print(json.dumps(result, indent=2))
-        sys.exit(0 if result["success"] else 1)
-        
+
+        # Contract compliance: stdout only on success, stderr for all failures
+        if result["success"]:
+            # Success: exactly one JSON result to stdout (compact format)
+            print(json.dumps(result))
+            bridge.logger.info("Request completed successfully",
+                              processing_time=result.get("metadata", {}).get("processing_time"))
+
+            # Flush guarantees
+            sys.stdout.flush()
+            bridge.logger.flush()
+            sys.stderr.flush()
+
+            sys.exit(0)
+        else:
+            # Failure: no stdout output, error info to stderr only
+            bridge.logger.error("Request failed",
+                               error=result["error"],
+                               metadata=result.get("metadata", {}))
+
+            # Flush guarantees
+            bridge.logger.flush()
+            sys.stderr.flush()
+
+            sys.exit(1)
+
     except json.JSONDecodeError as e:
-        error_result = {
-            "success": False,
-            "data": None,
-            "metadata": {},
-            "error": f"Invalid JSON input: {str(e)}"
-        }
-        print(json.dumps(error_result, indent=2))
+        # Contract compliance: no stdout on failure, error to stderr only
+        stderr_sink = StreamSink(sys.stderr)
+        logger, _ = create_bridge_logger(stderr_sink, capture_stdlib_logs=False)
+
+        logger.error("Invalid JSON input",
+                    error=str(e),
+                    input_preview=input_raw[:100] if 'input_raw' in locals() else "unknown")
+
+        # Flush and exit with failure code (no stdout output)
+        logger.flush()
+        sys.stderr.flush()
         sys.exit(1)
-        
+
     except Exception as e:
-        # Return error in structured format
-        error_result = {
-            "success": False,
-            "data": None,
-            "metadata": {},
-            "error": str(e)
-        }
-        print(json.dumps(error_result, indent=2))
-        sys.exit(1)
+        # Contract compliance: no stdout on failure, error to stderr only
+        try:
+            # Try to use existing bridge logger if available
+            if 'bridge' in locals() and bridge.logger:
+                bridge.logger.error("Unhandled exception",
+                                   error=str(e),
+                                   error_type=type(e).__name__)
+                bridge.logger.flush()
+            else:
+                # Create minimal logger for error reporting
+                stderr_sink = StreamSink(sys.stderr)
+                logger, _ = create_bridge_logger(stderr_sink, capture_stdlib_logs=False)
+                logger.error("Bridge initialization or execution failed",
+                           error=str(e),
+                           error_type=type(e).__name__)
+                logger.flush()
+
+            # Flush and exit with failure code (no stdout output)
+            sys.stderr.flush()
+            sys.exit(1)
+
+        except Exception:
+            # Last resort: write minimal error info and exit
+            try:
+                sys.stderr.write(f"FATAL_ERROR: {str(e)}\n")
+                sys.stderr.flush()
+            except Exception:
+                pass
+            sys.exit(1)
 
 
 if __name__ == "__main__":
