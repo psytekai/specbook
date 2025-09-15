@@ -42,7 +42,7 @@ jobs:
 
   mac-build-bridge:
     name: Build Python Bridge (macOS)
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -172,7 +172,7 @@ jobs:
           npm ci --ignore-scripts
         env:
           npm_config_target_platform: darwin
-          npm_config_target_arch: arm64
+          npm_config_target_arch: x64
           npm_config_disturl: https://electronjs.org/headers
           npm_config_runtime: electron
           npm_config_cache: /tmp/.npm
@@ -192,14 +192,14 @@ jobs:
           test -f dist/main/index.js || { echo "❌ dist/main/index.js missing!"; exit 1; }
           echo "✅ Build verification passed"
 
-      # Rebuild native modules against Electron 37 for Apple Silicon
-      - name: Rebuild native modules for Electron
-        working-directory: electron-app
-        run: npx @electron/rebuild --version=37.2.4 --arch=arm64
+      # # Rebuild native modules against Electron 37 for Apple Silicon
+      # - name: Rebuild native modules for Electron
+      #   working-directory: electron-app
+      #   run: npx @electron/rebuild --version=37.2.4 --arch=-x64
 
       - name: Package macOS app (unsigned)
         working-directory: electron-app
-        run: npx electron-builder --mac --universal
+        run: npx electron-builder --mac --x64
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
 
