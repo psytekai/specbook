@@ -239,7 +239,7 @@ const ProductNew: React.FC = () => {
           ...prev,
           productDescription: data.description || '',
           specificationDescription: data.description || '', // Map description to both fields
-          category: data.type ? [data.type] : [], // Map type to category
+          
           productName: data.model_no || '', // Use model_no as product name fallback
           manufacturer: '', // Not provided by Python scraper
           price: undefined // Not provided by Python scraper
