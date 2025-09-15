@@ -160,14 +160,22 @@ jobs:
 
       - name: Install deps
         working-directory: electron-app
-        run: npm ci
+        run: |
+          npm ci --ignore-scripts
+        env:
+          npm_config_target_platform: darwin
+          npm_config_target_arch: arm64
+          npm_config_disturl: https://electronjs.org/headers
+          npm_config_runtime: electron
+          npm_config_cache: /tmp/.npm
+          npm_config_target: 37.2.4
 
       - name: Build renderer/main
         working-directory: electron-app
         run: |
           npm run build:main
           npm run build:renderer
-          
+
       - name: Verify build output
         working-directory: electron-app
         run: |
