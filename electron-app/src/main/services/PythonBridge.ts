@@ -60,6 +60,8 @@ export interface ScrapeResult {
  */
 function bridgePath(): string {
   const base = app.isPackaged ? process.resourcesPath : path.join(process.cwd(), "dist");
+
+  
   const exe = process.platform === "win32" ? "electron_bridge.exe" : "electron_bridge";
   return path.join(base, "python", "electron_bridge", exe);
 }
@@ -77,7 +79,8 @@ export function runBridge(args: string[] = [], opts: any = {}): ChildProcess {
   
   return spawn(bridgeExecutable, args, { 
     stdio: ["pipe", "pipe", "pipe"], 
-    windowsHide: true, 
+    windowsHide: true,
+    env: { ...process.env },
     ...opts 
   });
 }
