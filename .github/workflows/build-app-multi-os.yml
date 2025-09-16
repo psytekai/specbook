@@ -165,7 +165,7 @@ jobs:
           path: electron-app/resources/python/electron_bridge
 
       - name: Fix bridge permissions
-        run: chmod +x electron-app/resources/python/electron_bridge/electron_bridge.exe
+        run: chmod +x electron-app/resources/python/electron_bridge/electron_bridge
 
       - name: Verify bridge
         run: ls -laR electron-app/resources/python/electron_bridge || true
