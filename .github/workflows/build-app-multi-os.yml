@@ -9,6 +9,8 @@ on:
       - "requirements*.txt"
       - "electron-app/**"
       - ".github/workflows/build-app-multi-os.yml"
+  pull_request:
+    branches: [ main ]
 
 # -------------------- Stage 1: Build Python bridges --------------------
 
