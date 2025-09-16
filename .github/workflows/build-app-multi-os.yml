@@ -9,8 +9,6 @@ on:
       - "requirements*.txt"
       - "electron-app/**"
       - ".github/workflows/build-app-multi-os.yml"
-  pull_request:
-    branches: [ main ]
 
 # -------------------- Stage 1: Build Python bridges --------------------
 
@@ -165,6 +163,9 @@ jobs:
         with:
           name: electron_bridge-mac-x64
           path: electron-app/resources/python/electron_bridge
+
+      - name: Fix bridge permissions
+        run: chmod +x electron-app/resources/python/electron_bridge/electron_bridge.exe
 
       - name: Verify bridge
         run: ls -laR electron-app/resources/python/electron_bridge || true
