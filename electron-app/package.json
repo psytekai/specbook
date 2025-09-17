@@ -62,7 +62,6 @@
     "better-sqlite3": "^12.2.0",
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^10.1.0",
-    "puppeteer": "^24.16.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^6.30.1",

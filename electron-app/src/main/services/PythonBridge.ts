@@ -4,6 +4,8 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as fsSync from 'fs';
 import { app } from 'electron';
+import * as os from 'os';
+import { ProjectState } from './ProjectState';
 
 export interface ScrapeOptions {
   method?: 'auto' | 'requests' | 'firecrawl';
@@ -146,6 +148,26 @@ export class PythonBridge {
   private readonly CACHE_DURATION = 30000; // 30s
 
   /* -----------------------------
+     Log file path helper
+  ------------------------------ */
+  private getProjectLogFilePath(prefix: string = 'python_bridge'):
+    string {
+    try {
+      const projectPath = ProjectState.getInstance().currentFilePath;
+      const stamp = new Date()
+        .toISOString()
+        .replace(/[:.]/g, '-')
+        .replace('T', '_')
+        .replace('Z', 'Z');
+      if (projectPath) {
+        const dir = path.join(projectPath, '.metadata', 'logs');
+        return path.join(dir, `${prefix}_${stamp}.log`);
+      }
+    } catch {}
+    return path.join(os.tmpdir(), 'specbridge', `${prefix}_${Date.now()}.log`);
+  }
+
+  /* -----------------------------
      Slots
   ------------------------------ */
   private async waitForSlot(): Promise<void> {
@@ -242,7 +264,10 @@ export class PythonBridge {
    */
   private async testBridge(): Promise<{ success: boolean; error?: string }> {
     return new Promise(resolve => {
-      const child = runBridge([], { env: { SPEC_BRIDGE_PAYLOAD: JSON.stringify({ url: 'https://example.com', options: { method: 'requests' } }) } });
+      const child = runBridge([], { env: {
+        SPEC_BRIDGE_PAYLOAD: JSON.stringify({ url: 'https://example.com', options: { method: 'requests' } }),
+        SPEC_BRIDGE_LOG_FILE: this.getProjectLogFilePath('diagnostic')
+      } });
       let out = '';
       let stderrSize = 0;
       const MAX_STDERR_SIZE = 256 * 1024;
@@ -521,7 +546,9 @@ export class PythonBridge {
       env: {
         PYTHONUNBUFFERED: '1',
         PYTHONIOENCODING: 'utf-8',
-        SPEC_BRIDGE_PAYLOAD: JSON.stringify({ url: 'test', options: {} })
+        SPEC_BRIDGE_PAYLOAD: JSON.stringify({ url: 'https://example.com', options: { method: 'requests' } }),
+        // Write diagnostics logs to a temp file for now
+        SPEC_BRIDGE_LOG_FILE: path.join(os.tmpdir(), 'specbridge', 'diagnostics.log')
       },
       testResult: null as any,
       error: null as any
