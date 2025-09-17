@@ -91,6 +91,27 @@ export function setupPythonIPC(mainWindow?: BrowserWindow): void {
       };
     }
   });
+  
+  /**
+   * Run Python bridge diagnostics
+   */
+  ipcMain.handle('python:run-diagnostics', async () => {
+    try {
+      console.log('🐍 IPC: python:run-diagnostics called');
+      const diagnostics = await pythonBridge.runDiagnostics();
+      console.log('🐍 IPC: Diagnostics result:', diagnostics);
+      return diagnostics;
+    } catch (error) {
+      console.error('🐍 IPC: Error running diagnostics:', error);
+      return {
+        executable: 'unknown',
+        exists: false,
+        platform: process.platform,
+        env: {},
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  });
 
   console.log('🐍 IPC: Python handlers registered successfully');
 }

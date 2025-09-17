@@ -71,8 +71,16 @@ function bridgePath(): string {
   ];
 
   const chosen = candidates.find(p => fsSync.existsSync(p)) ?? candidates[0];
-  // Log once for diagnostics
-  try { console.log('[Bridge] executable:', chosen); } catch {}
+  
+  // Enhanced diagnostics for debugging
+  console.log('[Bridge] Debug info:', {
+    platform: process.platform,
+    isPackaged: app.isPackaged,
+    candidates: candidates,
+    exists: candidates.map(p => ({ path: p, exists: fsSync.existsSync(p) })),
+    chosen: chosen,
+    chosenExists: fsSync.existsSync(chosen)
+  });
 
   return chosen;
 }
@@ -82,6 +90,12 @@ function bridgePath(): string {
 ------------------------------ */
 export function runBridge(args: string[] = [], opts: any = {}): ChildProcess {
   const bridgeExecutable = bridgePath();
+  
+  console.log('[Bridge] Attempting to spawn:', {
+    executable: bridgeExecutable,
+    args: args,
+    env: opts?.env ? Object.keys(opts.env) : 'none'
+  });
 
   if (!app.isPackaged && !fsSync.existsSync(bridgeExecutable)) {
     console.warn(`Bridge executable not found at ${bridgeExecutable}. Run 'npm run bundle-python' first.`);
@@ -242,9 +256,7 @@ export class PythonBridge {
       let stderrBuf = '';
       let sawStructuredLog = false;
 
-      // Minimal payload (URL value is irrelevant; we just exercise I/O path)
-      // Newline-framed so bridge readline() returns even if stdin isn't explicitly ended elsewhere.
-      const payload = { url: 'https://example.com', options: { method: 'requests' } };
+
 
       child.stdout?.on('data', c => (out += c.toString('utf8')));
 
@@ -284,11 +296,7 @@ export class PythonBridge {
         resolve(ok ? { success: true } : { success: false, error: 'No structured output detected' });
       });
 
-      try {
-        writeJsonLine(child, payload);
-      } catch (e: any) {
-        resolve({ success: false, error: `Failed to write to process: ${e?.message || e}` });
-      }
+      // No stdin write needed when using SPEC_BRIDGE_PAYLOAD
     });
   }
 
@@ -344,9 +352,20 @@ export class PythonBridge {
       timeout = setTimeout(() => {
         cleanup();
         if (!child.killed) {
-          child.kill('SIGTERM');
+          // Windows doesn't support POSIX signals properly
+          if (process.platform === 'win32') {
+            child.kill();  // Default signal works on Windows
+          } else {
+            child.kill('SIGTERM');
+          }
           setTimeout(() => {
-            if (!child.killed) child.kill('SIGKILL');
+            if (!child.killed) {
+              if (process.platform === 'win32') {
+                child.kill();  // Force kill on Windows
+              } else {
+                child.kill('SIGKILL');
+              }
+            }
           }, 5000);
         }
         resolve({
@@ -462,15 +481,121 @@ export class PythonBridge {
 
       child.on('error', error => {
         cleanup();
+        console.error('[Bridge] Process spawn error:', {
+          message: error.message,
+          code: (error as any).code,
+          syscall: (error as any).syscall,
+          path: (error as any).path,
+          spawnargs: (error as any).spawnargs,
+          executable: bridgePath()
+        });
         resolve({
           success: false,
           data: null,
-          metadata: {},
-          error: `Process error: ${error.message}`,
+          metadata: {
+            spawn_error: {
+              message: error.message,
+              code: (error as any).code,
+              syscall: (error as any).syscall,
+              path: (error as any).path
+            }
+          },
+          error: `Process error: ${error.message} (${(error as any).code || 'unknown'})`,
           diagnostics: diagnosticLogs,
         });
       });
     });
+  }
+
+  /* -----------------------------
+     Diagnostic test function
+  ------------------------------ */
+  async runDiagnostics(): Promise<{
+    executable: string;
+    exists: boolean;
+    platform: string;
+    env: Record<string, string>;
+    testResult?: any;
+    error?: string;
+  }> {
+    const bridgeExecutable = bridgePath();
+    const exists = fsSync.existsSync(bridgeExecutable);
+    
+    const diagnostics = {
+      executable: bridgeExecutable,
+      exists: exists,
+      platform: process.platform,
+      env: {
+        PYTHONUNBUFFERED: '1',
+        PYTHONIOENCODING: 'utf-8',
+        SPEC_BRIDGE_PAYLOAD: JSON.stringify({ url: 'test', options: {} })
+      },
+      testResult: null as any,
+      error: null as any
+    };
+    
+    if (!exists) {
+      diagnostics.error = `Executable not found at: ${bridgeExecutable}`;
+      return diagnostics;
+    }
+    
+    // Try to spawn and capture any errors
+    try {
+      const child = spawn(bridgeExecutable, [], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        windowsHide: true,
+        shell: false,
+        env: {
+          ...process.env,
+          ...diagnostics.env
+        } as NodeJS.ProcessEnv
+      });
+      
+      return new Promise((resolve) => {
+        let stdout = '';
+        let stderr = '';
+        
+        child.stdout?.on('data', (data) => {
+          stdout += data.toString();
+        });
+        
+        child.stderr?.on('data', (data) => {
+          stderr += data.toString();
+        });
+        
+        child.on('error', (error) => {
+          diagnostics.error = `Spawn error: ${error.message} (${(error as any).code})`;
+          diagnostics.testResult = {
+            stdout: stdout,
+            stderr: stderr,
+            spawnError: error
+          };
+          resolve(diagnostics);
+        });
+        
+        child.on('close', (code) => {
+          diagnostics.testResult = {
+            exitCode: code,
+            stdout: stdout,
+            stderr: stderr
+          };
+          if (code !== 0 && !stdout) {
+            diagnostics.error = `Process exited with code ${code}`;
+          }
+          resolve(diagnostics);
+        });
+        
+        // Timeout after 5 seconds
+        setTimeout(() => {
+          child.kill();
+          diagnostics.error = 'Test timeout';
+          resolve(diagnostics);
+        }, 5000);
+      });
+    } catch (error: any) {
+      diagnostics.error = `Exception: ${error.message}`;
+      return diagnostics;
+    }
   }
 
   /* -----------------------------
@@ -485,8 +610,15 @@ export class PythonBridge {
     const killPromises = Array.from(this.activeProcesses).map(proc => new Promise<void>(resolve => {
       if (proc.killed) return resolve();
       proc.once('exit', () => resolve());
-      proc.kill('SIGTERM');
-      setTimeout(() => { if (!proc.killed) proc.kill('SIGKILL'); }, 5000);
+      // Windows doesn't support POSIX signals properly
+      if (process.platform === 'win32') {
+        proc.kill();  // Default signal works on Windows
+      } else {
+        proc.kill('SIGTERM');
+        setTimeout(() => { 
+          if (!proc.killed) proc.kill('SIGKILL'); 
+        }, 5000);
+      }
     }));
     await Promise.all(killPromises);
     this.activeProcesses.clear();
