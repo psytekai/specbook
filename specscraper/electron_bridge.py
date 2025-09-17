@@ -210,7 +210,7 @@ class ElectronBridge:
 def _readline_with_timeout(timeout_seconds: float) -> str:
     """
     Read a SINGLE newline-terminated line from stdin with a timeout.
-    Works on Windows and POSIX without using select(); no EOF required.
+    Used only as a fallback when SPEC_BRIDGE_PAYLOAD is not provided.
     """
     if sys.stdin is None:
         raise RuntimeError("stdin is not available; run with stdio pipes")
@@ -324,6 +324,7 @@ def main() -> None:
         if result.get("success"):
             # Success: exactly one JSON result to stdout (compact)
             print(json.dumps(result, separators=(",", ":")))
+
             bridge.logger.info(
                 "Request completed successfully",
                 processing_time=result.get("metadata", {}).get("processing_time"),

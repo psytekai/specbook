@@ -87,13 +87,23 @@ export function runBridge(args: string[] = [], opts: any = {}): ChildProcess {
     console.warn(`Bridge executable not found at ${bridgeExecutable}. Run 'npm run bundle-python' first.`);
   }
 
-  return spawn(bridgeExecutable, args, {
+  const mergedEnv = {
+    ...process.env,
+    // Force unbuffered output and UTF-8 everywhere
+    PYTHONUNBUFFERED: '1',
+    PYTHONIOENCODING: 'utf-8',
+    ...(opts?.env || {}),
+  } as NodeJS.ProcessEnv;
+
+  const spawnOptions = {
     stdio: ['pipe', 'pipe', 'pipe'],
     windowsHide: true,
     shell: false,
-    env: { ...process.env },
     ...opts,
-  });
+    env: mergedEnv,
+  } as const;
+
+  return spawn(bridgeExecutable, args, spawnOptions);
 }
 
 /* -----------------------------
@@ -225,7 +235,7 @@ export class PythonBridge {
    */
   private async testBridge(): Promise<{ success: boolean; error?: string }> {
     return new Promise(resolve => {
-      const child = runBridge();
+      const child = runBridge([], { env: { SPEC_BRIDGE_PAYLOAD: JSON.stringify({ url: 'https://example.com', options: { method: 'requests' } }) } });
       let out = '';
       let stderrSize = 0;
       const MAX_STDERR_SIZE = 256 * 1024;
@@ -306,7 +316,9 @@ export class PythonBridge {
 
     return new Promise(async resolve => {
       await this.waitForSlot();
-      const child = runBridge();
+      // Prepare payload and send via environment to avoid stdin edge cases on Windows
+      const payload = JSON.stringify({ url, options: sanitizedOptions });
+      const child = runBridge([], { env: { SPEC_BRIDGE_PAYLOAD: payload } });
       this.activeProcesses.add(child);
 
       const stdoutChunks: Buffer[] = [];
@@ -346,20 +358,7 @@ export class PythonBridge {
         });
       }, 120000);
 
-      // Send input
-      try {
-        writeJsonLine(child, { url, options: sanitizedOptions });
-      } catch (error) {
-        cleanup();
-        resolve({
-          success: false,
-          data: null,
-          metadata: {},
-          error: `Failed to write to process: ${error}`,
-          diagnostics: diagnosticLogs,
-        });
-        return;
-      }
+      // No stdin write needed when using SPEC_BRIDGE_PAYLOAD
 
       // stdout: single compact JSON on success
       child.stdout!.on('data', (data: Buffer) => {
@@ -416,10 +415,21 @@ export class PythonBridge {
         try {
           const stdout = Buffer.concat(stdoutChunks).toString('utf8');
           if (!stdout.trim()) {
+            // Enhanced debugging for Windows
+            const debugInfo = {
+              platform: process.platform,
+              executablePath: bridgePath(),
+              exitCode: code,
+              stderrSize: stderrSize,
+              stdoutSize: stdoutSize,
+              diagnosticCount: diagnosticLogs.length,
+              lastDiagnostic: diagnosticLogs[diagnosticLogs.length - 1] || null
+            };
+            
             resolve({
               success: false,
               data: null,
-              metadata: {},
+              metadata: { debug_info: debugInfo },
               error: 'No output received from Python process',
               diagnostics: diagnosticLogs,
             });
