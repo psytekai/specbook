@@ -1,3 +1,4 @@
+// preload.ts
 import { contextBridge, ipcRenderer } from 'electron';
 
 // Expose protected methods that allow the renderer process to use
@@ -69,7 +70,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => {
       ipcRenderer.removeListener('python:scrape-progress', handler);
     };
-  }
+  },
+
+  // API keys input
+   sendApiKeys: (payload: { openai: string; firecrawl: string } | null) =>
+    ipcRenderer.send('api-keys-input', payload),
+
+   
 });
 
 // Types are defined in shared/types.ts

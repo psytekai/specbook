@@ -1,3 +1,4 @@
+// ApplicationMenu.ts
 import { Menu, BrowserWindow, dialog, app } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs/promises';
@@ -448,81 +449,105 @@ export class ApplicationMenu {
   private async showApiKeysDialog(): Promise<{openai: string, firecrawl: string} | null> {
     if (!this.mainWindow) return null;
 
+    const { ipcMain } = require('electron');
+
     return new Promise((resolve) => {
       const inputWindow = new BrowserWindow({
         parent: this.mainWindow!,
         modal: true,
-        width: 400,
-        height: 300,
-        resizable: true,
+        width: 450,
+        height: 350,
+        resizable: false,
+        minimizable: false,
+        maximizable: false,
+        show: false,
+        title: 'API Keys Configuration',
         webPreferences: {
-          nodeIntegration: true,
-          contextIsolation: false
-        }
+          nodeIntegration: false,
+          contextIsolation: true,
+          webSecurity: true,
+        },
       });
 
+      const cleanup = () => {
+        ipcMain.removeListener('api-keys-input', onKeys);
+      };
+  
+      const onKeys = (_evt: Electron.IpcMainEvent, data: { openai: string; firecrawl: string } | null) => {
+        cleanup();
+        if (!inputWindow.isDestroyed()) inputWindow.close();
+        resolve(data ?? null);
+      };
+  
+      ipcMain.once('api-keys-input', onKeys);
+  
       const html = `
-        <!DOCTYPE html>
+        <!doctype html>
         <html>
         <head>
+          <meta charset="utf-8" />
           <title>API Keys</title>
+          <style>
+            body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; padding:20px; background:#f5f5f5;}
+            .card { background:#fff; padding:16px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.08);}
+            h3 { margin:0 0 8px; }
+            label { display:block; margin:12px 0 6px; font-weight:500; }
+            input { width:100%; padding:8px; border:1px solid #ddd; border-radius:6px; }
+            .actions { margin-top:16px; text-align:right; }
+            button { padding:8px 14px; border:0; border-radius:6px; cursor:pointer; }
+            .cancel { background:#eee; margin-right:8px; }
+            .ok { background:#0078d4; color:#fff; }
+          </style>
         </head>
         <body>
-          <h3>API Keys Configuration</h3>
-          <p>Enter your API keys:</p>
-          
-          <label>OpenAI API Key:</label><br>
-          <input type="password" id="openaiKey" placeholder="sk-..." style="width: 100%; margin: 5px 0 15px 0;"><br>
-          
-          <label>Firecrawl API Key:</label><br>
-          <input type="password" id="firecrawlKey" placeholder="fc-..." style="width: 100%; margin: 5px 0 15px 0;"><br>
-          
-          <div style="text-align: right;">
-            <button onclick="cancel()" style="margin-right: 10px;">Cancel</button>
-            <button onclick="ok()">OK</button>
+          <div class="card">
+            <h3>API Keys Configuration</h3>
+            <p>Enter keys for this session:</p>
+            <label for="openaiKey">OpenAI API Key</label>
+            <input type="password" id="openaiKey" placeholder="sk-..." autocomplete="off" />
+            <label for="firecrawlKey">Firecrawl API Key</label>
+            <input type="password" id="firecrawlKey" placeholder="fc-..." autocomplete="off" />
+            <div class="actions">
+              <button class="cancel" id="btnCancel">Cancel</button>
+              <button class="ok" id="btnOk">OK</button>
+            </div>
           </div>
-          
           <script>
-            const { ipcRenderer } = require('electron');
-            
-            function ok() {
+            const send = (payload) => window.electronAPI?.sendApiKeys(payload);
+      
+            document.getElementById('btnOk').addEventListener('click', () => {
               const openai = document.getElementById('openaiKey').value.trim();
               const firecrawl = document.getElementById('firecrawlKey').value.trim();
-              if (openai && firecrawl) {
-                ipcRenderer.send('api-keys-input', { openai, firecrawl });
-              }
-            }
-            
-            function cancel() {
-              ipcRenderer.send('api-keys-input', null);
-            }
-            
-            document.getElementById('openaiKey').addEventListener('keypress', function(e) {
-              if (e.key === 'Enter') {
-                document.getElementById('firecrawlKey').focus();
-              }
+              if (!openai || !firecrawl) { alert('Please enter both API keys'); return; }
+              send({ openai, firecrawl });
+              window.close();
             });
-            
-            document.getElementById('firecrawlKey').addEventListener('keypress', function(e) {
-              if (e.key === 'Enter') {
-                ok();
-              }
+  
+            document.getElementById('btnCancel').addEventListener('click', () => {
+              send(null);
+              window.close();
             });
+  
+            document.getElementById('openaiKey').addEventListener('keypress', (e) => {
+              if (e.key === 'Enter') document.getElementById('firecrawlKey').focus();
+            });
+            document.getElementById('firecrawlKey').addEventListener('keypress', (e) => {
+              if (e.key === 'Enter') document.getElementById('btnOk').click();
+            });
+  
+            // Focus on load
+            setTimeout(() => document.getElementById('openaiKey').focus(), 0);
           </script>
         </body>
         </html>
       `;
-
+  
       inputWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
-
-      inputWindow.webContents.on('ipc-message', (_, channel, data) => {
-        if (channel === 'api-keys-input') {
-          inputWindow.close();
-          resolve(data);
-        }
-      });
-
+      inputWindow.once('ready-to-show', () => inputWindow.show());
+  
       inputWindow.on('closed', () => {
+        cleanup();
+        // If user closes the window without sending anything
         resolve(null);
       });
     });
