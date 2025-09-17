@@ -62,6 +62,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   scrapeProduct: (url: string, options?: any) => 
     ipcRenderer.invoke('python:scrape-product', url, options),
   getPythonStatus: () => ipcRenderer.invoke('python:get-status'),
+  pythonRunDiagnostics: () => ipcRenderer.invoke('python:run-diagnostics'),
   
   onScrapeProgress: (callback: (progress: any) => void) => {
     const handler = (_event: any, progress: any) => callback(progress);

@@ -76,7 +76,7 @@
       ]
     },
     "win": {
-      "target": ["nsis", "zip"]
+      "target": ["nsis"]
     },
     "files": [
       "dist/**",

@@ -123,13 +123,6 @@ export function runBridge(args: string[] = [], opts: any = {}): ChildProcess {
 /* -----------------------------
    Utilities
 ------------------------------ */
-function writeJsonLine(child: ChildProcess, obj: unknown) {
-  const line = JSON.stringify(obj) + '\n'; // newline-framed
-  if (!child.stdin) throw new Error('Process stdin not available');
-  child.stdin.write(line);
-  child.stdin.end(); // harmless even with readline-based bridge
-}
-
 function parseStructuredLine(line: string): StructuredLogEvent | null {
   try {
     return JSON.parse(line.replace(/\r$/, '')) as StructuredLogEvent; // strip CR if present

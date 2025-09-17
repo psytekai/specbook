@@ -15,38 +15,38 @@ on:
 # -------------------- Stage 1: Build Python bridges --------------------
 
 jobs:
-  win-build-bridge:
-    name: Build Python Bridge (Windows x64)
-    runs-on: windows-latest
-    defaults: { run: { shell: bash } }
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
-
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('specscraper/requirements*.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-
-      - name: Build PyInstaller (win x64)
-        working-directory: specscraper
-        run: |
-          python -m venv .venv
-          source .venv/Scripts/activate
-          python -m pip install -U pip wheel
-          [ -f requirements-minimal.txt ] && python -m pip install -r requirements-minimal.txt
-          python -m pip install pyinstaller
-          pyinstaller --noconfirm --clean --onedir --noconsole --name electron_bridge electron_bridge.py
-          deactivate
-
-      - name: Upload bridge (win x64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: electron_bridge-win-x64
-          path: specscraper/dist/electron_bridge/**
+#  win-build-bridge:
+#    name: Build Python Bridge (Windows x64)
+#    runs-on: windows-latest
+#    defaults: { run: { shell: bash } }
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: actions/setup-python@v5
+#        with: { python-version: "3.11" }
+#
+#      - name: Cache pip
+#        uses: actions/cache@v4
+#        with:
+#          path: ~/.cache/pip
+#          key: ${{ runner.os }}-pip-${{ hashFiles('specscraper/requirements*.txt') }}
+#          restore-keys: ${{ runner.os }}-pip-
+#
+#      - name: Build PyInstaller (win x64)
+#        working-directory: specscraper
+#        run: |
+#          python -m venv .venv
+#          source .venv/Scripts/activate
+#          python -m pip install -U pip wheel
+#          [ -f requirements-minimal.txt ] && python -m pip install -r requirements-minimal.txt
+#          python -m pip install pyinstaller
+#          pyinstaller --noconfirm --clean --onedir --noconsole --name electron_bridge electron_bridge.py
+#          deactivate
+#
+#      - name: Upload bridge (win x64)
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: electron_bridge-win-x64
+#          path: specscraper/dist/electron_bridge/**
 
   # mac-build-bridge:
     # name: Build Python Bridge (macOS x64)
@@ -80,6 +80,60 @@ jobs:
     #       name: electron_bridge-mac-x64
     #       path: specscraper/dist/electron_bridge/**
     #       if-no-files-found: error
+
+  win-build-bridge:
+    name: Build Python Bridge (Windows x64)
+    runs-on: windows-latest
+    defaults: { run: { shell: bash } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+
+      - name: Compute cache key
+        id: bridge_key
+        run: |
+          echo "key=${{ runner.os }}-pybridge-$(sha256sum specscraper/electron_bridge.py specscraper/requirements-minimal.txt | sha256sum | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Restore built bridge (if unchanged)
+        uses: actions/cache@v4
+        id: bridge_cache
+        with:
+          path: specscraper/dist/electron_bridge
+          key: ${{ steps.bridge_key.outputs.key }}
+
+      - name: Restore .venv (for faster installs)
+        uses: actions/cache@v4
+        with:
+          path: specscraper/.venv
+          key: ${{ runner.os }}-venv-${{ hashFiles('specscraper/requirements*.txt') }}
+          restore-keys: ${{ runner.os }}-venv-
+
+      - name: Build PyInstaller (win x64)
+        if: steps.bridge_cache.outputs.cache-hit != 'true'
+        working-directory: specscraper
+        run: |
+          python -m venv .venv
+          source .venv/Scripts/activate
+          python -m pip install -U pip wheel
+          [ -f requirements-minimal.txt ] && python -m pip install -r requirements-minimal.txt
+          python -m pip install pyinstaller
+          pyinstaller --noconfirm --clean --onedir --noconsole --name electron_bridge electron_bridge.py
+          deactivate
+
+      - name: Save built bridge to cache
+        if: steps.bridge_cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: specscraper/dist/electron_bridge
+          key: ${{ steps.bridge_key.outputs.key }}
+
+      - name: Upload bridge (win x64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron_bridge-win-x64
+          path: specscraper/dist/electron_bridge/**
+
 
   # -------- Stage 2: Build Electron apps (no manual rebuilds) --------
   win-build-electron:

@@ -412,7 +412,7 @@ const ProductNew: React.FC = () => {
             onClick={async () => {
               console.log('Running Python bridge diagnostics...');
               try {
-                const result = await window.api.invoke('python:run-diagnostics');
+                const result = await window.electronAPI.pythonRunDiagnostics();
                 console.log('Diagnostic result:', result);
                 alert(`Python Bridge Diagnostics:
 Executable: ${result.executable}
