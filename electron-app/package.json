@@ -4,10 +4,10 @@
   "main": "dist/main/index.js",
   "scripts": {
     "bundle-python": "bash scripts/bundle-python.sh",
-    "bundle-python:windows": "echo 'Windows Python builds handled by CI/CD. Download from GitHub Actions artifacts.'",
     "copy-resources": "mkdir -p dist/python && cp -R resources/python/electron_bridge dist/python/",
     "dev": "npm run bundle-python && npm run build:main && npm run copy-resources && concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:fast": "npm run build:main && npm run copy-resources && concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
+    "dev:lite": "npm run build:main && concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:vite": "vite --port 5173",
     "dev:electron": "wait-on tcp:5173 && cross-env NODE_ENV=development electron .",
     "build": "npm run build:renderer && npm run build:main",
@@ -35,6 +35,7 @@
   "license": "ISC",
   "description": "Architectural Product Management Desktop App",
   "devDependencies": {
+    "@electron/rebuild": "^3.6.0",
     "@eslint/js": "^9.32.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/jest": "^30.0.0",
@@ -50,7 +51,6 @@
     "cross-env": "^10.0.0",
     "electron": "^37.2.4",
     "electron-builder": "^26.0.12",
-    "@electron/rebuild": "^3.6.0",
     "eslint": "^9.32.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
@@ -69,39 +69,5 @@
     "react-router-dom": "^6.30.1",
     "sharp": "^0.33.5",
     "uuid": "^12.0.0"
-  },
-  "build": {
-    "mac": {
-      "target": [
-        { "target": "dmg", "arch": ["x64"] }
-      ]
-    },
-    "win": {
-      "target": ["nsis"]
-    },
-    "files": [
-      "dist/**",
-      "package.json",
-      "node_modules/**",
-      "resources/**",
-      "!src/**",
-      "!**/*.map"
-    ],
-    "directories": {
-      "buildResources": "public/icons"
-    },
-    "extraResources": [
-      {
-        "from": "resources/python/electron_bridge",
-        "to": "python/electron_bridge",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ]
-  },
-  "electronVersion": "37.2.4",
-  "npm": {
-    "rebuild": true
   }
 }
