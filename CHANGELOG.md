@@ -9,6 +9,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+[Phase 5.1] Windows Python Bridge and API Key Management
+- Fixed critical Python bridge communication issues on Windows platform
+  - Implemented line-based JSON protocol with proper newline handling
+  - Updated stdin/stdout communication for cross-platform compatibility
+  - Added environment variable passing for configuration options
+  - Enhanced error handling and process termination logic
+- Created secure API key management system
+  - New dedicated API Keys page in React application
+  - Non-blocking UI implementation preventing main process hangs
+  - Persistent storage using Electron store
+  - Secure IPC communication for key retrieval
+- Enhanced Windows build infrastructure
+  - Added pre-built native modules for better-sqlite3 and sharp
+  - Included PyInstaller Windows x64 executable bundle
+  - Updated electron-builder configuration for Windows packaging
+  - Added resource extraction and management scripts
+- Improved developer experience
+  - Added comprehensive logging infrastructure (Logger.ts)
+  - Created Windows-specific build and test scripts
+  - Enhanced debugging capabilities for Python bridge
+  - Streamlined CI/CD workflow for Windows builds
+
+### Fixed
+- **Windows Platform Issues**
+  - Resolved Python bridge stdin/stdout communication failures on Windows
+  - Fixed API key dialog blocking main process execution
+  - Corrected native module compilation issues in CI/CD pipeline
+  - Fixed electron-builder resource packaging for Windows distribution
+- **Cross-platform Compatibility**
+  - Standardized line-ending handling between platforms
+  - Fixed JSON parsing issues in Python bridge communication
+  - Resolved path separator issues in Windows builds
+  - Corrected environment variable handling across platforms
+
+### Changed
+- Updated CI/CD workflow to remove pull request triggers
+- Modified Python bridge to use environment variables for options
+- Enhanced electron-builder configuration with Windows-specific settings
+- Improved IPC handlers for better error handling and logging
+
 [Phase 5.0] Python Integration & File System Architecture
 - Implemented complete Python scraping integration for desktop application
   - PyInstaller bundle strategy with standalone executables (~40-60MB)

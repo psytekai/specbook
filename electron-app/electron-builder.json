@@ -2,11 +2,19 @@
   "appId": "com.specbook.electronapp",
   "productName": "SpecBook Manager",
   "directories": {
-    "output": "dist"
+    "output": "dist",
+    "buildResources": "public/icons"
   },
   "files": [
     "dist/**/*",
-    "package.json"
+    "package.json",
+    "node_modules/**",
+    "resources/**",
+    "!src/**",
+    "!**/*.map",
+    "!electron_bridge-win-x64/**",
+    "!prebuilt-native-win-x64/**",
+    "!scripts/**"
   ],
   "mac": {
     "category": "public.app-category.productivity",
@@ -16,22 +24,41 @@
         "target": "dmg",
         "arch": ["x64", "arm64"]
       }
+    ],
+    "extraResources": [
+      {
+        "from": "resources/python/electron_bridge",
+        "to": "python/electron_bridge",
+        "filter": ["**/*"]
+      }
     ]
   },
   "win": {
-    "target": "nsis",
-    "icon": "public/icons/icon.ico"
-  },
-  "nsis": {
-    "oneClick": false,
-    "allowToChangeInstallationDirectory": true,
-    "installerIcon": "public/icons/icon.ico",
-    "uninstallerIcon": "public/icons/icon.ico",
-    "installerHeaderIcon": "public/icons/icon.ico"
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "public/icons/icon.ico",
+    "extraResources": [
+      {
+        "from": "electron_bridge-win-x64",
+        "to": "python/electron_bridge",
+        "filter": ["**/*"]
+      }
+    ]
   },
   "linux": {
     "target": "AppImage",
     "icon": "public/icons/icon.png",
     "category": "Office"
+  },
+  "npmRebuild": true,
+  "buildDependenciesFromSource": true,
+  "electronVersion": "37.2.4",
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true
   }
 }

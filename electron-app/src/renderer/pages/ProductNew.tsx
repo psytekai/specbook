@@ -404,7 +404,34 @@ const ProductNew: React.FC = () => {
               disabled={isLoading || isScrapingLoading || isPythonAvailable !== true}
             >
               {isLoading || isScrapingLoading ? 'Fetching...' : 'Fetch Product Details'}
-            </button>
+          </button>
+          
+          {/* Diagnostic button for debugging */}
+          <button
+            type="button"
+            onClick={async () => {
+              console.log('Running Python bridge diagnostics...');
+              try {
+                const result = await window.electronAPI.pythonRunDiagnostics();
+                console.log('Diagnostic result:', result);
+                alert(`Python Bridge Diagnostics:
+Executable: ${result.executable}
+Exists: ${result.exists}
+Platform: ${result.platform}
+Error: ${result.error || 'None'}
+Exit Code: ${result.testResult?.exitCode}
+Stdout: ${result.testResult?.stdout?.slice(0, 200) || 'Empty'}
+Stderr: ${result.testResult?.stderr?.slice(0, 200) || 'Empty'}`);
+              } catch (error) {
+                console.error('Diagnostic error:', error);
+                alert(`Diagnostic failed: ${error}`);
+              }
+            }}
+            className="button"
+            style={{ marginLeft: '10px', backgroundColor: '#ff9800' }}
+          >
+            Run Diagnostics
+          </button>
             
             {/* Show scraping progress */}
             {scrapingProgress && (

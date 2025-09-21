@@ -5,6 +5,7 @@ import ProjectsPage from './pages/ProjectsPage';
 import ProjectPage from './pages/ProjectPage';
 import ProductPage from './pages/ProductPage';
 import ProductNew from './pages/ProductNew';
+import ApiKeysPage from './pages/ApiKeysPage';
 
 const Router: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const Router: React.FC = () => {
         <Route path="project" element={<ProjectPage />} />
         <Route path="project/products/:productId" element={<ProductPage />} />
         <Route path="project/products/new" element={<ProductNew />} />
+        <Route path="apiKeys" element={<ApiKeysPage />} />
       </Route>
     </Routes>
   );

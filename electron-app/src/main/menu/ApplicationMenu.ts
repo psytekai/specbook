@@ -1,7 +1,11 @@
+// ApplicationMenu.ts
 import { Menu, BrowserWindow, dialog, app } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { ProjectState } from '../services/ProjectState';
+import { logger } from '../../shared/logging/Logger';
+
+const log = logger.for('ApplicationMenu');
 
 interface RecentProjectsStore {
   recentProjects?: string[];
@@ -411,120 +415,13 @@ export class ApplicationMenu {
     if (!this.mainWindow) return;
 
     try {
-      const result = await dialog.showMessageBox(this.mainWindow, {
-        type: 'question',
-        buttons: ['Cancel', 'Set API Keys'],
-        defaultId: 1,
-        title: 'API Keys Configuration',
-        message: 'Configure API Keys for Web Scraping',
-        detail: 'Enter your OpenAI and Firecrawl API keys to enable web scraping functionality.'
-      });
-
-      if (result.response === 1) {
-        // Show single dialog for both API keys
-        const keys = await this.showApiKeysDialog();
-        if (keys) {
-          // Set environment variables for Python process
-          process.env.OPENAI_API_KEY = keys.openai;
-          process.env.FIRECRAWL_API_KEY = keys.firecrawl;
-
-          dialog.showMessageBox(this.mainWindow!, {
-            type: 'info',
-            title: 'API Keys Set',
-            message: 'API keys have been configured successfully.',
-            detail: 'The keys will be available for the current session.'
-          });
-        }
-      }
+      // Send navigation command to renderer
+      this.mainWindow.webContents.send('navigate-to', '/apiKeys');
+      log.info('Navigated to API Keys page');
     } catch (error) {
-      console.error('Error setting API keys:', error);
-      dialog.showErrorBox('Error', `Failed to set API keys: ${error}`);
+      console.error('Error navigating to API keys:', error);
+      dialog.showErrorBox('Error', `Failed to open API keys page: ${error}`);
     }
   }
 
-  /**
-   * Show dialog for both API keys
-   */
-  private async showApiKeysDialog(): Promise<{openai: string, firecrawl: string} | null> {
-    if (!this.mainWindow) return null;
-
-    return new Promise((resolve) => {
-      const inputWindow = new BrowserWindow({
-        parent: this.mainWindow!,
-        modal: true,
-        width: 400,
-        height: 300,
-        resizable: true,
-        webPreferences: {
-          nodeIntegration: true,
-          contextIsolation: false
-        }
-      });
-
-      const html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>API Keys</title>
-        </head>
-        <body>
-          <h3>API Keys Configuration</h3>
-          <p>Enter your API keys:</p>
-          
-          <label>OpenAI API Key:</label><br>
-          <input type="password" id="openaiKey" placeholder="sk-..." style="width: 100%; margin: 5px 0 15px 0;"><br>
-          
-          <label>Firecrawl API Key:</label><br>
-          <input type="password" id="firecrawlKey" placeholder="fc-..." style="width: 100%; margin: 5px 0 15px 0;"><br>
-          
-          <div style="text-align: right;">
-            <button onclick="cancel()" style="margin-right: 10px;">Cancel</button>
-            <button onclick="ok()">OK</button>
-          </div>
-          
-          <script>
-            const { ipcRenderer } = require('electron');
-            
-            function ok() {
-              const openai = document.getElementById('openaiKey').value.trim();
-              const firecrawl = document.getElementById('firecrawlKey').value.trim();
-              if (openai && firecrawl) {
-                ipcRenderer.send('api-keys-input', { openai, firecrawl });
-              }
-            }
-            
-            function cancel() {
-              ipcRenderer.send('api-keys-input', null);
-            }
-            
-            document.getElementById('openaiKey').addEventListener('keypress', function(e) {
-              if (e.key === 'Enter') {
-                document.getElementById('firecrawlKey').focus();
-              }
-            });
-            
-            document.getElementById('firecrawlKey').addEventListener('keypress', function(e) {
-              if (e.key === 'Enter') {
-                ok();
-              }
-            });
-          </script>
-        </body>
-        </html>
-      `;
-
-      inputWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
-
-      inputWindow.webContents.on('ipc-message', (_, channel, data) => {
-        if (channel === 'api-keys-input') {
-          inputWindow.close();
-          resolve(data);
-        }
-      });
-
-      inputWindow.on('closed', () => {
-        resolve(null);
-      });
-    });
-  }
 }

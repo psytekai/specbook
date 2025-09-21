@@ -1,3 +1,4 @@
+// preload.ts
 import { contextBridge, ipcRenderer } from 'electron';
 
 // Expose protected methods that allow the renderer process to use
@@ -23,6 +24,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Menu operations
   triggerNewProject: () => ipcRenderer.invoke('menu:new-project'),
   triggerOpenProject: () => ipcRenderer.invoke('menu:open-project'),
+  navigateToApiKeys: () => ipcRenderer.invoke('menu:navigate-to-api-keys'),
 
   // Event listeners
   onProjectChanged: (callback: (projectInfo: any) => void) => {
@@ -31,6 +33,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   removeProjectChangedListener: () => {
     ipcRenderer.removeAllListeners('project:changed');
+  },
+
+  onNavigate: (callback: (path: string) => void) => {
+    const handler = (_event: any, path: string) => callback(path);
+    ipcRenderer.on('navigate-to', handler);
+    // Return cleanup function
+    return () => {
+      ipcRenderer.removeListener('navigate-to', handler);
+    };
   },
 
   // API operations (replacing HTTP API with IPC)
@@ -61,6 +72,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   scrapeProduct: (url: string, options?: any) => 
     ipcRenderer.invoke('python:scrape-product', url, options),
   getPythonStatus: () => ipcRenderer.invoke('python:get-status'),
+  pythonRunDiagnostics: () => ipcRenderer.invoke('python:run-diagnostics'),
   
   onScrapeProgress: (callback: (progress: any) => void) => {
     const handler = (_event: any, progress: any) => callback(progress);
@@ -69,7 +81,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => {
       ipcRenderer.removeListener('python:scrape-progress', handler);
     };
-  }
+  },
+
+  // API keys management
+  setApiKeys: (keys: { openai: string; firecrawl: string }) =>
+    ipcRenderer.invoke('api-keys:set', keys),
+
+   
 });
 
 // Types are defined in shared/types.ts
