@@ -95,30 +95,7 @@ export function setupPythonIPC(mainWindow?: BrowserWindow): void {
     }
   });
   
-  /**
-   * Run Python bridge diagnostics
-   */
-  ipcMain.handle('python:run-diagnostics', async () => {
-    try {
-      log.info('🐍 IPC: python:run-diagnostics called');
-      log.info('🐍 IPC: Environment check:', {
-        OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'SET' : 'NOT SET',
-        FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY ? 'SET' : 'NOT SET'
-      });
-      const diagnostics = await pythonBridge.runDiagnostics();
-      log.info('🐍 IPC: Diagnostics result:', diagnostics);
-      return diagnostics;
-    } catch (error) {
-      log.error('🐍 IPC: Error running diagnostics:', { error });
-      return {
-        executable: 'unknown',
-        exists: false,
-        platform: process.platform,
-        env: {},
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  });
+  // Diagnostics IPC removed
 
   log.info('🐍 IPC: Python handlers registered successfully');
 }

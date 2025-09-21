@@ -37,14 +37,6 @@ export interface ElectronAPI {
   checkPythonAvailability: () => Promise<any>;
   scrapeProduct: (url: string, options?: any) => Promise<any>;
   getPythonStatus: () => Promise<any>;
-  pythonRunDiagnostics: () => Promise<{
-    executable: string;
-    exists: boolean;
-    platform: string;
-    env: Record<string, string>;
-    testResult?: any;
-    error?: string;
-  }>;
   onScrapeProgress: (callback: (progress: any) => void) => () => void;
   navigateToApiKeys: () => Promise<{ success: boolean; error?: string }>;
   setApiKeys: (keys: { openai: string; firecrawl: string }) => Promise<{ success: boolean; error?: string }>;

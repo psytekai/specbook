@@ -406,31 +406,14 @@ const ProductNew: React.FC = () => {
               {isLoading || isScrapingLoading ? 'Fetching...' : 'Fetch Product Details'}
           </button>
           
-          {/* Diagnostic button for debugging */}
+          {/* Manual details toggle */}
           <button
             type="button"
-            onClick={async () => {
-              console.log('Running Python bridge diagnostics...');
-              try {
-                const result = await window.electronAPI.pythonRunDiagnostics();
-                console.log('Diagnostic result:', result);
-                alert(`Python Bridge Diagnostics:
-Executable: ${result.executable}
-Exists: ${result.exists}
-Platform: ${result.platform}
-Error: ${result.error || 'None'}
-Exit Code: ${result.testResult?.exitCode}
-Stdout: ${result.testResult?.stdout?.slice(0, 200) || 'Empty'}
-Stderr: ${result.testResult?.stderr?.slice(0, 200) || 'Empty'}`);
-              } catch (error) {
-                console.error('Diagnostic error:', error);
-                alert(`Diagnostic failed: ${error}`);
-              }
-            }}
-            className="button"
-            style={{ marginLeft: '10px', backgroundColor: '#ff9800' }}
+            onClick={() => setHasDetails(prev => !prev)}
+            className="button button-secondary"
+            style={{ marginLeft: '10px' }}
           >
-            Run Diagnostics
+            {hasDetails ? 'Hide Manual Details' : 'Enter Details Manually'}
           </button>
             
             {/* Show scraping progress */}
