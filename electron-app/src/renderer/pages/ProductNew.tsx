@@ -481,29 +481,16 @@ Stderr: ${result.testResult?.stderr?.slice(0, 200) || 'Empty'}`);
             <div className="form-section">
               <h2>Product Details</h2>
               
-              {/* Image Display - Shows fetched image or custom image */}
-              {formData.primaryThumbnailHash && (
+              {/* Image Display - Shows fetched image or custom image (prefer primary image) */}
+              {(formData.primaryImageHash || formData.primaryThumbnailHash) && (
                 <div className="form-group">
                   <label className="label">Product Image</label>
                   <div className="product-preview">
                     <img 
-                      src={getAssetUrl(formData.primaryThumbnailHash)!}
+                      src={getAssetUrl(formData.primaryImageHash) || getAssetUrl(formData.primaryThumbnailHash)!}
                       alt="Product image" 
                       className="product-image"
                     />
-                    <div className="image-actions">
-                      <button
-                        type="button"
-                        className="button button-secondary"
-                        onClick={() => setFormData(prev => ({ 
-                          ...prev, 
-                          primaryImageHash: undefined,
-                          primaryThumbnailHash: undefined
-                        }))}
-                      >
-                        Remove Image
-                      </button>
-                    </div>
                   </div>
                 </div>
               )}

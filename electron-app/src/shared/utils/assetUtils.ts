@@ -8,14 +8,14 @@ export function getAssetUrl(hash: string | undefined | null): string | undefined
 
 /**
  * Get the best available image URL for a product
- * Priority: thumbnail -> primary image -> undefined
+ * Priority: primary image -> thumbnail -> undefined
  */
 export function getProductImageUrl(product: {
   primaryThumbnailHash?: string;
   primaryImageHash?: string;
 }): string | undefined {
-  return getAssetUrl(product.primaryThumbnailHash) 
-    || getAssetUrl(product.primaryImageHash)
+  return getAssetUrl(product.primaryImageHash)
+    || getAssetUrl(product.primaryThumbnailHash)
     || undefined;
 }
 
