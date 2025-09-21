@@ -18,6 +18,8 @@ export interface ElectronAPI {
   triggerOpenProject: () => Promise<{ success: boolean; error?: string }>;
   onProjectChanged: (callback: (projectInfo: any) => void) => void;
   removeProjectChangedListener: () => void;
+  onRecentProjectsChanged: (callback: (projects: string[]) => void) => () => void;
+  onNavigate: (callback: (path: string) => void) => () => void;
   apiGet: (endpoint: string, params?: any) => Promise<any>;
   apiPost: (endpoint: string, data?: any) => Promise<any>;
   apiPut: (endpoint: string, data?: any) => Promise<any>;
@@ -44,6 +46,8 @@ export interface ElectronAPI {
     error?: string;
   }>;
   onScrapeProgress: (callback: (progress: any) => void) => () => void;
+  navigateToApiKeys: () => Promise<{ success: boolean; error?: string }>;
+  setApiKeys: (keys: { openai: string; firecrawl: string }) => Promise<{ success: boolean; error?: string }>;
 }
 
 declare global {

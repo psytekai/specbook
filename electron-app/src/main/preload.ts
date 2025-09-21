@@ -35,6 +35,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.removeAllListeners('project:changed');
   },
 
+  // Recent projects change events
+  onRecentProjectsChanged: (callback: (projects: string[]) => void) => {
+    const handler = (_event: any, projects: string[]) => callback(projects);
+    ipcRenderer.on('recent:changed', handler);
+    // Return cleanup function
+    return () => {
+      ipcRenderer.removeListener('recent:changed', handler);
+    };
+  },
+
   onNavigate: (callback: (path: string) => void) => {
     const handler = (_event: any, path: string) => callback(path);
     ipcRenderer.on('navigate-to', handler);

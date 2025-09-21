@@ -135,6 +135,21 @@ export const ElectronProjectProvider: React.FC<{ children: ReactNode }> = ({ chi
     };
   }, [project, navigate]);
 
+  // Listen for recent projects changes from main process
+  useEffect(() => {
+    if (!window.electronAPI || typeof window.electronAPI.onRecentProjectsChanged !== 'function') {
+      return;
+    }
+
+    const unsubscribe = window.electronAPI.onRecentProjectsChanged((projects: string[]) => {
+      setRecentProjects(projects || []);
+    });
+
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
+  }, []);
+
   // Refresh project state (can be called manually if needed)
   const refreshProject = useCallback(async () => {
     if (!window.electronAPI) {
