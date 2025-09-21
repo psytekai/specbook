@@ -24,6 +24,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Menu operations
   triggerNewProject: () => ipcRenderer.invoke('menu:new-project'),
   triggerOpenProject: () => ipcRenderer.invoke('menu:open-project'),
+  navigateToApiKeys: () => ipcRenderer.invoke('menu:navigate-to-api-keys'),
 
   // Event listeners
   onProjectChanged: (callback: (projectInfo: any) => void) => {
@@ -32,6 +33,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   removeProjectChangedListener: () => {
     ipcRenderer.removeAllListeners('project:changed');
+  },
+
+  onNavigate: (callback: (path: string) => void) => {
+    const handler = (_event: any, path: string) => callback(path);
+    ipcRenderer.on('navigate-to', handler);
+    // Return cleanup function
+    return () => {
+      ipcRenderer.removeListener('navigate-to', handler);
+    };
   },
 
   // API operations (replacing HTTP API with IPC)
@@ -73,9 +83,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     };
   },
 
-  // API keys input
-   sendApiKeys: (payload: { openai: string; firecrawl: string } | null) =>
-    ipcRenderer.send('api-keys-input', payload),
+  // API keys management
+  setApiKeys: (keys: { openai: string; firecrawl: string }) =>
+    ipcRenderer.invoke('api-keys:set', keys),
 
    
 });

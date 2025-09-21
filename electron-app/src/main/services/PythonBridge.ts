@@ -6,6 +6,9 @@ import * as fsSync from 'fs';
 import { app } from 'electron';
 import * as os from 'os';
 import { ProjectState } from './ProjectState';
+import { logger } from '../../shared/logging/Logger';
+
+var log = logger.for('PythonBridge');
 
 export interface ScrapeOptions {
   method?: 'auto' | 'requests' | 'firecrawl';
@@ -62,8 +65,20 @@ export interface ScrapeResult {
    Executable path resolution
 ------------------------------ */
 function bridgePath(): string {
-  const base = app.isPackaged ? process.resourcesPath : path.join(process.cwd(), 'dist');
+  const base = app.isPackaged
+    ? path.join(process.resourcesPath)
+    : path.join(app.getAppPath(), 'resources');
+    
   const exe = process.platform === 'win32' ? 'electron_bridge.exe' : 'electron_bridge';
+  
+  // For development on Windows, check for prebuilt executable
+  if (!app.isPackaged && process.platform === 'win32') {
+    const prebuilt = path.join(app.getAppPath(), 'electron_bridge-win-x64', exe);
+    if (fsSync.existsSync(prebuilt)) {
+      log.info('[Bridge] Using prebuilt Windows executable:', { prebuilt });
+      return prebuilt;
+    }
+  }
 
   // Try common packaged layouts
   const candidates = [
@@ -75,7 +90,7 @@ function bridgePath(): string {
   const chosen = candidates.find(p => fsSync.existsSync(p)) ?? candidates[0];
   
   // Enhanced diagnostics for debugging
-  console.log('[Bridge] Debug info:', {
+  log.info('[Bridge] Debug info:', {
     platform: process.platform,
     isPackaged: app.isPackaged,
     candidates: candidates,
@@ -93,7 +108,7 @@ function bridgePath(): string {
 export function runBridge(args: string[] = [], opts: any = {}): ChildProcess {
   const bridgeExecutable = bridgePath();
   
-  console.log('[Bridge] Attempting to spawn:', {
+  log.info('[Bridge] Attempting to spawn:', {
     executable: bridgeExecutable,
     args: args,
     env: opts?.env ? Object.keys(opts.env) : 'none'
@@ -264,8 +279,12 @@ export class PythonBridge {
    */
   private async testBridge(): Promise<{ success: boolean; error?: string }> {
     return new Promise(resolve => {
+      log.info('[Bridge] testBridge environment check:', {
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'SET' : 'NOT SET',
+        FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY ? 'SET' : 'NOT SET'
+      });
       const child = runBridge([], { env: {
-        SPEC_BRIDGE_PAYLOAD: JSON.stringify({ url: 'https://example.com', options: { method: 'requests' } }),
+        SPEC_BRIDGE_PAYLOAD: JSON.stringify({ url: 'https://www.homedepot.com/p/DEWALT-20V-MAX-Cordless-Drill-Driver-Kit-DCD771C2/204279858', options: { method: 'requests' } }),
         SPEC_BRIDGE_LOG_FILE: this.getProjectLogFilePath('diagnostic')
       } });
       let out = '';
@@ -344,6 +363,11 @@ export class PythonBridge {
       await this.waitForSlot();
       // Prepare payload and send via environment to avoid stdin edge cases on Windows
       const payload = JSON.stringify({ url, options: sanitizedOptions });
+      // Log environment status for debugging
+      log.info('[Bridge] Environment check before spawn:', {
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'SET' : 'NOT SET',
+        FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY ? 'SET' : 'NOT SET'
+      });
       const child = runBridge([], { env: { SPEC_BRIDGE_PAYLOAD: payload } });
       this.activeProcesses.add(child);
 
@@ -499,7 +523,7 @@ export class PythonBridge {
 
       child.on('error', error => {
         cleanup();
-        console.error('[Bridge] Process spawn error:', {
+        log.error('[Bridge] Process spawn error:', {
           message: error.message,
           code: (error as any).code,
           syscall: (error as any).syscall,
@@ -539,16 +563,31 @@ export class PythonBridge {
     const bridgeExecutable = bridgePath();
     const exists = fsSync.existsSync(bridgeExecutable);
     
+    // Create the additional env vars
+    const additionalEnv = {
+      PYTHONUNBUFFERED: '1',
+      PYTHONIOENCODING: 'utf-8',
+      SPEC_BRIDGE_PAYLOAD: JSON.stringify({ url: 'https://www.homedepot.com/p/DEWALT-20V-MAX-Cordless-Drill-Driver-Kit-DCD771C2/204279858', options: { method: 'requests' } }),
+      // Write diagnostics logs to a temp file for now
+      SPEC_BRIDGE_LOG_FILE: path.join(os.tmpdir(), 'specbridge', 'diagnostics.log')
+    };
+    
+    // Create the full merged environment that will be passed to the process
+    const fullEnv = {
+      ...process.env,
+      ...additionalEnv
+    } as NodeJS.ProcessEnv;
+    
+    // Show what's actually being passed, including API key status
     const diagnostics = {
       executable: bridgeExecutable,
       exists: exists,
       platform: process.platform,
       env: {
-        PYTHONUNBUFFERED: '1',
-        PYTHONIOENCODING: 'utf-8',
-        SPEC_BRIDGE_PAYLOAD: JSON.stringify({ url: 'https://example.com', options: { method: 'requests' } }),
-        // Write diagnostics logs to a temp file for now
-        SPEC_BRIDGE_LOG_FILE: path.join(os.tmpdir(), 'specbridge', 'diagnostics.log')
+        ...additionalEnv,
+        // Show whether API keys are present (but not their values for security)
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY ? '[SET]' : '[NOT SET]',
+        FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY ? '[SET]' : '[NOT SET]'
       },
       testResult: null as any,
       error: null as any
@@ -565,10 +604,7 @@ export class PythonBridge {
         stdio: ['pipe', 'pipe', 'pipe'],
         windowsHide: true,
         shell: false,
-        env: {
-          ...process.env,
-          ...diagnostics.env
-        } as NodeJS.ProcessEnv
+        env: fullEnv
       });
       
       return new Promise((resolve) => {

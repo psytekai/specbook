@@ -15,72 +15,6 @@ on:
 # -------------------- Stage 1: Build Python bridges --------------------
 
 jobs:
-#  win-build-bridge:
-#    name: Build Python Bridge (Windows x64)
-#    runs-on: windows-latest
-#    defaults: { run: { shell: bash } }
-#    steps:
-#      - uses: actions/checkout@v4
-#      - uses: actions/setup-python@v5
-#        with: { python-version: "3.11" }
-#
-#      - name: Cache pip
-#        uses: actions/cache@v4
-#        with:
-#          path: ~/.cache/pip
-#          key: ${{ runner.os }}-pip-${{ hashFiles('specscraper/requirements*.txt') }}
-#          restore-keys: ${{ runner.os }}-pip-
-#
-#      - name: Build PyInstaller (win x64)
-#        working-directory: specscraper
-#        run: |
-#          python -m venv .venv
-#          source .venv/Scripts/activate
-#          python -m pip install -U pip wheel
-#          [ -f requirements-minimal.txt ] && python -m pip install -r requirements-minimal.txt
-#          python -m pip install pyinstaller
-#          pyinstaller --noconfirm --clean --onedir --noconsole --name electron_bridge electron_bridge.py
-#          deactivate
-#
-#      - name: Upload bridge (win x64)
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: electron_bridge-win-x64
-#          path: specscraper/dist/electron_bridge/**
-
-  # mac-build-bridge:
-    # name: Build Python Bridge (macOS x64)
-    # runs-on: macos-13   # Intel runner so the bridge is truly x64
-    # steps:
-    #   - uses: actions/checkout@v4
-    #   - uses: actions/setup-python@v5
-    #     with: { python-version: "3.11" }
-
-    #   - name: Cache pip
-    #     uses: actions/cache@v4
-    #     with:
-    #       path: ~/.cache/pip
-    #       key: ${{ runner.os }}-pip-${{ hashFiles('specscraper/requirements*.txt') }}
-    #       restore-keys: ${{ runner.os }}-pip-
-
-    #   - name: Build PyInstaller (mac x64)
-    #     working-directory: specscraper
-    #     run: |
-    #       python3 -m venv .venv
-    #       source .venv/bin/activate
-    #       python -m pip install -U pip wheel
-    #       [ -f requirements-minimal.txt ] && python -m pip install -r requirements-minimal.txt
-    #       python -m pip install pyinstaller
-    #       pyinstaller --noconfirm --clean --onedir --noconsole --name electron_bridge electron_bridge.py
-    #       deactivate
-
-    #   - name: Upload bridge (mac x64)
-    #     uses: actions/upload-artifact@v4
-    #     with:
-    #       name: electron_bridge-mac-x64
-    #       path: specscraper/dist/electron_bridge/**
-    #       if-no-files-found: error
-
   win-build-bridge:
     name: Build Python Bridge (Windows x64)
     runs-on: windows-latest
@@ -358,63 +292,63 @@ jobs:
           if-no-files-found: error
 
 
-  # mac-build-electron:
-  #   name: Build Electron App (macOS x64)
-  #   runs-on: macos-13
-  #   needs: [mac-build-bridge]
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: "20"
-  #         cache: "npm"
-  #         cache-dependency-path: electron-app/package-lock.json
+  mac-build-electron:
+    name: Build Electron App (macOS x64)
+    runs-on: macos-13
+    needs: [mac-build-bridge]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: electron-app/package-lock.json
 
-  #     - name: Download bridge (mac x64)
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: electron_bridge-mac-x64
-  #         path: electron-app/resources/python/electron_bridge
+      - name: Download bridge (mac x64)
+        uses: actions/download-artifact@v4
+        with:
+          name: electron_bridge-mac-x64
+          path: electron-app/resources/python/electron_bridge
 
-  #     - name: Fix bridge permissions
-  #       run: chmod +x electron-app/resources/python/electron_bridge/electron_bridge
+      - name: Fix bridge permissions
+        run: chmod +x electron-app/resources/python/electron_bridge/electron_bridge
 
-  #     - name: Verify bridge
-  #       run: ls -laR electron-app/resources/python/electron_bridge || true
+      - name: Verify bridge
+        run: ls -laR electron-app/resources/python/electron_bridge || true
 
-  #     - name: Install deps
-  #       working-directory: electron-app
-  #       run: npm ci
-  #       env:
-  #         npm_config_runtime: electron
-  #         npm_config_target: 37.2.4         # keep in sync with devDependency "electron"
-  #         npm_config_disturl: https://electronjs.org/headers
-  #         npm_config_arch: x64
-  #         npm_config_build_from_source: true # optional: forces a local build if no prebuild exists
+      - name: Install deps
+        working-directory: electron-app
+        run: npm ci
+        env:
+          npm_config_runtime: electron
+          npm_config_target: 37.2.4         # keep in sync with devDependency "electron"
+          npm_config_disturl: https://electronjs.org/headers
+          npm_config_arch: x64
+          npm_config_build_from_source: true # optional: forces a local build if no prebuild exists
 
-  #     - name: Build renderer/main
-  #       working-directory: electron-app
-  #       run: |
-  #         npm run build:main
-  #         npm run build:renderer
+      - name: Build renderer/main
+        working-directory: electron-app
+        run: |
+          npm run build:main
+          npm run build:renderer
 
-  #     - name: Verify build output
-  #       working-directory: electron-app
-  #       run: |
-  #         ls -la dist/main/
-  #         test -f dist/main/index.js
+      - name: Verify build output
+        working-directory: electron-app
+        run: |
+          ls -la dist/main/
+          test -f dist/main/index.js
 
-  #     - name: Package macOS (DMG x64)
-  #       working-directory: electron-app
-  #       env: { CSC_IDENTITY_AUTO_DISCOVERY: "false" }
-  #       run: npx electron-builder --mac --x64
+      - name: Package macOS (DMG x64)
+        working-directory: electron-app
+        env: { CSC_IDENTITY_AUTO_DISCOVERY: "false" }
+        run: npx electron-builder --mac --x64
 
-  #     - name: Upload macOS artifact (DMG only)
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: electron-macos-dist
-  #         path: |
-  #           electron-app/dist/*.dmg
-  #           electron-app/dist/*.zip
-  #           electron-app/dist/mac/**
-  #         if-no-files-found: warn
+      - name: Upload macOS artifact (DMG only)
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-macos-dist
+          path: |
+            electron-app/dist/*.dmg
+            electron-app/dist/*.zip
+            electron-app/dist/mac/**
+          if-no-files-found: warn

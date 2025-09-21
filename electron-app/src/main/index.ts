@@ -9,6 +9,7 @@ import { setupPythonIPC } from './ipc/pythonHandlers';
 import { pythonBridge } from './services/PythonBridge';
 import { ProjectState } from './services/ProjectState';
 import { AssetManager } from './services/AssetManager';
+import { logger } from '../shared/logging/Logger';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling
 if (require('electron-squirrel-startup')) {
@@ -82,6 +83,13 @@ const createWindow = () => {
 
 // This method will be called when Electron has finished initialization
 app.whenReady().then(() => {
+  logger.init(); // uses app.getName() and app.getPath('logs')
+  logger.setDestination(process.env.NODE_ENV === 'development' ? 'both' : 'file');
+  logger.setLevel(process.env.NODE_ENV === 'development' ? 'debug' : 'info');
+
+  const log = logger.for('AppLifecycle');
+  log.info('App started', { platform: process.platform, versions: process.versions, logDir: logger.getLogDir() });
+
   // Set up IPC handlers first
   setupProjectIPC();
   setupAPIIPC();

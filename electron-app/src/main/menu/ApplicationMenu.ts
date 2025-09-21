@@ -3,6 +3,9 @@ import { Menu, BrowserWindow, dialog, app } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { ProjectState } from '../services/ProjectState';
+import { logger } from '../../shared/logging/Logger';
+
+const log = logger.for('ApplicationMenu');
 
 interface RecentProjectsStore {
   recentProjects?: string[];
@@ -412,144 +415,13 @@ export class ApplicationMenu {
     if (!this.mainWindow) return;
 
     try {
-      const result = await dialog.showMessageBox(this.mainWindow, {
-        type: 'question',
-        buttons: ['Cancel', 'Set API Keys'],
-        defaultId: 1,
-        title: 'API Keys Configuration',
-        message: 'Configure API Keys for Web Scraping',
-        detail: 'Enter your OpenAI and Firecrawl API keys to enable web scraping functionality.'
-      });
-
-      if (result.response === 1) {
-        // Show single dialog for both API keys
-        const keys = await this.showApiKeysDialog();
-        if (keys) {
-          // Set environment variables for Python process
-          process.env.OPENAI_API_KEY = keys.openai;
-          process.env.FIRECRAWL_API_KEY = keys.firecrawl;
-
-          dialog.showMessageBox(this.mainWindow!, {
-            type: 'info',
-            title: 'API Keys Set',
-            message: 'API keys have been configured successfully.',
-            detail: 'The keys will be available for the current session.'
-          });
-        }
-      }
+      // Send navigation command to renderer
+      this.mainWindow.webContents.send('navigate-to', '/apiKeys');
+      log.info('Navigated to API Keys page');
     } catch (error) {
-      console.error('Error setting API keys:', error);
-      dialog.showErrorBox('Error', `Failed to set API keys: ${error}`);
+      console.error('Error navigating to API keys:', error);
+      dialog.showErrorBox('Error', `Failed to open API keys page: ${error}`);
     }
   }
 
-  /**
-   * Show dialog for both API keys
-   */
-  private async showApiKeysDialog(): Promise<{openai: string, firecrawl: string} | null> {
-    if (!this.mainWindow) return null;
-
-    const { ipcMain } = require('electron');
-
-    return new Promise((resolve) => {
-      const inputWindow = new BrowserWindow({
-        parent: this.mainWindow!,
-        modal: true,
-        width: 450,
-        height: 350,
-        resizable: false,
-        minimizable: false,
-        maximizable: false,
-        show: false,
-        title: 'API Keys Configuration',
-        webPreferences: {
-          nodeIntegration: false,
-          contextIsolation: true,
-          webSecurity: true,
-        },
-      });
-
-      const cleanup = () => {
-        ipcMain.removeListener('api-keys-input', onKeys);
-      };
-  
-      const onKeys = (_evt: Electron.IpcMainEvent, data: { openai: string; firecrawl: string } | null) => {
-        cleanup();
-        if (!inputWindow.isDestroyed()) inputWindow.close();
-        resolve(data ?? null);
-      };
-  
-      ipcMain.once('api-keys-input', onKeys);
-  
-      const html = `
-        <!doctype html>
-        <html>
-        <head>
-          <meta charset="utf-8" />
-          <title>API Keys</title>
-          <style>
-            body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; padding:20px; background:#f5f5f5;}
-            .card { background:#fff; padding:16px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.08);}
-            h3 { margin:0 0 8px; }
-            label { display:block; margin:12px 0 6px; font-weight:500; }
-            input { width:100%; padding:8px; border:1px solid #ddd; border-radius:6px; }
-            .actions { margin-top:16px; text-align:right; }
-            button { padding:8px 14px; border:0; border-radius:6px; cursor:pointer; }
-            .cancel { background:#eee; margin-right:8px; }
-            .ok { background:#0078d4; color:#fff; }
-          </style>
-        </head>
-        <body>
-          <div class="card">
-            <h3>API Keys Configuration</h3>
-            <p>Enter keys for this session:</p>
-            <label for="openaiKey">OpenAI API Key</label>
-            <input type="password" id="openaiKey" placeholder="sk-..." autocomplete="off" />
-            <label for="firecrawlKey">Firecrawl API Key</label>
-            <input type="password" id="firecrawlKey" placeholder="fc-..." autocomplete="off" />
-            <div class="actions">
-              <button class="cancel" id="btnCancel">Cancel</button>
-              <button class="ok" id="btnOk">OK</button>
-            </div>
-          </div>
-          <script>
-            const send = (payload) => window.electronAPI?.sendApiKeys(payload);
-      
-            document.getElementById('btnOk').addEventListener('click', () => {
-              const openai = document.getElementById('openaiKey').value.trim();
-              const firecrawl = document.getElementById('firecrawlKey').value.trim();
-              if (!openai || !firecrawl) { alert('Please enter both API keys'); return; }
-              send({ openai, firecrawl });
-              window.close();
-            });
-  
-            document.getElementById('btnCancel').addEventListener('click', () => {
-              send(null);
-              window.close();
-            });
-  
-            document.getElementById('openaiKey').addEventListener('keypress', (e) => {
-              if (e.key === 'Enter') document.getElementById('firecrawlKey').focus();
-            });
-            document.getElementById('firecrawlKey').addEventListener('keypress', (e) => {
-              if (e.key === 'Enter') document.getElementById('btnOk').click();
-            });
-  
-            // Focus on load
-            setTimeout(() => document.getElementById('openaiKey').focus(), 0);
-          </script>
-        </body>
-        </html>
-      `;
-  
-      inputWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
-      inputWindow.once('ready-to-show', () => inputWindow.show());
-  
-      inputWindow.on('closed', () => {
-        cleanup();
-        // If user closes the window without sending anything
-        resolve(null);
-      });
-    });
-  }
 }
