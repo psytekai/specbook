@@ -59,9 +59,6 @@
   "electronVersion": "37.2.4",
   "nsis": {
     "oneClick": false,
-    "allowToChangeInstallationDirectory": true,
-    "installerIcon": "public/icons/icon.ico",
-    "uninstallerIcon": "public/icons/icon.ico",
-    "installerHeaderIcon": "public/icons/icon.ico"
+    "allowToChangeInstallationDirectory": true
   }
 }

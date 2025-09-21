@@ -101,7 +101,8 @@ package_app() {
     npx electron-builder --win --x64 \
         --config.npmRebuild=false \
         --config.buildDependenciesFromSource=false \
-        --config.nodeGypRebuild=false
+        --config.nodeGypRebuild=false \
+        -c.directories.output=dist-win
     
     echo -e "${GREEN}✅ Packaging completed${NC}"
 }
@@ -159,7 +160,7 @@ main() {
     echo -e "${GREEN}✨ Windows build complete with CI-built native modules!${NC}"
     echo ""
     echo "📦 Output files:"
-    ls -la dist/*.exe 2>/dev/null || echo "   No .exe files found"
+    ls -la dist-win/*.exe 2>/dev/null || echo "   No .exe files found"
     echo ""
     echo "Next steps:"
     echo "1. Copy the .exe installer to Windows"
