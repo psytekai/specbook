@@ -233,7 +233,7 @@ const ProductPage: React.FC = () => {
       <div className="product-page">
         <div className="page-header">
           <div>
-            <h1>{product.productName || product.description || "Untitled Product"}</h1>
+            <h1>[{product.tagId}] {product.productName || product.description || "Untitled Product"}</h1>
             <p className="project-breadcrumb">
               <span 
                 className="breadcrumb-link"
