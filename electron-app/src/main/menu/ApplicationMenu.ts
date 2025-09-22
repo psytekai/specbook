@@ -199,8 +199,7 @@ export class ApplicationMenu {
   addToRecentProjects(filePath: string): void {
     const recent = store.get('recentProjects', [] as string[]);
     const updated = [filePath, ...recent.filter((p: string) => p !== filePath)].slice(0, 10);
-    store.set('recentProjects', updated);
-    this.updateRecentProjectsMenu();
+    this.updateRecentProjectsAndBroadcast(updated);
   }
 
   /**
@@ -233,8 +232,7 @@ export class ApplicationMenu {
     submenuItems.push({
       label: 'Clear Recent Projects',
       click: () => {
-        store.delete('recentProjects');
-        this.updateRecentProjectsMenu();
+        this.clearRecentProjects();
       }
     });
 
@@ -247,6 +245,23 @@ export class ApplicationMenu {
   private updateRecentProjectsMenu(): void {
     // Rebuild the entire menu to update recent projects
     this.createApplicationMenu();
+  }
+
+  /**
+   * Centralized helper: persist recent projects, update menu, and broadcast to renderers
+   */
+  private updateRecentProjectsAndBroadcast(recentProjects: string[]): void {
+    store.set('recentProjects', recentProjects);
+    this.updateRecentProjectsMenu();
+
+    const windows = BrowserWindow.getAllWindows();
+    windows.forEach(win => {
+      try {
+        win.webContents.send('recent:changed', recentProjects);
+      } catch (error) {
+        // Ignore send errors for closed/destroyed windows
+      }
+    });
   }
 
   /**
@@ -381,8 +396,7 @@ export class ApplicationMenu {
       // Remove from recent if file doesn't exist
       const recent = store.get('recentProjects', [] as string[]);
       const updated = recent.filter((p: string) => p !== filePath);
-      store.set('recentProjects', updated);
-      this.updateRecentProjectsMenu();
+      this.updateRecentProjectsAndBroadcast(updated);
 
       if (this.mainWindow) {
         dialog.showErrorBox(
@@ -404,8 +418,7 @@ export class ApplicationMenu {
    * Clear all recent projects
    */
   clearRecentProjects(): void {
-    store.delete('recentProjects');
-    this.updateRecentProjectsMenu();
+    this.updateRecentProjectsAndBroadcast([]);
   }
 
   /**

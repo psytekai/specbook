@@ -1,3 +1,24 @@
+export interface Product {
+  id: string;
+  projectId: string;
+  url: string;
+  tagId?: string;
+  location: string[];
+  description?: string;
+  specificationDescription?: string;
+  category: string[];
+  productName: string;
+  manufacturer?: string;
+  price?: number;
+
+  primaryImageHash?: string;
+  primaryThumbnailHash?: string;
+  additionalImagesHashes?: string[];
+
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Shared types between main and renderer processes
 
 export interface ElectronAPI {
@@ -18,6 +39,8 @@ export interface ElectronAPI {
   triggerOpenProject: () => Promise<{ success: boolean; error?: string }>;
   onProjectChanged: (callback: (projectInfo: any) => void) => void;
   removeProjectChangedListener: () => void;
+  onRecentProjectsChanged: (callback: (projects: string[]) => void) => () => void;
+  onNavigate: (callback: (path: string) => void) => () => void;
   apiGet: (endpoint: string, params?: any) => Promise<any>;
   apiPost: (endpoint: string, data?: any) => Promise<any>;
   apiPut: (endpoint: string, data?: any) => Promise<any>;
@@ -35,15 +58,9 @@ export interface ElectronAPI {
   checkPythonAvailability: () => Promise<any>;
   scrapeProduct: (url: string, options?: any) => Promise<any>;
   getPythonStatus: () => Promise<any>;
-  pythonRunDiagnostics: () => Promise<{
-    executable: string;
-    exists: boolean;
-    platform: string;
-    env: Record<string, string>;
-    testResult?: any;
-    error?: string;
-  }>;
   onScrapeProgress: (callback: (progress: any) => void) => () => void;
+  navigateToApiKeys: () => Promise<{ success: boolean; error?: string }>;
+  setApiKeys: (keys: { openai: string; firecrawl: string }) => Promise<{ success: boolean; error?: string }>;
 }
 
 declare global {

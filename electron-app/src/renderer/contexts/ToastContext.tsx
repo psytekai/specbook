@@ -9,13 +9,22 @@ interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | null>(null);
 
+
+
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
+  
   const showToast = useCallback((message: string, type: ToastType, duration = 5000) => {
-    const id = Date.now().toString();
+    // Generate a robust unique ID to avoid React key collisions when multiple toasts are added quickly
+    const id = (typeof crypto !== 'undefined' && 'randomUUID' in crypto)
+      ? (crypto as Crypto).randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
     const toast: Toast = { id, message, type, duration };
-    
     setToasts(prev => [...prev, toast]);
 
     // Auto-remove toast after duration
@@ -24,11 +33,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         removeToast(id);
       }, duration);
     }
-  }, []);
-
-  const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  }, []);
+  }, [removeToast]);
 
   return (
     <ToastContext.Provider value={{ toasts, showToast, removeToast }}>

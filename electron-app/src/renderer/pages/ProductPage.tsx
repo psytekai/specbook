@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useElectronProject } from '../contexts/ElectronProjectContext';
-import { Product } from '../types';
+import { Product } from '../../shared/types';
 import { api } from '../services/apiIPC';
 import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
 import { EditableSection } from '../components/EditableSection';
@@ -129,7 +129,7 @@ const ProductPage: React.FC = () => {
       }
     } catch (err) {
       console.error(`Failed to update ${field}:`, err);
-      throw new Error(`Failed to update ${field}`);
+      throw new Error(`Failed to update product field: (${err})`);
     }
   };;
 
@@ -233,7 +233,7 @@ const ProductPage: React.FC = () => {
       <div className="product-page">
         <div className="page-header">
           <div>
-            <h1>{product.productName || product.description || "Untitled Product"}</h1>
+            <h1>[{product.tagId}] {product.productName || product.description || "Untitled Product"}</h1>
             <p className="project-breadcrumb">
               <span 
                 className="breadcrumb-link"
@@ -242,7 +242,7 @@ const ProductPage: React.FC = () => {
                 {project.name}
               </span>
               {' > '}
-              <span>{product.description}</span>
+              <span>{product.productName}</span>
             </p>
           </div>
           <button 
