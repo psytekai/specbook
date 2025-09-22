@@ -9,6 +9,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+sData Architecture Simplification and Bug Fixes
+- Simplified data architecture by removing API-to-internal field mapping layer
+  - Eliminated unnecessary `apiFieldMappings.ts` transformation system
+  - Components now work directly with internal domain model field names
+  - Streamlined data flow: Database ↔ Internal Schema ↔ UI
+- Enhanced debugging and logging capabilities
+  - Added structured logging throughout API handlers using centralized Logger
+  - Improved error tracking and context in product CRUD operations
+  - Better validation error messages for user feedback
+- Centralized type system improvements
+  - Moved `Product` interface to `shared/types.ts` for consistency
+  - Enhanced type safety across main and renderer processes
+  - Aligned TypeScript interfaces with database schema
+
+### Fixed
+- **Critical System Bugs**
+  - Fixed recent projects menu synchronization race condition across windows
+  - Implemented centralized `updateRecentProjectsAndBroadcast()` method in ApplicationMenu
+  - Added IPC event broadcasting to keep all renderer processes synchronized
+  - Enhanced preload script with `onRecentProjectsChanged` listener
+- **UI/UX Improvements**
+  - Fixed React key collision issues in toast system when multiple toasts added quickly
+  - Implemented robust UUID generation for toast IDs using `crypto.randomUUID()`
+  - Enhanced product image display logic (prioritize primary image over thumbnail)
+  - Improved manual details toggle in product creation form
+- **Database and Validation**
+  - Added comprehensive field validation in ProjectFileManager
+  - Required field validation for `url`, `tagId`, `productName`, `location`, and `category`
+  - Updated database constraints to match required field validations
+  - Made `tag_id`, `location`, `category`, and `product_name` NOT NULL in database schema
+
+### Changed
+- Updated form components to use internal field names
+  - `ProductNew.tsx`: Changed from API-style names (`productUrl`) to internal (`url`)
+  - `ProductPage.tsx`: Enhanced product display with tag ID in header
+  - Consistent field naming across all product CRUD operations
+- Cleaned up development and debugging tools
+  - Removed Python diagnostics functionality that was no longer needed
+  - Streamlined Python bridge interface by removing `pythonRunDiagnostics`
+  - Removed deprecated diagnostic UI components
+
+### Removed
+- API field mapping system (`apiFieldMappings.ts`)
+- Python diagnostics IPC handlers and UI components
+- Redundant field transformation logic in API handlers
+
 [Phase 5.1] Windows Python Bridge and API Key Management
 - Fixed critical Python bridge communication issues on Windows platform
   - Implemented line-based JSON protocol with proper newline handling
