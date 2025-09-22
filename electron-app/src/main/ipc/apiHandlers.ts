@@ -322,12 +322,9 @@ class APIRouter {
     }
 
     try {
-      // Accept internal fields directly; remove null values
-      const cleanedData = Object.fromEntries(
-        Object.entries(data).filter(([_, v]) => v !== null)
-      );
-      
-      const product = await manager.updateProduct(productId, cleanedData);
+      // Accept internal fields directly - no filtering needed
+      // The database schema and validation should handle null constraints
+      const product = await manager.updateProduct(productId, data);
       this.projectState.markDirty();
       
       log.info(`Product updated: ${productId}`, { product });

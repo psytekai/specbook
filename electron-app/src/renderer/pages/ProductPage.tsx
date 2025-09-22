@@ -129,7 +129,7 @@ const ProductPage: React.FC = () => {
       }
     } catch (err) {
       console.error(`Failed to update ${field}:`, err);
-      throw new Error(`Failed to update ${field}`);
+      throw new Error(`Failed to update product field: (${err})`);
     }
   };;
 
@@ -242,7 +242,7 @@ const ProductPage: React.FC = () => {
                 {project.name}
               </span>
               {' > '}
-              <span>{product.description}</span>
+              <span>{product.productName}</span>
             </p>
           </div>
           <button 

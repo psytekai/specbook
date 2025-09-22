@@ -74,12 +74,12 @@ export class ProjectFileManager {
           id TEXT PRIMARY KEY,
           project_id TEXT NOT NULL,
           url TEXT NOT NULL,
-          tag_id TEXT,
-          location TEXT,
+          tag_id TEXT NOT NULL,
+          location TEXT NOT NULL,
           description TEXT,
           specification_description TEXT,
-          category TEXT,
-          product_name TEXT,
+          category TEXT NOT NULL,
+          product_name TEXT NOT NULL,
           manufacturer TEXT,
           price REAL,
           primary_image_hash TEXT,
@@ -303,6 +303,13 @@ export class ProjectFileManager {
     }
 
     try {
+      // Validate required fields
+      if (!productData.url) throw new Error('Product URL is required');
+      if (!productData.tagId) throw new Error('Tag ID is required');
+      if (!productData.productName) throw new Error('Product name is required');
+      if (!productData.location || productData.location.length === 0) throw new Error('At least one location is required');
+      if (!productData.category || productData.category.length === 0) throw new Error('At least one category is required');
+      
       const id = uuidv4();
       const now = new Date().toISOString();
       
@@ -328,12 +335,12 @@ export class ProjectFileManager {
         dbData.id,
         dbData.project_id || this.currentProject.id,
         dbData.url,
-        dbData.tag_id || null,
-        JSON.stringify(productData.location || []),
+        dbData.tag_id, // Required field, validated above
+        JSON.stringify(productData.location), // Required field, validated above
         dbData.description || null,
         dbData.specification_description || null,
-        JSON.stringify(productData.category || []),
-        dbData.product_name,
+        JSON.stringify(productData.category), // Required field, validated above
+        dbData.product_name, // Required field, validated above
         dbData.manufacturer || null,
         dbData.price || null,
         dbData.primary_image_hash || null,
@@ -372,6 +379,13 @@ export class ProjectFileManager {
       if (!existing) {
         throw new Error(`Product not found: ${id}`);
       }
+
+      // Validate required fields if they're being updated
+      if (updates.url !== undefined && !updates.url) throw new Error('Product URL cannot be empty');
+      if (updates.tagId !== undefined && !updates.tagId) throw new Error('Tag ID cannot be empty');
+      if (updates.productName !== undefined && !updates.productName) throw new Error('Product name cannot be empty');
+      if (updates.location !== undefined && (!updates.location || updates.location.length === 0)) throw new Error('At least one location is required');
+      if (updates.category !== undefined && (!updates.category || updates.category.length === 0)) throw new Error('At least one category is required');
 
       // Build update query
       const updateFields: string[] = [];
