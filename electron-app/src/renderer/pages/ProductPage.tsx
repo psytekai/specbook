@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useElectronProject } from '../contexts/ElectronProjectContext';
-import { Product } from '../types';
+import { Product } from '../../shared/types';
 import { api } from '../services/apiIPC';
 import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
 import { EditableSection } from '../components/EditableSection';

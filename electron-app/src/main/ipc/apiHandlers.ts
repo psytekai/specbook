@@ -1,6 +1,9 @@
 import { ipcMain } from 'electron';
 import { ProjectState } from '../services/ProjectState';
-import { transformApiToInternal, transformInternalToApi } from '../../shared/mappings/apiFieldMappings';
+import { logger } from '../../shared/logging/Logger';
+
+var log = logger.for('apiHandlers');
+// Using internal schema end-to-end; no API->internal transforms needed
 
 /**
  * Set up IPC handlers that replace the existing API service
@@ -16,6 +19,7 @@ class APIRouter {
     // Normalize endpoint by removing /api prefix
     const normalizedEndpoint = endpoint.startsWith('/api') ? endpoint.slice(4) : endpoint;
     
+    log.info(`routeGet: ${normalizedEndpoint}`);
     try {
       if (normalizedEndpoint === '/projects') {
         return await this.getProjects(params);
@@ -241,9 +245,11 @@ class APIRouter {
     const product = products.find(p => p.id === productId);
     
     if (!product) {
+      log.error(`Product not found: ${productId}`);
       throw new Error('Product not found');
     }
 
+    log.info(`Product found: ${productId}`, { product });
     return { success: true, data: product };
   }
 
@@ -272,33 +278,30 @@ class APIRouter {
     }
 
     try {
-      // Transform API fields to internal format
-      const transformedData = transformApiToInternal(data);
-      
-      // Ensure required fields have defaults
+      // Accept internal fields directly
       const productData = {
         projectId: 'current',
-        url: transformedData.url || '',
-        tagId: transformedData.tagId,
-        location: transformedData.location || [],
-        description: transformedData.description,
-        specificationDescription: transformedData.specificationDescription,
-        category: transformedData.category || [],
-        productName: transformedData.productName || '',
-        manufacturer: transformedData.manufacturer,
-        price: transformedData.price,
-        primaryImageHash: transformedData.primaryImageHash,
-        primaryThumbnailHash: transformedData.primaryThumbnailHash,
-        additionalImagesHashes: transformedData.additionalImagesHashes || []
+        url: data.url || '',
+        tagId: data.tagId,
+        location: data.location || [],
+        description: data.description,
+        specificationDescription: data.specificationDescription,
+        category: data.category || [],
+        productName: data.productName || '',
+        manufacturer: data.manufacturer,
+        price: data.price,
+        primaryImageHash: data.primaryImageHash,
+        primaryThumbnailHash: data.primaryThumbnailHash,
+        additionalImagesHashes: data.additionalImagesHashes || []
       };
       
       const product = await manager.createProduct(productData);
       this.projectState.markDirty();
       
-      // Transform back to API format for response
+      // Return internal shape for renderer consumption
       return { 
         success: true, 
-        data: transformInternalToApi(product)
+        data: product
       };
     } catch (error) {
       console.error('Failed to create product:', error);
@@ -314,28 +317,27 @@ class APIRouter {
     const manager = this.projectState.getManager();
     
     if (!state.isOpen || !manager) {
+      log.error('No project open');
       throw new Error('No project open');
     }
 
     try {
-      // Transform API fields to internal format
-      const transformedData = transformApiToInternal(data);
-      
-      // Remove any null values from deprecated fields
+      // Accept internal fields directly; remove null values
       const cleanedData = Object.fromEntries(
-        Object.entries(transformedData).filter(([_, v]) => v !== null)
+        Object.entries(data).filter(([_, v]) => v !== null)
       );
       
       const product = await manager.updateProduct(productId, cleanedData);
       this.projectState.markDirty();
       
-      // Transform back to API format for response
+      log.info(`Product updated: ${productId}`, { product });
+      // Return internal shape for renderer consumption
       return { 
         success: true, 
-        data: transformInternalToApi(product)
+        data: product
       };
     } catch (error) {
-      console.error('Failed to update product:', error);
+      log.error('Failed to update product:', { error });
       return { 
         success: false, 
         error: error instanceof Error ? error.message : 'Failed to update product'

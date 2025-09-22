@@ -1,3 +1,24 @@
+export interface Product {
+  id: string;
+  projectId: string;
+  url: string;
+  tagId?: string;
+  location: string[];
+  description?: string;
+  specificationDescription?: string;
+  category: string[];
+  productName: string;
+  manufacturer?: string;
+  price?: number;
+
+  primaryImageHash?: string;
+  primaryThumbnailHash?: string;
+  additionalImagesHashes?: string[];
+
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Shared types between main and renderer processes
 
 export interface ElectronAPI {

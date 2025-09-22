@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useElectronProject } from '../contexts/ElectronProjectContext';
-import { Product } from '../types';
+import { Product } from '../../shared/types';
 import { api } from '../services/apiIPC';
 import { formatArray, formatPrice } from '../utils/formatters';
 import { TableSettingsModal, useTableSettings } from '../components/TableSettings';

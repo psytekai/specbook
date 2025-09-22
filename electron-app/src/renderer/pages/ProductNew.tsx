@@ -19,29 +19,29 @@ const ProductNew: React.FC = () => {
   const { project, isLoading: projectLoading, isInitializing } = useElectronProject();
   const { showToast } = useToast();
   
-  // API field names interface using camelCase
+  // Internal domain model field names
   interface ProductFormData {
-    productUrl: string;
+    url: string;
     tagId: string;
-    productLocation: string[];
-    productDescription: string;
+    location: string[];
+    description: string;
     specificationDescription: string;
     category: string[];
     productName?: string;
     manufacturer?: string;
     price?: number;
     
-    // Asset management - correct field names
+    // Asset management
     primaryImageHash?: string;
     primaryThumbnailHash?: string;
     additionalImagesHashes: string[];
   }
 
   const [formData, setFormData] = useState<ProductFormData>({
-    productUrl: '',
+    url: '',
     tagId: '',
-    productLocation: [],
-    productDescription: '',
+    location: [],
+    description: '',
     specificationDescription: '',
     category: [],
     additionalImagesHashes: []
@@ -209,9 +209,9 @@ const ProductNew: React.FC = () => {
   const handleFetchDetails = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const { productUrl } = formData;
+    const { url } = formData;
     
-    if (!productUrl) {
+    if (!url) {
       showToast('Product URL is required', 'error');
       return;
     }
@@ -224,7 +224,7 @@ const ProductNew: React.FC = () => {
     setIsLoading(true);
     
     try {
-      const result = await scrapeProduct(productUrl, {
+      const result = await scrapeProduct(url, {
         method: 'auto',
         llm_model: 'gpt-4o-mini'
       });
@@ -271,14 +271,13 @@ const ProductNew: React.FC = () => {
 
         setFormData(prev => ({
           ...prev,
-          productDescription: data.description || '',
+          description: data.description || '',
           specificationDescription: data.type || '',
 
-          productName: data.model_no || '', // Use model_no as product name fallback
-          manufacturer: '', // Not provided by Python scraper
-          price: undefined, // Not provided by Python scraper
+          productName: data.model_no || '',
+          manufacturer: '',
+          price: undefined,
 
-          // Set image hashes if successfully downloaded
           primaryImageHash: imageHash,
           primaryThumbnailHash: thumbnailHash
         }));
@@ -297,7 +296,7 @@ const ProductNew: React.FC = () => {
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.productUrl) {
+    if (!formData.url) {
       showToast('Product URL is required', 'error');
       return;
     }
@@ -305,7 +304,7 @@ const ProductNew: React.FC = () => {
     try {
       setIsSaving(true);
       
-      // Submit with correct field names - no manual mapping needed
+      // Submit with internal field names
       await api.post('/api/products', {
         ...formData,
         projectId: 'current'
@@ -354,15 +353,15 @@ const ProductNew: React.FC = () => {
             <h2>Product Information</h2>
             
             <div className="form-group">
-              <label htmlFor="productUrl" className="label">
+              <label htmlFor="url" className="label">
                 Product URL *
               </label>
               <input
-                id="productUrl"
-                name="productUrl"
+                id="url"
+                name="url"
                 type="url"
                 className="input"
-                value={formData.productUrl}
+                value={formData.url}
                 onChange={handleInputChange}
                 placeholder="https://example.com/product"
                 required
@@ -390,8 +389,8 @@ const ProductNew: React.FC = () => {
                 Product Locations *
               </label>
               <LocationMultiSelect
-                selectedLocations={formData.productLocation}
-                onSelectionChange={(locations: string[]) => setFormData(prev => ({ ...prev, productLocation: locations }))}
+                selectedLocations={formData.location}
+                onSelectionChange={(locations: string[]) => setFormData(prev => ({ ...prev, location: locations }))}
                 availableLocations={locations}
                 onAddLocation={handleAddLocation}
                 required={true}
@@ -491,14 +490,14 @@ const ProductNew: React.FC = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="productDescription" className="label">
+                <label htmlFor="description" className="label">
                   Description
                 </label>
                 <textarea
-                  id="productDescription"
-                  name="productDescription"
+                  id="description"
+                  name="description"
                   className="input textarea"
-                  value={formData.productDescription}
+                  value={formData.description}
                   onChange={handleInputChange}
                   rows={4}
                 />

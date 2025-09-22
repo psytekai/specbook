@@ -8,27 +8,7 @@ export interface Project {
   updatedAt: Date;
 }
 
-export interface Product {
-  id: string;
-  projectId: string;
-  url: string;
-  tagId?: string;  // Make optional
-  location: string[];  // Keep as array
-  description?: string;  // Make optional
-  specificationDescription?: string;  // Make optional
-  category: string[];  // Change from string | string[] to just string[]
-  productName: string;
-  manufacturer?: string;
-  price?: number;
-  
-  // Asset fields - ensure camelCase
-  primaryImageHash?: string;
-  primaryThumbnailHash?: string;
-  additionalImagesHashes?: string[];
-  
-  createdAt: Date;
-  updatedAt: Date;
-}
+// Product type now lives in shared/types.ts; import from there where needed
 
 export interface ApiError {
   message: string;
