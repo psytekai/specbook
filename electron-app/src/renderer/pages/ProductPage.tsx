@@ -233,7 +233,7 @@ const ProductPage: React.FC = () => {
       <div className="product-page">
         <div className="page-header">
           <div>
-            <h1>[{product.tagId}] {product.productName || product.description || "Untitled Product"}</h1>
+            <h1>[{product.tagId}] {product.productName || product.type || "Untitled Product"}</h1>
             <p className="project-breadcrumb">
               <span 
                 className="breadcrumb-link"
@@ -265,7 +265,7 @@ const ProductPage: React.FC = () => {
                   <div className="image-container">
                     <img 
                       src={getProductImageUrl(product)!} 
-                      alt={product.description || 'Product image'}
+                      alt={product.type || 'Product image'}
                     />
                     <button
                       type="button"
@@ -373,12 +373,12 @@ const ProductPage: React.FC = () => {
             <div className="detail-section">
               <h2>Description</h2>
               <EditableSection
-                label="Product Description"
-                value={product.description}
+                label="Product Type"
+                value={product.type}
                 type="textarea"
-                placeholder="Enter product description"
+                placeholder="Enter product type"
                 multiline={true}
-                onSave={(value) => updateProductField('description', value as string)}
+                onSave={(value) => updateProductField('type', value as string)}
                 className="full-width"
               />
             </div>

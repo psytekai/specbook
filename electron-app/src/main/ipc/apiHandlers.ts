@@ -269,6 +269,7 @@ class APIRouter {
     throw new Error('Use File > Close Project instead');
   }
 
+  // TODO: use a shared type object for product data
   private async createProduct(data: any) {
     const state = this.projectState.getStateInfo();
     const manager = this.projectState.getManager();
@@ -284,7 +285,7 @@ class APIRouter {
         url: data.url || '',
         tagId: data.tagId,
         location: data.location || [],
-        description: data.description,
+        type: data.type,
         specificationDescription: data.specificationDescription,
         category: data.category || [],
         productName: data.productName || '',

@@ -17,7 +17,7 @@ interface ProjectPageState {
     select: boolean;
     image: boolean;
     productName: boolean;
-    description: boolean;
+    type: boolean;
     manufacturer: boolean;
     price: boolean;
     category: boolean;
@@ -66,7 +66,7 @@ const getStoredState = (): Partial<ProjectPageState> => {
         select: true,
         image: true,
         productName: true,
-        description: true,
+        type: true,
         manufacturer: true,
         price: true,
         category: true,
@@ -218,15 +218,15 @@ const ProjectPage: React.FC = () => {
   // Helper function to filter products
   const filterProducts = (products: Product[]) => {
     return products.filter(product => {
-      // Search filter - searches across product name, description, manufacturer
+      // Search filter - searches across product name, type, manufacturer
       if (filters.search.trim()) {
         const searchTerm = filters.search.toLowerCase().trim();
         const productName = (product.productName || '').toLowerCase();
-        const description = (product.description || '').toLowerCase();
+        const type = (product.type || '').toLowerCase();
         const manufacturer = (product.manufacturer || '').toLowerCase();
         
         if (!productName.includes(searchTerm) && 
-            !description.includes(searchTerm) && 
+            !type.includes(searchTerm) && 
             !manufacturer.includes(searchTerm)) {
           return false;
         }
@@ -270,8 +270,8 @@ const ProjectPage: React.FC = () => {
     return [...products].sort((a, b) => {
       switch (sortBy) {
         case 'name': {
-          const aName = a.productName || a.description || '';
-          const bName = b.productName || b.description || '';
+          const aName = a.productName || a.type || '';
+          const bName = b.productName || b.type || '';
           return aName.localeCompare(bName);
         }
         case 'manufacturer': {
@@ -735,13 +735,13 @@ const ProjectPage: React.FC = () => {
                       <div className="product-image">
                         <img 
                           src={getProductImageUrl(product) || getPlaceholderImage()} 
-                          alt={product.description || 'Product image'}
+                          alt={product.type || 'Product image'}
                           className="w-full h-48 object-cover"
                         />
                       </div>
                       <div className="product-info">
-                        <h3 className="product-title">{product.productName || product.description}</h3>
-                        <p className="product-description">{product.description}</p>
+                        <h3 className="product-title">{product.productName || product.type}</h3>
+                        <p className="product-type">{product.type}</p>
                         {product.manufacturer && <p className="product-manufacturer">By: {product.manufacturer}</p>}
                         {product.price && <p className="product-price">{formatPrice(product.price)}</p>}
                         <p className="product-category">{typeof product.category === 'string' ? product.category : formatArray(product.category)}</p>
@@ -813,7 +813,7 @@ const ProjectPage: React.FC = () => {
                           )}
                           {tableSettings.settings.columns.image?.visible && <th className="image-header">Image</th>}
                           {tableSettings.settings.columns.productName?.visible && <th className="product-name-header">Product Name</th>}
-                          {tableSettings.settings.columns.description?.visible && <th className="description-header">Description</th>}
+                          {tableSettings.settings.columns.type?.visible && <th className="type-header">Type</th>}
                           {tableSettings.settings.columns.manufacturer?.visible && <th className="manufacturer-header">Manufacturer</th>}
                           {tableSettings.settings.columns.price?.visible && <th className="price-header">Price</th>}
                           {tableSettings.settings.columns.category?.visible && <th className="category-header">Category</th>}
@@ -840,7 +840,7 @@ const ProjectPage: React.FC = () => {
                                 <div className="list-product-image">
                                   <img 
                                     src={getProductImageUrl(product) || getPlaceholderImage()} 
-                                    alt={product.description || 'Product image'}
+                                    alt={product.type || 'Product image'}
                                   />
                                 </div>
                               </td>
@@ -850,9 +850,9 @@ const ProjectPage: React.FC = () => {
                                 <span className="product-name">{product.productName || 'N/A'}</span>
                               </td>
                             )}
-                            {tableSettings.settings.columns.description?.visible && (
-                              <td className="description-cell">
-                                <span className="product-description">{product.description}</span>
+                            {tableSettings.settings.columns.type?.visible && (
+                              <td className="type-cell">
+                                <span className="product-type">{product.type}</span>
                               </td>
                             )}
                             {tableSettings.settings.columns.manufacturer?.visible && (

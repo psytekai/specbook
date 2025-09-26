@@ -76,7 +76,7 @@ export class ProjectFileManager {
           url TEXT NOT NULL,
           tag_id TEXT NOT NULL,
           location TEXT NOT NULL,
-          description TEXT,
+          type TEXT,
           specification_description TEXT,
           category TEXT NOT NULL,
           product_name TEXT NOT NULL,
@@ -129,45 +129,14 @@ export class ProjectFileManager {
    */
   async migrateDatabase(db: Database.Database): Promise<void> {
     try {
-      // Check if asset columns exist
-      const tableInfo = db.prepare("PRAGMA table_info(products)").all() as Array<{name: string}>;
-      const columnNames = tableInfo.map(col => col.name);
+      // Apply versioned migrations
+      const currentVersion = this.getSchemaVersion(db);
+      const targetVersion = 2; // Latest schema version
       
-      // Phase 4: Add asset management columns if they don't exist
-      const assetColumns = [
-        { name: 'primary_image_hash', type: 'TEXT' },
-        { name: 'primary_thumbnail_hash', type: 'TEXT' },
-        { name: 'additional_images_hashes', type: 'TEXT' }  // JSON array of hashes
-      ];
-      
-      for (const column of assetColumns) {
-        if (!columnNames.includes(column.name)) {
-          console.log(`Adding column ${column.name} to products table...`);
-          db.exec(`ALTER TABLE products ADD COLUMN ${column.name} ${column.type}`);
-        }
+      for (let version = currentVersion + 1; version <= targetVersion; version++) {
+        console.log(`Applying migration version ${version}...`);
+        this.applyMigration(db, version);
       }
-      
-      // Create assets metadata table for tracking
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS assets (
-          hash TEXT PRIMARY KEY,
-          original_name TEXT,
-          mimetype TEXT,
-          size INTEGER,
-          width INTEGER,
-          height INTEGER,
-          thumbnail_hash TEXT,
-          ref_count INTEGER DEFAULT 1,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-      
-      // Create index for faster lookups
-      db.exec(`
-        CREATE INDEX IF NOT EXISTS idx_assets_ref_count ON assets(ref_count);
-        CREATE INDEX IF NOT EXISTS idx_assets_last_accessed ON assets(last_accessed);
-      `);
       
       console.log('Database migration completed successfully');
     } catch (error) {
@@ -214,7 +183,79 @@ export class ProjectFileManager {
    */
   applyMigration(db: Database.Database, version: number): void {
     const migrations: Record<number, () => void> = {
-      // Future migrations can be added here
+      1: () => {
+        // Migration: Add asset management columns and tables
+        console.log('Adding asset management columns and tables...');
+        
+        // Check if asset columns exist
+        const tableInfo = db.prepare("PRAGMA table_info(products)").all() as Array<{name: string}>;
+        const columnNames = tableInfo.map(col => col.name);
+        
+        // Add asset management columns if they don't exist
+        const assetColumns = [
+          { name: 'primary_image_hash', type: 'TEXT' },
+          { name: 'primary_thumbnail_hash', type: 'TEXT' },
+          { name: 'additional_images_hashes', type: 'TEXT' }  // JSON array of hashes
+        ];
+        
+        for (const column of assetColumns) {
+          if (!columnNames.includes(column.name)) {
+            console.log(`Adding column ${column.name} to products table...`);
+            db.exec(`ALTER TABLE products ADD COLUMN ${column.name} ${column.type}`);
+          }
+        }
+        
+        // Create assets metadata table for tracking
+        db.exec(`
+          CREATE TABLE IF NOT EXISTS assets (
+            hash TEXT PRIMARY KEY,
+            original_name TEXT,
+            mimetype TEXT,
+            size INTEGER,
+            width INTEGER,
+            height INTEGER,
+            thumbnail_hash TEXT,
+            ref_count INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+        
+        // Create index for faster lookups
+        db.exec(`
+          CREATE INDEX IF NOT EXISTS idx_assets_ref_count ON assets(ref_count);
+          CREATE INDEX IF NOT EXISTS idx_assets_last_accessed ON assets(last_accessed);
+        `);
+        
+        console.log('Successfully added asset management columns and tables');
+      },
+      2: () => {
+        // Migration: Rename description column to type and swap data with specification_description
+        console.log('Renaming description column to type and swapping data...');
+        
+        // Step 1: Add temporary columns to hold data during swap
+        db.exec('ALTER TABLE products ADD COLUMN temp_description TEXT');
+        db.exec('ALTER TABLE products ADD COLUMN temp_spec_desc TEXT');
+        
+        // Step 2: Copy current data to temporary columns
+        db.exec('UPDATE products SET temp_description = description');
+        db.exec('UPDATE products SET temp_spec_desc = specification_description');
+        
+        // Step 3: Rename description column to type
+        db.exec('ALTER TABLE products RENAME COLUMN description TO type');
+        
+        // Step 4: Perform the data swap
+        // Move temp_spec_desc (originally specification_description) to type
+        db.exec('UPDATE products SET type = temp_spec_desc');
+        // Move temp_description (originally description) to specification_description
+        db.exec('UPDATE products SET specification_description = temp_description');
+        
+        // Step 5: Drop the temporary columns
+        db.exec('ALTER TABLE products DROP COLUMN temp_description');
+        db.exec('ALTER TABLE products DROP COLUMN temp_spec_desc');
+        
+        console.log('Successfully renamed description column to type and swapped data with specification_description');
+      }
     };
     
     if (migrations[version]) {
@@ -324,7 +365,7 @@ export class ProjectFileManager {
       const stmt = this.db.prepare(`
         INSERT INTO products (
           id, project_id, url, tag_id, location,
-          description, specification_description, category, 
+          type, specification_description, category, 
           product_name, manufacturer, price,
           primary_image_hash, primary_thumbnail_hash, additional_images_hashes,
           created_at, updated_at
@@ -337,7 +378,7 @@ export class ProjectFileManager {
         dbData.url,
         dbData.tag_id, // Required field, validated above
         JSON.stringify(productData.location), // Required field, validated above
-        dbData.description || null,
+        dbData.type || null,
         dbData.specification_description || null,
         JSON.stringify(productData.category), // Required field, validated above
         dbData.product_name, // Required field, validated above
@@ -404,9 +445,9 @@ export class ProjectFileManager {
         values.push(JSON.stringify(updates.location));
         await this.extractAndStoreLocations(updates.location);
       }
-      if (updates.description !== undefined) {
-        updateFields.push('description = ?');
-        values.push(updates.description);
+      if (updates.type !== undefined) {
+        updateFields.push('type = ?');
+        values.push(updates.type);
       }
       if (updates.specificationDescription !== undefined) {
         updateFields.push('specification_description = ?');
@@ -732,7 +773,7 @@ export class ProjectFileManager {
       url: mappedRow.url,
       tagId: mappedRow.tagId || undefined,
       location: this.parseJsonArray(mappedRow.location),
-      description: mappedRow.description || undefined,
+      type: mappedRow.type || undefined,
       specificationDescription: mappedRow.specificationDescription || undefined,
       category: this.parseJsonArray(mappedRow.category),
       productName: mappedRow.productName,

@@ -31,9 +31,9 @@ const createDefaultColumns = (): Record<string, ColumnConfig> => ({
     minWidth: 180,
     essential: true
   },
-  description: {
-    key: 'description',
-    label: 'Description',
+  type: {
+    key: 'type',
+    label: 'Type',
     visible: true,
     order: 3,
     width: 'auto',
