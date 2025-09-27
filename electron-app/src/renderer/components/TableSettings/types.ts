@@ -48,12 +48,24 @@ export interface TableSettings {
   activePresetId?: string;
 }
 
+// Import types from the main types file
+import { Location, Category } from '../../types';
+
 export interface TableSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   settings: TableSettings;
   onApply: (settings: TableSettings) => void;
   onReset?: () => void;
+  // New props for locations and categories management
+  locations?: Location[];
+  categories?: Category[];
+  onAddLocation?: (name: string) => Promise<Location>;
+  onUpdateLocation?: (id: string, name: string) => Promise<Location>;
+  onDeleteLocation?: (id: string) => Promise<boolean>;
+  onAddCategory?: (name: string) => Promise<Category>;
+  onUpdateCategory?: (id: string, name: string) => Promise<Category>;
+  onDeleteCategory?: (id: string) => Promise<boolean>;
 }
 
-export type SettingsTab = 'columns' | 'export';
+export type SettingsTab = 'columns' | 'export' | 'locations' | 'categories';

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useElectronProject } from '../contexts/ElectronProjectContext';
 import { Product } from '../../shared/types';
+import { Location, Category } from '../types';
 import { api } from '../services/apiIPC';
 import { formatArray, formatPrice } from '../utils/formatters';
 import { TableSettingsModal, useTableSettings } from '../components/TableSettings';
@@ -133,6 +134,8 @@ const ProjectPage: React.FC = () => {
   const navigate = useNavigate();
   const { project, isLoading: projectLoading, isInitializing } = useElectronProject();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -162,6 +165,92 @@ const ProjectPage: React.FC = () => {
 
   // For the new file-based system, we only have one current project
   const currentProject = project;
+
+  // Helper functions to map IDs to names
+  const getCategoryName = (categoryId: string): string => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.name : categoryId; // Fallback to ID if name not found
+  };
+
+  const getLocationName = (locationId: string): string => {
+    const location = locations.find(loc => loc.id === locationId);
+    return location ? location.name : locationId; // Fallback to ID if name not found
+  };
+
+  const getCategoryNames = (categoryIds: string[]): string[] => {
+    return categoryIds.map(id => getCategoryName(id));
+  };
+
+  const getLocationNames = (locationIds: string[]): string[] => {
+    return locationIds.map(id => getLocationName(id));
+  };
+
+  // Handlers for managing categories and locations from table settings
+  const handleAddCategory = async (categoryName: string): Promise<Category> => {
+    try {
+      const response = await api.post<Category>('/api/categories', { name: categoryName });
+      setCategories(prev => [...prev, response.data]);
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to add category');
+    }
+  };
+
+  const handleUpdateCategory = async (id: string, name: string): Promise<Category> => {
+    try {
+      const response = await api.put<Category>(`/api/categories/${id}`, { name });
+      setCategories(prev => prev.map(cat => cat.id === id ? response.data : cat));
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to update category');
+    }
+  };
+
+  const handleDeleteCategory = async (id: string): Promise<boolean> => {
+    try {
+      await api.delete(`/api/categories/${id}`);
+      setCategories(prev => prev.filter(cat => cat.id !== id));
+      // Refresh products to reflect the changes
+      const response = await api.get<Product[]>(`/api/projects/current/products`);
+      setProducts(response.data);
+      return true;
+    } catch (error) {
+      throw new Error('Failed to delete category');
+    }
+  };
+
+  const handleAddLocation = async (locationName: string): Promise<Location> => {
+    try {
+      const response = await api.post<Location>('/api/locations', { name: locationName });
+      setLocations(prev => [...prev, response.data]);
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to add location');
+    }
+  };
+
+  const handleUpdateLocation = async (id: string, name: string): Promise<Location> => {
+    try {
+      const response = await api.put<Location>(`/api/locations/${id}`, { name });
+      setLocations(prev => prev.map(loc => loc.id === id ? response.data : loc));
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to update location');
+    }
+  };
+
+  const handleDeleteLocation = async (id: string): Promise<boolean> => {
+    try {
+      await api.delete(`/api/locations/${id}`);
+      setLocations(prev => prev.filter(loc => loc.id !== id));
+      // Refresh products to reflect the changes
+      const response = await api.get<Product[]>(`/api/projects/current/products`);
+      setProducts(response.data);
+      return true;
+    } catch (error) {
+      throw new Error('Failed to delete location');
+    }
+  };
 
   // Redirect to welcome page if no project is open
   useEffect(() => {
@@ -232,25 +321,20 @@ const ProjectPage: React.FC = () => {
         }
       }
       
-      // Category filter - handles both string and array formats
+      // Category filter - convert IDs to names and check
       if (filters.category) {
-        if (typeof product.category === 'string') {
-          if (product.category !== filters.category) {
-            return false;
-          }
-        } else {
-          // Handle legacy array format
-          const productCategories = Array.isArray(product.category) ? product.category : [product.category];
-          if (!productCategories.includes(filters.category)) {
-            return false;
-          }
+        const productCategoryIds = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean);
+        const productCategoryNames = getCategoryNames(productCategoryIds);
+        if (!productCategoryNames.includes(filters.category)) {
+          return false;
         }
       }
       
-      // Location filter - handles array of locations
+      // Location filter - convert IDs to names and check
       if (filters.location) {
-        const productLocations = Array.isArray(product.location) ? product.location : [product.location];
-        if (!productLocations.includes(filters.location)) {
+        const productLocationIds = Array.isArray(product.location) ? product.location : [product.location].filter(Boolean);
+        const productLocationNames = getLocationNames(productLocationIds);
+        if (!productLocationNames.includes(filters.location)) {
           return false;
         }
       }
@@ -285,13 +369,17 @@ const ProjectPage: React.FC = () => {
           return aPrice - bPrice;
         }
         case 'category': {
-          const aCategory = typeof a.category === 'string' ? a.category : formatArray(a.category);
-          const bCategory = typeof b.category === 'string' ? b.category : formatArray(b.category);
+          const aCategoryIds = Array.isArray(a.category) ? a.category : [a.category].filter(Boolean);
+          const bCategoryIds = Array.isArray(b.category) ? b.category : [b.category].filter(Boolean);
+          const aCategory = formatArray(getCategoryNames(aCategoryIds));
+          const bCategory = formatArray(getCategoryNames(bCategoryIds));
           return aCategory.localeCompare(bCategory);
         }
         case 'location': {
-          const aLocation = formatArray(a.location);
-          const bLocation = formatArray(b.location);
+          const aLocationIds = Array.isArray(a.location) ? a.location : [a.location].filter(Boolean);
+          const bLocationIds = Array.isArray(b.location) ? b.location : [b.location].filter(Boolean);
+          const aLocation = formatArray(getLocationNames(aLocationIds));
+          const bLocation = formatArray(getLocationNames(bLocationIds));
           return aLocation.localeCompare(bLocation);
         }
         case 'date':
@@ -306,16 +394,17 @@ const ProjectPage: React.FC = () => {
     const filtered = filterProducts(products);
     const sorted = sortProducts(filtered);
     const grouped = sorted.reduce((acc, product) => {
-      const locations = Array.isArray(product.location) && product.location.length > 0 
+      const locationIds = Array.isArray(product.location) && product.location.length > 0 
         ? product.location 
-        : ['Unspecified'];
+        : [];
+      const locationNames = locationIds.length > 0 ? getLocationNames(locationIds) : ['Unspecified'];
       
       // Add product to each location group (for multi-location support)
-      locations.forEach(location => {
-        if (!acc[location]) {
-          acc[location] = [];
+      locationNames.forEach(locationName => {
+        if (!acc[locationName]) {
+          acc[locationName] = [];
         }
-        acc[location].push(product);
+        acc[locationName].push(product);
       });
       return acc;
     }, {} as Record<string, Product[]>);
@@ -335,9 +424,11 @@ const ProjectPage: React.FC = () => {
     const filtered = filterProducts(products);
     const sorted = sortProducts(filtered);
     const grouped = sorted.reduce((acc, product) => {
-      const categories = Array.isArray(product.category) ? product.category : [product.category || 'Uncategorized'];
-      categories.forEach(category => {
-        const categoryKey = category || 'Uncategorized';
+      const categoryIds = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean);
+      const categoryNames = categoryIds.length > 0 ? getCategoryNames(categoryIds) : ['Uncategorized'];
+      
+      categoryNames.forEach(categoryName => {
+        const categoryKey = categoryName || 'Uncategorized';
         if (!acc[categoryKey]) {
           acc[categoryKey] = [];
         }
@@ -389,14 +480,17 @@ const ProjectPage: React.FC = () => {
     return Array.isArray(product.location) ? product.location.length : 1;
   };
 
-  // Get unique values for filter dropdowns
+  // Get unique values for filter dropdowns (convert IDs to names)
   const uniqueCategories = [...new Set(products.flatMap(p => {
-    if (typeof p.category === 'string') {
-      return [p.category];
-    }
-    return Array.isArray(p.category) ? p.category : [p.category];
+    const categoryIds = Array.isArray(p.category) ? p.category : [p.category].filter(Boolean);
+    return getCategoryNames(categoryIds);
   }).filter(Boolean))].sort();
-  const uniqueLocations = [...new Set(products.flatMap(p => Array.isArray(p.location) ? p.location : [p.location]).filter(Boolean))].sort();
+  
+  const uniqueLocations = [...new Set(products.flatMap(p => {
+    const locationIds = Array.isArray(p.location) ? p.location : [p.location].filter(Boolean);
+    return getLocationNames(locationIds);
+  }).filter(Boolean))].sort();
+  
   const uniqueManufacturers = [...new Set(products.map(p => p.manufacturer).filter(Boolean))].sort();
 
   // Selection handlers
@@ -485,21 +579,30 @@ const ProjectPage: React.FC = () => {
   useEffect(() => {
     if (!currentProject) return;
 
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await api.get<Product[]>(`/api/projects/current/products`);
-        setProducts(response.data);
+        
+        // Fetch products, categories, and locations in parallel
+        const [productsResponse, categoriesResponse, locationsResponse] = await Promise.all([
+          api.get<Product[]>(`/api/projects/current/products`),
+          api.get<Category[]>('/api/categories'),
+          api.get<Location[]>('/api/locations')
+        ]);
+        
+        setProducts(productsResponse.data);
+        setCategories(categoriesResponse.data);
+        setLocations(locationsResponse.data);
       } catch (err) {
-        setError('Failed to load products');
-        console.error('Error fetching products:', err);
+        setError('Failed to load data');
+        console.error('Error fetching data:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
+    fetchData();
   }, [currentProject]);
 
   // Show loading state while checking for project
@@ -754,9 +857,9 @@ const ProjectPage: React.FC = () => {
                         <p className="product-type">{product.type}</p>
                         {product.manufacturer && <p className="product-manufacturer">By: {product.manufacturer}</p>}
                         {product.price && <p className="product-price">{formatPrice(product.price)}</p>}
-                        <p className="product-category">{typeof product.category === 'string' ? product.category : formatArray(product.category)}</p>
+                        <p className="product-category">{formatArray(getCategoryNames(Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)))}</p>
                         <div className="product-location-info">
-                          <p className="product-location">{formatArray(product.location)}</p>
+                          <p className="product-location">{formatArray(getLocationNames(Array.isArray(product.location) ? product.location : [product.location].filter(Boolean)))}</p>
                           {isMultiLocationProduct(product) && groupBy === 'location' && (
                             <span className="multi-location-badge" title={`This product appears in ${getLocationCount(product)} locations`}>
                               📍 {getLocationCount(product)}
@@ -908,14 +1011,14 @@ const ProjectPage: React.FC = () => {
                                 case 'category':
                                   return (
                                     <td key={column.key} className="category-cell">
-                                      <span>{typeof product.category === 'string' ? product.category : formatArray(product.category)}</span>
+                                      <span>{formatArray(getCategoryNames(Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)))}</span>
                                     </td>
                                   );
                                 case 'location':
                                   return (
                                     <td key={column.key} className="location-cell">
                                       <div className="table-location-info">
-                                        <span>{formatArray(product.location)}</span>
+                                        <span>{formatArray(getLocationNames(Array.isArray(product.location) ? product.location : [product.location].filter(Boolean)))}</span>
                                         {isMultiLocationProduct(product) && groupBy === 'location' && (
                                           <span className="multi-location-badge table-badge" title={`This product appears in ${getLocationCount(product)} locations`}>
                                             📍 {getLocationCount(product)}
@@ -972,6 +1075,14 @@ const ProjectPage: React.FC = () => {
           onReset={() => {
             tableSettings.resetSettings();
           }}
+          locations={locations}
+          categories={categories}
+          onAddLocation={handleAddLocation}
+          onUpdateLocation={handleUpdateLocation}
+          onDeleteLocation={handleDeleteLocation}
+          onAddCategory={handleAddCategory}
+          onUpdateCategory={handleUpdateCategory}
+          onDeleteCategory={handleDeleteCategory}
         />
       </div>
     </div>

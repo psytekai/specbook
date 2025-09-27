@@ -100,6 +100,16 @@ class APIRouter {
         return await this.updateProduct(productId, data);
       }
       
+      if (normalizedEndpoint.match(/^\/categories\/([^/]+)$/)) {
+        const categoryId = normalizedEndpoint.split('/')[2];
+        return await this.updateCategory(categoryId, data);
+      }
+      
+      if (normalizedEndpoint.match(/^\/locations\/([^/]+)$/)) {
+        const locationId = normalizedEndpoint.split('/')[2];
+        return await this.updateLocation(locationId, data);
+      }
+      
       throw new Error(`Unknown PUT endpoint: ${endpoint}`);
     } catch (error) {
       return {
@@ -121,6 +131,16 @@ class APIRouter {
       if (normalizedEndpoint.match(/^\/products\/([^/]+)$/)) {
         const productId = normalizedEndpoint.split('/')[2];
         return await this.deleteProduct(productId);
+      }
+      
+      if (normalizedEndpoint.match(/^\/categories\/([^/]+)$/)) {
+        const categoryId = normalizedEndpoint.split('/')[2];
+        return await this.deleteCategory(categoryId);
+      }
+      
+      if (normalizedEndpoint.match(/^\/locations\/([^/]+)$/)) {
+        const locationId = normalizedEndpoint.split('/')[2];
+        return await this.deleteLocation(locationId);
       }
       
       throw new Error(`Unknown DELETE endpoint: ${endpoint}`);
@@ -391,14 +411,7 @@ class APIRouter {
       throw new Error('No project open');
     }
 
-    // For now, we don't have createLocation method in ProjectFileManager
-    // Just return a mock location
-    const location = {
-      id: Date.now().toString(),
-      name: data.name,
-      createdAt: new Date().toISOString()
-    };
-
+    const location = await manager.createLocation(data.name);
     this.projectState.markDirty();
     return { success: true, data: location };
   }
@@ -434,16 +447,71 @@ class APIRouter {
       throw new Error('No project open');
     }
 
-    // For now, we don't have createCategory method in ProjectFileManager
-    // Just return a mock category
-    const category = {
-      id: Date.now().toString(),
-      name: data.name,
-      createdAt: new Date().toISOString()
-    };
-
+    const category = await manager.createCategory(data.name);
     this.projectState.markDirty();
     return { success: true, data: category };
+  }
+
+  private async updateCategory(categoryId: string, data: any) {
+    const state = this.projectState.getStateInfo();
+    const manager = this.projectState.getManager();
+    
+    if (!state.isOpen || !manager) {
+      throw new Error('No project open');
+    }
+
+    const category = await manager.updateCategory(categoryId, data.name);
+    this.projectState.markDirty();
+    return { success: true, data: category };
+  }
+
+  private async deleteCategory(categoryId: string) {
+    const state = this.projectState.getStateInfo();
+    const manager = this.projectState.getManager();
+    
+    if (!state.isOpen || !manager) {
+      throw new Error('No project open');
+    }
+
+    const deleted = await manager.deleteCategory(categoryId);
+    
+    if (!deleted) {
+      throw new Error('Failed to delete category');
+    }
+
+    this.projectState.markDirty();
+    return { success: true, data: { id: categoryId } };
+  }
+
+  private async updateLocation(locationId: string, data: any) {
+    const state = this.projectState.getStateInfo();
+    const manager = this.projectState.getManager();
+    
+    if (!state.isOpen || !manager) {
+      throw new Error('No project open');
+    }
+
+    const location = await manager.updateLocation(locationId, data.name);
+    this.projectState.markDirty();
+    return { success: true, data: location };
+  }
+
+  private async deleteLocation(locationId: string) {
+    const state = this.projectState.getStateInfo();
+    const manager = this.projectState.getManager();
+    
+    if (!state.isOpen || !manager) {
+      throw new Error('No project open');
+    }
+
+    const deleted = await manager.deleteLocation(locationId);
+    
+    if (!deleted) {
+      throw new Error('Failed to delete location');
+    }
+
+    this.projectState.markDirty();
+    return { success: true, data: { id: locationId } };
   }
 }
 

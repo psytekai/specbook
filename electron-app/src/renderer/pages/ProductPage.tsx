@@ -23,21 +23,23 @@ const ProductPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Add handlers for multi-select components
-  const handleAddLocation = async (locationName: string) => {
+  const handleAddLocation = async (locationName: string): Promise<Location> => {
     try {
       const request: AddLocationRequest = { name: locationName };
       const response = await api.post<Location>('/api/locations', request);
       setLocations(prev => [...prev, response.data]);
+      return response.data;
     } catch (error) {
       throw new Error('Failed to add location');
     }
   };
 
-  const handleAddCategory = async (categoryName: string) => {
+  const handleAddCategory = async (categoryName: string): Promise<Category> => {
     try {
       const request: AddCategoryRequest = { name: categoryName };
       const response = await api.post<Category>('/api/categories', request);
       setCategories(prev => [...prev, response.data]);
+      return response.data;
     } catch (error) {
       throw new Error('Failed to add category');
     }
@@ -339,7 +341,7 @@ const ProductPage: React.FC = () => {
                   <label className="editable-label">Categories</label>
                   <CategoryMultiSelect
                     selectedCategories={Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)}
-                    onSelectionChange={(categories) => updateProductField('category', categories)}
+                    onSelectionChange={(categoryIds) => updateProductField('category', categoryIds)}
                     availableCategories={categories}
                     onAddCategory={handleAddCategory}
                   />
@@ -349,7 +351,7 @@ const ProductPage: React.FC = () => {
                   <label className="editable-label">Locations</label>
                   <LocationMultiSelect
                     selectedLocations={Array.isArray(product.location) ? product.location : [product.location].filter(Boolean)}
-                    onSelectionChange={(locations: string[]) => updateProductField('location', locations)}
+                    onSelectionChange={(locationIds: string[]) => updateProductField('location', locationIds)}
                     availableLocations={locations}
                     onAddLocation={handleAddLocation}
                   />
