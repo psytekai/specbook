@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useElectronProject } from '../contexts/ElectronProjectContext';
 import { Product } from '../../shared/types';
@@ -428,6 +428,32 @@ const ProjectPage: React.FC = () => {
     setSelectedProducts(newSelected);
     setSelectAll(checked);
   };
+
+  const handleBulkDelete = useCallback(async () => {
+    if (confirm(`Are you sure you want to delete ${selectedProducts.size} product${selectedProducts.size !== 1 ? 's' : ''}?`)) {
+      try {
+        // Delete each selected product
+        const deletePromises = Array.from(selectedProducts).map(productId => 
+          api.delete(`/api/products/${productId}`)
+        );
+        
+        await Promise.all(deletePromises);
+        
+        // Refresh the products list
+        const response = await api.get<Product[]>(`/api/projects/current/products`);
+        setProducts(response.data);
+        
+        // Clear selection
+        setSelectedProducts(new Set());
+        setSelectAll(false);
+        
+        console.log(`Successfully deleted ${deletePromises.length} product${deletePromises.length !== 1 ? 's' : ''}`);
+      } catch (error) {
+        console.error('Failed to delete products:', error);
+        alert('Failed to delete some products. Please try again.');
+      }
+    }
+  }, [selectedProducts]);
   
   // Get organized products based on current settings
   const organizedProducts = (() => {
@@ -667,14 +693,7 @@ const ProjectPage: React.FC = () => {
               </button>
               <button 
                 className="bulk-action-button danger"
-                onClick={() => {
-                  // TODO: Implement bulk delete
-                  if (confirm(`Are you sure you want to delete ${selectedProducts.size} product${selectedProducts.size !== 1 ? 's' : ''}?`)) {
-                    console.log('Deleting selected products:', Array.from(selectedProducts));
-                    setSelectedProducts(new Set());
-                    setSelectAll(false);
-                  }
-                }}
+                onClick={handleBulkDelete}
               >
                 Delete
               </button>
