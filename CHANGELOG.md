@@ -5,7 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] - 2025-09-27
+
+### Added
+- Bulk delete functionality for products with checkbox selection system
+- "Select All" capability for bulk operations
+- Confirmation dialog for bulk delete operations to prevent accidental data loss
+- Database migration system for schema changes
+- Product name as a required field for data integrity
+
+### Changed
+- **BREAKING**: Renamed product field from `description` to `name` for better semantic clarity
+- Consolidated type definitions to shared module (`src/shared/types.ts`)
+- Rearranged table columns for improved workflow and readability
+- Enhanced scraper data extraction for better handling of product names vs descriptions
+- Simplified Python bridge initialization process
+- Improved product page styling with better spacing and visual organization
+- Enhanced project page CSS for cleaner layout
+
+### Fixed
+- Python bridge error handling now properly surfaces errors to UI
+- Table settings modal styling issues
+- Type inconsistencies between frontend and backend
+- Redundant re-renders in table components
+
+### Removed
+- Duplicate type definitions across renderer and main process
+- Redundant Python bridge initialization code
+- Significant amount of dead code (~488 deletions)
+
+### Technical Improvements
+- Better TypeScript inference throughout the codebase
+- Streamlined communication between Electron and Python processes
+- Optimized bulk delete operations for large selections
+- Improved error recovery mechanisms
+- Enhanced user feedback when operations fail
+
+### Migration Notes
+- Existing projects will automatically migrate the `description` field to `name`
+- No data loss during migration
+- Projects created before this change will continue to work seamlessly
+
+## [0.2.0]
 
 ### Added
 
@@ -334,7 +375,7 @@ sData Architecture Simplification and Bug Fixes
 - Navigation flow when projects are opened/closed
 - API compatibility layer maintains existing component interfaces
 
-## [1.0.0] - Initial Release
+## [0.1.s0] - Initial Release
 
 ### Added
 - Phase 1: Project File Manager Core implementation
