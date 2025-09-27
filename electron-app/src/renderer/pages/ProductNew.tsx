@@ -27,7 +27,7 @@ const ProductNew: React.FC = () => {
     type: string;
     specificationDescription: string;
     category: string[];
-    productName?: string;
+    productName: string;
     manufacturer?: string;
     price?: number;
     
@@ -303,6 +303,11 @@ const ProductNew: React.FC = () => {
       return;
     }
     
+    if (!formData.productName || formData.productName.trim() === '') {
+      showToast('Product name is required', 'error');
+      return;
+    }
+    
     try {
       setIsSaving(true);
       
@@ -493,7 +498,7 @@ const ProductNew: React.FC = () => {
               
               <div className="form-group">
                 <label htmlFor="productName" className="label">
-                  Product Title
+                  Product Title *
                 </label>
                 <input
                   id="productName"
@@ -503,6 +508,7 @@ const ProductNew: React.FC = () => {
                   value={formData.productName || ''}
                   onChange={handleInputChange}
                   placeholder="Enter product title"
+                  required
                 />
               </div>
               
