@@ -357,7 +357,7 @@
   vertical-align: middle; /* Changed from top to middle for consistency */
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
   height: 3.5rem; /* Fixed height to match header */
   min-height: 3.5rem;
   max-height: 3.5rem;
@@ -400,9 +400,9 @@
 
 .type-header,
 .type-cell {
-  width: 300px;
-  min-width: 200px;
-  max-width: 400px;
+  width: 150px;
+  min-width: 120px;
+  max-width: 150px;
 }
 
 .manufacturer-header,
@@ -553,7 +553,7 @@
 }
 
 .type-cell .product-type {
-  display: flex;
+  /* display: flex; */
   align-items: center;
   min-height: 2.5rem;
   line-height: 1.4;
@@ -663,9 +663,9 @@
 
 .type-header,
 .type-cell {
-  width: 300px;
-  min-width: 200px;
-  max-width: 400px;
+  width: 150px;
+  min-width: 120px;
+  max-width: 150px;
 }
 
 .manufacturer-header,
@@ -813,13 +813,6 @@
 
 .type-cell {
   vertical-align: middle;
-}
-
-.type-cell .product-type {
-  display: flex;
-  align-items: center;
-  min-height: 2.5rem;
-  line-height: 1.4;
 }
 
 .category-cell {

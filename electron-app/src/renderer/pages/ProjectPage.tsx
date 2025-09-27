@@ -666,15 +666,6 @@ const ProjectPage: React.FC = () => {
                 Export
               </button>
               <button 
-                className="bulk-action-button secondary"
-                onClick={() => {
-                  // TODO: Implement bulk category update
-                  console.log('Updating categories for:', Array.from(selectedProducts));
-                }}
-              >
-                Update Category
-              </button>
-              <button 
                 className="bulk-action-button danger"
                 onClick={() => {
                   // TODO: Implement bulk delete
@@ -801,112 +792,144 @@ const ProjectPage: React.FC = () => {
                     <table className="product-table">
                       <thead>
                         <tr>
-                          {tableSettings.settings.columns.select?.visible && (
-                            <th className="select-header">
-                              <input
-                                type="checkbox"
-                                className="row-checkbox"
-                                checked={selectAll}
-                                onChange={(e) => handleSelectAll(e.target.checked)}
-                              />
-                            </th>
-                          )}
-                          {tableSettings.settings.columns.image?.visible && <th className="image-header">Image</th>}
-                          {tableSettings.settings.columns.productName?.visible && <th className="product-name-header">Product Name</th>}
-                          {tableSettings.settings.columns.type?.visible && <th className="type-header">Type</th>}
-                          {tableSettings.settings.columns.manufacturer?.visible && <th className="manufacturer-header">Manufacturer</th>}
-                          {tableSettings.settings.columns.price?.visible && <th className="price-header">Price</th>}
-                          {tableSettings.settings.columns.category?.visible && <th className="category-header">Category</th>}
-                          {tableSettings.settings.columns.location?.visible && <th className="location-header">Location</th>}
-                          {tableSettings.settings.columns.tagId?.visible && <th className="tagid-header">Tag ID</th>}
-                          {tableSettings.settings.columns.actions?.visible && <th className="actions-header">Actions</th>}
+                          {tableSettings.orderedColumns.filter(col => col.visible).map(column => {
+                            switch (column.key) {
+                              case 'select':
+                                return (
+                                  <th key={column.key} className="select-header">
+                                    <input
+                                      type="checkbox"
+                                      className="row-checkbox"
+                                      checked={selectAll}
+                                      onChange={(e) => handleSelectAll(e.target.checked)}
+                                    />
+                                  </th>
+                                );
+                              case 'image':
+                                return <th key={column.key} className="image-header">Image</th>;
+                              case 'tagId':
+                                return <th key={column.key} className="tagid-header">Tag ID</th>;
+                              case 'productName':
+                                return <th key={column.key} className="product-name-header">Product Name</th>;
+                              case 'type':
+                                return <th key={column.key} className="type-header">Type</th>;
+                              case 'manufacturer':
+                                return <th key={column.key} className="manufacturer-header">Manufacturer</th>;
+                              case 'price':
+                                return <th key={column.key} className="price-header">Price</th>;
+                              case 'category':
+                                return <th key={column.key} className="category-header">Category</th>;
+                              case 'location':
+                                return <th key={column.key} className="location-header">Location</th>;
+                              case 'actions':
+                                return <th key={column.key} className="actions-header">Actions</th>;
+                              default:
+                                return null;
+                            }
+                          })}
                         </tr>
                       </thead>
                       <tbody>
                         {locationProducts.map(product => (
                           <tr key={product.id} className="table-row">
-                            {tableSettings.settings.columns.select?.visible && (
-                              <td className="select-cell">
-                                <input
-                                  type="checkbox"
-                                  className="row-checkbox"
-                                  checked={selectedProducts.has(product.id)}
-                                  onChange={(e) => handleSelectProduct(product.id, e.target.checked)}
-                                />
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.image?.visible && (
-                              <td className="image-cell">
-                                <div className="list-product-image">
-                                  <img 
-                                    src={getProductImageUrl(product) || getPlaceholderImage()} 
-                                    alt={product.type || 'Product image'}
-                                  />
-                                </div>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.productName?.visible && (
-                              <td className="product-name-cell">
-                                <span className="product-name">{product.productName || 'N/A'}</span>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.type?.visible && (
-                              <td className="type-cell">
-                                <span className="product-type">{product.type}</span>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.manufacturer?.visible && (
-                              <td className="manufacturer-cell">
-                                <span>{product.manufacturer || 'N/A'}</span>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.price?.visible && (
-                              <td className="price-cell">
-                                <span>{formatPrice(product.price)}</span>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.category?.visible && (
-                              <td className="category-cell">
-                                <span>{typeof product.category === 'string' ? product.category : formatArray(product.category)}</span>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.location?.visible && (
-                              <td className="location-cell">
-                                <div className="table-location-info">
-                                  <span>{formatArray(product.location)}</span>
-                                  {isMultiLocationProduct(product) && groupBy === 'location' && (
-                                    <span className="multi-location-badge table-badge" title={`This product appears in ${getLocationCount(product)} locations`}>
-                                      📍 {getLocationCount(product)}
-                                    </span>
-                                  )}
-                                </div>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.tagId?.visible && (
-                              <td className="tagid-cell">
-                                <span>{product.tagId}</span>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.actions?.visible && (
-                              <td className="actions-cell">
-                                <div className="list-actions">
-                                  <button
-                                    className="action-button primary"
-                                    onClick={() => navigate(`/project/products/${product.id}`)}
-                                  >
-                                    View
-                                  </button>
-                                  <a 
-                                    href={product.url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="action-button secondary"
-                                  >
-                                    Source
-                                  </a>
-                                </div>
-                              </td>
-                            )}
+                            {tableSettings.orderedColumns.filter(col => col.visible).map(column => {
+                              switch (column.key) {
+                                case 'select':
+                                  return (
+                                    <td key={column.key} className="select-cell">
+                                      <input
+                                        type="checkbox"
+                                        className="row-checkbox"
+                                        checked={selectedProducts.has(product.id)}
+                                        onChange={(e) => handleSelectProduct(product.id, e.target.checked)}
+                                      />
+                                    </td>
+                                  );
+                                case 'image':
+                                  return (
+                                    <td key={column.key} className="image-cell">
+                                      <div className="list-product-image">
+                                        <img 
+                                          src={getProductImageUrl(product) || getPlaceholderImage()} 
+                                          alt={product.type || 'Product image'}
+                                        />
+                                      </div>
+                                    </td>
+                                  );
+                                case 'tagId':
+                                  return (
+                                    <td key={column.key} className="tagid-cell">
+                                      <span>{product.tagId}</span>
+                                    </td>
+                                  );
+                                case 'productName':
+                                  return (
+                                    <td key={column.key} className="product-name-cell">
+                                      <span className="product-name">{product.productName || 'N/A'}</span>
+                                    </td>
+                                  );
+                                case 'type':
+                                  return (
+                                    <td key={column.key} className="type-cell">
+                                      <span className="product-type">{product.type}</span>
+                                    </td>
+                                  );
+                                case 'manufacturer':
+                                  return (
+                                    <td key={column.key} className="manufacturer-cell">
+                                      <span>{product.manufacturer || 'N/A'}</span>
+                                    </td>
+                                  );
+                                case 'price':
+                                  return (
+                                    <td key={column.key} className="price-cell">
+                                      <span>{formatPrice(product.price)}</span>
+                                    </td>
+                                  );
+                                case 'category':
+                                  return (
+                                    <td key={column.key} className="category-cell">
+                                      <span>{typeof product.category === 'string' ? product.category : formatArray(product.category)}</span>
+                                    </td>
+                                  );
+                                case 'location':
+                                  return (
+                                    <td key={column.key} className="location-cell">
+                                      <div className="table-location-info">
+                                        <span>{formatArray(product.location)}</span>
+                                        {isMultiLocationProduct(product) && groupBy === 'location' && (
+                                          <span className="multi-location-badge table-badge" title={`This product appears in ${getLocationCount(product)} locations`}>
+                                            📍 {getLocationCount(product)}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </td>
+                                  );
+                                case 'actions':
+                                  return (
+                                    <td key={column.key} className="actions-cell">
+                                      <div className="list-actions">
+                                        <button
+                                          className="action-button primary"
+                                          onClick={() => navigate(`/project/products/${product.id}`)}
+                                        >
+                                          View
+                                        </button>
+                                        <a 
+                                          href={product.url} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="action-button secondary"
+                                        >
+                                          Source
+                                        </a>
+                                      </div>
+                                    </td>
+                                  );
+                                default:
+                                  return null;
+                              }
+                            })}
                           </tr>
                         ))}
                       </tbody>
