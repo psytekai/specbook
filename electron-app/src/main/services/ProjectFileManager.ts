@@ -4,13 +4,13 @@ import Database from 'better-sqlite3';
 import { v4 as uuidv4 } from 'uuid';
 import { AssetManager } from './AssetManager';
 import { mapDbRowToInterface, mapInterfaceToDb } from '../../shared/mappings/fieldMappings';
-import type { 
-  Project, 
-  Product, 
-  Category, 
-  Location, 
+import type {
+  Project,
+  Product,
+  Category,
+  Location,
   Manifest,
-  ProjectFileManagerOptions 
+  ProjectFileManagerOptions
 } from '../types/project.types';
 
 /**
@@ -61,10 +61,10 @@ export class ProjectFileManager {
   async initializeDatabase(projectPath: string): Promise<Database.Database> {
     try {
       const dbPath = path.join(projectPath, 'project.db');
-      
+
       // Create database connection
       const db = new Database(dbPath);
-      
+
       // Enable foreign keys
       db.exec('PRAGMA foreign_keys = ON');
 
@@ -76,7 +76,7 @@ export class ProjectFileManager {
           url TEXT NOT NULL,
           tag_id TEXT NOT NULL,
           location TEXT,
-          type TEXT,
+          description TEXT,
           specification_description TEXT,
           category TEXT,
           product_name TEXT NOT NULL,
@@ -132,12 +132,12 @@ export class ProjectFileManager {
       // Apply versioned migrations
       const currentVersion = this.getSchemaVersion(db);
       const targetVersion = 2; // Latest schema version
-      
+
       for (let version = currentVersion + 1; version <= targetVersion; version++) {
         console.log(`Applying migration version ${version}...`);
         this.applyMigration(db, version);
       }
-      
+
       console.log('Database migration completed successfully');
     } catch (error) {
       console.error('Database migration failed:', error);
@@ -154,7 +154,7 @@ export class ProjectFileManager {
       const tableExists = db.prepare(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'"
       ).get();
-      
+
       if (!tableExists) {
         // Create schema version table
         db.exec(`
@@ -163,12 +163,12 @@ export class ProjectFileManager {
             applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
           )
         `);
-        
+
         // Insert initial version
         db.prepare('INSERT INTO schema_version (version) VALUES (?)').run(1);
         return 1;
       }
-      
+
       // Get current version
       const result = db.prepare('SELECT MAX(version) as version FROM schema_version').get() as {version: number};
       return result?.version || 1;
@@ -186,25 +186,25 @@ export class ProjectFileManager {
       1: () => {
         // Migration: Add asset management columns and tables
         console.log('Adding asset management columns and tables...');
-        
+
         // Check if asset columns exist
         const tableInfo = db.prepare("PRAGMA table_info(products)").all() as Array<{name: string}>;
         const columnNames = tableInfo.map(col => col.name);
-        
+
         // Add asset management columns if they don't exist
         const assetColumns = [
           { name: 'primary_image_hash', type: 'TEXT' },
           { name: 'primary_thumbnail_hash', type: 'TEXT' },
           { name: 'additional_images_hashes', type: 'TEXT' }  // JSON array of hashes
         ];
-        
+
         for (const column of assetColumns) {
           if (!columnNames.includes(column.name)) {
             console.log(`Adding column ${column.name} to products table...`);
             db.exec(`ALTER TABLE products ADD COLUMN ${column.name} ${column.type}`);
           }
         }
-        
+
         // Create assets metadata table for tracking
         db.exec(`
           CREATE TABLE IF NOT EXISTS assets (
@@ -220,48 +220,48 @@ export class ProjectFileManager {
             last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
           )
         `);
-        
+
         // Create index for faster lookups
         db.exec(`
           CREATE INDEX IF NOT EXISTS idx_assets_ref_count ON assets(ref_count);
           CREATE INDEX IF NOT EXISTS idx_assets_last_accessed ON assets(last_accessed);
         `);
-        
+
         console.log('Successfully added asset management columns and tables');
       },
       2: () => {
         // Migration: Multiple schema updates
         console.log('Applying migration 2: column renaming, data swapping, and constraint updates...');
-        
+
         // Part 1: Rename description column to type and swap data with specification_description
         console.log('Renaming description column to type and swapping data...');
-        
+
         // Step 1: Add temporary columns to hold data during swap
         db.exec('ALTER TABLE products ADD COLUMN temp_description TEXT');
         db.exec('ALTER TABLE products ADD COLUMN temp_spec_desc TEXT');
-        
+
         // Step 2: Copy current data to temporary columns
         db.exec('UPDATE products SET temp_description = description');
         db.exec('UPDATE products SET temp_spec_desc = specification_description');
-        
+
         // Step 3: Rename description column to type
         db.exec('ALTER TABLE products RENAME COLUMN description TO type');
-        
+
         // Step 4: Perform the data swap
         // Move temp_spec_desc (originally specification_description) to type
         db.exec('UPDATE products SET type = temp_spec_desc');
         // Move temp_description (originally description) to specification_description
         db.exec('UPDATE products SET specification_description = temp_description');
-        
+
         // Step 5: Drop the temporary columns
         db.exec('ALTER TABLE products DROP COLUMN temp_description');
         db.exec('ALTER TABLE products DROP COLUMN temp_spec_desc');
-        
+
         console.log('Successfully renamed description column to type and swapped data with specification_description');
-        
+
         // Part 2: Update location and category columns to reference IDs and remove NOT NULL constraints
         console.log('Updating location and category columns to reference IDs...');
-        
+
         // Create new products table with updated schema
         db.exec(`
           CREATE TABLE products_new (
@@ -283,11 +283,11 @@ export class ProjectFileManager {
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
           )
         `);
-        
+
         // Function to convert name arrays to ID arrays
         const convertNamesToIds = (nameArray: string[], tableName: string): string[] => {
           if (!nameArray || nameArray.length === 0) return [];
-          
+
           const ids: string[] = [];
           for (const name of nameArray) {
             if (name && name.trim()) {
@@ -299,7 +299,7 @@ export class ProjectFileManager {
           }
           return ids;
         };
-        
+
         // Migrate data from old table to new table, converting names to IDs
         const products = db.prepare('SELECT * FROM products').all() as any[];
         const insertStmt = db.prepare(`
@@ -309,23 +309,23 @@ export class ProjectFileManager {
             primary_thumbnail_hash, additional_images_hashes, created_at, updated_at
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
-        
+
         for (const product of products) {
           // Parse existing location and category arrays (they contain names)
           let locationNames: string[] = [];
           let categoryNames: string[] = [];
-          
+
           try {
             locationNames = product.location ? JSON.parse(product.location) : [];
             categoryNames = product.category ? JSON.parse(product.category) : [];
           } catch (error) {
             console.warn(`Failed to parse location/category for product ${product.id}:`, error);
           }
-          
+
           // Convert names to IDs
           const locationIds = convertNamesToIds(locationNames, 'locations');
           const categoryIds = convertNamesToIds(categoryNames, 'categories');
-          
+
           insertStmt.run(
             product.id,
             product.project_id,
@@ -345,11 +345,11 @@ export class ProjectFileManager {
             product.updated_at
           );
         }
-        
+
         // Drop old table and rename new table
         db.exec('DROP TABLE products');
         db.exec('ALTER TABLE products_new RENAME TO products');
-        
+
         // Recreate the update trigger
         db.exec(`
           CREATE TRIGGER IF NOT EXISTS update_products_timestamp 
@@ -358,11 +358,11 @@ export class ProjectFileManager {
             UPDATE products SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
           END
         `);
-        
+
         console.log('Successfully updated location and category columns to reference IDs and removed NOT NULL constraints');
       }
     };
-    
+
     if (migrations[version]) {
       db.transaction(() => {
         migrations[version]();
@@ -454,10 +454,10 @@ export class ProjectFileManager {
       if (!productData.tagId) throw new Error('Tag ID is required');
       if (!productData.productName) throw new Error('Product name is required');
       // Note: location and category are now optional (no NOT NULL constraint)
-      
+
       const id = uuidv4();
       const now = new Date().toISOString();
-      
+
       // Map interface fields to database column names
       const dbData = mapInterfaceToDb({
         ...productData,
@@ -465,7 +465,7 @@ export class ProjectFileManager {
         createdAt: now,
         updatedAt: now
       });
-      
+
       const stmt = this.db.prepare(`
         INSERT INTO products (
           id, project_id, url, tag_id, location,
@@ -475,7 +475,7 @@ export class ProjectFileManager {
           created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
-      
+
       stmt.run(
         dbData.id,
         dbData.project_id || this.currentProject.id,
@@ -695,13 +695,13 @@ export class ProjectFileManager {
     try {
       const id = uuidv4();
       const now = new Date().toISOString();
-      
+
       const stmt = this.db.prepare(`
         INSERT INTO categories (id, name, created_at) VALUES (?, ?, ?)
       `);
-      
+
       stmt.run(id, name.trim(), now);
-      
+
       return {
         id,
         name: name.trim(),
@@ -733,9 +733,9 @@ export class ProjectFileManager {
       const stmt = this.db.prepare(`
         UPDATE categories SET name = ? WHERE id = ?
       `);
-      
+
       stmt.run(name.trim(), id);
-      
+
       return {
         id,
         name: name.trim(),
@@ -766,12 +766,12 @@ export class ProjectFileManager {
 
       // Remove category from all products that reference it
       const products = this.db.prepare('SELECT id, category FROM products WHERE category IS NOT NULL').all() as any[];
-      
+
       for (const product of products) {
         try {
           const categoryIds = JSON.parse(product.category) as string[];
           const updatedCategoryIds = categoryIds.filter(catId => catId !== id);
-          
+
           const updateStmt = this.db.prepare('UPDATE products SET category = ? WHERE id = ?');
           updateStmt.run(
             updatedCategoryIds.length > 0 ? JSON.stringify(updatedCategoryIds) : null,
@@ -825,13 +825,13 @@ export class ProjectFileManager {
     try {
       const id = uuidv4();
       const now = new Date().toISOString();
-      
+
       const stmt = this.db.prepare(`
         INSERT INTO locations (id, name, created_at) VALUES (?, ?, ?)
       `);
-      
+
       stmt.run(id, name.trim(), now);
-      
+
       return {
         id,
         name: name.trim(),
@@ -863,9 +863,9 @@ export class ProjectFileManager {
       const stmt = this.db.prepare(`
         UPDATE locations SET name = ? WHERE id = ?
       `);
-      
+
       stmt.run(name.trim(), id);
-      
+
       return {
         id,
         name: name.trim(),
@@ -896,12 +896,12 @@ export class ProjectFileManager {
 
       // Remove location from all products that reference it
       const products = this.db.prepare('SELECT id, location FROM products WHERE location IS NOT NULL').all() as any[];
-      
+
       for (const product of products) {
         try {
           const locationIds = JSON.parse(product.location) as string[];
           const updatedLocationIds = locationIds.filter(locId => locId !== id);
-          
+
           const updateStmt = this.db.prepare('UPDATE products SET location = ? WHERE id = ?');
           updateStmt.run(
             updatedLocationIds.length > 0 ? JSON.stringify(updatedLocationIds) : null,
@@ -954,7 +954,7 @@ export class ProjectFileManager {
 
       // Initialize database
       this.db = await this.initializeDatabase(projectPath);
-      
+
       // Apply latest schema (ensures new projects have all columns)
       await this.migrateDatabase(this.db);
 
@@ -990,7 +990,7 @@ export class ProjectFileManager {
 
       // Initialize database (this will create tables if they don't exist)
       this.db = await this.initializeDatabase(projectPath);
-      
+
       // Run migrations for existing projects
       await this.migrateDatabase(this.db);
 
@@ -1081,7 +1081,7 @@ export class ProjectFileManager {
   private parseProductRow(row: any): Product {
     // First apply field name mappings
     const mappedRow = mapDbRowToInterface(row);
-    
+
     // Then parse JSON fields and ensure correct types
     return {
       id: mappedRow.id,
@@ -1095,12 +1095,12 @@ export class ProjectFileManager {
       productName: mappedRow.productName,
       manufacturer: mappedRow.manufacturer || undefined,
       price: mappedRow.price || undefined,
-      
+
       // Asset fields now properly mapped from snake_case
       primaryImageHash: mappedRow.primaryImageHash || undefined,
       primaryThumbnailHash: mappedRow.primaryThumbnailHash || undefined,
       additionalImagesHashes: this.parseJsonArray(mappedRow.additionalImagesHashes),
-      
+
       createdAt: new Date(mappedRow.createdAt),
       updatedAt: new Date(mappedRow.updatedAt)
     };
