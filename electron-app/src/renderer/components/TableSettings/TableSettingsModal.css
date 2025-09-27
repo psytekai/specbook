@@ -1297,10 +1297,6 @@
   min-width: 0;
 }
 
-.items-list {
-  /* Container for the items table */
-}
-
 .empty-state {
   padding: 40px 20px;
   text-align: center;
@@ -1350,11 +1346,6 @@
 .categories-settings .actions-header {
   justify-content: center;
   min-width: 80px;
-}
-
-.locations-settings .table-body,
-.categories-settings .table-body {
-  /* Container for table rows */
 }
 
 .locations-settings .table-row,
