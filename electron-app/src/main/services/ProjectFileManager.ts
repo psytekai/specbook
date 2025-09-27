@@ -76,7 +76,7 @@ export class ProjectFileManager {
           url TEXT NOT NULL,
           tag_id TEXT NOT NULL,
           location TEXT NOT NULL,
-          type TEXT,
+          description TEXT,
           specification_description TEXT,
           category TEXT NOT NULL,
           product_name TEXT NOT NULL,
