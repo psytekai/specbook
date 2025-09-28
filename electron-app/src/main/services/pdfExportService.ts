@@ -11,6 +11,7 @@ import {
   PDFLayoutConfig,
   DEFAULT_PDF_LAYOUT 
 } from '../../shared/types/exportTypes';
+import { EXPORT_CONFIG } from '../../shared/config/exportConfig';
 
 export class PDFExportService {
   private layout: PDFLayoutConfig;
@@ -216,7 +217,7 @@ export class PDFExportService {
     const totalProducts = groupedData.reduce((sum, group) => sum + group.totalCount, 0);
     
     // Title
-    doc.fontSize(20)
+    doc.fontSize(EXPORT_CONFIG.layout.fonts.title)
        .font(this.layout.fonts.header)
        .fillColor(this.layout.colors.primary)
        .text('Product Export Report', this.layout.margins.left, this.layout.margins.top);
@@ -267,7 +268,7 @@ export class PDFExportService {
        .fillColor('#f8fafc')
        .fill();
 
-    doc.fontSize(9)
+    doc.fontSize(EXPORT_CONFIG.layout.fonts.header)
        .font(this.layout.fonts.header)
        .fillColor(this.layout.colors.text);
 
@@ -282,7 +283,7 @@ export class PDFExportService {
   private async addProductRow(doc: PDFKit.PDFDocument, product: ProductForExport, config: PDFExportConfig, y: number): Promise<number> {
     const visibleColumns = config.columns.filter(col => col.visible);
     let x = this.layout.margins.left;
-    const rowHeight = this.layout.spacing.rowHeight;
+    const rowHeight = EXPORT_CONFIG.layout.spacing.rowHeight;
 
     // Alternating row background
     doc.rect(this.layout.margins.left, y, 
@@ -291,7 +292,7 @@ export class PDFExportService {
        .fillColor('#ffffff')
        .fill();
 
-    doc.fontSize(8)
+    doc.fontSize(EXPORT_CONFIG.layout.fonts.body)
        .font(this.layout.fonts.body)
        .fillColor(this.layout.colors.text);
 
@@ -300,8 +301,10 @@ export class PDFExportService {
       const cellY = y + 5;
 
       if (column.key === 'image' && config.includeImages) {
-        // Add image placeholder or actual image
-        await this.addProductImage(doc, product, x + 5, cellY);
+        // Add image placeholder or actual image - center it in the cell
+        const imageX = x + (column.width - EXPORT_CONFIG.layout.image.width) / 2;
+        const imageY = y + (rowHeight - EXPORT_CONFIG.layout.image.height) / 2;
+        await this.addProductImage(doc, product, imageX, imageY);
       } else if (column.key === 'url') {
         // Add hyperlink
         doc.fillColor(this.layout.colors.primary)
@@ -401,9 +404,9 @@ export class PDFExportService {
           }
           // Successfully found an image, embed it
           doc.image(imagePath, x, y, {
-            width: this.layout.image.width,
-            height: this.layout.image.height,
-            fit: [this.layout.image.width, this.layout.image.height],
+            width: EXPORT_CONFIG.layout.image.width,
+            height: EXPORT_CONFIG.layout.image.height,
+            fit: [EXPORT_CONFIG.layout.image.width, EXPORT_CONFIG.layout.image.height],
             align: 'center',
             valign: 'center'
           });
@@ -425,16 +428,16 @@ export class PDFExportService {
 
   private addImagePlaceholder(doc: PDFKit.PDFDocument, x: number, y: number): void {
     // Add placeholder rectangle
-    doc.rect(x, y, this.layout.image.width, this.layout.image.height)
+    doc.rect(x, y, EXPORT_CONFIG.layout.image.width, EXPORT_CONFIG.layout.image.height)
        .fillColor('#f3f4f6')
        .fill()
        .strokeColor(this.layout.colors.border)
        .stroke();
 
     // Add placeholder text
-    doc.fontSize(6)
+    doc.fontSize(EXPORT_CONFIG.layout.fonts.small)
        .fillColor(this.layout.colors.secondary)
-       .text('IMG', x + 15, y + 20);
+       .text('IMG', x + EXPORT_CONFIG.layout.image.width/3, y + EXPORT_CONFIG.layout.image.height/2);
   }
 
   private addDocumentFooter(doc: PDFKit.PDFDocument): void {

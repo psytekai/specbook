@@ -6,6 +6,7 @@ import {
   PDFGenerationResult
 } from '../../../../shared/types/exportTypes';
 import { ExportService } from '../../../services/exportService';
+import { EXPORT_CONFIG, getVisibleColumns } from '../../../../shared/config/exportConfig';
 
 interface ExportSettingsProps {
   settings: ExportSettingsType;
@@ -13,14 +14,8 @@ interface ExportSettingsProps {
   onChange: (settings: ExportSettingsType) => void;
 }
 
-export const ExportSettings: React.FC<ExportSettingsProps> = ({ columns }) => {
-  const [pdfConfig, setPdfConfig] = useState<Partial<PDFExportConfig>>({
-    groupBy: 'category',
-    sortBy: 'name',
-    includeImages: true,
-    pageSize: 'A4',
-    orientation: 'portrait',
-  });
+export const ExportSettings: React.FC<ExportSettingsProps> = () => {
+  const [pdfConfig, setPdfConfig] = useState<Partial<PDFExportConfig>>(EXPORT_CONFIG.defaults);
   const [isExporting, setIsExporting] = useState(false);
   const [exportResult, setExportResult] = useState<PDFGenerationResult | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -37,27 +32,14 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({ columns }) => {
     try {
       const exportService = ExportService.getInstance();
       
-      // Prepare the export configuration with visible columns
-      // Always include essential columns even if not visible in table
-      const essentialColumns = ['productName', 'url', 'tagId'];
-      const allRequiredColumns = new Set<string>();
-      
-      // Add visible columns
-      Object.entries(columns)
-        .filter(([_, config]) => config.visible)
-        .forEach(([key, _]) => allRequiredColumns.add(key));
-      
-      // Ensure essential columns are included
-      essentialColumns.forEach(key => allRequiredColumns.add(key));
-      
-      const exportColumns = Array.from(allRequiredColumns).map(key => {
-        const columnConfig = columns[key];
-        return {
-          key,
-          label: columnConfig?.label || key,
-          visible: true,
-        };
-      });
+      // Use single source of truth for export configuration
+      const exportColumns = getVisibleColumns().map(col => ({
+        key: col.key,
+        label: col.label,
+        width: col.width,
+        visible: col.visible,
+        essential: col.essential,
+      }));
 
       const fullConfig = exportService.prepareExportConfig(pdfConfig, exportColumns, true);
       

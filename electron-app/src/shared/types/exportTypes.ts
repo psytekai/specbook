@@ -118,14 +118,14 @@ export const DEFAULT_PDF_LAYOUT: PDFLayoutConfig = {
     border: '#e2e8f0',
   },
   spacing: {
-    lineHeight: 1.4,
-    sectionGap: 20,
-    rowHeight: 60,
+    lineHeight: 1.2,
+    sectionGap: 15,
+    rowHeight: 45,
   },
   image: {
-    width: 50,
-    height: 50,
-    placeholder: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yNSAyMEMyNi4zODA3IDIwIDI3LjUgMTguODgwNyAyNy41IDE3LjVDMjcuNSAxNi4xMTkzIDI2LjM4MDcgMTUgMjUgMTVDMjMuNjE5MyAxNSAyMi41IDE2LjExOTMgMjIuNSAxNy41QzIyLjUgMTguODgwNyAyMy42MTkzIDIwIDI1IDIwWiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNMzUgMzVIMTVMMjAgMjVMMjUgMzBMMzAgMjBMMzUgMzVaIiBmaWxsPSIjOUNBM0FGIi8+Cjwvc3ZnPgo=',
+    width: 70,
+    height: 70,
+    placeholder: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzAiIGhlaWdodD0iNzAiIHZpZXdCb3g9IjAgMCA3MCA3MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjcwIiBoZWlnaHQ9IjcwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zNSAyOEMzNi45MzMgMjggMzguNSAyNi40MzMgMzguNSAyNC41QzM4LjUgMjIuNTY3IDM2LjkzMyAyMSAzNSAyMUMzMy4wNjcgMjEgMzEuNSAyMi41NjcgMzEuNSAyNC41QzMxLjUgMjYuNDMzIDMzLjA2NyAyOCAzNSAyOFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTQ5IDQ5SDIxTDI4IDM1TDM1IDQyTDQyIDI4TDQ5IDQ5WiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K',
   },
 };
 
