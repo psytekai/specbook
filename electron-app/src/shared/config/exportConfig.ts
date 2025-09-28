@@ -83,28 +83,47 @@ export function getEssentialColumns(): ExportColumnDefinition[] {
   return EXPORT_CONFIG.columns.filter(col => col.essential);
 }
 
-export function getTotalWidth(): number {
-  return getVisibleColumns().reduce((sum, col) => sum + col.width, 0);
-}
-
-export function validateConfiguration(orientation: 'portrait' | 'landscape' = 'portrait'): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
+export function getColumnsForGroupBy(groupBy: 'category' | 'location'): ExportColumnDefinition[] {
   const visibleColumns = getVisibleColumns();
   
-  if (visibleColumns.length === 0) {
+  // Filter out the column that matches the groupBy field to avoid redundancy
+  return visibleColumns.filter(col => {
+    if (groupBy === 'category' && col.key === 'category') {
+      return false; // Hide category column when grouping by category
+    }
+    if (groupBy === 'location' && col.key === 'location') {
+      return false; // Hide location column when grouping by location
+    }
+    return true;
+  });
+}
+
+export function getTotalWidth(groupBy?: 'category' | 'location'): number {
+  const columns = groupBy ? getColumnsForGroupBy(groupBy) : getVisibleColumns();
+  return columns.reduce((sum, col) => sum + col.width, 0);
+}
+
+export function validateConfiguration(
+  orientation: 'portrait' | 'landscape' = 'portrait',
+  groupBy?: 'category' | 'location'
+): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+  const columnsToCheck = groupBy ? getColumnsForGroupBy(groupBy) : getVisibleColumns();
+  
+  if (columnsToCheck.length === 0) {
     errors.push('At least one column must be visible');
   }
   
-  const totalWidth = getTotalWidth();
+  const totalWidth = getTotalWidth(groupBy);
   const maxWidth = orientation === 'landscape' ? 1250 : 1000;
   
   if (totalWidth > maxWidth) {
     errors.push(`Total width (${totalWidth}px) exceeds page width (${maxWidth}px)`);
   }
   
-  // Check essential columns
+  // Check essential columns (but exclude the grouped column from essential check)
   const essentialKeys = getEssentialColumns().map(col => col.key);
-  const visibleKeys = visibleColumns.map(col => col.key);
+  const visibleKeys = columnsToCheck.map(col => col.key);
   const missingEssential = essentialKeys.filter(key => !visibleKeys.includes(key));
   
   if (missingEssential.length > 0) {

@@ -6,7 +6,7 @@ import {
   PDFGenerationResult
 } from '../../../../shared/types/exportTypes';
 import { ExportService } from '../../../services/exportService';
-import { EXPORT_CONFIG, getVisibleColumns } from '../../../../shared/config/exportConfig';
+import { EXPORT_CONFIG, getColumnsForGroupBy } from '../../../../shared/config/exportConfig';
 
 interface ExportSettingsProps {
   settings: ExportSettingsType;
@@ -33,7 +33,9 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
       const exportService = ExportService.getInstance();
       
       // Use single source of truth for export configuration
-      const exportColumns = getVisibleColumns().map(col => ({
+      // Filter columns based on groupBy to avoid redundancy
+      const groupBy = pdfConfig.groupBy || EXPORT_CONFIG.defaults.groupBy;
+      const exportColumns = getColumnsForGroupBy(groupBy).map(col => ({
         key: col.key,
         label: col.label,
         width: col.width,

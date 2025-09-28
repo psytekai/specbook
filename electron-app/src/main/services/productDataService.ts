@@ -92,7 +92,7 @@ export class ProductDataService {
    * Validates export configuration using single source of truth
    */
   static validateExportConfig(config: PDFExportConfig): { valid: boolean; errors: string[] } {
-    return validateConfiguration(config.orientation);
+    return validateConfiguration(config.orientation, config.groupBy);
   }
 
   /**
