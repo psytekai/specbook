@@ -61,6 +61,10 @@ export interface ElectronAPI {
   onScrapeProgress: (callback: (progress: any) => void) => () => void;
   navigateToApiKeys: () => Promise<{ success: boolean; error?: string }>;
   setApiKeys: (keys: { openai: string; firecrawl: string }) => Promise<{ success: boolean; error?: string }>;
+
+  // PDF Export operations
+  exportToPDF: (request: any) => Promise<any>;
+  onExportProgress: (callback: (progress: any) => void) => () => void;
 }
 
 // Python Scraping Types
@@ -125,6 +129,9 @@ export interface PythonStatus {
   activeProcesses?: number;
   maxProcesses?: number;
 }
+
+// Re-export PDF export types
+export * from './types/exportTypes';
 
 declare global {
   interface Window {

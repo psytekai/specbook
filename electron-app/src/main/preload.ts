@@ -96,6 +96,30 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setApiKeys: (keys: { openai: string; firecrawl: string }) =>
     ipcRenderer.invoke('api-keys:set', keys),
 
+  // PDF Export operations
+  exportToPDF: (request: any) => ipcRenderer.invoke('export:pdf', request),
+  cancelExport: (exportId: string) => ipcRenderer.invoke('export:cancel', exportId),
+  getExportStatistics: (config: any) => ipcRenderer.invoke('export:getStatistics', config),
+  validateExportConfig: (config: any) => ipcRenderer.invoke('export:validateConfig', config),
+  getDefaultExportConfig: () => ipcRenderer.invoke('export:getDefaultConfig'),
+
+  onExportProgress: (callback: (data: any) => void) => {
+    const handler = (_event: any, data: any) => callback(data);
+    ipcRenderer.on('export:progress', handler);
+    // Return cleanup function
+    return () => {
+      ipcRenderer.removeListener('export:progress', handler);
+    };
+  },
+
+  onExportCompleted: (callback: (result: any) => void) => {
+    const handler = (_event: any, result: any) => callback(result);
+    ipcRenderer.on('export:completed', handler);
+    // Return cleanup function
+    return () => {
+      ipcRenderer.removeListener('export:completed', handler);
+    };
+  },
    
 });
 

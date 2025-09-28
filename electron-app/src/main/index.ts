@@ -6,6 +6,7 @@ import { setupProjectIPC } from './ipc/projectHandlers';
 import { setupAPIIPC } from './ipc/apiHandlers';
 import { setupAssetIPC } from './ipc/assetHandlers';
 import { setupPythonIPC } from './ipc/pythonHandlers';
+import { setupExportHandlers } from './handlers/exportHandlers';
 import { pythonBridge } from './services/PythonBridge';
 import { ProjectState } from './services/ProjectState';
 import { AssetManager } from './services/AssetManager';
@@ -94,6 +95,7 @@ app.whenReady().then(() => {
   setupProjectIPC();
   setupAPIIPC();
   setupAssetIPC();
+  setupExportHandlers();
   
   // Create window first to pass to Python IPC
   const mainWindow = createWindow();

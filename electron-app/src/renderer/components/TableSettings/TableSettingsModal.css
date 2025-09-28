@@ -21,6 +21,12 @@
   
   /* Animation Easing */
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* PDF Export Colors */
+  --pdf-primary: #dc2626;
+  --pdf-primary-light: rgba(220, 38, 38, 0.1);
+  --pdf-success: #16a34a;
+  --pdf-warning: #ea580c;
 }
 
 .table-settings-modal {
@@ -1488,4 +1494,199 @@
 .locations-settings .action-button.cancel:hover,
 .categories-settings .action-button.cancel:hover {
   background: var(--background-hover);
+}
+
+/* PDF Export Specific Styles */
+.control-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.control-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.control-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  margin-bottom: 0.375rem;
+}
+
+.control-select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  background: var(--background-primary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: all 0.2s var(--ease-smooth);
+}
+
+.control-select:focus {
+  outline: none;
+  border-color: var(--accent-vibrant);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+
+.control-description {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+/* Export Statistics */
+.export-stats {
+  background: var(--surface-overlay);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.stat-value {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.group-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.group-item {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding: 0.25rem 0.5rem;
+  background: var(--background-secondary);
+  border-radius: 0.375rem;
+}
+
+.group-more {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Export Progress */
+.export-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-left: 0.75rem;
+}
+
+.progress-bar {
+  width: 200px;
+  height: 4px;
+  background: var(--border-color);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--pdf-primary), var(--pdf-success));
+  border-radius: 2px;
+  transition: width 0.3s var(--ease-smooth);
+}
+
+.progress-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.progress-stage {
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.progress-message {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.progress-item {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* PDF Export Button Styling */
+.export-button.pdf {
+  background: linear-gradient(135deg, var(--pdf-primary), #b91c1c);
+  color: white;
+  border: none;
+}
+
+.export-button.pdf:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b91c1c, #991b1b);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.export-button.pdf:disabled {
+  background: var(--background-disabled);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+/* Enhanced Export Status */
+.export-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--surface-overlay);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  margin-top: 1rem;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-top: 2px solid var(--pdf-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
