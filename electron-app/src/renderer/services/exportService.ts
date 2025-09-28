@@ -3,7 +3,7 @@ import {
   PDFExportRequest, 
   PDFGenerationResult,
   PDFGenerationProgress 
-} from '../../../shared/types/exportTypes';
+} from '../../shared/types/exportTypes';
 
 export class ExportService {
   private static instance: ExportService;
@@ -164,7 +164,11 @@ export class ExportService {
     visibleColumns: Array<{ key: string; label: string; visible: boolean }>,
     includeHeaders: boolean = true
   ): Partial<PDFExportConfig> {
-    const columns = visibleColumns
+    const orientation = baseConfig.orientation || 'portrait';
+    const maxWidth = orientation === 'landscape' ? 750 : 500;
+    
+    // Get initial column widths
+    let columns = visibleColumns
       .filter(col => col.visible)
       .map(col => ({
         key: col.key,
@@ -173,6 +177,18 @@ export class ExportService {
         visible: true,
         essential: this.isEssentialColumn(col.key),
       }));
+
+    // Calculate total width and adjust if necessary
+    const totalWidth = columns.reduce((sum, col) => sum + col.width, 0);
+    
+    if (totalWidth > maxWidth) {
+      // Scale down all column widths proportionally
+      const scaleFactor = maxWidth / totalWidth;
+      columns = columns.map(col => ({
+        ...col,
+        width: Math.floor(col.width * scaleFactor),
+      }));
+    }
 
     return {
       groupBy: 'category',
@@ -192,19 +208,19 @@ export class ExportService {
    */
   private getColumnWidth(columnKey: string): number {
     const widthMap: Record<string, number> = {
-      image: 70,
-      productName: 200,
-      type: 100,
-      specificationDescription: 250,
-      url: 60,
-      tagId: 80,
-      manufacturer: 120,
-      price: 80,
-      category: 120,
-      location: 120,
+      image: 50,
+      productName: 120,
+      type: 80,
+      specificationDescription: 150,
+      url: 40,
+      tagId: 60,
+      manufacturer: 80,
+      price: 60,
+      category: 80,
+      location: 80,
     };
 
-    return widthMap[columnKey] || 100;
+    return widthMap[columnKey] || 80;
   }
 
   /**

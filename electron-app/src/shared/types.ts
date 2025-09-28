@@ -62,9 +62,18 @@ export interface ElectronAPI {
   navigateToApiKeys: () => Promise<{ success: boolean; error?: string }>;
   setApiKeys: (keys: { openai: string; firecrawl: string }) => Promise<{ success: boolean; error?: string }>;
 
+  // File system operations
+  openPath: (path: string) => Promise<{ success: boolean; error?: string }>;
+  showItemInFolder: (path: string) => Promise<{ success: boolean; error?: string }>;
+
   // PDF Export operations
   exportToPDF: (request: any) => Promise<any>;
+  cancelExport: (exportId: string) => Promise<boolean>;
+  getExportStatistics: (config: any) => Promise<any>;
+  validateExportConfig: (config: any) => Promise<{ valid: boolean; errors: string[] }>;
+  getDefaultExportConfig: () => Promise<any>;
   onExportProgress: (callback: (progress: any) => void) => () => void;
+  onExportCompleted: (callback: (result: any) => void) => () => void;
 }
 
 // Python Scraping Types

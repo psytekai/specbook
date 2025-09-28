@@ -96,6 +96,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setApiKeys: (keys: { openai: string; firecrawl: string }) =>
     ipcRenderer.invoke('api-keys:set', keys),
 
+  // File system operations
+  openPath: (path: string) => ipcRenderer.invoke('shell:open-path', path),
+  showItemInFolder: (path: string) => ipcRenderer.invoke('shell:show-item-in-folder', path),
+
   // PDF Export operations
   exportToPDF: (request: any) => ipcRenderer.invoke('export:pdf', request),
   cancelExport: (exportId: string) => ipcRenderer.invoke('export:cancel', exportId),

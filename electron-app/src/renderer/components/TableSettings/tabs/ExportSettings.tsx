@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { ExportSettings as ExportSettingsType, ColumnConfig } from '../types';
 import { 
   PDFExportConfig, 
-  PDF_EXPORT_OPTIONS
+  PDF_EXPORT_OPTIONS,
+  PDFGenerationResult
 } from '../../../../shared/types/exportTypes';
+import { ExportService } from '../../../services/exportService';
 
 interface ExportSettingsProps {
   settings: ExportSettingsType;
@@ -11,7 +13,7 @@ interface ExportSettingsProps {
   onChange: (settings: ExportSettingsType) => void;
 }
 
-export const ExportSettings: React.FC<ExportSettingsProps> = () => {
+export const ExportSettings: React.FC<ExportSettingsProps> = ({ columns }) => {
   const [pdfConfig, setPdfConfig] = useState<Partial<PDFExportConfig>>({
     groupBy: 'category',
     sortBy: 'name',
@@ -20,6 +22,8 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
     orientation: 'portrait',
   });
   const [isExporting, setIsExporting] = useState(false);
+  const [exportResult, setExportResult] = useState<PDFGenerationResult | null>(null);
+  const [showResult, setShowResult] = useState(false);
 
   const handlePDFConfigChange = (updates: Partial<PDFExportConfig>) => {
     setPdfConfig(prev => ({ ...prev, ...updates }));
@@ -27,22 +31,73 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
 
   const handleExport = async () => {
     setIsExporting(true);
+    setExportResult(null);
+    setShowResult(false);
+    
     try {
-      // TODO: Implement PDF export functionality
-      // This would typically call the electron API to export PDF
-      console.log('Exporting PDF with config:', pdfConfig);
+      const exportService = ExportService.getInstance();
       
-      // Simulate export process
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Prepare the export configuration with visible columns
+      // Always include essential columns even if not visible in table
+      const essentialColumns = ['productName', 'url', 'tagId'];
+      const allRequiredColumns = new Set<string>();
       
-      // TODO: Show success message or handle result
-      alert('PDF export completed successfully!');
+      // Add visible columns
+      Object.entries(columns)
+        .filter(([_, config]) => config.visible)
+        .forEach(([key, _]) => allRequiredColumns.add(key));
+      
+      // Ensure essential columns are included
+      essentialColumns.forEach(key => allRequiredColumns.add(key));
+      
+      const exportColumns = Array.from(allRequiredColumns).map(key => {
+        const columnConfig = columns[key];
+        return {
+          key,
+          label: columnConfig?.label || key,
+          visible: true,
+        };
+      });
+
+      const fullConfig = exportService.prepareExportConfig(pdfConfig, exportColumns, true);
+      
+      // Call the export service (this will show the file save dialog)
+      const result = await exportService.exportToPDF(fullConfig as PDFExportConfig);
+      
+      setExportResult(result);
+      setShowResult(true);
+      
     } catch (error) {
       console.error('Export failed:', error);
-      alert('Export failed. Please try again.');
+      setExportResult({
+        success: false,
+        error: error instanceof Error ? error.message : 'Export failed. Please try again.',
+        metadata: {
+          pageCount: 0,
+          fileSize: 0,
+          generationTime: 0,
+          productCount: 0,
+          groupCount: 0,
+        },
+      });
+      setShowResult(true);
     } finally {
       setIsExporting(false);
     }
+  };
+
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const formatDuration = (ms: number): string => {
+    if (ms < 1000) return `${ms}ms`;
+    return `${(ms / 1000).toFixed(1)}s`;
   };
 
   return (
@@ -139,6 +194,59 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
             {isExporting ? 'Exporting...' : 'Export PDF'}
           </button>
         </div>
+
+        {/* Export Result */}
+        {showResult && exportResult && (
+          <div className={`export-result ${exportResult.success ? 'success' : 'error'}`}>
+            {exportResult.success ? (
+              <div className="export-success">
+                <div className="success-header">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 12l2 2 4-4"/>
+                    <circle cx="10" cy="10" r="9"/>
+                  </svg>
+                  <h4>Export Completed Successfully!</h4>
+                </div>
+                
+                <div className="export-details">
+                  <div className="detail-row">
+                    <span className="detail-label">File:</span>
+                    <span className="detail-value">{exportResult.filePath}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Products:</span>
+                    <span className="detail-value">{exportResult.metadata.productCount}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Pages:</span>
+                    <span className="detail-value">{exportResult.metadata.pageCount}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">File Size:</span>
+                    <span className="detail-value">{formatFileSize(exportResult.metadata.fileSize)}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Generation Time:</span>
+                    <span className="detail-value">{formatDuration(exportResult.metadata.generationTime)}</span>
+                  </div>
+                </div>
+
+              </div>
+            ) : (
+              <div className="export-error">
+                <div className="error-header">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="10" cy="10" r="9"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                  <h4>Export Failed</h4>
+                </div>
+                <p className="error-message">{exportResult.error}</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
