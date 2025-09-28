@@ -10,7 +10,7 @@ export interface ColumnConfig {
 }
 
 export interface ExportSettings {
-  defaultFormat: 'csv' | 'excel' | 'pdf';
+  defaultFormat: 'pdf';
   includeHeaders: boolean;
   includeFilters: boolean;
   dateFormat: string;
@@ -18,7 +18,7 @@ export interface ExportSettings {
 }
 
 export interface ExportConfig {
-  format: 'csv' | 'excel' | 'pdf';
+  format: 'pdf';
   columns: string[];
   includeHeaders: boolean;
   includeFilters: boolean;

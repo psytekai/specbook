@@ -98,7 +98,7 @@ const createDefaultColumns = (): Record<string, ColumnConfig> => ({
 
 
 const createDefaultExportSettings = (): ExportSettings => ({
-  defaultFormat: 'csv',
+  defaultFormat: 'pdf',
   includeHeaders: true,
   includeFilters: true,
   dateFormat: 'YYYY-MM-DD'
