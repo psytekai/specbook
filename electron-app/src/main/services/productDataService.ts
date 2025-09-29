@@ -6,7 +6,15 @@ export class ProductDataService {
   /**
    * Converts Product objects to ProductForExport format
    */
-  static convertProductsForExport(products: Product[]): ProductForExport[] {
+  static convertProductsForExport(
+    products: Product[], 
+    categories: Array<{id: string, name: string}> = [], 
+    locations: Array<{id: string, name: string}> = []
+  ): ProductForExport[] {
+    // Create lookup maps for efficient ID to name resolution
+    const categoryMap = new Map(categories.map(cat => [cat.id, cat.name]));
+    const locationMap = new Map(locations.map(loc => [loc.id, loc.name]));
+
     return products.map(product => ({
       id: product.id,
       productName: product.productName,
@@ -14,13 +22,24 @@ export class ProductDataService {
       specificationDescription: product.specificationDescription,
       url: product.url,
       tagId: product.tagId,
-      category: product.category,
-      location: product.location,
+      category: this.resolveIdsToNames(product.category, categoryMap),
+      location: this.resolveIdsToNames(product.location, locationMap),
       manufacturer: product.manufacturer,
       price: product.price,
       primaryImageHash: product.primaryImageHash,
       primaryThumbnailHash: product.primaryThumbnailHash,
     }));
+  }
+
+  /**
+   * Helper method to resolve ID arrays to name arrays
+   */
+  private static resolveIdsToNames(ids: string[] | undefined, nameMap: Map<string, string>): string[] {
+    if (!ids || !Array.isArray(ids)) {
+      return [];
+    }
+    
+    return ids.map(id => nameMap.get(id) || id); // Fallback to ID if name not found
   }
 
   /**
