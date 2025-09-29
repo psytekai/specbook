@@ -13,6 +13,10 @@ import type {
   ProjectFileManagerOptions
 } from '../types/project.types';
 
+import { logger } from '../../shared/logging/Logger';
+
+var log = logger.for('ProjectFileManager');
+
 /**
  * ProjectFileManager handles all file-based operations for .specbook projects
  * including database management, file structure creation, and CRUD operations.
@@ -65,59 +69,7 @@ export class ProjectFileManager {
       // Create database connection
       const db = new Database(dbPath);
 
-      // Enable foreign keys
-      db.exec('PRAGMA foreign_keys = ON');
-
-      // Create products table
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS products (
-          id TEXT PRIMARY KEY,
-          project_id TEXT NOT NULL,
-          url TEXT NOT NULL,
-          tag_id TEXT NOT NULL,
-          location TEXT,
-          description TEXT,
-          specification_description TEXT,
-          category TEXT,
-          product_name TEXT NOT NULL,
-          manufacturer TEXT,
-          price REAL,
-          primary_image_hash TEXT,
-          primary_thumbnail_hash TEXT,
-          additional_images_hashes TEXT,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      // Create categories table
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS categories (
-          id TEXT PRIMARY KEY,
-          name TEXT UNIQUE NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      // Create locations table
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS locations (
-          id TEXT PRIMARY KEY,
-          name TEXT UNIQUE NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      // Create update trigger for products
-      db.exec(`
-        CREATE TRIGGER IF NOT EXISTS update_products_timestamp 
-        AFTER UPDATE ON products
-        BEGIN
-          UPDATE products SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
-        END
-      `);
-
-      console.log(`Initialized database at: ${dbPath}`);
+      log.info(`Initialized database at: ${dbPath}`);
       return db;
     } catch (error) {
       throw new Error(`Failed to initialize database: ${error}`);
@@ -131,16 +83,17 @@ export class ProjectFileManager {
     try {
       // Apply versioned migrations
       const currentVersion = this.getSchemaVersion(db);
+      log.info('Current schema version:', {currentVersion});
       const targetVersion = 2; // Latest schema version
 
       for (let version = currentVersion + 1; version <= targetVersion; version++) {
-        console.log(`Applying migration version ${version}...`);
+        log.info(`Applying migration version ${version}...`);
         this.applyMigration(db, version);
       }
 
-      console.log('Database migration completed successfully');
+      log.info('Database migration completed successfully');
     } catch (error) {
-      console.error('Database migration failed:', error);
+      log.error('Database migration failed:', {error});
       throw new Error(`Failed to migrate database: ${error}`);
     }
   }
@@ -165,16 +118,16 @@ export class ProjectFileManager {
         `);
 
         // Insert initial version
-        db.prepare('INSERT INTO schema_version (version) VALUES (?)').run(1);
-        return 1;
+        db.prepare('INSERT INTO schema_version (version) VALUES (?)').run(0);
+        return 0;
       }
 
       // Get current version
       const result = db.prepare('SELECT MAX(version) as version FROM schema_version').get() as {version: number};
-      return result?.version || 1;
+      return result?.version || 0;
     } catch (error) {
-      console.error('Error getting schema version:', error);
-      return 1;
+      log.error('Error getting schema version:', {error});
+      return 0;
     }
   }
 
@@ -184,6 +137,58 @@ export class ProjectFileManager {
   applyMigration(db: Database.Database, version: number): void {
     const migrations: Record<number, () => void> = {
       1: () => {
+          // Enable foreign keys
+        db.exec('PRAGMA foreign_keys = ON');
+
+        // Create products table
+        db.exec(`
+          CREATE TABLE IF NOT EXISTS products (
+            id TEXT PRIMARY KEY,
+            project_id TEXT NOT NULL,
+            url TEXT NOT NULL,
+            tag_id TEXT NOT NULL,
+            location TEXT,
+            description TEXT,
+            specification_description TEXT,
+            category TEXT,
+            product_name TEXT NOT NULL,
+            manufacturer TEXT,
+            price REAL,
+            primary_image_hash TEXT,
+            primary_thumbnail_hash TEXT,
+            additional_images_hashes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+
+        // Create categories table
+        db.exec(`
+          CREATE TABLE IF NOT EXISTS categories (
+            id TEXT PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+
+        // Create locations table
+        db.exec(`
+          CREATE TABLE IF NOT EXISTS locations (
+            id TEXT PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+
+        // Create update trigger for products
+        db.exec(`
+          CREATE TRIGGER IF NOT EXISTS update_products_timestamp 
+          AFTER UPDATE ON products
+          BEGIN
+            UPDATE products SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+          END
+        `);
+
         // Migration: Add asset management columns and tables
         console.log('Adding asset management columns and tables...');
 
