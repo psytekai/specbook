@@ -180,8 +180,8 @@ const ProjectPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category'>(storedState.sortBy || 'date');
   const [filters, setFilters] = useState(storedState.filters || {
     search: '',
-    category: '',
-    location: '',
+    category: '',  // This will now store category ID
+    location: '',  // This will now store location ID
     manufacturer: ''
   });
   const [pagination, setPagination] = useState(storedState.pagination || {
@@ -404,10 +404,6 @@ const ProjectPage: React.FC = () => {
     return Array.isArray(product.location) ? product.location.length : 1;
   };
 
-  // Get unique values for filter dropdowns from all available data
-  const uniqueCategories = categories.map(cat => cat.name).sort();
-  const uniqueLocations = locations.map(loc => loc.name).sort();
-  
   // For manufacturers, we'll need to get this from the backend as well
   // For now, we'll use what we have in the current page
   const uniqueManufacturers = [...new Set(products.map(p => p.manufacturer).filter(Boolean))].sort();
@@ -523,7 +519,7 @@ const ProjectPage: React.FC = () => {
           </div>
         </div>
 
-        {!loading && !error && products.length > 0 && (
+        {!loading && !error && (
           <div className="controls-bar">
             <div className="sort-controls">
               <div className="control-group">
@@ -564,8 +560,8 @@ const ProjectPage: React.FC = () => {
                   onChange={(e) => updateFilters('category', e.target.value)}
                 >
                   <option value="">All</option>
-                  {uniqueCategories.map(category => (
-                    <option key={category} value={category}>{category}</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>{category.name}</option>
                   ))}
                 </select>
               </div>
@@ -578,8 +574,8 @@ const ProjectPage: React.FC = () => {
                   onChange={(e) => updateFilters('location', e.target.value)}
                 >
                   <option value="">All</option>
-                  {uniqueLocations.map(location => (
-                    <option key={location} value={location}>{location}</option>
+                  {locations.map(location => (
+                    <option key={location.id} value={location.id}>{location.name}</option>
                   ))}
                 </select>
               </div>
@@ -698,13 +694,27 @@ const ProjectPage: React.FC = () => {
           </div>
         ) : products.length === 0 ? (
           <div className="empty-state">
-            <p>No products in this project yet.</p>
-            <button 
-              className="button button-primary"
-              onClick={() => navigate('/project/products/new')}
-            >
-              Add First Product
-            </button>
+            {(filters.search || filters.category || filters.location || filters.manufacturer) ? (
+              <>
+                <p>No products match the current filters.</p>
+                <button 
+                  className="button button-secondary"
+                  onClick={clearFilters}
+                >
+                  Clear Filters
+                </button>
+              </>
+            ) : (
+              <>
+                <p>No products in this project yet.</p>
+                <button 
+                  className="button button-primary"
+                  onClick={() => navigate('/project/products/new')}
+                >
+                  Add First Product
+                </button>
+              </>
+            )}
           </div>
         ) : viewMode === 'grid' ? (
           <div className="products-container">
