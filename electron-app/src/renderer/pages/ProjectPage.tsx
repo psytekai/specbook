@@ -665,15 +665,6 @@ const ProjectPage: React.FC = () => {
             </div>
             <div className="bulk-actions-buttons">
               <button 
-                className="bulk-action-button secondary"
-                onClick={() => {
-                  // TODO: Implement bulk export
-                  console.log('Exporting selected products:', Array.from(selectedProducts));
-                }}
-              >
-                Export
-              </button>
-              <button 
                 className="bulk-action-button danger"
                 onClick={handleBulkDelete}
               >
@@ -863,7 +854,11 @@ const ProjectPage: React.FC = () => {
                                 case 'image':
                                   return (
                                     <td key={column.key} className="image-cell">
-                                      <div className="list-product-image">
+                                      <div 
+                                        className="list-product-image"
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => navigate(`/project/products/${product.id}`)}
+                                      >
                                         <img 
                                           src={getProductImageUrl(product) || getPlaceholderImage()} 
                                           alt={product.type || 'Product image'}
@@ -874,7 +869,12 @@ const ProjectPage: React.FC = () => {
                                 case 'tagId':
                                   return (
                                     <td key={column.key} className="tagid-cell">
-                                      <span>{product.tagId}</span>
+                                      <span 
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => navigate(`/project/products/${product.id}`)}
+                                      >
+                                        {product.tagId}
+                                      </span>
                                     </td>
                                   );
                                 case 'productName':
