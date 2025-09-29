@@ -273,8 +273,10 @@ const ProductPage: React.FC = () => {
                       type="button"
                       className="image-delete-btn"
                       onClick={() => {
-                        updateProductField('primaryImageHash', null);
-                        updateProductField('primaryThumbnailHash', null);
+                        if (confirm('Are you sure you want to remove this image?')) {
+                          updateProductField('primaryImageHash', null);
+                          updateProductField('primaryThumbnailHash', null);
+                        }
                       }}
                       aria-label="Remove image"
                     >
@@ -373,7 +375,7 @@ const ProductPage: React.FC = () => {
             </div>
 
             <div className="detail-section">
-              <h2>Description</h2>
+              <h2>Type</h2>
               <EditableSection
                 label="Product Type"
                 value={product.type}

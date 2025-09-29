@@ -13,7 +13,7 @@ import './ProjectPage.css';
 interface ProjectPageState {
   viewMode: 'grid' | 'list';
   groupBy: 'none' | 'location' | 'category' | 'manufacturer';
-  sortBy: 'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category';
+  sortBy: 'name' | 'date' | 'manufacturer' | 'price' | 'tagId';
   visibleColumns: {
     select: boolean;
     image: boolean;
@@ -61,8 +61,8 @@ const getStoredState = (): Partial<ProjectPageState> => {
       validatedState.groupBy = parsed.groupBy;
     }
     
-    if (parsed.sortBy === 'name' || parsed.sortBy === 'date' || parsed.sortBy === 'location' || 
-        parsed.sortBy === 'manufacturer' || parsed.sortBy === 'price' || parsed.sortBy === 'category') {
+    if (parsed.sortBy === 'name' || parsed.sortBy === 'date' || 
+        parsed.sortBy === 'manufacturer' || parsed.sortBy === 'price' || parsed.sortBy === 'tagId') {
       validatedState.sortBy = parsed.sortBy;
     }
     
@@ -157,6 +157,7 @@ const ProjectPage: React.FC = () => {
   const navigate = useNavigate();
   const { project, isLoading: projectLoading, isInitializing } = useElectronProject();
   const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]); // For grouping
   const [categories, setCategories] = useState<Category[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
@@ -177,11 +178,11 @@ const ProjectPage: React.FC = () => {
   const storedState = getStoredState();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(storedState.viewMode || 'list');
   const [groupBy, setGroupBy] = useState<'none' | 'location' | 'category' | 'manufacturer'>(storedState.groupBy || 'none');
-  const [sortBy, setSortBy] = useState<'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category'>(storedState.sortBy || 'date');
+  const [sortBy, setSortBy] = useState<'name' | 'date' | 'manufacturer' | 'price' | 'tagId'>(storedState.sortBy || 'date');
   const [filters, setFilters] = useState(storedState.filters || {
     search: '',
-    category: '',
-    location: '',
+    category: '',  // This will now store category ID
+    location: '',  // This will now store location ID
     manufacturer: ''
   });
   const [pagination, setPagination] = useState(storedState.pagination || {
@@ -224,12 +225,15 @@ const ProjectPage: React.FC = () => {
       setLoading(true);
       setError(null);
       
+      // Determine if we need all products for grouping
+      const needsAllProducts = groupBy !== 'none';
+      
       // Build API parameters
       const params = {
-        page: pagination.page,
-        limit: pagination.limit,
+        page: needsAllProducts ? undefined : pagination.page,
+        limit: needsAllProducts ? undefined : pagination.limit,
+        fetchAll: needsAllProducts,
         sortBy,
-        groupBy: groupBy !== 'none' ? groupBy : undefined,
         ...filters
       };
 
@@ -241,11 +245,19 @@ const ProjectPage: React.FC = () => {
       ]);
       
       if (productsResponse.success && productsResponse.data && productsResponse.pagination) {
-        setProducts(productsResponse.data);
-        setPaginationInfo({
-          total: productsResponse.pagination.total,
-          pages: productsResponse.pagination.pages
-        });
+        if (needsAllProducts) {
+          // Store all products for grouping
+          setAllProducts(productsResponse.data);
+          setProducts([]); // Clear paginated products
+        } else {
+          // Store paginated products
+          setProducts(productsResponse.data);
+          setAllProducts([]); // Clear all products
+          setPaginationInfo({
+            total: productsResponse.pagination.total,
+            pages: productsResponse.pagination.pages
+          });
+        }
       } else {
         throw new Error('Failed to fetch products');
       }
@@ -348,7 +360,7 @@ const ProjectPage: React.FC = () => {
     }
   };
 
-  const updateSortBy = (sort: 'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category') => {
+  const updateSortBy = (sort: 'name' | 'date' | 'manufacturer' | 'price' | 'tagId') => {
     setSortBy(sort);
     if (isInitialized) {
       saveState({ sortBy: sort });
@@ -404,13 +416,60 @@ const ProjectPage: React.FC = () => {
     return Array.isArray(product.location) ? product.location.length : 1;
   };
 
-  // Get unique values for filter dropdowns from all available data
-  const uniqueCategories = categories.map(cat => cat.name).sort();
-  const uniqueLocations = locations.map(loc => loc.name).sort();
-  
+  // Frontend grouping function
+  const groupProducts = (productsToGroup: Product[], groupByField: 'location' | 'category' | 'manufacturer') => {
+    const groups: Record<string, Product[]> = {};
+
+    productsToGroup.forEach(product => {
+      let groupKeys: string[] = [];
+
+      switch (groupByField) {
+        case 'location':
+          const locations = Array.isArray(product.location) ? product.location : [product.location].filter(Boolean);
+          if (locations.length === 0) {
+            groupKeys = ['No Location'];
+          } else {
+            groupKeys = locations.map(locationId => getLocationName(locationId));
+          }
+          break;
+        case 'category':
+          const categories = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean);
+          if (categories.length === 0) {
+            groupKeys = ['No Category'];
+          } else {
+            groupKeys = categories.map(categoryId => getCategoryName(categoryId));
+          }
+          break;
+        case 'manufacturer':
+          groupKeys = [product.manufacturer || 'No Manufacturer'];
+          break;
+        default:
+          groupKeys = ['Other'];
+      }
+
+      // Add product to each group it belongs to
+      groupKeys.forEach(groupKey => {
+        if (!groups[groupKey]) {
+          groups[groupKey] = [];
+        }
+        groups[groupKey].push(product);
+      });
+    });
+
+    // Sort groups alphabetically and return as sorted object
+    const sortedGroupKeys = Object.keys(groups).sort((a, b) => a.localeCompare(b));
+    const sortedGroups: Record<string, Product[]> = {};
+    sortedGroupKeys.forEach(key => {
+      sortedGroups[key] = groups[key];
+    });
+
+    return sortedGroups;
+  };;
+
   // For manufacturers, we'll need to get this from the backend as well
-  // For now, we'll use what we have in the current page
-  const uniqueManufacturers = [...new Set(products.map(p => p.manufacturer).filter(Boolean))].sort();
+  // For now, we'll use what we have in the current data
+  const dataForFilters = groupBy === 'none' ? products : allProducts;
+  const uniqueManufacturers = [...new Set(dataForFilters.map(p => p.manufacturer).filter(Boolean))].sort();
 
   // Selection handlers
   const handleSelectProduct = (productId: string, checked: boolean) => {
@@ -467,11 +526,43 @@ const ProjectPage: React.FC = () => {
     }
   }, [selectedProducts, fetchData]);
   
-  // Since backend handles grouping, we just display the products as returned
-  // The backend will return products already filtered, sorted, and grouped
-  const organizedProducts = groupBy === 'none' 
-    ? { 'All Products': products }
-    : { [groupBy]: products }; // Backend should handle proper grouping
+  // Determine which products to display and how to organize them
+  const getDisplayData = () => {
+    if (groupBy === 'none') {
+      // Use backend-paginated products
+      return {
+        organizedProducts: { 'All Products': products },
+        currentPaginationInfo: paginationInfo
+      };
+    } else {
+      // Use frontend grouping and pagination
+      const grouped = groupProducts(allProducts, groupBy as 'location' | 'category' | 'manufacturer');
+      
+      // Apply frontend pagination
+      const startIdx = (pagination.page - 1) * pagination.limit;
+      const endIdx = startIdx + pagination.limit;
+      
+      // Flatten all grouped products to apply pagination
+      const allGroupedProducts = Object.values(grouped).flat();
+      const paginatedProducts = allGroupedProducts.slice(startIdx, endIdx);
+      
+      // Re-group the paginated products for display
+      const paginatedGrouped = groupProducts(paginatedProducts, groupBy as 'location' | 'category' | 'manufacturer');
+      
+      // Calculate pagination info for grouped data
+      const frontendPaginationInfo = {
+        total: allGroupedProducts.length,
+        pages: Math.ceil(allGroupedProducts.length / pagination.limit)
+      };
+      
+      return {
+        organizedProducts: paginatedGrouped,
+        currentPaginationInfo: frontendPaginationInfo
+      };
+    }
+  };
+
+  const { organizedProducts, currentPaginationInfo } = getDisplayData();
 
   // Mark component as initialized after first render
   useEffect(() => {
@@ -523,7 +614,7 @@ const ProjectPage: React.FC = () => {
           </div>
         </div>
 
-        {!loading && !error && products.length > 0 && (
+        {!loading && !error && (
           <div className="controls-bar">
             <div className="sort-controls">
               <div className="control-group">
@@ -545,14 +636,13 @@ const ProjectPage: React.FC = () => {
                 <select
                   className="control-select"
                   value={sortBy}
-                  onChange={(e) => updateSortBy(e.target.value as 'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category')}
+                  onChange={(e) => updateSortBy(e.target.value as 'name' | 'date' | 'manufacturer' | 'price' | 'tagId')}
                 >
                   <option value="date">Date Added</option>
                   <option value="name">Product Name</option>
+                  <option value="tagId">Tag ID</option>
                   <option value="manufacturer">Manufacturer</option>
                   <option value="price">Price</option>
-                  <option value="category">Category</option>
-                  <option value="location">Location</option>
                 </select>
               </div>
               
@@ -564,8 +654,8 @@ const ProjectPage: React.FC = () => {
                   onChange={(e) => updateFilters('category', e.target.value)}
                 >
                   <option value="">All</option>
-                  {uniqueCategories.map(category => (
-                    <option key={category} value={category}>{category}</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>{category.name}</option>
                   ))}
                 </select>
               </div>
@@ -578,8 +668,8 @@ const ProjectPage: React.FC = () => {
                   onChange={(e) => updateFilters('location', e.target.value)}
                 >
                   <option value="">All</option>
-                  {uniqueLocations.map(location => (
-                    <option key={location} value={location}>{location}</option>
+                  {locations.map(location => (
+                    <option key={location.id} value={location.id}>{location.name}</option>
                   ))}
                 </select>
               </div>
@@ -670,15 +760,6 @@ const ProjectPage: React.FC = () => {
             </div>
             <div className="bulk-actions-buttons">
               <button 
-                className="bulk-action-button secondary"
-                onClick={() => {
-                  // TODO: Implement bulk export
-                  console.log('Exporting selected products:', Array.from(selectedProducts));
-                }}
-              >
-                Export
-              </button>
-              <button 
                 className="bulk-action-button danger"
                 onClick={handleBulkDelete}
               >
@@ -696,15 +777,29 @@ const ProjectPage: React.FC = () => {
           <div className="error-state">
             <p>{error}</p>
           </div>
-        ) : products.length === 0 ? (
+        ) : (groupBy === 'none' ? products.length === 0 : allProducts.length === 0) ? (
           <div className="empty-state">
-            <p>No products in this project yet.</p>
-            <button 
-              className="button button-primary"
-              onClick={() => navigate('/project/products/new')}
-            >
-              Add First Product
-            </button>
+            {(filters.search || filters.category || filters.location || filters.manufacturer) ? (
+              <>
+                <p>No products match the current filters.</p>
+                <button 
+                  className="button button-secondary"
+                  onClick={clearFilters}
+                >
+                  Clear Filters
+                </button>
+              </>
+            ) : (
+              <>
+                <p>No products in this project yet.</p>
+                <button 
+                  className="button button-primary"
+                  onClick={() => navigate('/project/products/new')}
+                >
+                  Add First Product
+                </button>
+              </>
+            )}
           </div>
         ) : viewMode === 'grid' ? (
           <div className="products-container">
@@ -854,7 +949,11 @@ const ProjectPage: React.FC = () => {
                                 case 'image':
                                   return (
                                     <td key={column.key} className="image-cell">
-                                      <div className="list-product-image">
+                                      <div 
+                                        className="list-product-image"
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => navigate(`/project/products/${product.id}`)}
+                                      >
                                         <img 
                                           src={getProductImageUrl(product) || getPlaceholderImage()} 
                                           alt={product.type || 'Product image'}
@@ -865,7 +964,12 @@ const ProjectPage: React.FC = () => {
                                 case 'tagId':
                                   return (
                                     <td key={column.key} className="tagid-cell">
-                                      <span>{product.tagId}</span>
+                                      <span 
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => navigate(`/project/products/${product.id}`)}
+                                      >
+                                        {product.tagId}
+                                      </span>
                                     </td>
                                   );
                                 case 'productName':
@@ -948,11 +1052,11 @@ const ProjectPage: React.FC = () => {
         )}
 
                 {/* Pagination Controls */}
-                {!loading && !error && paginationInfo.pages > 1 && (
+                {!loading && !error && currentPaginationInfo.pages > 1 && (
           <div className="pagination-container">
             <div className="pagination-info">
               <span>
-                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, paginationInfo.total)} of {paginationInfo.total} products
+                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, currentPaginationInfo.total)} of {currentPaginationInfo.total} products
               </span>
             </div>
             <div className="pagination-controls">
@@ -976,7 +1080,7 @@ const ProjectPage: React.FC = () => {
               {/* Page numbers */}
               {(() => {
                 const currentPage = pagination.page;
-                const totalPages = paginationInfo.pages;
+                const totalPages = currentPaginationInfo.pages;
                 const pages = [];
                 
                 // Always show first page
@@ -1013,7 +1117,7 @@ const ProjectPage: React.FC = () => {
               
               <button
                 className="pagination-button"
-                disabled={pagination.page >= paginationInfo.pages}
+                disabled={pagination.page >= currentPaginationInfo.pages}
                 onClick={() => updatePagination({ page: pagination.page + 1 })}
                 title="Next page"
               >
@@ -1021,8 +1125,8 @@ const ProjectPage: React.FC = () => {
               </button>
               <button
                 className="pagination-button"
-                disabled={pagination.page >= paginationInfo.pages}
-                onClick={() => updatePagination({ page: paginationInfo.pages })}
+                disabled={pagination.page >= currentPaginationInfo.pages}
+                onClick={() => updatePagination({ page: currentPaginationInfo.pages })}
                 title="Last page"
               >
                 »»
