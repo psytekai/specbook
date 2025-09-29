@@ -306,7 +306,20 @@ class APIRouter {
       });
     }
 
-    // Apply pagination
+    // Apply pagination (skip if fetchAll is requested)
+    if (params.fetchAll) {
+      return {
+        success: true,
+        data: products,
+        pagination: {
+          page: 1,
+          limit: products.length,
+          total: products.length,
+          pages: 1
+        }
+      };
+    }
+
     const page = params.page || 1;
     const limit = params.limit || 20;
     const offset = (page - 1) * limit;
