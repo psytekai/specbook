@@ -19,6 +19,28 @@ const tabs: Array<{ key: SettingsTab; label: string; icon: React.ReactNode }> = 
     )
   },
   {
+    key: 'locations',
+    label: 'Locations',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 1.5a4.5 4.5 0 0 1 4.5 4.5c0 2.5-4.5 8.5-4.5 8.5S3.5 8.5 3.5 6A4.5 4.5 0 0 1 8 1.5z" stroke="currentColor" strokeWidth="1.5"/>
+        <circle cx="8" cy="6" r="1.5" stroke="currentColor" strokeWidth="1.5"/>
+      </svg>
+    )
+  },
+  {
+    key: 'categories',
+    label: 'Categories',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+        <rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+        <rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+        <rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+      </svg>
+    )
+  },
+  {
     key: 'export',
     label: 'Export',
     icon: (

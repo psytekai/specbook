@@ -3,10 +3,10 @@ import { Category } from '../../types';
 import './CategoryMultiSelect.css';
 
 interface CategoryMultiSelectProps {
-  selectedCategories: string[];
-  onSelectionChange: (categories: string[]) => void;
+  selectedCategories: string[]; // Array of category IDs
+  onSelectionChange: (categoryIds: string[]) => void;
   availableCategories: Category[];
-  onAddCategory: (category: string) => Promise<void>;
+  onAddCategory: (categoryName: string) => Promise<Category>; // Returns the created category with ID
   disabled?: boolean;
   required?: boolean;
   className?: string;
@@ -25,18 +25,18 @@ export const CategoryMultiSelect: React.FC<CategoryMultiSelectProps> = ({
   const [newCategory, setNewCategory] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
-  const handleCategoryToggle = (category: string) => {
-    if (selectedCategories.includes(category)) {
+  const handleCategoryToggle = (categoryId: string) => {
+    if (selectedCategories.includes(categoryId)) {
       // Remove category
-      onSelectionChange(selectedCategories.filter(cat => cat !== category));
+      onSelectionChange(selectedCategories.filter(id => id !== categoryId));
     } else {
       // Add category
-      onSelectionChange([...selectedCategories, category]);
+      onSelectionChange([...selectedCategories, categoryId]);
     }
   };
 
-  const handleRemoveCategory = (categoryToRemove: string) => {
-    onSelectionChange(selectedCategories.filter(cat => cat !== categoryToRemove));
+  const handleRemoveCategory = (categoryIdToRemove: string) => {
+    onSelectionChange(selectedCategories.filter(id => id !== categoryIdToRemove));
   };
 
   const handleAddCategory = async () => {
@@ -46,9 +46,9 @@ export const CategoryMultiSelect: React.FC<CategoryMultiSelectProps> = ({
 
     setIsAdding(true);
     try {
-      await onAddCategory(newCategory.trim());
-      // Add the new category to selection
-      onSelectionChange([...selectedCategories, newCategory.trim()]);
+      const createdCategory = await onAddCategory(newCategory.trim());
+      // Add the new category ID to selection
+      onSelectionChange([...selectedCategories, createdCategory.id]);
       setNewCategory('');
       setShowAddCategory(false);
     } catch (error) {
@@ -64,8 +64,14 @@ export const CategoryMultiSelect: React.FC<CategoryMultiSelectProps> = ({
   };
 
   const availableForSelection = availableCategories.filter(
-    category => !selectedCategories.includes(category.name)
+    category => !selectedCategories.includes(category.id)
   );
+
+  // Helper function to get category name by ID
+  const getCategoryName = (categoryId: string): string => {
+    const category = availableCategories.find(cat => cat.id === categoryId);
+    return category ? category.name : categoryId; // Fallback to ID if name not found
+  };
 
   return (
     <div className={`category-multi-select ${className}`}>
@@ -74,15 +80,15 @@ export const CategoryMultiSelect: React.FC<CategoryMultiSelectProps> = ({
         <div className="selected-categories">
           <label className="selected-categories-label">Selected categories:</label>
           <div className="category-tags">
-            {selectedCategories.map(category => (
-              <div key={category} className="category-tag">
-                <span>{category}</span>
+            {selectedCategories.map(categoryId => (
+              <div key={categoryId} className="category-tag">
+                <span>{getCategoryName(categoryId)}</span>
                 <button
                   type="button"
                   className="category-tag-remove"
-                  onClick={() => handleRemoveCategory(category)}
+                  onClick={() => handleRemoveCategory(categoryId)}
                   disabled={disabled}
-                  aria-label={`Remove ${category}`}
+                  aria-label={`Remove ${getCategoryName(categoryId)}`}
                 >
                   ×
                 </button>
@@ -113,7 +119,7 @@ export const CategoryMultiSelect: React.FC<CategoryMultiSelectProps> = ({
               }
             </option>
             {availableForSelection.map(category => (
-              <option key={category.id} value={category.name}>
+              <option key={category.id} value={category.id}>
                 {category.name}
               </option>
             ))}

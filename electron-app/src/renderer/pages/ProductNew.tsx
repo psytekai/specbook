@@ -113,25 +113,29 @@ const ProductNew: React.FC = () => {
     }));
   };
 
-  const handleAddLocation = async (locationName: string) => {
+  const handleAddLocation = async (locationName: string): Promise<Location> => {
     try {
       const request: AddLocationRequest = { name: locationName };
       const response = await api.post<Location>('/api/locations', request);
       setLocations(prev => [...prev, response.data]);
       showToast('Location added successfully', 'success');
-    } catch (_error) {
+      return response.data;
+    } catch (error) {
       showToast('Failed to add location', 'error');
+      throw error;
     }
   };
 
-  const handleAddCategory = async (categoryName: string) => {
+  const handleAddCategory = async (categoryName: string): Promise<Category> => {
     try {
       const request: AddCategoryRequest = { name: categoryName };
       const response = await api.post<Category>('/api/categories', request);
       setCategories(prev => [...prev, response.data]);
       showToast('Category added successfully', 'success');
-    } catch (_error) {
+      return response.data;
+    } catch (error) {
       showToast('Failed to add category', 'error');
+      throw error;
     }
   };
 
@@ -397,7 +401,7 @@ const ProductNew: React.FC = () => {
               </label>
               <LocationMultiSelect
                 selectedLocations={formData.location}
-                onSelectionChange={(locations: string[]) => setFormData(prev => ({ ...prev, location: locations }))}
+                onSelectionChange={(locationIds: string[]) => setFormData(prev => ({ ...prev, location: locationIds }))}
                 availableLocations={locations}
                 onAddLocation={handleAddLocation}
                 required={true}
@@ -580,7 +584,7 @@ const ProductNew: React.FC = () => {
                 </label>
                 <CategoryMultiSelect
                   selectedCategories={formData.category}
-                  onSelectionChange={(categories) => setFormData(prev => ({ ...prev, category: categories }))}
+                  onSelectionChange={(categoryIds) => setFormData(prev => ({ ...prev, category: categoryIds }))}
                   availableCategories={categories}
                   onAddCategory={handleAddCategory}
                   required={true}

@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0] - 2025-09-27
 
+[Category & Location CRUD Operates]
+### Added
+- Full CRUD operations for categories and locations
+  - Create, update, and delete categories with automatic product reference cleanup
+  - Create, update, and delete locations with automatic product reference cleanup
+  - Inline editing UI for renaming categories and locations
+  - Confirmation dialogs for safe deletion
+- Database migration 2 with comprehensive schema improvements
+  - Automatic conversion of name-based references to ID-based references
+  - Safe data migration preserving all existing information
+
+### Changed
+- **BREAKING**: Categories and locations now use IDs instead of names
+  - Database stores category/location IDs in products table
+  - Frontend components updated to work with ID references
+  - API endpoints now expect and return IDs
+- Made categories and locations optional fields for products
+  - Removed NOT NULL constraints from database schema
+  - Products can now be created without categories or locations
+- Improved data integrity with proper foreign key-like relationships
+- Enhanced UI for managing categories and locations
+  - Edit icons for inline renaming
+  - Delete icons with confirmation dialogs
+  - Better visual organization in product forms
+
+### Fixed
+- Category and location persistence issues
+- NOT NULL constraint violations when creating products
+- Duplicate name handling with proper error messages
+- Reference cleanup when deleting categories/locations
+
+### Technical Improvements
+- Proper ID-based referential integrity
+- Automatic cleanup of orphaned references
+- Better error handling for CRUD operations
+- Improved migration safety with edge case handling
+
+[Enhancements]
 ### Added
 - Bulk delete functionality for products with checkbox selection system
 - "Select All" capability for bulk operations

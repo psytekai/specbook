@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useElectronProject } from '../contexts/ElectronProjectContext';
 import { Product } from '../../shared/types';
+import { Location, Category } from '../types';
 import { api } from '../services/apiIPC';
 import { formatArray, formatPrice } from '../utils/formatters';
 import { TableSettingsModal, useTableSettings } from '../components/TableSettings';
@@ -31,7 +32,12 @@ interface ProjectPageState {
     location: string;
     manufacturer: string;
   };
+  pagination: {
+    page: number;
+    limit: number;
+  };
 }
+
 
 // Local storage utilities
 const STORAGE_KEY = 'projectPage_preferences';
@@ -112,6 +118,24 @@ const getStoredState = (): Partial<ProjectPageState> => {
       }
     }
     
+    // Validate pagination
+    if (parsed.pagination && typeof parsed.pagination === 'object') {
+      const defaultPagination = {
+        page: 1,
+        limit: 20
+      };
+      
+      validatedState.pagination = { ...defaultPagination };
+      
+      // Validate pagination settings
+      if (typeof parsed.pagination.page === 'number' && parsed.pagination.page > 0) {
+        validatedState.pagination.page = parsed.pagination.page;
+      }
+      if (typeof parsed.pagination.limit === 'number' && parsed.pagination.limit > 0 && parsed.pagination.limit <= 100) {
+        validatedState.pagination.limit = parsed.pagination.limit;
+      }
+    }
+    
     return validatedState;
   } catch (error) {
     console.warn('Failed to load project page preferences:', error);
@@ -133,6 +157,8 @@ const ProjectPage: React.FC = () => {
   const navigate = useNavigate();
   const { project, isLoading: projectLoading, isInitializing } = useElectronProject();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -158,10 +184,146 @@ const ProjectPage: React.FC = () => {
     location: '',
     manufacturer: ''
   });
+  const [pagination, setPagination] = useState(storedState.pagination || {
+    page: 1,
+    limit: 20
+  });
+  const [paginationInfo, setPaginationInfo] = useState({
+    total: 0,
+    pages: 0
+  });
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
 
   // For the new file-based system, we only have one current project
   const currentProject = project;
+
+  // Helper functions to map IDs to names
+  const getCategoryName = (categoryId: string): string => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.name : categoryId; // Fallback to ID if name not found
+  };
+
+  const getLocationName = (locationId: string): string => {
+    const location = locations.find(loc => loc.id === locationId);
+    return location ? location.name : locationId; // Fallback to ID if name not found
+  };
+
+  const getCategoryNames = (categoryIds: string[]): string[] => {
+    return categoryIds.map(id => getCategoryName(id));
+  };
+
+  const getLocationNames = (locationIds: string[]): string[] => {
+    return locationIds.map(id => getLocationName(id));
+  };
+
+  // Fetch data with pagination and filters
+  const fetchData = useCallback(async () => {
+    if (!currentProject) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Build API parameters
+      const params = {
+        page: pagination.page,
+        limit: pagination.limit,
+        sortBy,
+        groupBy: groupBy !== 'none' ? groupBy : undefined,
+        ...filters
+      };
+
+      // Fetch products with pagination, categories, and locations in parallel
+      const [productsResponse, categoriesResponse, locationsResponse] = await Promise.all([
+        api.get<Product[]>(`/api/projects/current/products`, params),
+        api.get<Category[]>('/api/categories'),
+        api.get<Location[]>('/api/locations')
+      ]);
+      
+      if (productsResponse.success && productsResponse.data && productsResponse.pagination) {
+        setProducts(productsResponse.data);
+        setPaginationInfo({
+          total: productsResponse.pagination.total,
+          pages: productsResponse.pagination.pages
+        });
+      } else {
+        throw new Error('Failed to fetch products');
+      }
+      
+      setCategories(categoriesResponse.data);
+      setLocations(locationsResponse.data);
+    } catch (err) {
+      setError('Failed to load data');
+      console.error('Error fetching data:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentProject, pagination, sortBy, groupBy, filters]);
+
+  // Handlers for managing categories and locations from table settings
+  const handleAddCategory = useCallback(async (categoryName: string): Promise<Category> => {
+    try {
+      const response = await api.post<Category>('/api/categories', { name: categoryName });
+      setCategories(prev => [...prev, response.data]);
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to add category');
+    }
+  }, []);
+
+  const handleUpdateCategory = useCallback(async (id: string, name: string): Promise<Category> => {
+    try {
+      const response = await api.put<Category>(`/api/categories/${id}`, { name });
+      setCategories(prev => prev.map(cat => cat.id === id ? response.data : cat));
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to update category');
+    }
+  }, []);
+
+  const handleDeleteCategory = useCallback(async (id: string): Promise<boolean> => {
+    try {
+      await api.delete(`/api/categories/${id}`);
+      setCategories(prev => prev.filter(cat => cat.id !== id));
+      // Refresh products to reflect the changes
+      await fetchData();
+      return true;
+    } catch (error) {
+      throw new Error('Failed to delete category');
+    }
+  }, [fetchData]);
+
+  const handleAddLocation = useCallback(async (locationName: string): Promise<Location> => {
+    try {
+      const response = await api.post<Location>('/api/locations', { name: locationName });
+      setLocations(prev => [...prev, response.data]);
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to add location');
+    }
+  }, []);
+
+  const handleUpdateLocation = useCallback(async (id: string, name: string): Promise<Location> => {
+    try {
+      const response = await api.put<Location>(`/api/locations/${id}`, { name });
+      setLocations(prev => prev.map(loc => loc.id === id ? response.data : loc));
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to update location');
+    }
+  }, []);
+
+  const handleDeleteLocation = useCallback(async (id: string): Promise<boolean> => {
+    try {
+      await api.delete(`/api/locations/${id}`);
+      setLocations(prev => prev.filter(loc => loc.id !== id));
+      // Refresh products to reflect the changes
+      await fetchData();
+      return true;
+    } catch (error) {
+      throw new Error('Failed to delete location');
+    }
+  }, [fetchData]);
 
   // Redirect to welcome page if no project is open
   useEffect(() => {
@@ -197,8 +359,11 @@ const ProjectPage: React.FC = () => {
   const updateFilters = (filterKey: keyof typeof filters, value: string | number | null) => {
     const newFilters = { ...filters, [filterKey]: value };
     setFilters(newFilters);
+    // Reset to first page when filters change
+    const newPagination = { ...pagination, page: 1 };
+    setPagination(newPagination);
     if (isInitialized) {
-      saveState({ filters: newFilters });
+      saveState({ filters: newFilters, pagination: newPagination });
     }
   };
 
@@ -210,174 +375,24 @@ const ProjectPage: React.FC = () => {
       manufacturer: ''
     };
     setFilters(clearedFilters);
+    // Reset to first page when filters are cleared
+    const newPagination = { ...pagination, page: 1 };
+    setPagination(newPagination);
     if (isInitialized) {
-      saveState({ filters: clearedFilters });
+      saveState({ filters: clearedFilters, pagination: newPagination });
     }
   };
 
-  // Helper function to filter products
-  const filterProducts = (products: Product[]) => {
-    return products.filter(product => {
-      // Search filter - searches across product name, type, manufacturer
-      if (filters.search.trim()) {
-        const searchTerm = filters.search.toLowerCase().trim();
-        const productName = (product.productName || '').toLowerCase();
-        const type = (product.type || '').toLowerCase();
-        const manufacturer = (product.manufacturer || '').toLowerCase();
-        
-        if (!productName.includes(searchTerm) && 
-            !type.includes(searchTerm) && 
-            !manufacturer.includes(searchTerm)) {
-          return false;
-        }
-      }
-      
-      // Category filter - handles both string and array formats
-      if (filters.category) {
-        if (typeof product.category === 'string') {
-          if (product.category !== filters.category) {
-            return false;
-          }
-        } else {
-          // Handle legacy array format
-          const productCategories = Array.isArray(product.category) ? product.category : [product.category];
-          if (!productCategories.includes(filters.category)) {
-            return false;
-          }
-        }
-      }
-      
-      // Location filter - handles array of locations
-      if (filters.location) {
-        const productLocations = Array.isArray(product.location) ? product.location : [product.location];
-        if (!productLocations.includes(filters.location)) {
-          return false;
-        }
-      }
-      
-      // Manufacturer filter
-      if (filters.manufacturer && product.manufacturer !== filters.manufacturer) {
-        return false;
-      }
-      
-      
-      return true;
-    });
+  const updatePagination = (updates: Partial<typeof pagination>) => {
+    const newPagination = { ...pagination, ...updates };
+    setPagination(newPagination);
+    if (isInitialized) {
+      saveState({ pagination: newPagination });
+    }
   };
 
-  // Helper function to sort products
-  const sortProducts = (products: Product[]) => {
-    return [...products].sort((a, b) => {
-      switch (sortBy) {
-        case 'name': {
-          const aName = a.productName || a.type || '';
-          const bName = b.productName || b.type || '';
-          return aName.localeCompare(bName);
-        }
-        case 'manufacturer': {
-          const aManufacturer = a.manufacturer || '';
-          const bManufacturer = b.manufacturer || '';
-          return aManufacturer.localeCompare(bManufacturer);
-        }
-        case 'price': {
-          const aPrice = a.price || 0;
-          const bPrice = b.price || 0;
-          return aPrice - bPrice;
-        }
-        case 'category': {
-          const aCategory = typeof a.category === 'string' ? a.category : formatArray(a.category);
-          const bCategory = typeof b.category === 'string' ? b.category : formatArray(b.category);
-          return aCategory.localeCompare(bCategory);
-        }
-        case 'location': {
-          const aLocation = formatArray(a.location);
-          const bLocation = formatArray(b.location);
-          return aLocation.localeCompare(bLocation);
-        }
-        case 'date':
-        default:
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      }
-    });
-  };
-
-  // Helper function to group products by location
-  const groupProductsByLocation = (products: Product[]) => {
-    const filtered = filterProducts(products);
-    const sorted = sortProducts(filtered);
-    const grouped = sorted.reduce((acc, product) => {
-      const locations = Array.isArray(product.location) && product.location.length > 0 
-        ? product.location 
-        : ['Unspecified'];
-      
-      // Add product to each location group (for multi-location support)
-      locations.forEach(location => {
-        if (!acc[location]) {
-          acc[location] = [];
-        }
-        acc[location].push(product);
-      });
-      return acc;
-    }, {} as Record<string, Product[]>);
-
-    // Sort location keys alphabetically
-    const sortedKeys = Object.keys(grouped).sort();
-    const sortedGrouped: Record<string, Product[]> = {};
-    sortedKeys.forEach(key => {
-      sortedGrouped[key] = grouped[key];
-    });
-
-    return sortedGrouped;
-  };
-
-  // Helper function to group products by category
-  const groupProductsByCategory = (products: Product[]) => {
-    const filtered = filterProducts(products);
-    const sorted = sortProducts(filtered);
-    const grouped = sorted.reduce((acc, product) => {
-      const categories = Array.isArray(product.category) ? product.category : [product.category || 'Uncategorized'];
-      categories.forEach(category => {
-        const categoryKey = category || 'Uncategorized';
-        if (!acc[categoryKey]) {
-          acc[categoryKey] = [];
-        }
-        acc[categoryKey].push(product);
-      });
-      return acc;
-    }, {} as Record<string, Product[]>);
-
-    // Sort category keys alphabetically
-    const sortedKeys = Object.keys(grouped).sort();
-    const sortedGrouped: Record<string, Product[]> = {};
-    sortedKeys.forEach(key => {
-      sortedGrouped[key] = grouped[key];
-    });
-
-    return sortedGrouped;
-  };
-
-  // Helper function to group products by manufacturer
-  const groupProductsByManufacturer = (products: Product[]) => {
-    const filtered = filterProducts(products);
-    const sorted = sortProducts(filtered);
-    const grouped = sorted.reduce((acc, product) => {
-      const manufacturer = product.manufacturer || 'Unknown Manufacturer';
-      if (!acc[manufacturer]) {
-        acc[manufacturer] = [];
-      }
-      acc[manufacturer].push(product);
-      return acc;
-    }, {} as Record<string, Product[]>);
-
-    // Sort manufacturer keys alphabetically
-    const sortedKeys = Object.keys(grouped).sort();
-    const sortedGrouped: Record<string, Product[]> = {};
-    sortedKeys.forEach(key => {
-      sortedGrouped[key] = grouped[key];
-    });
-
-    return sortedGrouped;
-  };
+  // Since filtering, sorting, and grouping are now handled by the backend,
+  // we just need to organize the already-processed products for display
 
   // Helper function to check if a product has multiple locations
   const isMultiLocationProduct = (product: Product) => {
@@ -389,14 +404,12 @@ const ProjectPage: React.FC = () => {
     return Array.isArray(product.location) ? product.location.length : 1;
   };
 
-  // Get unique values for filter dropdowns
-  const uniqueCategories = [...new Set(products.flatMap(p => {
-    if (typeof p.category === 'string') {
-      return [p.category];
-    }
-    return Array.isArray(p.category) ? p.category : [p.category];
-  }).filter(Boolean))].sort();
-  const uniqueLocations = [...new Set(products.flatMap(p => Array.isArray(p.location) ? p.location : [p.location]).filter(Boolean))].sort();
+  // Get unique values for filter dropdowns from all available data
+  const uniqueCategories = categories.map(cat => cat.name).sort();
+  const uniqueLocations = locations.map(loc => loc.name).sort();
+  
+  // For manufacturers, we'll need to get this from the backend as well
+  // For now, we'll use what we have in the current page
   const uniqueManufacturers = [...new Set(products.map(p => p.manufacturer).filter(Boolean))].sort();
 
   // Selection handlers
@@ -440,8 +453,7 @@ const ProjectPage: React.FC = () => {
         await Promise.all(deletePromises);
         
         // Refresh the products list
-        const response = await api.get<Product[]>(`/api/projects/current/products`);
-        setProducts(response.data);
+        await fetchData();
         
         // Clear selection
         setSelectedProducts(new Set());
@@ -453,22 +465,13 @@ const ProjectPage: React.FC = () => {
         alert('Failed to delete some products. Please try again.');
       }
     }
-  }, [selectedProducts]);
+  }, [selectedProducts, fetchData]);
   
-  // Get organized products based on current settings
-  const organizedProducts = (() => {
-    switch (groupBy) {
-      case 'location':
-        return groupProductsByLocation(products);
-      case 'category':
-        return groupProductsByCategory(products);
-      case 'manufacturer':
-        return groupProductsByManufacturer(products);
-      case 'none':
-      default:
-        return { 'All Products': sortProducts(filterProducts(products)) };
-    }
-  })();
+  // Since backend handles grouping, we just display the products as returned
+  // The backend will return products already filtered, sorted, and grouped
+  const organizedProducts = groupBy === 'none' 
+    ? { 'All Products': products }
+    : { [groupBy]: products }; // Backend should handle proper grouping
 
   // Mark component as initialized after first render
   useEffect(() => {
@@ -483,24 +486,8 @@ const ProjectPage: React.FC = () => {
   }, [viewMode, groupBy, sortBy, isInitialized]);
 
   useEffect(() => {
-    if (!currentProject) return;
-
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await api.get<Product[]>(`/api/projects/current/products`);
-        setProducts(response.data);
-      } catch (err) {
-        setError('Failed to load products');
-        console.error('Error fetching products:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, [currentProject]);
+    fetchData();
+  }, [fetchData]);
 
   // Show loading state while checking for project
   if (isInitializing || projectLoading || !currentProject) {
@@ -754,9 +741,9 @@ const ProjectPage: React.FC = () => {
                         <p className="product-type">{product.type}</p>
                         {product.manufacturer && <p className="product-manufacturer">By: {product.manufacturer}</p>}
                         {product.price && <p className="product-price">{formatPrice(product.price)}</p>}
-                        <p className="product-category">{typeof product.category === 'string' ? product.category : formatArray(product.category)}</p>
+                        <p className="product-category">{formatArray(getCategoryNames(Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)))}</p>
                         <div className="product-location-info">
-                          <p className="product-location">{formatArray(product.location)}</p>
+                          <p className="product-location">{formatArray(getLocationNames(Array.isArray(product.location) ? product.location : [product.location].filter(Boolean)))}</p>
                           {isMultiLocationProduct(product) && groupBy === 'location' && (
                             <span className="multi-location-badge" title={`This product appears in ${getLocationCount(product)} locations`}>
                               📍 {getLocationCount(product)}
@@ -908,14 +895,14 @@ const ProjectPage: React.FC = () => {
                                 case 'category':
                                   return (
                                     <td key={column.key} className="category-cell">
-                                      <span>{typeof product.category === 'string' ? product.category : formatArray(product.category)}</span>
+                                      <span>{formatArray(getCategoryNames(Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)))}</span>
                                     </td>
                                   );
                                 case 'location':
                                   return (
                                     <td key={column.key} className="location-cell">
                                       <div className="table-location-info">
-                                        <span>{formatArray(product.location)}</span>
+                                        <span>{formatArray(getLocationNames(Array.isArray(product.location) ? product.location : [product.location].filter(Boolean)))}</span>
                                         {isMultiLocationProduct(product) && groupBy === 'location' && (
                                           <span className="multi-location-badge table-badge" title={`This product appears in ${getLocationCount(product)} locations`}>
                                             📍 {getLocationCount(product)}
@@ -960,6 +947,105 @@ const ProjectPage: React.FC = () => {
           </div>
         )}
 
+                {/* Pagination Controls */}
+                {!loading && !error && paginationInfo.pages > 1 && (
+          <div className="pagination-container">
+            <div className="pagination-info">
+              <span>
+                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, paginationInfo.total)} of {paginationInfo.total} products
+              </span>
+            </div>
+            <div className="pagination-controls">
+              <button
+                className="pagination-button"
+                disabled={pagination.page <= 1}
+                onClick={() => updatePagination({ page: 1 })}
+                title="First page"
+              >
+                ««
+              </button>
+              <button
+                className="pagination-button"
+                disabled={pagination.page <= 1}
+                onClick={() => updatePagination({ page: pagination.page - 1 })}
+                title="Previous page"
+              >
+                ‹
+              </button>
+              
+              {/* Page numbers */}
+              {(() => {
+                const currentPage = pagination.page;
+                const totalPages = paginationInfo.pages;
+                const pages = [];
+                
+                // Always show first page
+                if (currentPage > 3) {
+                  pages.push(1);
+                  if (currentPage > 4) pages.push('...');
+                }
+                
+                // Show pages around current page
+                for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                  pages.push(i);
+                }
+                
+                // Always show last page
+                if (currentPage < totalPages - 2) {
+                  if (currentPage < totalPages - 3) pages.push('...');
+                  pages.push(totalPages);
+                }
+                
+                return pages.map((page, index) => (
+                  page === '...' ? (
+                    <span key={`ellipsis-${index}`} className="pagination-ellipsis">...</span>
+                  ) : (
+                    <button
+                      key={page}
+                      className={`pagination-button ${page === currentPage ? 'active' : ''}`}
+                      onClick={() => updatePagination({ page: page as number })}
+                    >
+                      {page}
+                    </button>
+                  )
+                ));
+              })()}
+              
+              <button
+                className="pagination-button"
+                disabled={pagination.page >= paginationInfo.pages}
+                onClick={() => updatePagination({ page: pagination.page + 1 })}
+                title="Next page"
+              >
+                ›
+              </button>
+              <button
+                className="pagination-button"
+                disabled={pagination.page >= paginationInfo.pages}
+                onClick={() => updatePagination({ page: paginationInfo.pages })}
+                title="Last page"
+              >
+                »»
+              </button>
+            </div>
+            <div className="pagination-size">
+              <label>
+                Items per page:
+                <select
+                  value={pagination.limit}
+                  onChange={(e) => updatePagination({ page: 1, limit: parseInt(e.target.value) })}
+                  className="pagination-size-select"
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        )}
+
         {/* Table Settings Modal */}
         <TableSettingsModal
           isOpen={showTableSettings}
@@ -972,6 +1058,14 @@ const ProjectPage: React.FC = () => {
           onReset={() => {
             tableSettings.resetSettings();
           }}
+          locations={locations}
+          categories={categories}
+          onAddLocation={handleAddLocation}
+          onUpdateLocation={handleUpdateLocation}
+          onDeleteLocation={handleDeleteLocation}
+          onAddCategory={handleAddCategory}
+          onUpdateCategory={handleUpdateCategory}
+          onDeleteCategory={handleDeleteCategory}
         />
       </div>
     </div>

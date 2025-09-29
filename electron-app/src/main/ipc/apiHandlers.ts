@@ -100,6 +100,16 @@ class APIRouter {
         return await this.updateProduct(productId, data);
       }
       
+      if (normalizedEndpoint.match(/^\/categories\/([^/]+)$/)) {
+        const categoryId = normalizedEndpoint.split('/')[2];
+        return await this.updateCategory(categoryId, data);
+      }
+      
+      if (normalizedEndpoint.match(/^\/locations\/([^/]+)$/)) {
+        const locationId = normalizedEndpoint.split('/')[2];
+        return await this.updateLocation(locationId, data);
+      }
+      
       throw new Error(`Unknown PUT endpoint: ${endpoint}`);
     } catch (error) {
       return {
@@ -121,6 +131,16 @@ class APIRouter {
       if (normalizedEndpoint.match(/^\/products\/([^/]+)$/)) {
         const productId = normalizedEndpoint.split('/')[2];
         return await this.deleteProduct(productId);
+      }
+      
+      if (normalizedEndpoint.match(/^\/categories\/([^/]+)$/)) {
+        const categoryId = normalizedEndpoint.split('/')[2];
+        return await this.deleteCategory(categoryId);
+      }
+      
+      if (normalizedEndpoint.match(/^\/locations\/([^/]+)$/)) {
+        const locationId = normalizedEndpoint.split('/')[2];
+        return await this.deleteLocation(locationId);
       }
       
       throw new Error(`Unknown DELETE endpoint: ${endpoint}`);
@@ -208,10 +228,90 @@ class APIRouter {
       };
     }
 
-    const products = await manager.getProducts({
+    // Get all products first
+    let products = await manager.getProducts({
       category: params.category,
       location: params.location
     });
+
+    // Apply search filter
+    if (params.search && params.search.trim()) {
+      const searchTerm = params.search.toLowerCase().trim();
+      products = products.filter(product => {
+        const productName = (product.productName || '').toLowerCase();
+        const type = (product.type || '').toLowerCase();
+        const manufacturer = (product.manufacturer || '').toLowerCase();
+        
+        return productName.includes(searchTerm) || 
+               type.includes(searchTerm) || 
+               manufacturer.includes(searchTerm);
+      });
+    }
+
+    // Apply category filter (by name)
+    if (params.category && params.category.trim()) {
+      const categoryFilter = params.category.trim();
+      products = products.filter(product => {
+        const categoryIds = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean);
+        // We need to convert category IDs to names for comparison
+        // For now, we'll assume the filter is by ID until we implement name-based filtering
+        return categoryIds.includes(categoryFilter);
+      });
+    }
+
+    // Apply location filter (by name)
+    if (params.location && params.location.trim()) {
+      const locationFilter = params.location.trim();
+      products = products.filter(product => {
+        const locationIds = Array.isArray(product.location) ? product.location : [product.location].filter(Boolean);
+        // We need to convert location IDs to names for comparison
+        // For now, we'll assume the filter is by ID until we implement name-based filtering
+        return locationIds.includes(locationFilter);
+      });
+    }
+
+    // Apply manufacturer filter
+    if (params.manufacturer && params.manufacturer.trim()) {
+      products = products.filter(product => product.manufacturer === params.manufacturer.trim());
+    }
+
+    // Apply sorting
+    if (params.sortBy) {
+      products.sort((a, b) => {
+        switch (params.sortBy) {
+          case 'name': {
+            const aName = a.productName || a.type || '';
+            const bName = b.productName || b.type || '';
+            return aName.localeCompare(bName);
+          }
+          case 'manufacturer': {
+            const aManufacturer = a.manufacturer || '';
+            const bManufacturer = b.manufacturer || '';
+            return aManufacturer.localeCompare(bManufacturer);
+          }
+          case 'price': {
+            const aPrice = a.price || 0;
+            const bPrice = b.price || 0;
+            return aPrice - bPrice;
+          }
+          case 'category': {
+            // For now, sort by first category ID
+            const aCategory = Array.isArray(a.category) ? a.category[0] || '' : a.category || '';
+            const bCategory = Array.isArray(b.category) ? b.category[0] || '' : b.category || '';
+            return aCategory.localeCompare(bCategory);
+          }
+          case 'location': {
+            // For now, sort by first location ID
+            const aLocation = Array.isArray(a.location) ? a.location[0] || '' : a.location || '';
+            const bLocation = Array.isArray(b.location) ? b.location[0] || '' : b.location || '';
+            return aLocation.localeCompare(bLocation);
+          }
+          case 'date':
+          default:
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        }
+      });
+    }
 
     // Apply pagination
     const page = params.page || 1;
@@ -391,14 +491,7 @@ class APIRouter {
       throw new Error('No project open');
     }
 
-    // For now, we don't have createLocation method in ProjectFileManager
-    // Just return a mock location
-    const location = {
-      id: Date.now().toString(),
-      name: data.name,
-      createdAt: new Date().toISOString()
-    };
-
+    const location = await manager.createLocation(data.name);
     this.projectState.markDirty();
     return { success: true, data: location };
   }
@@ -434,16 +527,71 @@ class APIRouter {
       throw new Error('No project open');
     }
 
-    // For now, we don't have createCategory method in ProjectFileManager
-    // Just return a mock category
-    const category = {
-      id: Date.now().toString(),
-      name: data.name,
-      createdAt: new Date().toISOString()
-    };
-
+    const category = await manager.createCategory(data.name);
     this.projectState.markDirty();
     return { success: true, data: category };
+  }
+
+  private async updateCategory(categoryId: string, data: any) {
+    const state = this.projectState.getStateInfo();
+    const manager = this.projectState.getManager();
+    
+    if (!state.isOpen || !manager) {
+      throw new Error('No project open');
+    }
+
+    const category = await manager.updateCategory(categoryId, data.name);
+    this.projectState.markDirty();
+    return { success: true, data: category };
+  }
+
+  private async deleteCategory(categoryId: string) {
+    const state = this.projectState.getStateInfo();
+    const manager = this.projectState.getManager();
+    
+    if (!state.isOpen || !manager) {
+      throw new Error('No project open');
+    }
+
+    const deleted = await manager.deleteCategory(categoryId);
+    
+    if (!deleted) {
+      throw new Error('Failed to delete category');
+    }
+
+    this.projectState.markDirty();
+    return { success: true, data: { id: categoryId } };
+  }
+
+  private async updateLocation(locationId: string, data: any) {
+    const state = this.projectState.getStateInfo();
+    const manager = this.projectState.getManager();
+    
+    if (!state.isOpen || !manager) {
+      throw new Error('No project open');
+    }
+
+    const location = await manager.updateLocation(locationId, data.name);
+    this.projectState.markDirty();
+    return { success: true, data: location };
+  }
+
+  private async deleteLocation(locationId: string) {
+    const state = this.projectState.getStateInfo();
+    const manager = this.projectState.getManager();
+    
+    if (!state.isOpen || !manager) {
+      throw new Error('No project open');
+    }
+
+    const deleted = await manager.deleteLocation(locationId);
+    
+    if (!deleted) {
+      throw new Error('Failed to delete location');
+    }
+
+    this.projectState.markDirty();
+    return { success: true, data: { id: locationId } };
   }
 }
 
