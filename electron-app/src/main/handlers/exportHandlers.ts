@@ -68,7 +68,7 @@ export function setupExportHandlers() {
       }
 
       // Get products data (this would typically come from your database/API)
-      const products = await getProductsForExport(request.config);
+      const { products, categories, locations } = await getProductsForExport(request.config);
       
       // Create PDF service with progress callback
       const pdfService = new PDFExportService();
@@ -80,7 +80,7 @@ export function setupExportHandlers() {
       });
 
       // Convert products to export format
-      const exportProducts = ProductDataService.convertProductsForExport(products);
+      const exportProducts = ProductDataService.convertProductsForExport(products, categories, locations);
       
       // Filter products based on configuration
       const filteredProducts = ProductDataService.filterProducts(exportProducts, request.config);
@@ -125,8 +125,8 @@ export function setupExportHandlers() {
   // Get export statistics handler
   ipcMain.handle('export:getStatistics', async (_event, config: PDFExportConfig) => {
     try {
-      const products = await getProductsForExport(config);
-      const exportProducts = ProductDataService.convertProductsForExport(products);
+      const { products, categories, locations } = await getProductsForExport(config);
+      const exportProducts = ProductDataService.convertProductsForExport(products, categories, locations);
       return ProductDataService.getExportStatistics(exportProducts, config);
     } catch (error) {
       console.error('Error getting export statistics:', error);
@@ -148,7 +148,7 @@ export function setupExportHandlers() {
 /**
  * Get products for export based on configuration
  */
-async function getProductsForExport(config: PDFExportConfig): Promise<Product[]> {
+async function getProductsForExport(config: PDFExportConfig): Promise<{ products: Product[], categories: any[], locations: any[] }> {
   const log = logger.for('ExportHandlers');
   const projectState = ProjectState.getInstance();
   
@@ -158,7 +158,7 @@ async function getProductsForExport(config: PDFExportConfig): Promise<Product[]>
     
     if (!state.isOpen || !manager) {
       log.warn('No project open for export');
-      return [];
+      return { products: [], categories: [], locations: [] };
     }
 
     log.info('Fetching products for export', { 
@@ -167,18 +167,22 @@ async function getProductsForExport(config: PDFExportConfig): Promise<Product[]>
       hasFilters: !!config.filters 
     });
 
-    // Get all products from the current project
-    const products = await manager.getProducts({
-      category: config.filters?.category,
-      location: config.filters?.location,
-    });
+    // Get all products, categories, and locations from the current project
+    const [products, categories, locations] = await Promise.all([
+      manager.getProducts({
+        category: config.filters?.category,
+        location: config.filters?.location,
+      }),
+      manager.getCategories(),
+      manager.getLocations()
+    ]);
 
-    log.info(`Retrieved ${products.length} products for export`);
-    return products;
+    log.info(`Retrieved ${products.length} products, ${categories.length} categories, ${locations.length} locations for export`);
+    return { products, categories, locations };
     
   } catch (error) {
-    log.error('Error fetching products for export:', error as Error);
-    throw new Error('Failed to fetch products for export');
+    log.error('Error fetching data for export:', error as Error);
+    throw new Error('Failed to fetch data for export');
   }
 }
 
