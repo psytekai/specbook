@@ -13,7 +13,7 @@ import './ProjectPage.css';
 interface ProjectPageState {
   viewMode: 'grid' | 'list';
   groupBy: 'none' | 'location' | 'category' | 'manufacturer';
-  sortBy: 'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category';
+  sortBy: 'name' | 'date' | 'manufacturer' | 'price' | 'tagId';
   visibleColumns: {
     select: boolean;
     image: boolean;
@@ -61,8 +61,8 @@ const getStoredState = (): Partial<ProjectPageState> => {
       validatedState.groupBy = parsed.groupBy;
     }
     
-    if (parsed.sortBy === 'name' || parsed.sortBy === 'date' || parsed.sortBy === 'location' || 
-        parsed.sortBy === 'manufacturer' || parsed.sortBy === 'price' || parsed.sortBy === 'category') {
+    if (parsed.sortBy === 'name' || parsed.sortBy === 'date' || 
+        parsed.sortBy === 'manufacturer' || parsed.sortBy === 'price' || parsed.sortBy === 'tagId') {
       validatedState.sortBy = parsed.sortBy;
     }
     
@@ -177,7 +177,7 @@ const ProjectPage: React.FC = () => {
   const storedState = getStoredState();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(storedState.viewMode || 'list');
   const [groupBy, setGroupBy] = useState<'none' | 'location' | 'category' | 'manufacturer'>(storedState.groupBy || 'none');
-  const [sortBy, setSortBy] = useState<'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category'>(storedState.sortBy || 'date');
+  const [sortBy, setSortBy] = useState<'name' | 'date' | 'manufacturer' | 'price' | 'tagId'>(storedState.sortBy || 'date');
   const [filters, setFilters] = useState(storedState.filters || {
     search: '',
     category: '',  // This will now store category ID
@@ -348,7 +348,7 @@ const ProjectPage: React.FC = () => {
     }
   };
 
-  const updateSortBy = (sort: 'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category') => {
+  const updateSortBy = (sort: 'name' | 'date' | 'manufacturer' | 'price' | 'tagId') => {
     setSortBy(sort);
     if (isInitialized) {
       saveState({ sortBy: sort });
@@ -541,14 +541,13 @@ const ProjectPage: React.FC = () => {
                 <select
                   className="control-select"
                   value={sortBy}
-                  onChange={(e) => updateSortBy(e.target.value as 'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category')}
+                  onChange={(e) => updateSortBy(e.target.value as 'name' | 'date' | 'manufacturer' | 'price' | 'tagId')}
                 >
                   <option value="date">Date Added</option>
                   <option value="name">Product Name</option>
+                  <option value="tagId">Tag ID</option>
                   <option value="manufacturer">Manufacturer</option>
                   <option value="price">Price</option>
-                  <option value="category">Category</option>
-                  <option value="location">Location</option>
                 </select>
               </div>
               

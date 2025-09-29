@@ -294,21 +294,14 @@ class APIRouter {
             const bPrice = b.price || 0;
             return aPrice - bPrice;
           }
-          case 'category': {
-            // For now, sort by first category ID
-            const aCategory = Array.isArray(a.category) ? a.category[0] || '' : a.category || '';
-            const bCategory = Array.isArray(b.category) ? b.category[0] || '' : b.category || '';
-            return aCategory.localeCompare(bCategory);
-          }
-          case 'location': {
-            // For now, sort by first location ID
-            const aLocation = Array.isArray(a.location) ? a.location[0] || '' : a.location || '';
-            const bLocation = Array.isArray(b.location) ? b.location[0] || '' : b.location || '';
-            return aLocation.localeCompare(bLocation);
+          case 'tagId': {
+            const aTagId = a.tagId || '';
+            const bTagId = b.tagId || '';
+            return aTagId.localeCompare(bTagId);
           }
           case 'date':
           default:
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
         }
       });
     }
