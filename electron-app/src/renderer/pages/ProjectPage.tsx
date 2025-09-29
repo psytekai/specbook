@@ -426,14 +426,22 @@ const ProjectPage: React.FC = () => {
       switch (groupByField) {
         case 'location':
           const locations = Array.isArray(product.location) ? product.location : [product.location].filter(Boolean);
-          groupKeys = locations.map(locationId => getLocationName(locationId));
+          if (locations.length === 0) {
+            groupKeys = ['No Location'];
+          } else {
+            groupKeys = locations.map(locationId => getLocationName(locationId));
+          }
           break;
         case 'category':
           const categories = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean);
-          groupKeys = categories.map(categoryId => getCategoryName(categoryId));
+          if (categories.length === 0) {
+            groupKeys = ['No Category'];
+          } else {
+            groupKeys = categories.map(categoryId => getCategoryName(categoryId));
+          }
           break;
         case 'manufacturer':
-          groupKeys = [product.manufacturer || 'Unknown'];
+          groupKeys = [product.manufacturer || 'No Manufacturer'];
           break;
         default:
           groupKeys = ['Other'];
@@ -448,8 +456,15 @@ const ProjectPage: React.FC = () => {
       });
     });
 
-    return groups;
-  };
+    // Sort groups alphabetically and return as sorted object
+    const sortedGroupKeys = Object.keys(groups).sort((a, b) => a.localeCompare(b));
+    const sortedGroups: Record<string, Product[]> = {};
+    sortedGroupKeys.forEach(key => {
+      sortedGroups[key] = groups[key];
+    });
+
+    return sortedGroups;
+  };;
 
   // For manufacturers, we'll need to get this from the backend as well
   // For now, we'll use what we have in the current data
