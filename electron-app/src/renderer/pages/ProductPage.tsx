@@ -23,21 +23,23 @@ const ProductPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Add handlers for multi-select components
-  const handleAddLocation = async (locationName: string) => {
+  const handleAddLocation = async (locationName: string): Promise<Location> => {
     try {
       const request: AddLocationRequest = { name: locationName };
       const response = await api.post<Location>('/api/locations', request);
       setLocations(prev => [...prev, response.data]);
+      return response.data;
     } catch (error) {
       throw new Error('Failed to add location');
     }
   };
 
-  const handleAddCategory = async (categoryName: string) => {
+  const handleAddCategory = async (categoryName: string): Promise<Category> => {
     try {
       const request: AddCategoryRequest = { name: categoryName };
       const response = await api.post<Category>('/api/categories', request);
       setCategories(prev => [...prev, response.data]);
+      return response.data;
     } catch (error) {
       throw new Error('Failed to add category');
     }
@@ -233,7 +235,7 @@ const ProductPage: React.FC = () => {
       <div className="product-page">
         <div className="page-header">
           <div>
-            <h1>[{product.tagId}] {product.productName || product.description || "Untitled Product"}</h1>
+            <h1>[{product.tagId}] {product.productName || product.type || "Untitled Product"}</h1>
             <p className="project-breadcrumb">
               <span 
                 className="breadcrumb-link"
@@ -265,14 +267,16 @@ const ProductPage: React.FC = () => {
                   <div className="image-container">
                     <img 
                       src={getProductImageUrl(product)!} 
-                      alt={product.description || 'Product image'}
+                      alt={product.type || 'Product image'}
                     />
                     <button
                       type="button"
                       className="image-delete-btn"
                       onClick={() => {
-                        updateProductField('primaryImageHash', null);
-                        updateProductField('primaryThumbnailHash', null);
+                        if (confirm('Are you sure you want to remove this image?')) {
+                          updateProductField('primaryImageHash', null);
+                          updateProductField('primaryThumbnailHash', null);
+                        }
                       }}
                       aria-label="Remove image"
                     >
@@ -339,7 +343,7 @@ const ProductPage: React.FC = () => {
                   <label className="editable-label">Categories</label>
                   <CategoryMultiSelect
                     selectedCategories={Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)}
-                    onSelectionChange={(categories) => updateProductField('category', categories)}
+                    onSelectionChange={(categoryIds) => updateProductField('category', categoryIds)}
                     availableCategories={categories}
                     onAddCategory={handleAddCategory}
                   />
@@ -349,7 +353,7 @@ const ProductPage: React.FC = () => {
                   <label className="editable-label">Locations</label>
                   <LocationMultiSelect
                     selectedLocations={Array.isArray(product.location) ? product.location : [product.location].filter(Boolean)}
-                    onSelectionChange={(locations: string[]) => updateProductField('location', locations)}
+                    onSelectionChange={(locationIds: string[]) => updateProductField('location', locationIds)}
                     availableLocations={locations}
                     onAddLocation={handleAddLocation}
                   />
@@ -371,14 +375,14 @@ const ProductPage: React.FC = () => {
             </div>
 
             <div className="detail-section">
-              <h2>Description</h2>
+              <h2>Type</h2>
               <EditableSection
-                label="Product Description"
-                value={product.description}
+                label="Product Type"
+                value={product.type}
                 type="textarea"
-                placeholder="Enter product description"
+                placeholder="Enter product type"
                 multiline={true}
-                onSave={(value) => updateProductField('description', value as string)}
+                onSave={(value) => updateProductField('type', value as string)}
                 className="full-width"
               />
             </div>

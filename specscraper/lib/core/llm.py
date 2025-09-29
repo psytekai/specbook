@@ -16,9 +16,12 @@ class PromptTemplator:
     
     class ProductExtractionOutput(BaseModel):
         """Pydantic model for product extraction output"""
+        product_name: str = Field(description="Short product name or title")
+        manufacturer: str = Field(description="Manufacturer name")
         image_url: str = Field(description="Direct URL to the product image")
         type: str = Field(description="The product category (e.g. range hood, grill, fireplace, etc.)")
-        description: str = Field(description="Short product description, including brand, size, material, color, and notable features")
+        price: float = Field(description="Product price")
+        specification: str = Field(description="Short product description or specification, including brand, size, material, color, and notable features")
         model_no: str = Field(description="Manufacturer model number, item no, or sku no.")
         product_link: str = Field(description="Original product page URL")
 
@@ -53,6 +56,28 @@ class PromptTemplator:
     - images
 
     **Data to Extract**
+    - product_name
+        - description: Short product name or title
+        - instructions
+            - If the product name is not found, return ""
+        - validation:
+            - Remove extra whitespace
+            - Preserve original formatting (hyphens, spaces)
+    - manufacturer
+        - description: Manufacturer name
+        - instructions
+            - If the manufacturer is not found, return ""
+        - validation:
+            - Remove extra whitespace
+            - Preserve original formatting (hyphens, spaces)
+    - price
+        - description: Product price
+        - instructions
+            - If the price is not found, return ""
+        - validation:
+            - Remove extra whitespace
+            - Remove any non-numeric characters
+            - Convert to float
     - image_url
         - description: main product image URL
         - instructions 
@@ -74,7 +99,7 @@ class PromptTemplator:
             - "range hood"
             - "grill"
             - "fireplace"
-    - description
+    - specification
         - formatting_rules:
             - Line 1: Manufacturer/Brand name
             - Line 2: Product line or model name
@@ -115,8 +140,11 @@ class PromptTemplator:
     ```json
     {{
     "image_url": "",
+    "product_name": "",
+    "manufacturer": "",
+    "price": 0.0,
     "type": "",
-    "description": "",
+    "specification": "",
     "model_no": "",
     "product_link": ""
     }}

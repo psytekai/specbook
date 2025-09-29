@@ -1,5 +1,6 @@
 import { ipcMain, BrowserWindow } from 'electron';
-import { pythonBridge, ScrapeOptions, ScrapeProgress } from '../services/PythonBridge';
+import { pythonBridge } from '../services/PythonBridge';
+import type { ScrapeOptions, ScrapeProgress } from '../../shared/types';
 import { logger } from '../../shared/logging/Logger';
 
 var log = logger.for('pythonHandlers');
@@ -60,7 +61,9 @@ export function setupPythonIPC(mainWindow?: BrowserWindow): void {
       log.info('🐍 IPC: Scrape result:', {
         success: result.success,
         hasData: !!result.data,
-        error: result.error
+        error: result.error,
+        result: result?.data,
+        metadata: result?.metadata,
       });
       
       return result;

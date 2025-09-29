@@ -14,7 +14,7 @@ export interface Product {
   url: string;
   tagId?: string;  // Optional to match DB
   location: string[];  // Always array
-  description?: string;  // Optional to match DB
+  type?: string;  // Optional to match DB
   specificationDescription?: string;  // Optional to match DB
   category: string[];  // Always array, never string
   productName: string;

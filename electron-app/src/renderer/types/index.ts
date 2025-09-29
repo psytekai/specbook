@@ -21,19 +21,6 @@ export interface FetchProductDetailsRequest {
   productLocation: string;
 }
 
-export interface FetchProductDetailsResponse {
-  productDescription: string;
-  specificationDescription: string;
-  category: string[];
-  productName?: string;
-  manufacturer?: string;
-  price?: number;
-  // Asset management fields (Phase 4)
-  primaryImageHash?: string;
-  primaryThumbnailHash?: string;
-  additionalImagesHashes?: string[];
-}
-
 export interface SaveProductRequest {
   productUrl: string;
   tagId: string;
@@ -81,62 +68,11 @@ export interface Toast {
   duration?: number;
 }
 
-// Python Scraping Types
-export interface ScrapeProgress {
-  type: 'progress';
-  stage: 'init' | 'scraping' | 'processing' | 'extraction' | 'complete';
-  progress: number;
-  message: string;
-  timestamp: number;
-}
-
-export interface ScrapeOptions {
-  method?: 'auto' | 'requests' | 'firecrawl';
-  llm_model?: string;
-  temperature?: number;
-  max_tokens?: number;
-}
-
-export interface StructuredLogEvent {
-  schema: string;
-  ts: string;
-  event_id: number;
-  level: 'debug' | 'info' | 'warn' | 'error';
-  component: string;
-  message: string;
-  ctx?: Record<string, any>;
-}
-
-export interface ScrapeResult {
-  success: boolean;
-  data: {
-    image_url: string;
-    type: string;
-    description: string;
-    model_no: string;
-    product_link: string;
-  } | null;
-  metadata: {
-    scrape_method?: string;
-    processing_time?: number;
-    scrape_time?: number;
-    llm_model?: string;
-    status_code?: number;
-    html_length?: number;
-    processed_length?: number;
-    prompt_tokens?: number;
-    execution_time?: number;
-    partial_output?: string;
-    [key: string]: any;
-  };
-  error: string | null;
-  diagnostics?: StructuredLogEvent[];
-}
-
-export interface PythonStatus {
-  available: boolean;
-  error: string | null;
-  bridgePath: string;
-  activeProcesses?: number;
-  maxProcesses?: number;
-}
+// Python Scraping Types - now imported from shared
+export type {
+  ScrapeProgress,
+  ScrapeOptions,
+  StructuredLogEvent,
+  ScrapeResult,
+  PythonStatus
+} from '../../shared/types';

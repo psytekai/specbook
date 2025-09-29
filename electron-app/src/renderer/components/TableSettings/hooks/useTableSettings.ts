@@ -20,30 +20,41 @@ const createDefaultColumns = (): Record<string, ColumnConfig> => ({
     order: 1,
     width: 'fixed',
     minWidth: 80,
+    maxWidth: 120,
+    essential: true
+  },
+  tagId: {
+    key: 'tagId',
+    label: 'Tag ID',
+    visible: true,
+    order: 2,
+    width: 'fixed',
+    minWidth: 100,
     maxWidth: 120
   },
   productName: {
     key: 'productName',
     label: 'Product Name',
     visible: true,
-    order: 2,
+    order: 3,
     width: 'auto',
     minWidth: 180,
     essential: true
   },
-  description: {
-    key: 'description',
-    label: 'Description',
+  type: {
+    key: 'type',
+    label: 'Type',
     visible: true,
-    order: 3,
-    width: 'auto',
-    minWidth: 200
+    order: 4,
+    width: 'fixed',
+    minWidth: 120,
+    maxWidth: 150
   },
   manufacturer: {
     key: 'manufacturer',
     label: 'Manufacturer',
     visible: true,
-    order: 4,
+    order: 5,
     width: 'auto',
     minWidth: 150
   },
@@ -51,7 +62,7 @@ const createDefaultColumns = (): Record<string, ColumnConfig> => ({
     key: 'price',
     label: 'Price',
     visible: true,
-    order: 5,
+    order: 6,
     width: 'fixed',
     minWidth: 100,
     maxWidth: 120
@@ -60,7 +71,7 @@ const createDefaultColumns = (): Record<string, ColumnConfig> => ({
     key: 'category',
     label: 'Category',
     visible: true,
-    order: 6,
+    order: 7,
     width: 'auto',
     minWidth: 120
   },
@@ -68,18 +79,9 @@ const createDefaultColumns = (): Record<string, ColumnConfig> => ({
     key: 'location',
     label: 'Location',
     visible: true,
-    order: 7,
+    order: 8,
     width: 'auto',
     minWidth: 120
-  },
-  tagId: {
-    key: 'tagId',
-    label: 'Tag ID',
-    visible: true,
-    order: 8,
-    width: 'fixed',
-    minWidth: 100,
-    maxWidth: 120
   },
   actions: {
     key: 'actions',
@@ -96,7 +98,7 @@ const createDefaultColumns = (): Record<string, ColumnConfig> => ({
 
 
 const createDefaultExportSettings = (): ExportSettings => ({
-  defaultFormat: 'csv',
+  defaultFormat: 'pdf',
   includeHeaders: true,
   includeFilters: true,
   dateFormat: 'YYYY-MM-DD'

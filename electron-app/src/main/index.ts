@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, protocol } from 'electron';
+import { app, BrowserWindow, shell, protocol, ipcMain } from 'electron';
 import path from 'node:path';
 import * as fs from 'fs';
 import { ApplicationMenu } from './menu/ApplicationMenu';
@@ -6,6 +6,7 @@ import { setupProjectIPC } from './ipc/projectHandlers';
 import { setupAPIIPC } from './ipc/apiHandlers';
 import { setupAssetIPC } from './ipc/assetHandlers';
 import { setupPythonIPC } from './ipc/pythonHandlers';
+import { setupExportHandlers } from './handlers/exportHandlers';
 import { pythonBridge } from './services/PythonBridge';
 import { ProjectState } from './services/ProjectState';
 import { AssetManager } from './services/AssetManager';
@@ -94,6 +95,28 @@ app.whenReady().then(() => {
   setupProjectIPC();
   setupAPIIPC();
   setupAssetIPC();
+  setupExportHandlers();
+  
+  // Set up shell handlers
+  ipcMain.handle('shell:open-path', async (_event, filePath: string) => {
+    try {
+      await shell.openPath(filePath);
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to open path:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  });
+
+  ipcMain.handle('shell:show-item-in-folder', async (_event, filePath: string) => {
+    try {
+      shell.showItemInFolder(filePath);
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to show item in folder:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  });
   
   // Create window first to pass to Python IPC
   const mainWindow = createWindow();
