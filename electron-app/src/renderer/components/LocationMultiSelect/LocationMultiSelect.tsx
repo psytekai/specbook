@@ -3,10 +3,10 @@ import { Location } from '../../types';
 import './LocationMultiSelect.css';
 
 interface LocationMultiSelectProps {
-  selectedLocations: string[];
-  onSelectionChange: (locations: string[]) => void;
+  selectedLocations: string[]; // Array of location IDs
+  onSelectionChange: (locationIds: string[]) => void;
   availableLocations: Location[];
-  onAddLocation: (location: string) => Promise<void>;
+  onAddLocation: (locationName: string) => Promise<Location>; // Returns the created location with ID
   disabled?: boolean;
   required?: boolean;
   className?: string;
@@ -25,18 +25,18 @@ export const LocationMultiSelect: React.FC<LocationMultiSelectProps> = ({
   const [newLocation, setNewLocation] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
-  const handleLocationToggle = (location: string) => {
-    if (selectedLocations.includes(location)) {
+  const handleLocationToggle = (locationId: string) => {
+    if (selectedLocations.includes(locationId)) {
       // Remove location
-      onSelectionChange(selectedLocations.filter(loc => loc !== location));
+      onSelectionChange(selectedLocations.filter(id => id !== locationId));
     } else {
       // Add location
-      onSelectionChange([...selectedLocations, location]);
+      onSelectionChange([...selectedLocations, locationId]);
     }
   };
 
-  const handleRemoveLocation = (locationToRemove: string) => {
-    onSelectionChange(selectedLocations.filter(loc => loc !== locationToRemove));
+  const handleRemoveLocation = (locationIdToRemove: string) => {
+    onSelectionChange(selectedLocations.filter(id => id !== locationIdToRemove));
   };
 
   const handleAddLocation = async () => {
@@ -46,9 +46,9 @@ export const LocationMultiSelect: React.FC<LocationMultiSelectProps> = ({
 
     setIsAdding(true);
     try {
-      await onAddLocation(newLocation.trim());
-      // Add the new location to selection
-      onSelectionChange([...selectedLocations, newLocation.trim()]);
+      const createdLocation = await onAddLocation(newLocation.trim());
+      // Add the new location ID to selection
+      onSelectionChange([...selectedLocations, createdLocation.id]);
       setNewLocation('');
       setShowAddLocation(false);
     } catch (error) {
@@ -64,8 +64,14 @@ export const LocationMultiSelect: React.FC<LocationMultiSelectProps> = ({
   };
 
   const availableForSelection = availableLocations.filter(
-    location => !selectedLocations.includes(location.name)
+    location => !selectedLocations.includes(location.id)
   );
+
+  // Helper function to get location name by ID
+  const getLocationName = (locationId: string): string => {
+    const location = availableLocations.find(loc => loc.id === locationId);
+    return location ? location.name : locationId; // Fallback to ID if name not found
+  };
 
   return (
     <div className={`location-multi-select ${className}`}>
@@ -74,15 +80,15 @@ export const LocationMultiSelect: React.FC<LocationMultiSelectProps> = ({
         <div className="selected-locations">
           <label className="selected-locations-label">Selected locations:</label>
           <div className="location-tags">
-            {selectedLocations.map(location => (
-              <div key={location} className="location-tag">
-                <span>{location}</span>
+            {selectedLocations.map(locationId => (
+              <div key={locationId} className="location-tag">
+                <span>{getLocationName(locationId)}</span>
                 <button
                   type="button"
                   className="location-tag-remove"
-                  onClick={() => handleRemoveLocation(location)}
+                  onClick={() => handleRemoveLocation(locationId)}
                   disabled={disabled}
-                  aria-label={`Remove ${location}`}
+                  aria-label={`Remove ${getLocationName(locationId)}`}
                 >
                   ×
                 </button>
@@ -113,7 +119,7 @@ export const LocationMultiSelect: React.FC<LocationMultiSelectProps> = ({
               }
             </option>
             {availableForSelection.map(location => (
-              <option key={location.id} value={location.name}>
+              <option key={location.id} value={location.id}>
                 {location.name}
               </option>
             ))}

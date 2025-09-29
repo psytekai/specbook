@@ -3,6 +3,8 @@ import { TableSettingsModalProps, SettingsTab, TableSettings } from './types';
 import { SettingsTabs } from './components/SettingsTabs';
 import { ColumnSettings } from './tabs/ColumnSettings';
 import { ExportSettings } from './tabs/ExportSettings';
+import { LocationsSettings } from './tabs/LocationsSettings';
+import { CategoriesSettings } from './tabs/CategoriesSettings';
 import './TableSettingsModal.css';
 
 export const TableSettingsModal: React.FC<TableSettingsModalProps> = ({
@@ -10,7 +12,15 @@ export const TableSettingsModal: React.FC<TableSettingsModalProps> = ({
   onClose,
   settings,
   onApply,
-  onReset
+  onReset,
+  locations = [],
+  categories = [],
+  onAddLocation,
+  onUpdateLocation,
+  onDeleteLocation,
+  onAddCategory,
+  onUpdateCategory,
+  onDeleteCategory
 }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('columns');
   const [localSettings, setLocalSettings] = useState<TableSettings>(settings);
@@ -114,6 +124,24 @@ export const TableSettingsModal: React.FC<TableSettingsModalProps> = ({
             />
           )}
           
+          {activeTab === 'locations' && onAddLocation && onUpdateLocation && onDeleteLocation && (
+            <LocationsSettings 
+              locations={locations}
+              onAddLocation={onAddLocation}
+              onUpdateLocation={onUpdateLocation}
+              onDeleteLocation={onDeleteLocation}
+            />
+          )}
+          
+          {activeTab === 'categories' && onAddCategory && onUpdateCategory && onDeleteCategory && (
+            <CategoriesSettings 
+              categories={categories}
+              onAddCategory={onAddCategory}
+              onUpdateCategory={onUpdateCategory}
+              onDeleteCategory={onDeleteCategory}
+            />
+          )}
+          
           {activeTab === 'export' && (
             <ExportSettings 
               settings={localSettings.export}
@@ -125,6 +153,7 @@ export const TableSettingsModal: React.FC<TableSettingsModalProps> = ({
           )}
         </div>
 
+        { activeTab === "columns" && 
         <div className="table-settings-footer">
           <div className="footer-left">
             {onReset && (
@@ -152,6 +181,7 @@ export const TableSettingsModal: React.FC<TableSettingsModalProps> = ({
             </button>
           </div>
         </div>
+        }
       </div>
     </div>
   );

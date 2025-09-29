@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
 import { ExportSettings as ExportSettingsType, ColumnConfig } from '../types';
+import { 
+  PDFExportConfig, 
+  PDF_EXPORT_OPTIONS,
+  PDFGenerationResult
+} from '../../../../shared/types/exportTypes';
+import { ExportService } from '../../../services/exportService';
+import { EXPORT_CONFIG, getColumnsForGroupBy } from '../../../../shared/config/exportConfig';
 
 interface ExportSettingsProps {
   settings: ExportSettingsType;
@@ -7,215 +14,223 @@ interface ExportSettingsProps {
   onChange: (settings: ExportSettingsType) => void;
 }
 
-export const ExportSettings: React.FC<ExportSettingsProps> = ({
-  settings,
-  columns,
-  onChange
-}) => {
+export const ExportSettings: React.FC<ExportSettingsProps> = () => {
+  const [pdfConfig, setPdfConfig] = useState<Partial<PDFExportConfig>>(EXPORT_CONFIG.defaults);
   const [isExporting, setIsExporting] = useState(false);
+  const [exportResult, setExportResult] = useState<PDFGenerationResult | null>(null);
+  const [showResult, setShowResult] = useState(false);
 
-  const handleFormatChange = (format: ExportSettingsType['defaultFormat']) => {
-    onChange({ ...settings, defaultFormat: format });
+  const handlePDFConfigChange = (updates: Partial<PDFExportConfig>) => {
+    setPdfConfig(prev => ({ ...prev, ...updates }));
   };
 
-  const handleToggle = (key: keyof ExportSettingsType, value: boolean) => {
-    onChange({ ...settings, [key]: value });
-  };
-
-  const handleDateFormatChange = (dateFormat: string) => {
-    onChange({ ...settings, dateFormat });
-  };
-
-  const handleQuickExport = async (format: 'csv' | 'excel' | 'pdf') => {
+  const handleExport = async () => {
     setIsExporting(true);
+    setExportResult(null);
+    setShowResult(false);
+    
     try {
-      // TODO: Implement actual export functionality
-      console.log('Exporting as:', format);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate export
+      const exportService = ExportService.getInstance();
+      
+      // Use single source of truth for export configuration
+      // Filter columns based on groupBy to avoid redundancy
+      const groupBy = pdfConfig.groupBy || EXPORT_CONFIG.defaults.groupBy;
+      const exportColumns = getColumnsForGroupBy(groupBy).map(col => ({
+        key: col.key,
+        label: col.label,
+        width: col.width,
+        visible: col.visible,
+        essential: col.essential,
+      }));
+
+      const fullConfig = exportService.prepareExportConfig(pdfConfig, exportColumns, true);
+      
+      // Call the export service (this will show the file save dialog)
+      const result = await exportService.exportToPDF(fullConfig as PDFExportConfig);
+      
+      setExportResult(result);
+      setShowResult(true);
+      
     } catch (error) {
       console.error('Export failed:', error);
+      setExportResult({
+        success: false,
+        error: error instanceof Error ? error.message : 'Export failed. Please try again.',
+        metadata: {
+          pageCount: 0,
+          fileSize: 0,
+          generationTime: 0,
+          productCount: 0,
+          groupCount: 0,
+        },
+      });
+      setShowResult(true);
     } finally {
       setIsExporting(false);
     }
   };
 
-  const visibleColumns = Object.values(columns).filter(col => col.visible);
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const formatDuration = (ms: number): string => {
+    if (ms < 1000) return `${ms}ms`;
+    return `${(ms / 1000).toFixed(1)}s`;
+  };
 
   return (
-    <div className="settings-section" role="tabpanel" id="export-panel">
-      {/* Export Format */}
-      <div className="settings-group">
-        <div className="settings-section-title">Default Export Format</div>
-        <div className="settings-description">
-          Choose your preferred format for data exports
-        </div>
-        
-        <div className="radio-group">
-          {[
-            { value: 'csv', label: 'CSV', description: 'Comma-separated values, universal format' },
-            { value: 'excel', label: 'Excel', description: 'Microsoft Excel format (.xlsx)' },
-            { value: 'pdf', label: 'PDF', description: 'Formatted document for printing' }
-          ].map(option => (
-            <label key={option.value} className={`radio-option ${settings.defaultFormat === option.value ? 'selected' : ''}`}>
-              <input
-                type="radio"
-                name="exportFormat"
-                value={option.value}
-                checked={settings.defaultFormat === option.value}
-                onChange={() => handleFormatChange(option.value as ExportSettingsType['defaultFormat'])}
-              />
-              <div className="radio-content">
-                <span className="radio-label">{option.label}</span>
-                <span className="radio-description">{option.description}</span>
-              </div>
-            </label>
-          ))}
-        </div>
-      </div>
+    <div className="export-settings">
+      <div className="settings-section">
+        <h3>PDF Export Settings</h3>
+        <p className="settings-description">
+          Configure PDF layout and page settings for data exports.
+        </p>
 
-      {/* Export Options */}
-      <div className="settings-group">
-        <div className="settings-section-title">Export Options</div>
-        
-        <div className="settings-row">
-          <div className="settings-label">
-            <span>Include Headers</span>
-            <div className="settings-description">Add column names as the first row</div>
-          </div>
-          <label className="toggle-switch">
-            <input
-              type="checkbox"
-              checked={settings.includeHeaders}
-              onChange={(e) => handleToggle('includeHeaders', e.target.checked)}
-            />
-            <span className="toggle-slider"></span>
-          </label>
-        </div>
-
-        <div className="settings-row">
-          <div className="settings-label">
-            <span>Include Filter State</span>
-            <div className="settings-description">Add a note about current filters to the export</div>
-          </div>
-          <label className="toggle-switch">
-            <input
-              type="checkbox"
-              checked={settings.includeFilters}
-              onChange={(e) => handleToggle('includeFilters', e.target.checked)}
-            />
-            <span className="toggle-slider"></span>
-          </label>
-        </div>
-      </div>
-
-      {/* Date Format */}
-      <div className="settings-group">
-        <div className="settings-section-title">Date Format</div>
-        <div className="settings-description">
-          How dates should be formatted in exports
-        </div>
-        
-        <div className="control-group">
+        {/* PDF Layout Options */}
+        <div className="form-field">
+          <label className="field-label">Group by</label>
           <select
-            className="control-select"
-            value={settings.dateFormat}
-            onChange={(e) => handleDateFormatChange(e.target.value)}
+            className="field-input"
+            value={pdfConfig.groupBy || 'category'}
+            onChange={(e) => handlePDFConfigChange({ 
+              groupBy: e.target.value as 'category' | 'location' 
+            })}
           >
-            <option value="YYYY-MM-DD">2024-01-15 (ISO format)</option>
-            <option value="MM/DD/YYYY">01/15/2024 (US format)</option>
-            <option value="DD/MM/YYYY">15/01/2024 (EU format)</option>
-            <option value="DD-MMM-YYYY">15-Jan-2024 (Readable)</option>
-            <option value="MMMM DD, YYYY">January 15, 2024 (Full)</option>
+            {PDF_EXPORT_OPTIONS.groupBy.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <div className="field-description">
+            {PDF_EXPORT_OPTIONS.groupBy.find(opt => opt.value === pdfConfig.groupBy)?.description}
+          </div>
+        </div>
+
+        <div className="form-field">
+          <label className="field-label">Sort by</label>
+          <select
+            className="field-input"
+            value={pdfConfig.sortBy || 'name'}
+            onChange={(e) => handlePDFConfigChange({ 
+              sortBy: e.target.value as PDFExportConfig['sortBy']
+            })}
+          >
+            {PDF_EXPORT_OPTIONS.sortBy.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <div className="field-description">
+            {PDF_EXPORT_OPTIONS.sortBy.find(opt => opt.value === pdfConfig.sortBy)?.description}
+          </div>
+        </div>
+
+        {/* Page Settings */}
+        <div className="form-field">
+          <label className="field-label">Page Size</label>
+          <select
+            className="field-input"
+            value={pdfConfig.pageSize || 'A4'}
+            onChange={(e) => handlePDFConfigChange({ 
+              pageSize: e.target.value as 'A4' | 'Letter'
+            })}
+          >
+            {PDF_EXPORT_OPTIONS.pageSize.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
-      </div>
 
-      {/* Quick Export */}
-      <div className="settings-group">
-        <div className="settings-section-title">Quick Export</div>
-        <div className="settings-description">
-          Export current table data with one click
-        </div>
-        
-        <div className="export-buttons">
-          <button
-            className="export-button csv"
-            onClick={() => handleQuickExport('csv')}
-            disabled={isExporting}
+        <div className="form-field">
+          <label className="field-label">Orientation</label>
+          <select
+            className="field-input"
+            value={pdfConfig.orientation || 'portrait'}
+            onChange={(e) => handlePDFConfigChange({ 
+              orientation: e.target.value as 'portrait' | 'landscape'
+            })}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 2v8M5 7l3-3 3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 12v1a1 1 0 001 1h8a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-            Export CSV
-          </button>
-          
-          <button
-            className="export-button excel"
-            onClick={() => handleQuickExport('excel')}
-            disabled={isExporting}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 2v8M5 7l3-3 3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 12v1a1 1 0 001 1h8a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-            Export Excel
-          </button>
-          
-          <button
-            className="export-button pdf"
-            onClick={() => handleQuickExport('pdf')}
-            disabled={isExporting}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 2v8M5 7l3-3 3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 12v1a1 1 0 001 1h8a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-            Export PDF
-          </button>
-        </div>
-        
-        {isExporting && (
-          <div className="export-status">
-            <div className="loading-spinner"></div>
-            <span>Preparing export...</span>
-          </div>
-        )}
-      </div>
-
-      {/* Export Summary */}
-      <div className="settings-group">
-        <div className="settings-section-title">Export Preview</div>
-        <div className="settings-info">
-          <div className="info-item">
-            <span className="info-label">Columns to export:</span>
-            <span className="info-value">{visibleColumns.length} columns</span>
-          </div>
-          <div className="info-item">
-            <span className="info-label">Default format:</span>
-            <span className="info-value">{settings.defaultFormat.toUpperCase()}</span>
-          </div>
-          <div className="info-item">
-            <span className="info-label">Include headers:</span>
-            <span className="info-value">{settings.includeHeaders ? 'Yes' : 'No'}</span>
-          </div>
-          <div className="info-item">
-            <span className="info-label">Date format:</span>
-            <span className="info-value">{settings.dateFormat}</span>
-          </div>
-        </div>
-        
-        <div className="export-preview">
-          <div className="preview-title">Column preview:</div>
-          <div className="preview-columns">
-            {visibleColumns.slice(0, 5).map(col => (
-              <span key={col.key} className="preview-column">{col.label}</span>
+            {PDF_EXPORT_OPTIONS.orientation.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
             ))}
-            {visibleColumns.length > 5 && (
-              <span className="preview-more">+{visibleColumns.length - 5} more</span>
+          </select>
+        </div>
+
+        {/* Export Action */}
+        <div className="export-action">
+          <button
+            className="button button-primary"
+            onClick={handleExport}
+            disabled={isExporting}
+          >
+            {isExporting ? 'Exporting...' : 'Export PDF'}
+          </button>
+        </div>
+
+        {/* Export Result */}
+        {showResult && exportResult && (
+          <div className={`export-result ${exportResult.success ? 'success' : 'error'}`}>
+            {exportResult.success ? (
+              <div className="export-success">
+                <div className="success-header">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 12l2 2 4-4"/>
+                    <circle cx="10" cy="10" r="9"/>
+                  </svg>
+                  <h4>Export Completed Successfully!</h4>
+                </div>
+                
+                <div className="export-details">
+                  <div className="detail-row">
+                    <span className="detail-label">File:</span>
+                    <span className="detail-value">{exportResult.filePath}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Products:</span>
+                    <span className="detail-value">{exportResult.metadata.productCount}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Pages:</span>
+                    <span className="detail-value">{exportResult.metadata.pageCount}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">File Size:</span>
+                    <span className="detail-value">{formatFileSize(exportResult.metadata.fileSize)}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Generation Time:</span>
+                    <span className="detail-value">{formatDuration(exportResult.metadata.generationTime)}</span>
+                  </div>
+                </div>
+
+              </div>
+            ) : (
+              <div className="export-error">
+                <div className="error-header">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="10" cy="10" r="9"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                  <h4>Export Failed</h4>
+                </div>
+                <p className="error-message">{exportResult.error}</p>
+              </div>
             )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

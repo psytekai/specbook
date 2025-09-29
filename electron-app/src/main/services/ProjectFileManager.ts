@@ -4,14 +4,18 @@ import Database from 'better-sqlite3';
 import { v4 as uuidv4 } from 'uuid';
 import { AssetManager } from './AssetManager';
 import { mapDbRowToInterface, mapInterfaceToDb } from '../../shared/mappings/fieldMappings';
-import type { 
-  Project, 
-  Product, 
-  Category, 
-  Location, 
+import type {
+  Project,
+  Product,
+  Category,
+  Location,
   Manifest,
-  ProjectFileManagerOptions 
+  ProjectFileManagerOptions
 } from '../types/project.types';
+
+import { logger } from '../../shared/logging/Logger';
+
+var log = logger.for('ProjectFileManager');
 
 /**
  * ProjectFileManager handles all file-based operations for .specbook projects
@@ -61,63 +65,11 @@ export class ProjectFileManager {
   async initializeDatabase(projectPath: string): Promise<Database.Database> {
     try {
       const dbPath = path.join(projectPath, 'project.db');
-      
+
       // Create database connection
       const db = new Database(dbPath);
-      
-      // Enable foreign keys
-      db.exec('PRAGMA foreign_keys = ON');
 
-      // Create products table
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS products (
-          id TEXT PRIMARY KEY,
-          project_id TEXT NOT NULL,
-          url TEXT NOT NULL,
-          tag_id TEXT NOT NULL,
-          location TEXT NOT NULL,
-          description TEXT,
-          specification_description TEXT,
-          category TEXT NOT NULL,
-          product_name TEXT NOT NULL,
-          manufacturer TEXT,
-          price REAL,
-          primary_image_hash TEXT,
-          primary_thumbnail_hash TEXT,
-          additional_images_hashes TEXT,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      // Create categories table
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS categories (
-          id TEXT PRIMARY KEY,
-          name TEXT UNIQUE NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      // Create locations table
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS locations (
-          id TEXT PRIMARY KEY,
-          name TEXT UNIQUE NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      // Create update trigger for products
-      db.exec(`
-        CREATE TRIGGER IF NOT EXISTS update_products_timestamp 
-        AFTER UPDATE ON products
-        BEGIN
-          UPDATE products SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
-        END
-      `);
-
-      console.log(`Initialized database at: ${dbPath}`);
+      log.info(`Initialized database at: ${dbPath}`);
       return db;
     } catch (error) {
       throw new Error(`Failed to initialize database: ${error}`);
@@ -129,49 +81,19 @@ export class ProjectFileManager {
    */
   async migrateDatabase(db: Database.Database): Promise<void> {
     try {
-      // Check if asset columns exist
-      const tableInfo = db.prepare("PRAGMA table_info(products)").all() as Array<{name: string}>;
-      const columnNames = tableInfo.map(col => col.name);
-      
-      // Phase 4: Add asset management columns if they don't exist
-      const assetColumns = [
-        { name: 'primary_image_hash', type: 'TEXT' },
-        { name: 'primary_thumbnail_hash', type: 'TEXT' },
-        { name: 'additional_images_hashes', type: 'TEXT' }  // JSON array of hashes
-      ];
-      
-      for (const column of assetColumns) {
-        if (!columnNames.includes(column.name)) {
-          console.log(`Adding column ${column.name} to products table...`);
-          db.exec(`ALTER TABLE products ADD COLUMN ${column.name} ${column.type}`);
-        }
+      // Apply versioned migrations
+      const currentVersion = this.getSchemaVersion(db);
+      log.info('Current schema version:', {currentVersion});
+      const targetVersion = 2; // Latest schema version
+
+      for (let version = currentVersion + 1; version <= targetVersion; version++) {
+        log.info(`Applying migration version ${version}...`);
+        this.applyMigration(db, version);
       }
-      
-      // Create assets metadata table for tracking
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS assets (
-          hash TEXT PRIMARY KEY,
-          original_name TEXT,
-          mimetype TEXT,
-          size INTEGER,
-          width INTEGER,
-          height INTEGER,
-          thumbnail_hash TEXT,
-          ref_count INTEGER DEFAULT 1,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-      
-      // Create index for faster lookups
-      db.exec(`
-        CREATE INDEX IF NOT EXISTS idx_assets_ref_count ON assets(ref_count);
-        CREATE INDEX IF NOT EXISTS idx_assets_last_accessed ON assets(last_accessed);
-      `);
-      
-      console.log('Database migration completed successfully');
+
+      log.info('Database migration completed successfully');
     } catch (error) {
-      console.error('Database migration failed:', error);
+      log.error('Database migration failed:', {error});
       throw new Error(`Failed to migrate database: ${error}`);
     }
   }
@@ -185,7 +107,7 @@ export class ProjectFileManager {
       const tableExists = db.prepare(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'"
       ).get();
-      
+
       if (!tableExists) {
         // Create schema version table
         db.exec(`
@@ -194,18 +116,18 @@ export class ProjectFileManager {
             applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
           )
         `);
-        
+
         // Insert initial version
-        db.prepare('INSERT INTO schema_version (version) VALUES (?)').run(1);
-        return 1;
+        db.prepare('INSERT INTO schema_version (version) VALUES (?)').run(0);
+        return 0;
       }
-      
+
       // Get current version
       const result = db.prepare('SELECT MAX(version) as version FROM schema_version').get() as {version: number};
-      return result?.version || 1;
+      return result?.version || 0;
     } catch (error) {
-      console.error('Error getting schema version:', error);
-      return 1;
+      log.error('Error getting schema version:', {error});
+      return 0;
     }
   }
 
@@ -214,9 +136,238 @@ export class ProjectFileManager {
    */
   applyMigration(db: Database.Database, version: number): void {
     const migrations: Record<number, () => void> = {
-      // Future migrations can be added here
+      1: () => {
+          // Enable foreign keys
+        db.exec('PRAGMA foreign_keys = ON');
+
+        // Create products table
+        db.exec(`
+          CREATE TABLE IF NOT EXISTS products (
+            id TEXT PRIMARY KEY,
+            project_id TEXT NOT NULL,
+            url TEXT NOT NULL,
+            tag_id TEXT NOT NULL,
+            location TEXT,
+            description TEXT,
+            specification_description TEXT,
+            category TEXT,
+            product_name TEXT NOT NULL,
+            manufacturer TEXT,
+            price REAL,
+            primary_image_hash TEXT,
+            primary_thumbnail_hash TEXT,
+            additional_images_hashes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+
+        // Create categories table
+        db.exec(`
+          CREATE TABLE IF NOT EXISTS categories (
+            id TEXT PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+
+        // Create locations table
+        db.exec(`
+          CREATE TABLE IF NOT EXISTS locations (
+            id TEXT PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+
+        // Create update trigger for products
+        db.exec(`
+          CREATE TRIGGER IF NOT EXISTS update_products_timestamp 
+          AFTER UPDATE ON products
+          BEGIN
+            UPDATE products SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+          END
+        `);
+
+        // Migration: Add asset management columns and tables
+        console.log('Adding asset management columns and tables...');
+
+        // Check if asset columns exist
+        const tableInfo = db.prepare("PRAGMA table_info(products)").all() as Array<{name: string}>;
+        const columnNames = tableInfo.map(col => col.name);
+
+        // Add asset management columns if they don't exist
+        const assetColumns = [
+          { name: 'primary_image_hash', type: 'TEXT' },
+          { name: 'primary_thumbnail_hash', type: 'TEXT' },
+          { name: 'additional_images_hashes', type: 'TEXT' }  // JSON array of hashes
+        ];
+
+        for (const column of assetColumns) {
+          if (!columnNames.includes(column.name)) {
+            console.log(`Adding column ${column.name} to products table...`);
+            db.exec(`ALTER TABLE products ADD COLUMN ${column.name} ${column.type}`);
+          }
+        }
+
+        // Create assets metadata table for tracking
+        db.exec(`
+          CREATE TABLE IF NOT EXISTS assets (
+            hash TEXT PRIMARY KEY,
+            original_name TEXT,
+            mimetype TEXT,
+            size INTEGER,
+            width INTEGER,
+            height INTEGER,
+            thumbnail_hash TEXT,
+            ref_count INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+
+        // Create index for faster lookups
+        db.exec(`
+          CREATE INDEX IF NOT EXISTS idx_assets_ref_count ON assets(ref_count);
+          CREATE INDEX IF NOT EXISTS idx_assets_last_accessed ON assets(last_accessed);
+        `);
+
+        console.log('Successfully added asset management columns and tables');
+      },
+      2: () => {
+        // Migration: Multiple schema updates
+        console.log('Applying migration 2: column renaming, data swapping, and constraint updates...');
+
+        // Part 1: Rename description column to type and swap data with specification_description
+        console.log('Renaming description column to type and swapping data...');
+
+        // Step 1: Add temporary columns to hold data during swap
+        db.exec('ALTER TABLE products ADD COLUMN temp_description TEXT');
+        db.exec('ALTER TABLE products ADD COLUMN temp_spec_desc TEXT');
+
+        // Step 2: Copy current data to temporary columns
+        db.exec('UPDATE products SET temp_description = description');
+        db.exec('UPDATE products SET temp_spec_desc = specification_description');
+
+        // Step 3: Rename description column to type
+        db.exec('ALTER TABLE products RENAME COLUMN description TO type');
+
+        // Step 4: Perform the data swap
+        // Move temp_spec_desc (originally specification_description) to type
+        db.exec('UPDATE products SET type = temp_spec_desc');
+        // Move temp_description (originally description) to specification_description
+        db.exec('UPDATE products SET specification_description = temp_description');
+
+        // Step 5: Drop the temporary columns
+        db.exec('ALTER TABLE products DROP COLUMN temp_description');
+        db.exec('ALTER TABLE products DROP COLUMN temp_spec_desc');
+
+        console.log('Successfully renamed description column to type and swapped data with specification_description');
+
+        // Part 2: Update location and category columns to reference IDs and remove NOT NULL constraints
+        console.log('Updating location and category columns to reference IDs...');
+
+        // Create new products table with updated schema
+        db.exec(`
+          CREATE TABLE products_new (
+            id TEXT PRIMARY KEY,
+            project_id TEXT NOT NULL,
+            url TEXT NOT NULL,
+            tag_id TEXT NOT NULL,
+            location TEXT,
+            type TEXT,
+            specification_description TEXT,
+            category TEXT,
+            product_name TEXT NOT NULL,
+            manufacturer TEXT,
+            price REAL,
+            primary_image_hash TEXT,
+            primary_thumbnail_hash TEXT,
+            additional_images_hashes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+
+        // Function to convert name arrays to ID arrays
+        const convertNamesToIds = (nameArray: string[], tableName: string): string[] => {
+          if (!nameArray || nameArray.length === 0) return [];
+
+          const ids: string[] = [];
+          for (const name of nameArray) {
+            if (name && name.trim()) {
+              const result = db.prepare(`SELECT id FROM ${tableName} WHERE name = ?`).get(name.trim()) as {id: string} | undefined;
+              if (result) {
+                ids.push(result.id);
+              }
+            }
+          }
+          return ids;
+        };
+
+        // Migrate data from old table to new table, converting names to IDs
+        const products = db.prepare('SELECT * FROM products').all() as any[];
+        const insertStmt = db.prepare(`
+          INSERT INTO products_new (
+            id, project_id, url, tag_id, location, type, specification_description, 
+            category, product_name, manufacturer, price, primary_image_hash, 
+            primary_thumbnail_hash, additional_images_hashes, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+
+        for (const product of products) {
+          // Parse existing location and category arrays (they contain names)
+          let locationNames: string[] = [];
+          let categoryNames: string[] = [];
+
+          try {
+            locationNames = product.location ? JSON.parse(product.location) : [];
+            categoryNames = product.category ? JSON.parse(product.category) : [];
+          } catch (error) {
+            console.warn(`Failed to parse location/category for product ${product.id}:`, error);
+          }
+
+          // Convert names to IDs
+          const locationIds = convertNamesToIds(locationNames, 'locations');
+          const categoryIds = convertNamesToIds(categoryNames, 'categories');
+
+          insertStmt.run(
+            product.id,
+            product.project_id,
+            product.url,
+            product.tag_id,
+            locationIds.length > 0 ? JSON.stringify(locationIds) : null,
+            product.type,
+            product.specification_description,
+            categoryIds.length > 0 ? JSON.stringify(categoryIds) : null,
+            product.product_name,
+            product.manufacturer,
+            product.price,
+            product.primary_image_hash,
+            product.primary_thumbnail_hash,
+            product.additional_images_hashes,
+            product.created_at,
+            product.updated_at
+          );
+        }
+
+        // Drop old table and rename new table
+        db.exec('DROP TABLE products');
+        db.exec('ALTER TABLE products_new RENAME TO products');
+
+        // Recreate the update trigger
+        db.exec(`
+          CREATE TRIGGER IF NOT EXISTS update_products_timestamp 
+          AFTER UPDATE ON products
+          BEGIN
+            UPDATE products SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+          END
+        `);
+
+        console.log('Successfully updated location and category columns to reference IDs and removed NOT NULL constraints');
+      }
     };
-    
+
     if (migrations[version]) {
       db.transaction(() => {
         migrations[version]();
@@ -307,12 +458,11 @@ export class ProjectFileManager {
       if (!productData.url) throw new Error('Product URL is required');
       if (!productData.tagId) throw new Error('Tag ID is required');
       if (!productData.productName) throw new Error('Product name is required');
-      if (!productData.location || productData.location.length === 0) throw new Error('At least one location is required');
-      if (!productData.category || productData.category.length === 0) throw new Error('At least one category is required');
-      
+      // Note: location and category are now optional (no NOT NULL constraint)
+
       const id = uuidv4();
       const now = new Date().toISOString();
-      
+
       // Map interface fields to database column names
       const dbData = mapInterfaceToDb({
         ...productData,
@@ -320,26 +470,26 @@ export class ProjectFileManager {
         createdAt: now,
         updatedAt: now
       });
-      
+
       const stmt = this.db.prepare(`
         INSERT INTO products (
           id, project_id, url, tag_id, location,
-          description, specification_description, category, 
+          type, specification_description, category, 
           product_name, manufacturer, price,
           primary_image_hash, primary_thumbnail_hash, additional_images_hashes,
           created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
-      
+
       stmt.run(
         dbData.id,
         dbData.project_id || this.currentProject.id,
         dbData.url,
         dbData.tag_id, // Required field, validated above
-        JSON.stringify(productData.location), // Required field, validated above
-        dbData.description || null,
+        productData.location && productData.location.length > 0 ? JSON.stringify(productData.location) : null,
+        dbData.type || null,
         dbData.specification_description || null,
-        JSON.stringify(productData.category), // Required field, validated above
+        productData.category && productData.category.length > 0 ? JSON.stringify(productData.category) : null,
         dbData.product_name, // Required field, validated above
         dbData.manufacturer || null,
         dbData.price || null,
@@ -353,9 +503,8 @@ export class ProjectFileManager {
       // Update product count in manifest
       await this.updateProductCount();
 
-      // Extract and store categories and locations
-      await this.extractAndStoreCategories(productData.category || []);
-      await this.extractAndStoreLocations(productData.location || []);
+      // Note: Since we're now working with IDs, we don't need to extract and store
+      // categories and locations here. The IDs should already exist in the database.
 
       // Get the created product using the same parsing logic
       const createdRow = this.db.prepare('SELECT * FROM products WHERE id = ?').get(id) as any;
@@ -384,8 +533,7 @@ export class ProjectFileManager {
       if (updates.url !== undefined && !updates.url) throw new Error('Product URL cannot be empty');
       if (updates.tagId !== undefined && !updates.tagId) throw new Error('Tag ID cannot be empty');
       if (updates.productName !== undefined && !updates.productName) throw new Error('Product name cannot be empty');
-      if (updates.location !== undefined && (!updates.location || updates.location.length === 0)) throw new Error('At least one location is required');
-      if (updates.category !== undefined && (!updates.category || updates.category.length === 0)) throw new Error('At least one category is required');
+      // Note: location and category are now optional (no NOT NULL constraint)
 
       // Build update query
       const updateFields: string[] = [];
@@ -401,12 +549,11 @@ export class ProjectFileManager {
       }
       if (updates.location !== undefined) {
         updateFields.push('location = ?');
-        values.push(JSON.stringify(updates.location));
-        await this.extractAndStoreLocations(updates.location);
+        values.push(updates.location && updates.location.length > 0 ? JSON.stringify(updates.location) : null);
       }
-      if (updates.description !== undefined) {
-        updateFields.push('description = ?');
-        values.push(updates.description);
+      if (updates.type !== undefined) {
+        updateFields.push('type = ?');
+        values.push(updates.type);
       }
       if (updates.specificationDescription !== undefined) {
         updateFields.push('specification_description = ?');
@@ -414,8 +561,7 @@ export class ProjectFileManager {
       }
       if (updates.category !== undefined) {
         updateFields.push('category = ?');
-        values.push(JSON.stringify(updates.category));
-        await this.extractAndStoreCategories(updates.category);
+        values.push(updates.category && updates.category.length > 0 ? JSON.stringify(updates.category) : null);
       }
       if (updates.productName !== undefined) {
         updateFields.push('product_name = ?');
@@ -544,6 +690,114 @@ export class ProjectFileManager {
   }
 
   /**
+   * Creates a new category
+   */
+  async createCategory(name: string): Promise<Category> {
+    if (!this.db) {
+      throw new Error('No project is currently open');
+    }
+
+    try {
+      const id = uuidv4();
+      const now = new Date().toISOString();
+
+      const stmt = this.db.prepare(`
+        INSERT INTO categories (id, name, created_at) VALUES (?, ?, ?)
+      `);
+
+      stmt.run(id, name.trim(), now);
+
+      return {
+        id,
+        name: name.trim(),
+        createdAt: new Date(now)
+      };
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('UNIQUE constraint failed')) {
+        throw new Error(`Category "${name}" already exists`);
+      }
+      throw new Error(`Failed to create category: ${error}`);
+    }
+  }
+
+  /**
+   * Updates an existing category
+   */
+  async updateCategory(id: string, name: string): Promise<Category> {
+    if (!this.db) {
+      throw new Error('No project is currently open');
+    }
+
+    try {
+      // Check if category exists
+      const existing = this.db.prepare('SELECT * FROM categories WHERE id = ?').get(id) as any;
+      if (!existing) {
+        throw new Error(`Category not found: ${id}`);
+      }
+
+      const stmt = this.db.prepare(`
+        UPDATE categories SET name = ? WHERE id = ?
+      `);
+
+      stmt.run(name.trim(), id);
+
+      return {
+        id,
+        name: name.trim(),
+        createdAt: new Date(existing.created_at)
+      };
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('UNIQUE constraint failed')) {
+        throw new Error(`Category "${name}" already exists`);
+      }
+      throw new Error(`Failed to update category: ${error}`);
+    }
+  }
+
+  /**
+   * Deletes a category and removes it from all products
+   */
+  async deleteCategory(id: string): Promise<boolean> {
+    if (!this.db) {
+      throw new Error('No project is currently open');
+    }
+
+    try {
+      // Check if category exists
+      const existing = this.db.prepare('SELECT * FROM categories WHERE id = ?').get(id) as any;
+      if (!existing) {
+        throw new Error(`Category not found: ${id}`);
+      }
+
+      // Remove category from all products that reference it
+      const products = this.db.prepare('SELECT id, category FROM products WHERE category IS NOT NULL').all() as any[];
+
+      for (const product of products) {
+        try {
+          const categoryIds = JSON.parse(product.category) as string[];
+          const updatedCategoryIds = categoryIds.filter(catId => catId !== id);
+
+          const updateStmt = this.db.prepare('UPDATE products SET category = ? WHERE id = ?');
+          updateStmt.run(
+            updatedCategoryIds.length > 0 ? JSON.stringify(updatedCategoryIds) : null,
+            product.id
+          );
+        } catch (parseError) {
+          console.warn(`Failed to parse category data for product ${product.id}:`, parseError);
+        }
+      }
+
+      // Delete the category
+      const deleteStmt = this.db.prepare('DELETE FROM categories WHERE id = ?');
+      const result = deleteStmt.run(id);
+
+      return result.changes > 0;
+    } catch (error) {
+      throw new Error(`Failed to delete category: ${error}`);
+    }
+  }
+
+  /**
    * Gets all locations
    */
   async getLocations(): Promise<Location[]> {
@@ -562,6 +816,114 @@ export class ProjectFileManager {
       }));
     } catch (error) {
       throw new Error(`Failed to get locations: ${error}`);
+    }
+  }
+
+  /**
+   * Creates a new location
+   */
+  async createLocation(name: string): Promise<Location> {
+    if (!this.db) {
+      throw new Error('No project is currently open');
+    }
+
+    try {
+      const id = uuidv4();
+      const now = new Date().toISOString();
+
+      const stmt = this.db.prepare(`
+        INSERT INTO locations (id, name, created_at) VALUES (?, ?, ?)
+      `);
+
+      stmt.run(id, name.trim(), now);
+
+      return {
+        id,
+        name: name.trim(),
+        createdAt: new Date(now)
+      };
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('UNIQUE constraint failed')) {
+        throw new Error(`Location "${name}" already exists`);
+      }
+      throw new Error(`Failed to create location: ${error}`);
+    }
+  }
+
+  /**
+   * Updates an existing location
+   */
+  async updateLocation(id: string, name: string): Promise<Location> {
+    if (!this.db) {
+      throw new Error('No project is currently open');
+    }
+
+    try {
+      // Check if location exists
+      const existing = this.db.prepare('SELECT * FROM locations WHERE id = ?').get(id) as any;
+      if (!existing) {
+        throw new Error(`Location not found: ${id}`);
+      }
+
+      const stmt = this.db.prepare(`
+        UPDATE locations SET name = ? WHERE id = ?
+      `);
+
+      stmt.run(name.trim(), id);
+
+      return {
+        id,
+        name: name.trim(),
+        createdAt: new Date(existing.created_at)
+      };
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('UNIQUE constraint failed')) {
+        throw new Error(`Location "${name}" already exists`);
+      }
+      throw new Error(`Failed to update location: ${error}`);
+    }
+  }
+
+  /**
+   * Deletes a location and removes it from all products
+   */
+  async deleteLocation(id: string): Promise<boolean> {
+    if (!this.db) {
+      throw new Error('No project is currently open');
+    }
+
+    try {
+      // Check if location exists
+      const existing = this.db.prepare('SELECT * FROM locations WHERE id = ?').get(id) as any;
+      if (!existing) {
+        throw new Error(`Location not found: ${id}`);
+      }
+
+      // Remove location from all products that reference it
+      const products = this.db.prepare('SELECT id, location FROM products WHERE location IS NOT NULL').all() as any[];
+
+      for (const product of products) {
+        try {
+          const locationIds = JSON.parse(product.location) as string[];
+          const updatedLocationIds = locationIds.filter(locId => locId !== id);
+
+          const updateStmt = this.db.prepare('UPDATE products SET location = ? WHERE id = ?');
+          updateStmt.run(
+            updatedLocationIds.length > 0 ? JSON.stringify(updatedLocationIds) : null,
+            product.id
+          );
+        } catch (parseError) {
+          console.warn(`Failed to parse location data for product ${product.id}:`, parseError);
+        }
+      }
+
+      // Delete the location
+      const deleteStmt = this.db.prepare('DELETE FROM locations WHERE id = ?');
+      const result = deleteStmt.run(id);
+
+      return result.changes > 0;
+    } catch (error) {
+      throw new Error(`Failed to delete location: ${error}`);
     }
   }
 
@@ -597,7 +959,7 @@ export class ProjectFileManager {
 
       // Initialize database
       this.db = await this.initializeDatabase(projectPath);
-      
+
       // Apply latest schema (ensures new projects have all columns)
       await this.migrateDatabase(this.db);
 
@@ -633,7 +995,7 @@ export class ProjectFileManager {
 
       // Initialize database (this will create tables if they don't exist)
       this.db = await this.initializeDatabase(projectPath);
-      
+
       // Run migrations for existing projects
       await this.migrateDatabase(this.db);
 
@@ -724,7 +1086,7 @@ export class ProjectFileManager {
   private parseProductRow(row: any): Product {
     // First apply field name mappings
     const mappedRow = mapDbRowToInterface(row);
-    
+
     // Then parse JSON fields and ensure correct types
     return {
       id: mappedRow.id,
@@ -732,18 +1094,18 @@ export class ProjectFileManager {
       url: mappedRow.url,
       tagId: mappedRow.tagId || undefined,
       location: this.parseJsonArray(mappedRow.location),
-      description: mappedRow.description || undefined,
+      type: mappedRow.type || undefined,
       specificationDescription: mappedRow.specificationDescription || undefined,
       category: this.parseJsonArray(mappedRow.category),
       productName: mappedRow.productName,
       manufacturer: mappedRow.manufacturer || undefined,
       price: mappedRow.price || undefined,
-      
+
       // Asset fields now properly mapped from snake_case
       primaryImageHash: mappedRow.primaryImageHash || undefined,
       primaryThumbnailHash: mappedRow.primaryThumbnailHash || undefined,
       additionalImagesHashes: this.parseJsonArray(mappedRow.additionalImagesHashes),
-      
+
       createdAt: new Date(mappedRow.createdAt),
       updatedAt: new Date(mappedRow.updatedAt)
     };
@@ -784,47 +1146,6 @@ export class ProjectFileManager {
     }
   }
 
-  /**
-   * Extracts and stores unique categories
-   */
-  private async extractAndStoreCategories(categories: string[]): Promise<void> {
-    if (!this.db || !categories || categories.length === 0) return;
-
-    try {
-      const stmt = this.db.prepare(`
-        INSERT OR IGNORE INTO categories (id, name) VALUES (?, ?)
-      `);
-
-      for (const category of categories) {
-        if (category && category.trim()) {
-          stmt.run(uuidv4(), category.trim());
-        }
-      }
-    } catch (error) {
-      console.error('Failed to store categories:', error);
-    }
-  }
-
-  /**
-   * Extracts and stores unique locations
-   */
-  private async extractAndStoreLocations(locations: string[]): Promise<void> {
-    if (!this.db || !locations || locations.length === 0) return;
-
-    try {
-      const stmt = this.db.prepare(`
-        INSERT OR IGNORE INTO locations (id, name) VALUES (?, ?)
-      `);
-
-      for (const location of locations) {
-        if (location && location.trim()) {
-          stmt.run(uuidv4(), location.trim());
-        }
-      }
-    } catch (error) {
-      console.error('Failed to store locations:', error);
-    }
-  }
 
   /**
    * Gets the current project

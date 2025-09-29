@@ -17,7 +17,7 @@ export const DB_TO_INTERFACE_MAPPING = {
   'id': 'id',
   'url': 'url',
   'location': 'location',
-  'description': 'description', 
+  'type': 'type', 
   'category': 'category',
   'manufacturer': 'manufacturer',
   'price': 'price'

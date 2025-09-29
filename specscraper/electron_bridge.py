@@ -320,27 +320,21 @@ def main() -> None:
 
         result = bridge.scrape_product(url=url, options=input_data.get("options", {}))
 
-        # Contract compliance: stdout only on success, stderr for all failures
-        if result.get("success"):
-            # Success: exactly one JSON result to stdout (compact)
-            print(json.dumps(result, separators=(",", ":")))
+        # Contract compliance: if the request succeeds, print the result to stdout regardless of the scrape success or failure
+        # We want to bubble up the error to the frontend otherwise we send nothing to the bridge and it stalls.
+        # Success: exactly one JSON result to stdout (compact)
+        print(json.dumps(result, separators=(",", ":")))
 
-            bridge.logger.info(
-                "Request completed successfully",
-                processing_time=result.get("metadata", {}).get("processing_time"),
-            )
+        bridge.logger.info(
+            "Request completed successfully",
+            processing_time=result.get("metadata", {}).get("processing_time"),
+        )
 
-            # Flush guarantees
-            sys.stdout.flush()
-            bridge.logger.flush()
-            sys.stderr.flush()
-            sys.exit(0)
-
-        # Failure: no stdout output, error info to stderr only
-        bridge.logger.error("Request failed", error=result.get("error"), metadata=result.get("metadata", {}))
+        # Flush guarantees
+        sys.stdout.flush()
         bridge.logger.flush()
         sys.stderr.flush()
-        sys.exit(1)
+        sys.exit(0)
 
     except json.JSONDecodeError as e:
         # Contract: no stdout on failure, error to stderr only
@@ -377,3 +371,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+s
+# echo '{"url":"https://www.kohler.com/en/products/lighting/shop-lighting/embra-by-studio-mcgee-14-pendant-32259-pe01?skuId=32259-PE01-2GL","options":{"method":"auto","llm_model":"gpt-4o-mini","temperature":0.7,"max_tokens":1000}}'| python3 electron_bridge.py > bridge.log 2>stderr.log

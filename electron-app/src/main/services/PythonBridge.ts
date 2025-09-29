@@ -4,62 +4,11 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as fsSync from 'fs';
 import { app } from 'electron';
-import * as os from 'os';
-import { ProjectState } from './ProjectState';
 import { logger } from '../../shared/logging/Logger';
+import type { ScrapeOptions, ScrapeProgress, StructuredLogEvent, ScrapeResult } from '../../shared/types';
 
 var log = logger.for('PythonBridge');
 
-export interface ScrapeOptions {
-  method?: 'auto' | 'requests' | 'firecrawl';
-  llm_model?: string;
-  temperature?: number;
-  max_tokens?: number;
-}
-
-export interface ScrapeProgress {
-  type: 'progress';
-  stage: 'init' | 'scraping' | 'processing' | 'extraction' | 'complete';
-  progress: number;
-  message: string;
-  timestamp: number;
-}
-
-export interface StructuredLogEvent {
-  schema: string;
-  ts: string;
-  event_id: number;
-  level: 'debug' | 'info' | 'warn' | 'error';
-  component: string;
-  message: string;
-  ctx?: Record<string, any>;
-}
-
-export interface ScrapeResult {
-  success: boolean;
-  data: {
-    image_url: string;
-    type: string;
-    description: string;
-    model_no: string;
-    product_link: string;
-  } | null;
-  metadata: {
-    scrape_method?: string;
-    processing_time?: number;
-    scrape_time?: number;
-    llm_model?: string;
-    status_code?: number;
-    html_length?: number;
-    processed_length?: number;
-    prompt_tokens?: number;
-    execution_time?: number;
-    partial_output?: string;
-    [key: string]: any;
-  };
-  error: string | null;
-  diagnostics?: StructuredLogEvent[];
-}
 
 /* -----------------------------
    Executable path resolution
@@ -111,7 +60,8 @@ export function runBridge(args: string[] = [], opts: any = {}): ChildProcess {
   log.info('[Bridge] Attempting to spawn:', {
     executable: bridgeExecutable,
     args: args,
-    env: opts?.env ? Object.keys(opts.env) : 'none'
+    env: opts?.env ? Object.keys(opts.env) : 'none',
+    specBridgePayload: opts?.env?.SPEC_BRIDGE_PAYLOAD
   });
 
   if (!app.isPackaged && !fsSync.existsSync(bridgeExecutable)) {
@@ -161,26 +111,6 @@ export class PythonBridge {
     | { checked: number; available: boolean; error: string | null }
     | null = null;
   private readonly CACHE_DURATION = 30000; // 30s
-
-  /* -----------------------------
-     Log file path helper
-  ------------------------------ */
-  private getProjectLogFilePath(prefix: string = 'python_bridge'):
-    string {
-    try {
-      const projectPath = ProjectState.getInstance().currentFilePath;
-      const stamp = new Date()
-        .toISOString()
-        .replace(/[:.]/g, '-')
-        .replace('T', '_')
-        .replace('Z', 'Z');
-      if (projectPath) {
-        const dir = path.join(projectPath, '.metadata', 'logs');
-        return path.join(dir, `${prefix}_${stamp}.log`);
-      }
-    } catch {}
-    return path.join(os.tmpdir(), 'specbridge', `${prefix}_${Date.now()}.log`);
-  }
 
   /* -----------------------------
      Slots
@@ -252,10 +182,8 @@ export class PythonBridge {
     try {
       const executablePath = bridgePath();
       await fs.access(executablePath, fs.constants.R_OK);
-
-      const testResult = await this.testBridge();
-      this.isAvailable = testResult.success;
-      this.lastError = testResult.error ?? null;
+      this.isAvailable = true;
+      this.lastError = null;
     } catch (error) {
       this.isAvailable = false;
       this.lastError = `Bridge not available at ${bridgePath()}: ${error}`;
@@ -267,74 +195,6 @@ export class PythonBridge {
       error: this.lastError,
     };
     return this.isAvailable;
-  }
-
-  /**
-   * Network-independent health check.
-   * We only verify that:
-   *  - the process starts,
-   *  - it can read a newline-framed payload,
-   *  - it emits any structured stderr log line OR valid stdout JSON,
-   *  - and then exits (code may be 0 or 1).
-   */
-  private async testBridge(): Promise<{ success: boolean; error?: string }> {
-    return new Promise(resolve => {
-      log.info('[Bridge] testBridge environment check:', {
-        OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'SET' : 'NOT SET',
-        FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY ? 'SET' : 'NOT SET'
-      });
-      const child = runBridge([], { env: {
-        SPEC_BRIDGE_PAYLOAD: JSON.stringify({ url: 'https://www.homedepot.com/p/DEWALT-20V-MAX-Cordless-Drill-Driver-Kit-DCD771C2/204279858', options: { method: 'requests' } }),
-        SPEC_BRIDGE_LOG_FILE: this.getProjectLogFilePath('diagnostic')
-      } });
-      let out = '';
-      let stderrSize = 0;
-      const MAX_STDERR_SIZE = 256 * 1024;
-      let stderrBuf = '';
-      let sawStructuredLog = false;
-
-
-
-      child.stdout?.on('data', c => (out += c.toString('utf8')));
-
-      child.stderr?.on('data', (data: Buffer) => {
-        stderrSize += data.length;
-        if (stderrSize > MAX_STDERR_SIZE) return;
-
-        stderrBuf += data.toString('utf8');
-        let idx: number;
-        while ((idx = stderrBuf.indexOf('\n')) >= 0) {
-          const line = stderrBuf.slice(0, idx).replace(/\r$/, '');
-          stderrBuf = stderrBuf.slice(idx + 1);
-          if (!line) continue;
-          const evt = parseStructuredLine(line);
-          if (evt) sawStructuredLog = true;
-        }
-      });
-
-      child.on('error', err => {
-        resolve({ success: false, error: `Process error: ${err.message}` });
-      });
-
-      child.on('close', () => {
-        // Consider bridge "available" if it either produced valid stdout JSON
-        // OR at least one structured stderr line (proves it ran and read input).
-        let ok = false;
-        try {
-          if (out.trim()) {
-            const parsed = JSON.parse(out);
-            ok = parsed && typeof parsed === 'object';
-          }
-        } catch {
-          // ignore
-        }
-        if (!ok && sawStructuredLog) ok = true;
-
-        resolve(ok ? { success: true } : { success: false, error: 'No structured output detected' });
-      });
-
-      // No stdin write needed when using SPEC_BRIDGE_PAYLOAD
-    });
   }
 
   /* -----------------------------

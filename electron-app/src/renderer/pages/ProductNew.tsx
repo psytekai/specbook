@@ -24,10 +24,10 @@ const ProductNew: React.FC = () => {
     url: string;
     tagId: string;
     location: string[];
-    description: string;
+    type: string;
     specificationDescription: string;
     category: string[];
-    productName?: string;
+    productName: string;
     manufacturer?: string;
     price?: number;
     
@@ -41,9 +41,12 @@ const ProductNew: React.FC = () => {
     url: '',
     tagId: '',
     location: [],
-    description: '',
+    type: '',
     specificationDescription: '',
     category: [],
+    productName: '',
+    manufacturer: '',
+    price: undefined,
     additionalImagesHashes: []
   });
   
@@ -110,25 +113,29 @@ const ProductNew: React.FC = () => {
     }));
   };
 
-  const handleAddLocation = async (locationName: string) => {
+  const handleAddLocation = async (locationName: string): Promise<Location> => {
     try {
       const request: AddLocationRequest = { name: locationName };
       const response = await api.post<Location>('/api/locations', request);
       setLocations(prev => [...prev, response.data]);
       showToast('Location added successfully', 'success');
-    } catch (_error) {
+      return response.data;
+    } catch (error) {
       showToast('Failed to add location', 'error');
+      throw error;
     }
   };
 
-  const handleAddCategory = async (categoryName: string) => {
+  const handleAddCategory = async (categoryName: string): Promise<Category> => {
     try {
       const request: AddCategoryRequest = { name: categoryName };
       const response = await api.post<Category>('/api/categories', request);
       setCategories(prev => [...prev, response.data]);
       showToast('Category added successfully', 'success');
-    } catch (_error) {
+      return response.data;
+    } catch (error) {
       showToast('Failed to add category', 'error');
+      throw error;
     }
   };
 
@@ -271,12 +278,11 @@ const ProductNew: React.FC = () => {
 
         setFormData(prev => ({
           ...prev,
-          description: data.description || '',
-          specificationDescription: data.type || '',
-
-          productName: data.model_no || '',
-          manufacturer: '',
-          price: undefined,
+          type: data.type || '',
+          specificationDescription: data.specification || '',
+          productName: data.product_name || '',
+          manufacturer: data.manufacturer || '',
+          price: data.price || undefined,
 
           primaryImageHash: imageHash,
           primaryThumbnailHash: thumbnailHash
@@ -298,6 +304,11 @@ const ProductNew: React.FC = () => {
     
     if (!formData.url) {
       showToast('Product URL is required', 'error');
+      return;
+    }
+    
+    if (!formData.productName || formData.productName.trim() === '') {
+      showToast('Product name is required', 'error');
       return;
     }
     
@@ -390,7 +401,7 @@ const ProductNew: React.FC = () => {
               </label>
               <LocationMultiSelect
                 selectedLocations={formData.location}
-                onSelectionChange={(locations: string[]) => setFormData(prev => ({ ...prev, location: locations }))}
+                onSelectionChange={(locationIds: string[]) => setFormData(prev => ({ ...prev, location: locationIds }))}
                 availableLocations={locations}
                 onAddLocation={handleAddLocation}
                 required={true}
@@ -490,16 +501,65 @@ const ProductNew: React.FC = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="description" className="label">
-                  Description
+                <label htmlFor="productName" className="label">
+                  Product Title *
                 </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  className="input textarea"
-                  value={formData.description}
+                <input
+                  id="productName"
+                  name="productName"
+                  type="text"
+                  className="input"
+                  value={formData.productName || ''}
                   onChange={handleInputChange}
-                  rows={4}
+                  placeholder="Enter product title"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="manufacturer" className="label">
+                  Manufacturer
+                </label>
+                <input
+                  id="manufacturer"
+                  name="manufacturer"
+                  type="text"
+                  className="input"
+                  value={formData.manufacturer || ''}
+                  onChange={handleInputChange}
+                  placeholder="Enter manufacturer"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="price" className="label">
+                  Price
+                </label>
+                <input
+                  id="price"
+                  name="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="input"
+                  value={formData.price || ''}
+                  onChange={handleInputChange}
+                  placeholder="Enter price"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="type" className="label">
+                  Type
+                </label>
+                <input
+                  id="type"
+                  name="type"
+                  type="text"
+                  className="input"
+                  value={formData.type}
+                  onChange={handleInputChange}
+                  placeholder="Enter product type"
                 />
               </div>
               
@@ -514,6 +574,7 @@ const ProductNew: React.FC = () => {
                   value={formData.specificationDescription}
                   onChange={handleInputChange}
                   rows={4}
+                  placeholder="Enter product specifications"
                 />
               </div>
               
@@ -523,7 +584,7 @@ const ProductNew: React.FC = () => {
                 </label>
                 <CategoryMultiSelect
                   selectedCategories={formData.category}
-                  onSelectionChange={(categories) => setFormData(prev => ({ ...prev, category: categories }))}
+                  onSelectionChange={(categoryIds) => setFormData(prev => ({ ...prev, category: categoryIds }))}
                   availableCategories={categories}
                   onAddCategory={handleAddCategory}
                   required={true}

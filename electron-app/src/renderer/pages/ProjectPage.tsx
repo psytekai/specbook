@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useElectronProject } from '../contexts/ElectronProjectContext';
 import { Product } from '../../shared/types';
+import { Location, Category } from '../types';
 import { api } from '../services/apiIPC';
 import { formatArray, formatPrice } from '../utils/formatters';
 import { TableSettingsModal, useTableSettings } from '../components/TableSettings';
@@ -12,12 +13,12 @@ import './ProjectPage.css';
 interface ProjectPageState {
   viewMode: 'grid' | 'list';
   groupBy: 'none' | 'location' | 'category' | 'manufacturer';
-  sortBy: 'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category';
+  sortBy: 'name' | 'date' | 'manufacturer' | 'price' | 'tagId';
   visibleColumns: {
     select: boolean;
     image: boolean;
     productName: boolean;
-    description: boolean;
+    type: boolean;
     manufacturer: boolean;
     price: boolean;
     category: boolean;
@@ -31,7 +32,12 @@ interface ProjectPageState {
     location: string;
     manufacturer: string;
   };
+  pagination: {
+    page: number;
+    limit: number;
+  };
 }
+
 
 // Local storage utilities
 const STORAGE_KEY = 'projectPage_preferences';
@@ -55,8 +61,8 @@ const getStoredState = (): Partial<ProjectPageState> => {
       validatedState.groupBy = parsed.groupBy;
     }
     
-    if (parsed.sortBy === 'name' || parsed.sortBy === 'date' || parsed.sortBy === 'location' || 
-        parsed.sortBy === 'manufacturer' || parsed.sortBy === 'price' || parsed.sortBy === 'category') {
+    if (parsed.sortBy === 'name' || parsed.sortBy === 'date' || 
+        parsed.sortBy === 'manufacturer' || parsed.sortBy === 'price' || parsed.sortBy === 'tagId') {
       validatedState.sortBy = parsed.sortBy;
     }
     
@@ -66,7 +72,7 @@ const getStoredState = (): Partial<ProjectPageState> => {
         select: true,
         image: true,
         productName: true,
-        description: true,
+        type: true,
         manufacturer: true,
         price: true,
         category: true,
@@ -112,6 +118,24 @@ const getStoredState = (): Partial<ProjectPageState> => {
       }
     }
     
+    // Validate pagination
+    if (parsed.pagination && typeof parsed.pagination === 'object') {
+      const defaultPagination = {
+        page: 1,
+        limit: 20
+      };
+      
+      validatedState.pagination = { ...defaultPagination };
+      
+      // Validate pagination settings
+      if (typeof parsed.pagination.page === 'number' && parsed.pagination.page > 0) {
+        validatedState.pagination.page = parsed.pagination.page;
+      }
+      if (typeof parsed.pagination.limit === 'number' && parsed.pagination.limit > 0 && parsed.pagination.limit <= 100) {
+        validatedState.pagination.limit = parsed.pagination.limit;
+      }
+    }
+    
     return validatedState;
   } catch (error) {
     console.warn('Failed to load project page preferences:', error);
@@ -133,6 +157,9 @@ const ProjectPage: React.FC = () => {
   const navigate = useNavigate();
   const { project, isLoading: projectLoading, isInitializing } = useElectronProject();
   const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]); // For grouping
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -151,17 +178,164 @@ const ProjectPage: React.FC = () => {
   const storedState = getStoredState();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(storedState.viewMode || 'list');
   const [groupBy, setGroupBy] = useState<'none' | 'location' | 'category' | 'manufacturer'>(storedState.groupBy || 'none');
-  const [sortBy, setSortBy] = useState<'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category'>(storedState.sortBy || 'date');
+  const [sortBy, setSortBy] = useState<'name' | 'date' | 'manufacturer' | 'price' | 'tagId'>(storedState.sortBy || 'date');
   const [filters, setFilters] = useState(storedState.filters || {
     search: '',
-    category: '',
-    location: '',
+    category: '',  // This will now store category ID
+    location: '',  // This will now store location ID
     manufacturer: ''
+  });
+  const [pagination, setPagination] = useState(storedState.pagination || {
+    page: 1,
+    limit: 20
+  });
+  const [paginationInfo, setPaginationInfo] = useState({
+    total: 0,
+    pages: 0
   });
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
 
   // For the new file-based system, we only have one current project
   const currentProject = project;
+
+  // Helper functions to map IDs to names
+  const getCategoryName = (categoryId: string): string => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.name : categoryId; // Fallback to ID if name not found
+  };
+
+  const getLocationName = (locationId: string): string => {
+    const location = locations.find(loc => loc.id === locationId);
+    return location ? location.name : locationId; // Fallback to ID if name not found
+  };
+
+  const getCategoryNames = (categoryIds: string[]): string[] => {
+    return categoryIds.map(id => getCategoryName(id));
+  };
+
+  const getLocationNames = (locationIds: string[]): string[] => {
+    return locationIds.map(id => getLocationName(id));
+  };
+
+  // Fetch data with pagination and filters
+  const fetchData = useCallback(async () => {
+    if (!currentProject) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Determine if we need all products for grouping
+      const needsAllProducts = groupBy !== 'none';
+      
+      // Build API parameters
+      const params = {
+        page: needsAllProducts ? undefined : pagination.page,
+        limit: needsAllProducts ? undefined : pagination.limit,
+        fetchAll: needsAllProducts,
+        sortBy,
+        ...filters
+      };
+
+      // Fetch products with pagination, categories, and locations in parallel
+      const [productsResponse, categoriesResponse, locationsResponse] = await Promise.all([
+        api.get<Product[]>(`/api/projects/current/products`, params),
+        api.get<Category[]>('/api/categories'),
+        api.get<Location[]>('/api/locations')
+      ]);
+      
+      if (productsResponse.success && productsResponse.data && productsResponse.pagination) {
+        if (needsAllProducts) {
+          // Store all products for grouping
+          setAllProducts(productsResponse.data);
+          setProducts([]); // Clear paginated products
+        } else {
+          // Store paginated products
+          setProducts(productsResponse.data);
+          setAllProducts([]); // Clear all products
+          setPaginationInfo({
+            total: productsResponse.pagination.total,
+            pages: productsResponse.pagination.pages
+          });
+        }
+      } else {
+        throw new Error('Failed to fetch products');
+      }
+      
+      setCategories(categoriesResponse.data);
+      setLocations(locationsResponse.data);
+    } catch (err) {
+      setError('Failed to load data');
+      console.error('Error fetching data:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentProject, pagination, sortBy, groupBy, filters]);
+
+  // Handlers for managing categories and locations from table settings
+  const handleAddCategory = useCallback(async (categoryName: string): Promise<Category> => {
+    try {
+      const response = await api.post<Category>('/api/categories', { name: categoryName });
+      setCategories(prev => [...prev, response.data]);
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to add category');
+    }
+  }, []);
+
+  const handleUpdateCategory = useCallback(async (id: string, name: string): Promise<Category> => {
+    try {
+      const response = await api.put<Category>(`/api/categories/${id}`, { name });
+      setCategories(prev => prev.map(cat => cat.id === id ? response.data : cat));
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to update category');
+    }
+  }, []);
+
+  const handleDeleteCategory = useCallback(async (id: string): Promise<boolean> => {
+    try {
+      await api.delete(`/api/categories/${id}`);
+      setCategories(prev => prev.filter(cat => cat.id !== id));
+      // Refresh products to reflect the changes
+      await fetchData();
+      return true;
+    } catch (error) {
+      throw new Error('Failed to delete category');
+    }
+  }, [fetchData]);
+
+  const handleAddLocation = useCallback(async (locationName: string): Promise<Location> => {
+    try {
+      const response = await api.post<Location>('/api/locations', { name: locationName });
+      setLocations(prev => [...prev, response.data]);
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to add location');
+    }
+  }, []);
+
+  const handleUpdateLocation = useCallback(async (id: string, name: string): Promise<Location> => {
+    try {
+      const response = await api.put<Location>(`/api/locations/${id}`, { name });
+      setLocations(prev => prev.map(loc => loc.id === id ? response.data : loc));
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to update location');
+    }
+  }, []);
+
+  const handleDeleteLocation = useCallback(async (id: string): Promise<boolean> => {
+    try {
+      await api.delete(`/api/locations/${id}`);
+      setLocations(prev => prev.filter(loc => loc.id !== id));
+      // Refresh products to reflect the changes
+      await fetchData();
+      return true;
+    } catch (error) {
+      throw new Error('Failed to delete location');
+    }
+  }, [fetchData]);
 
   // Redirect to welcome page if no project is open
   useEffect(() => {
@@ -186,7 +360,7 @@ const ProjectPage: React.FC = () => {
     }
   };
 
-  const updateSortBy = (sort: 'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category') => {
+  const updateSortBy = (sort: 'name' | 'date' | 'manufacturer' | 'price' | 'tagId') => {
     setSortBy(sort);
     if (isInitialized) {
       saveState({ sortBy: sort });
@@ -197,8 +371,11 @@ const ProjectPage: React.FC = () => {
   const updateFilters = (filterKey: keyof typeof filters, value: string | number | null) => {
     const newFilters = { ...filters, [filterKey]: value };
     setFilters(newFilters);
+    // Reset to first page when filters change
+    const newPagination = { ...pagination, page: 1 };
+    setPagination(newPagination);
     if (isInitialized) {
-      saveState({ filters: newFilters });
+      saveState({ filters: newFilters, pagination: newPagination });
     }
   };
 
@@ -210,174 +387,24 @@ const ProjectPage: React.FC = () => {
       manufacturer: ''
     };
     setFilters(clearedFilters);
+    // Reset to first page when filters are cleared
+    const newPagination = { ...pagination, page: 1 };
+    setPagination(newPagination);
     if (isInitialized) {
-      saveState({ filters: clearedFilters });
+      saveState({ filters: clearedFilters, pagination: newPagination });
     }
   };
 
-  // Helper function to filter products
-  const filterProducts = (products: Product[]) => {
-    return products.filter(product => {
-      // Search filter - searches across product name, description, manufacturer
-      if (filters.search.trim()) {
-        const searchTerm = filters.search.toLowerCase().trim();
-        const productName = (product.productName || '').toLowerCase();
-        const description = (product.description || '').toLowerCase();
-        const manufacturer = (product.manufacturer || '').toLowerCase();
-        
-        if (!productName.includes(searchTerm) && 
-            !description.includes(searchTerm) && 
-            !manufacturer.includes(searchTerm)) {
-          return false;
-        }
-      }
-      
-      // Category filter - handles both string and array formats
-      if (filters.category) {
-        if (typeof product.category === 'string') {
-          if (product.category !== filters.category) {
-            return false;
-          }
-        } else {
-          // Handle legacy array format
-          const productCategories = Array.isArray(product.category) ? product.category : [product.category];
-          if (!productCategories.includes(filters.category)) {
-            return false;
-          }
-        }
-      }
-      
-      // Location filter - handles array of locations
-      if (filters.location) {
-        const productLocations = Array.isArray(product.location) ? product.location : [product.location];
-        if (!productLocations.includes(filters.location)) {
-          return false;
-        }
-      }
-      
-      // Manufacturer filter
-      if (filters.manufacturer && product.manufacturer !== filters.manufacturer) {
-        return false;
-      }
-      
-      
-      return true;
-    });
+  const updatePagination = (updates: Partial<typeof pagination>) => {
+    const newPagination = { ...pagination, ...updates };
+    setPagination(newPagination);
+    if (isInitialized) {
+      saveState({ pagination: newPagination });
+    }
   };
 
-  // Helper function to sort products
-  const sortProducts = (products: Product[]) => {
-    return [...products].sort((a, b) => {
-      switch (sortBy) {
-        case 'name': {
-          const aName = a.productName || a.description || '';
-          const bName = b.productName || b.description || '';
-          return aName.localeCompare(bName);
-        }
-        case 'manufacturer': {
-          const aManufacturer = a.manufacturer || '';
-          const bManufacturer = b.manufacturer || '';
-          return aManufacturer.localeCompare(bManufacturer);
-        }
-        case 'price': {
-          const aPrice = a.price || 0;
-          const bPrice = b.price || 0;
-          return aPrice - bPrice;
-        }
-        case 'category': {
-          const aCategory = typeof a.category === 'string' ? a.category : formatArray(a.category);
-          const bCategory = typeof b.category === 'string' ? b.category : formatArray(b.category);
-          return aCategory.localeCompare(bCategory);
-        }
-        case 'location': {
-          const aLocation = formatArray(a.location);
-          const bLocation = formatArray(b.location);
-          return aLocation.localeCompare(bLocation);
-        }
-        case 'date':
-        default:
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      }
-    });
-  };
-
-  // Helper function to group products by location
-  const groupProductsByLocation = (products: Product[]) => {
-    const filtered = filterProducts(products);
-    const sorted = sortProducts(filtered);
-    const grouped = sorted.reduce((acc, product) => {
-      const locations = Array.isArray(product.location) && product.location.length > 0 
-        ? product.location 
-        : ['Unspecified'];
-      
-      // Add product to each location group (for multi-location support)
-      locations.forEach(location => {
-        if (!acc[location]) {
-          acc[location] = [];
-        }
-        acc[location].push(product);
-      });
-      return acc;
-    }, {} as Record<string, Product[]>);
-
-    // Sort location keys alphabetically
-    const sortedKeys = Object.keys(grouped).sort();
-    const sortedGrouped: Record<string, Product[]> = {};
-    sortedKeys.forEach(key => {
-      sortedGrouped[key] = grouped[key];
-    });
-
-    return sortedGrouped;
-  };
-
-  // Helper function to group products by category
-  const groupProductsByCategory = (products: Product[]) => {
-    const filtered = filterProducts(products);
-    const sorted = sortProducts(filtered);
-    const grouped = sorted.reduce((acc, product) => {
-      const categories = Array.isArray(product.category) ? product.category : [product.category || 'Uncategorized'];
-      categories.forEach(category => {
-        const categoryKey = category || 'Uncategorized';
-        if (!acc[categoryKey]) {
-          acc[categoryKey] = [];
-        }
-        acc[categoryKey].push(product);
-      });
-      return acc;
-    }, {} as Record<string, Product[]>);
-
-    // Sort category keys alphabetically
-    const sortedKeys = Object.keys(grouped).sort();
-    const sortedGrouped: Record<string, Product[]> = {};
-    sortedKeys.forEach(key => {
-      sortedGrouped[key] = grouped[key];
-    });
-
-    return sortedGrouped;
-  };
-
-  // Helper function to group products by manufacturer
-  const groupProductsByManufacturer = (products: Product[]) => {
-    const filtered = filterProducts(products);
-    const sorted = sortProducts(filtered);
-    const grouped = sorted.reduce((acc, product) => {
-      const manufacturer = product.manufacturer || 'Unknown Manufacturer';
-      if (!acc[manufacturer]) {
-        acc[manufacturer] = [];
-      }
-      acc[manufacturer].push(product);
-      return acc;
-    }, {} as Record<string, Product[]>);
-
-    // Sort manufacturer keys alphabetically
-    const sortedKeys = Object.keys(grouped).sort();
-    const sortedGrouped: Record<string, Product[]> = {};
-    sortedKeys.forEach(key => {
-      sortedGrouped[key] = grouped[key];
-    });
-
-    return sortedGrouped;
-  };
+  // Since filtering, sorting, and grouping are now handled by the backend,
+  // we just need to organize the already-processed products for display
 
   // Helper function to check if a product has multiple locations
   const isMultiLocationProduct = (product: Product) => {
@@ -389,15 +416,60 @@ const ProjectPage: React.FC = () => {
     return Array.isArray(product.location) ? product.location.length : 1;
   };
 
-  // Get unique values for filter dropdowns
-  const uniqueCategories = [...new Set(products.flatMap(p => {
-    if (typeof p.category === 'string') {
-      return [p.category];
-    }
-    return Array.isArray(p.category) ? p.category : [p.category];
-  }).filter(Boolean))].sort();
-  const uniqueLocations = [...new Set(products.flatMap(p => Array.isArray(p.location) ? p.location : [p.location]).filter(Boolean))].sort();
-  const uniqueManufacturers = [...new Set(products.map(p => p.manufacturer).filter(Boolean))].sort();
+  // Frontend grouping function
+  const groupProducts = (productsToGroup: Product[], groupByField: 'location' | 'category' | 'manufacturer') => {
+    const groups: Record<string, Product[]> = {};
+
+    productsToGroup.forEach(product => {
+      let groupKeys: string[] = [];
+
+      switch (groupByField) {
+        case 'location':
+          const locations = Array.isArray(product.location) ? product.location : [product.location].filter(Boolean);
+          if (locations.length === 0) {
+            groupKeys = ['No Location'];
+          } else {
+            groupKeys = locations.map(locationId => getLocationName(locationId));
+          }
+          break;
+        case 'category':
+          const categories = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean);
+          if (categories.length === 0) {
+            groupKeys = ['No Category'];
+          } else {
+            groupKeys = categories.map(categoryId => getCategoryName(categoryId));
+          }
+          break;
+        case 'manufacturer':
+          groupKeys = [product.manufacturer || 'No Manufacturer'];
+          break;
+        default:
+          groupKeys = ['Other'];
+      }
+
+      // Add product to each group it belongs to
+      groupKeys.forEach(groupKey => {
+        if (!groups[groupKey]) {
+          groups[groupKey] = [];
+        }
+        groups[groupKey].push(product);
+      });
+    });
+
+    // Sort groups alphabetically and return as sorted object
+    const sortedGroupKeys = Object.keys(groups).sort((a, b) => a.localeCompare(b));
+    const sortedGroups: Record<string, Product[]> = {};
+    sortedGroupKeys.forEach(key => {
+      sortedGroups[key] = groups[key];
+    });
+
+    return sortedGroups;
+  };;
+
+  // For manufacturers, we'll need to get this from the backend as well
+  // For now, we'll use what we have in the current data
+  const dataForFilters = groupBy === 'none' ? products : allProducts;
+  const uniqueManufacturers = [...new Set(dataForFilters.map(p => p.manufacturer).filter(Boolean))].sort();
 
   // Selection handlers
   const handleSelectProduct = (productId: string, checked: boolean) => {
@@ -428,21 +500,69 @@ const ProjectPage: React.FC = () => {
     setSelectedProducts(newSelected);
     setSelectAll(checked);
   };
-  
-  // Get organized products based on current settings
-  const organizedProducts = (() => {
-    switch (groupBy) {
-      case 'location':
-        return groupProductsByLocation(products);
-      case 'category':
-        return groupProductsByCategory(products);
-      case 'manufacturer':
-        return groupProductsByManufacturer(products);
-      case 'none':
-      default:
-        return { 'All Products': sortProducts(filterProducts(products)) };
+
+  const handleBulkDelete = useCallback(async () => {
+    if (confirm(`Are you sure you want to delete ${selectedProducts.size} product${selectedProducts.size !== 1 ? 's' : ''}?`)) {
+      try {
+        // Delete each selected product
+        const deletePromises = Array.from(selectedProducts).map(productId => 
+          api.delete(`/api/products/${productId}`)
+        );
+        
+        await Promise.all(deletePromises);
+        
+        // Refresh the products list
+        await fetchData();
+        
+        // Clear selection
+        setSelectedProducts(new Set());
+        setSelectAll(false);
+        
+        console.log(`Successfully deleted ${deletePromises.length} product${deletePromises.length !== 1 ? 's' : ''}`);
+      } catch (error) {
+        console.error('Failed to delete products:', error);
+        alert('Failed to delete some products. Please try again.');
+      }
     }
-  })();
+  }, [selectedProducts, fetchData]);
+  
+  // Determine which products to display and how to organize them
+  const getDisplayData = () => {
+    if (groupBy === 'none') {
+      // Use backend-paginated products
+      return {
+        organizedProducts: { 'All Products': products },
+        currentPaginationInfo: paginationInfo
+      };
+    } else {
+      // Use frontend grouping and pagination
+      const grouped = groupProducts(allProducts, groupBy as 'location' | 'category' | 'manufacturer');
+      
+      // Apply frontend pagination
+      const startIdx = (pagination.page - 1) * pagination.limit;
+      const endIdx = startIdx + pagination.limit;
+      
+      // Flatten all grouped products to apply pagination
+      const allGroupedProducts = Object.values(grouped).flat();
+      const paginatedProducts = allGroupedProducts.slice(startIdx, endIdx);
+      
+      // Re-group the paginated products for display
+      const paginatedGrouped = groupProducts(paginatedProducts, groupBy as 'location' | 'category' | 'manufacturer');
+      
+      // Calculate pagination info for grouped data
+      const frontendPaginationInfo = {
+        total: allGroupedProducts.length,
+        pages: Math.ceil(allGroupedProducts.length / pagination.limit)
+      };
+      
+      return {
+        organizedProducts: paginatedGrouped,
+        currentPaginationInfo: frontendPaginationInfo
+      };
+    }
+  };
+
+  const { organizedProducts, currentPaginationInfo } = getDisplayData();
 
   // Mark component as initialized after first render
   useEffect(() => {
@@ -457,24 +577,8 @@ const ProjectPage: React.FC = () => {
   }, [viewMode, groupBy, sortBy, isInitialized]);
 
   useEffect(() => {
-    if (!currentProject) return;
-
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await api.get<Product[]>(`/api/projects/current/products`);
-        setProducts(response.data);
-      } catch (err) {
-        setError('Failed to load products');
-        console.error('Error fetching products:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, [currentProject]);
+    fetchData();
+  }, [fetchData]);
 
   // Show loading state while checking for project
   if (isInitializing || projectLoading || !currentProject) {
@@ -510,7 +614,7 @@ const ProjectPage: React.FC = () => {
           </div>
         </div>
 
-        {!loading && !error && products.length > 0 && (
+        {!loading && !error && (
           <div className="controls-bar">
             <div className="sort-controls">
               <div className="control-group">
@@ -532,14 +636,13 @@ const ProjectPage: React.FC = () => {
                 <select
                   className="control-select"
                   value={sortBy}
-                  onChange={(e) => updateSortBy(e.target.value as 'name' | 'date' | 'location' | 'manufacturer' | 'price' | 'category')}
+                  onChange={(e) => updateSortBy(e.target.value as 'name' | 'date' | 'manufacturer' | 'price' | 'tagId')}
                 >
                   <option value="date">Date Added</option>
                   <option value="name">Product Name</option>
+                  <option value="tagId">Tag ID</option>
                   <option value="manufacturer">Manufacturer</option>
                   <option value="price">Price</option>
-                  <option value="category">Category</option>
-                  <option value="location">Location</option>
                 </select>
               </div>
               
@@ -551,8 +654,8 @@ const ProjectPage: React.FC = () => {
                   onChange={(e) => updateFilters('category', e.target.value)}
                 >
                   <option value="">All</option>
-                  {uniqueCategories.map(category => (
-                    <option key={category} value={category}>{category}</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>{category.name}</option>
                   ))}
                 </select>
               </div>
@@ -565,8 +668,8 @@ const ProjectPage: React.FC = () => {
                   onChange={(e) => updateFilters('location', e.target.value)}
                 >
                   <option value="">All</option>
-                  {uniqueLocations.map(location => (
-                    <option key={location} value={location}>{location}</option>
+                  {locations.map(location => (
+                    <option key={location.id} value={location.id}>{location.name}</option>
                   ))}
                 </select>
               </div>
@@ -657,33 +760,8 @@ const ProjectPage: React.FC = () => {
             </div>
             <div className="bulk-actions-buttons">
               <button 
-                className="bulk-action-button secondary"
-                onClick={() => {
-                  // TODO: Implement bulk export
-                  console.log('Exporting selected products:', Array.from(selectedProducts));
-                }}
-              >
-                Export
-              </button>
-              <button 
-                className="bulk-action-button secondary"
-                onClick={() => {
-                  // TODO: Implement bulk category update
-                  console.log('Updating categories for:', Array.from(selectedProducts));
-                }}
-              >
-                Update Category
-              </button>
-              <button 
                 className="bulk-action-button danger"
-                onClick={() => {
-                  // TODO: Implement bulk delete
-                  if (confirm(`Are you sure you want to delete ${selectedProducts.size} product${selectedProducts.size !== 1 ? 's' : ''}?`)) {
-                    console.log('Deleting selected products:', Array.from(selectedProducts));
-                    setSelectedProducts(new Set());
-                    setSelectAll(false);
-                  }
-                }}
+                onClick={handleBulkDelete}
               >
                 Delete
               </button>
@@ -699,15 +777,29 @@ const ProjectPage: React.FC = () => {
           <div className="error-state">
             <p>{error}</p>
           </div>
-        ) : products.length === 0 ? (
+        ) : (groupBy === 'none' ? products.length === 0 : allProducts.length === 0) ? (
           <div className="empty-state">
-            <p>No products in this project yet.</p>
-            <button 
-              className="button button-primary"
-              onClick={() => navigate('/project/products/new')}
-            >
-              Add First Product
-            </button>
+            {(filters.search || filters.category || filters.location || filters.manufacturer) ? (
+              <>
+                <p>No products match the current filters.</p>
+                <button 
+                  className="button button-secondary"
+                  onClick={clearFilters}
+                >
+                  Clear Filters
+                </button>
+              </>
+            ) : (
+              <>
+                <p>No products in this project yet.</p>
+                <button 
+                  className="button button-primary"
+                  onClick={() => navigate('/project/products/new')}
+                >
+                  Add First Product
+                </button>
+              </>
+            )}
           </div>
         ) : viewMode === 'grid' ? (
           <div className="products-container">
@@ -735,18 +827,18 @@ const ProjectPage: React.FC = () => {
                       <div className="product-image">
                         <img 
                           src={getProductImageUrl(product) || getPlaceholderImage()} 
-                          alt={product.description || 'Product image'}
+                          alt={product.type || 'Product image'}
                           className="w-full h-48 object-cover"
                         />
                       </div>
                       <div className="product-info">
-                        <h3 className="product-title">{product.productName || product.description}</h3>
-                        <p className="product-description">{product.description}</p>
+                        <h3 className="product-title">{product.productName || product.type}</h3>
+                        <p className="product-type">{product.type}</p>
                         {product.manufacturer && <p className="product-manufacturer">By: {product.manufacturer}</p>}
                         {product.price && <p className="product-price">{formatPrice(product.price)}</p>}
-                        <p className="product-category">{typeof product.category === 'string' ? product.category : formatArray(product.category)}</p>
+                        <p className="product-category">{formatArray(getCategoryNames(Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)))}</p>
                         <div className="product-location-info">
-                          <p className="product-location">{formatArray(product.location)}</p>
+                          <p className="product-location">{formatArray(getLocationNames(Array.isArray(product.location) ? product.location : [product.location].filter(Boolean)))}</p>
                           {isMultiLocationProduct(product) && groupBy === 'location' && (
                             <span className="multi-location-badge" title={`This product appears in ${getLocationCount(product)} locations`}>
                               📍 {getLocationCount(product)}
@@ -801,112 +893,153 @@ const ProjectPage: React.FC = () => {
                     <table className="product-table">
                       <thead>
                         <tr>
-                          {tableSettings.settings.columns.select?.visible && (
-                            <th className="select-header">
-                              <input
-                                type="checkbox"
-                                className="row-checkbox"
-                                checked={selectAll}
-                                onChange={(e) => handleSelectAll(e.target.checked)}
-                              />
-                            </th>
-                          )}
-                          {tableSettings.settings.columns.image?.visible && <th className="image-header">Image</th>}
-                          {tableSettings.settings.columns.productName?.visible && <th className="product-name-header">Product Name</th>}
-                          {tableSettings.settings.columns.description?.visible && <th className="description-header">Description</th>}
-                          {tableSettings.settings.columns.manufacturer?.visible && <th className="manufacturer-header">Manufacturer</th>}
-                          {tableSettings.settings.columns.price?.visible && <th className="price-header">Price</th>}
-                          {tableSettings.settings.columns.category?.visible && <th className="category-header">Category</th>}
-                          {tableSettings.settings.columns.location?.visible && <th className="location-header">Location</th>}
-                          {tableSettings.settings.columns.tagId?.visible && <th className="tagid-header">Tag ID</th>}
-                          {tableSettings.settings.columns.actions?.visible && <th className="actions-header">Actions</th>}
+                          {tableSettings.orderedColumns.filter(col => col.visible).map(column => {
+                            switch (column.key) {
+                              case 'select':
+                                return (
+                                  <th key={column.key} className="select-header">
+                                    <input
+                                      type="checkbox"
+                                      className="row-checkbox"
+                                      checked={selectAll}
+                                      onChange={(e) => handleSelectAll(e.target.checked)}
+                                    />
+                                  </th>
+                                );
+                              case 'image':
+                                return <th key={column.key} className="image-header">Image</th>;
+                              case 'tagId':
+                                return <th key={column.key} className="tagid-header">Tag ID</th>;
+                              case 'productName':
+                                return <th key={column.key} className="product-name-header">Product Name</th>;
+                              case 'type':
+                                return <th key={column.key} className="type-header">Type</th>;
+                              case 'manufacturer':
+                                return <th key={column.key} className="manufacturer-header">Manufacturer</th>;
+                              case 'price':
+                                return <th key={column.key} className="price-header">Price</th>;
+                              case 'category':
+                                return <th key={column.key} className="category-header">Category</th>;
+                              case 'location':
+                                return <th key={column.key} className="location-header">Location</th>;
+                              case 'actions':
+                                return <th key={column.key} className="actions-header">Actions</th>;
+                              default:
+                                return null;
+                            }
+                          })}
                         </tr>
                       </thead>
                       <tbody>
                         {locationProducts.map(product => (
                           <tr key={product.id} className="table-row">
-                            {tableSettings.settings.columns.select?.visible && (
-                              <td className="select-cell">
-                                <input
-                                  type="checkbox"
-                                  className="row-checkbox"
-                                  checked={selectedProducts.has(product.id)}
-                                  onChange={(e) => handleSelectProduct(product.id, e.target.checked)}
-                                />
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.image?.visible && (
-                              <td className="image-cell">
-                                <div className="list-product-image">
-                                  <img 
-                                    src={getProductImageUrl(product) || getPlaceholderImage()} 
-                                    alt={product.description || 'Product image'}
-                                  />
-                                </div>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.productName?.visible && (
-                              <td className="product-name-cell">
-                                <span className="product-name">{product.productName || 'N/A'}</span>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.description?.visible && (
-                              <td className="description-cell">
-                                <span className="product-description">{product.description}</span>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.manufacturer?.visible && (
-                              <td className="manufacturer-cell">
-                                <span>{product.manufacturer || 'N/A'}</span>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.price?.visible && (
-                              <td className="price-cell">
-                                <span>{formatPrice(product.price)}</span>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.category?.visible && (
-                              <td className="category-cell">
-                                <span>{typeof product.category === 'string' ? product.category : formatArray(product.category)}</span>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.location?.visible && (
-                              <td className="location-cell">
-                                <div className="table-location-info">
-                                  <span>{formatArray(product.location)}</span>
-                                  {isMultiLocationProduct(product) && groupBy === 'location' && (
-                                    <span className="multi-location-badge table-badge" title={`This product appears in ${getLocationCount(product)} locations`}>
-                                      📍 {getLocationCount(product)}
-                                    </span>
-                                  )}
-                                </div>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.tagId?.visible && (
-                              <td className="tagid-cell">
-                                <span>{product.tagId}</span>
-                              </td>
-                            )}
-                            {tableSettings.settings.columns.actions?.visible && (
-                              <td className="actions-cell">
-                                <div className="list-actions">
-                                  <button
-                                    className="action-button primary"
-                                    onClick={() => navigate(`/project/products/${product.id}`)}
-                                  >
-                                    View
-                                  </button>
-                                  <a 
-                                    href={product.url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="action-button secondary"
-                                  >
-                                    Source
-                                  </a>
-                                </div>
-                              </td>
-                            )}
+                            {tableSettings.orderedColumns.filter(col => col.visible).map(column => {
+                              switch (column.key) {
+                                case 'select':
+                                  return (
+                                    <td key={column.key} className="select-cell">
+                                      <input
+                                        type="checkbox"
+                                        className="row-checkbox"
+                                        checked={selectedProducts.has(product.id)}
+                                        onChange={(e) => handleSelectProduct(product.id, e.target.checked)}
+                                      />
+                                    </td>
+                                  );
+                                case 'image':
+                                  return (
+                                    <td key={column.key} className="image-cell">
+                                      <div 
+                                        className="list-product-image"
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => navigate(`/project/products/${product.id}`)}
+                                      >
+                                        <img 
+                                          src={getProductImageUrl(product) || getPlaceholderImage()} 
+                                          alt={product.type || 'Product image'}
+                                        />
+                                      </div>
+                                    </td>
+                                  );
+                                case 'tagId':
+                                  return (
+                                    <td key={column.key} className="tagid-cell">
+                                      <span 
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => navigate(`/project/products/${product.id}`)}
+                                      >
+                                        {product.tagId}
+                                      </span>
+                                    </td>
+                                  );
+                                case 'productName':
+                                  return (
+                                    <td key={column.key} className="product-name-cell">
+                                      <span className="product-name">{product.productName || 'N/A'}</span>
+                                    </td>
+                                  );
+                                case 'type':
+                                  return (
+                                    <td key={column.key} className="type-cell">
+                                      <span className="product-type">{product.type}</span>
+                                    </td>
+                                  );
+                                case 'manufacturer':
+                                  return (
+                                    <td key={column.key} className="manufacturer-cell">
+                                      <span>{product.manufacturer || 'N/A'}</span>
+                                    </td>
+                                  );
+                                case 'price':
+                                  return (
+                                    <td key={column.key} className="price-cell">
+                                      <span>{formatPrice(product.price)}</span>
+                                    </td>
+                                  );
+                                case 'category':
+                                  return (
+                                    <td key={column.key} className="category-cell">
+                                      <span>{formatArray(getCategoryNames(Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)))}</span>
+                                    </td>
+                                  );
+                                case 'location':
+                                  return (
+                                    <td key={column.key} className="location-cell">
+                                      <div className="table-location-info">
+                                        <span>{formatArray(getLocationNames(Array.isArray(product.location) ? product.location : [product.location].filter(Boolean)))}</span>
+                                        {isMultiLocationProduct(product) && groupBy === 'location' && (
+                                          <span className="multi-location-badge table-badge" title={`This product appears in ${getLocationCount(product)} locations`}>
+                                            📍 {getLocationCount(product)}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </td>
+                                  );
+                                case 'actions':
+                                  return (
+                                    <td key={column.key} className="actions-cell">
+                                      <div className="list-actions">
+                                        <button
+                                          className="action-button primary"
+                                          onClick={() => navigate(`/project/products/${product.id}`)}
+                                        >
+                                          View
+                                        </button>
+                                        <a 
+                                          href={product.url} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="action-button secondary"
+                                        >
+                                          Source
+                                        </a>
+                                      </div>
+                                    </td>
+                                  );
+                                default:
+                                  return null;
+                              }
+                            })}
                           </tr>
                         ))}
                       </tbody>
@@ -915,6 +1048,105 @@ const ProjectPage: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+                {/* Pagination Controls */}
+                {!loading && !error && currentPaginationInfo.pages > 1 && (
+          <div className="pagination-container">
+            <div className="pagination-info">
+              <span>
+                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, currentPaginationInfo.total)} of {currentPaginationInfo.total} products
+              </span>
+            </div>
+            <div className="pagination-controls">
+              <button
+                className="pagination-button"
+                disabled={pagination.page <= 1}
+                onClick={() => updatePagination({ page: 1 })}
+                title="First page"
+              >
+                ««
+              </button>
+              <button
+                className="pagination-button"
+                disabled={pagination.page <= 1}
+                onClick={() => updatePagination({ page: pagination.page - 1 })}
+                title="Previous page"
+              >
+                ‹
+              </button>
+              
+              {/* Page numbers */}
+              {(() => {
+                const currentPage = pagination.page;
+                const totalPages = currentPaginationInfo.pages;
+                const pages = [];
+                
+                // Always show first page
+                if (currentPage > 3) {
+                  pages.push(1);
+                  if (currentPage > 4) pages.push('...');
+                }
+                
+                // Show pages around current page
+                for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                  pages.push(i);
+                }
+                
+                // Always show last page
+                if (currentPage < totalPages - 2) {
+                  if (currentPage < totalPages - 3) pages.push('...');
+                  pages.push(totalPages);
+                }
+                
+                return pages.map((page, index) => (
+                  page === '...' ? (
+                    <span key={`ellipsis-${index}`} className="pagination-ellipsis">...</span>
+                  ) : (
+                    <button
+                      key={page}
+                      className={`pagination-button ${page === currentPage ? 'active' : ''}`}
+                      onClick={() => updatePagination({ page: page as number })}
+                    >
+                      {page}
+                    </button>
+                  )
+                ));
+              })()}
+              
+              <button
+                className="pagination-button"
+                disabled={pagination.page >= currentPaginationInfo.pages}
+                onClick={() => updatePagination({ page: pagination.page + 1 })}
+                title="Next page"
+              >
+                ›
+              </button>
+              <button
+                className="pagination-button"
+                disabled={pagination.page >= currentPaginationInfo.pages}
+                onClick={() => updatePagination({ page: currentPaginationInfo.pages })}
+                title="Last page"
+              >
+                »»
+              </button>
+            </div>
+            <div className="pagination-size">
+              <label>
+                Items per page:
+                <select
+                  value={pagination.limit}
+                  onChange={(e) => updatePagination({ page: 1, limit: parseInt(e.target.value) })}
+                  className="pagination-size-select"
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </label>
+            </div>
           </div>
         )}
 
@@ -930,6 +1162,14 @@ const ProjectPage: React.FC = () => {
           onReset={() => {
             tableSettings.resetSettings();
           }}
+          locations={locations}
+          categories={categories}
+          onAddLocation={handleAddLocation}
+          onUpdateLocation={handleUpdateLocation}
+          onDeleteLocation={handleDeleteLocation}
+          onAddCategory={handleAddCategory}
+          onUpdateCategory={handleUpdateCategory}
+          onDeleteCategory={handleDeleteCategory}
         />
       </div>
     </div>
