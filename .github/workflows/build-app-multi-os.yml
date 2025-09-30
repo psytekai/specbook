@@ -1,19 +1,15 @@
-name: Build App (Windows + macOS)
+name: Build App (Windows)
 
+# Ship on tags
 on:
-  workflow_dispatch: {}
   push:
-    branches: [ main ]
-    paths:
-      - "specscraper/**"
-      - "electron-app/**"
-      - ".github/workflows/build-app-multi-os.yml"
+    tags: ['v*.*.*']
 
 
 # -------------------- Stage 1: Build Python bridges --------------------
 
 jobs:
-  win-build-bridge:
+  win-build-bridge: 
     name: Build Python Bridge (Windows x64)
     runs-on: windows-latest
     defaults: { run: { shell: bash } }
