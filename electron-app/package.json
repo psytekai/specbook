@@ -1,10 +1,11 @@
 {
-  "name": "specbook-manager",
+  "name": "specbooks",
   "version": "1.0.0",
   "main": "dist/main/index.js",
   "scripts": {
     "bundle-python": "bash scripts/bundle-python.sh",
     "copy-resources": "mkdir -p dist/python && cp -R resources/python/electron_bridge dist/python/",
+    "copy-win-bridge": "mkdir -p resources/python && rm -rf resources/python/electron_bridge && cp -R electron_bridge-win-x64 resources/python/electron_bridge",
     "dev": "npm run bundle-python && npm run build:main && npm run copy-resources && concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:fast": "npm run build:main && npm run copy-resources && concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:lite": "npm run build:main && concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
@@ -17,7 +18,7 @@
     "electron": "electron .",
     "dist": "npm run build && electron-builder",
     "dist:mac": "npm run bundle-python && npm run build && electron-builder --mac --x64",
-    "dist:win": "bash scripts/build-with-prebuilt-natives.sh",
+    "dist:win": "npm run copy-win-bridge && bash scripts/build-with-prebuilt-natives.sh",
     "native:extract": "bash scripts/extract-native-modules.sh",
     "native:verify": "bash scripts/extract-native-modules.sh --verify",
     "dist:linux": "npm run build && electron-builder --linux",
