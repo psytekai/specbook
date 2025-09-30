@@ -47,8 +47,10 @@ cd electron-app
 # Install dependencies
 npm install
 
-# Development mode (runs both Vite and Electron)
-npm run dev
+# Development mode options
+npm run dev          # Full dev mode with Python bundling
+npm run dev:fast     # Skip Python bundling (faster restarts)
+npm run dev:lite     # Minimal mode without Python resources
 
 # Type checking
 npm run type-check
@@ -73,9 +75,18 @@ npm run dist:mac    # macOS
 npm run dist:win    # Windows
 npm run dist:linux  # Linux
 
-# Electron utilities
-npm run rebuild     # Rebuild native modules
-npm run preview     # Preview built renderer
+# Python integration
+npm run bundle-python     # Bundle Python bridge for distribution
+npm run copy-resources    # Copy Python resources to dist
+npm run copy-win-bridge   # Prepare Windows Python bridge
+
+# Native modules
+npm run rebuild           # Rebuild native modules for Electron
+npm run native:extract    # Extract native modules for distribution
+npm run native:verify     # Verify native module extraction
+
+# Utilities
+npm run preview          # Preview built renderer
 ```
 
 ## Architecture Overview
@@ -142,7 +153,7 @@ from lib.benchmarking import ExperimentRunner, CacheManager, ReportGenerator
 
 **Electron App Architecture**
 - **Main Process**: Window management, security, IPC (`src/main/`)
-- **Renderer Process**: React 19.0 app with TypeScript (`src/renderer/`)
+- **Renderer Process**: React 19.1 app with TypeScript (`src/renderer/`)
 - **State Management**: React Context API (`ProjectContext`, `ToastContext`)
 - **Routing**: React Router v6 for navigation
 - **Testing**: Jest with TypeScript support
@@ -173,9 +184,9 @@ All data structures use Pydantic for type safety:
 ### Pipeline Development Workflow
 1. Create test dataset in `specscraper/workspace/input/specbook.csv`
 2. Develop/test in `specscraper/workspace/notebooks/specbook.ipynb`
-3. Run pipeline with monitoring: `python workspace/scripts/specbook_monitored.py` (from specscraper/)
-4. Validate results: `python verification_ui.py` (from specscraper/)
-5. Check metrics: `specscraper/workspace/output/metrics/`
+3. Run pipeline with monitoring from `specscraper/`: `python workspace/scripts/specbook_monitored.py`
+4. Validate results from `specscraper/`: `python verification_ui.py`
+5. Check metrics in `specscraper/workspace/output/metrics/`
 
 ### Benchmarking Workflow
 ```bash
@@ -191,10 +202,28 @@ python workspace/scripts/run_benchmarks.py \
 ```
 
 ### Electron App Development
-1. Start backend services (if needed)
-2. Run `npm run dev` in electron-app/
-3. Make changes - hot reload enabled
-4. Test packaging with `npm run dist`
+1. Run `npm run dev` in `electron-app/` (or `dev:fast` for quicker restarts)
+2. Make changes - hot reload enabled for renderer, restart for main process changes
+3. Test Python bridge integration with `bundle-python` before distribution
+4. Test packaging with `npm run dist` (use `dist:mac` or `dist:win` for specific platforms)
+
+### Testing Workflow
+```bash
+# Run all tests
+npm test
+
+# Watch mode for development
+npm run test:watch
+
+# Test specific file
+npm test AssetManager.test.ts
+
+# Main process tests only
+npm run test:main
+
+# Coverage report
+npm run test:coverage
+```
 
 ## Code Patterns
 
@@ -228,6 +257,44 @@ monitor.record_metric("scrape", results)
 - Pydantic models for all data structures
 - TypeScript for Electron app
 - Comprehensive validation at boundaries
+
+### Electron App Architecture Patterns
+
+**IPC Communication**
+- Main process handles file system operations via `ProjectFileManager`
+- Renderer communicates via `window.electronAPI` exposed through preload
+- API endpoints mirror REST conventions: `apiGet`, `apiPost`, `apiPut`, `apiDelete`
+
+**Asset Management**
+- Content-addressable storage using SHA-256 hashes
+- Automatic thumbnail generation via Sharp
+- Assets stored in `.specbook/assets/` directory
+- Database tracks reference counts for cleanup
+- Services: `AssetManager` handles all image operations
+
+**Project File Structure**
+```
+project-name.specbook/
+├── project.json              # Project metadata
+├── data.db                   # SQLite database
+└── assets/
+    ├── [hash].jpg           # Full-size images
+    └── thumbnails/
+        └── [hash].jpg       # Generated thumbnails
+```
+
+**State Management**
+- `ProjectContext`: Active project state, products, tags
+- `ToastContext`: Global notification system
+- `ElectronProjectContext`: Bridge between Electron and React state
+- State persists to SQLite via IPC handlers
+
+**Key Services**
+- `ProjectFileManager`: Project file operations and persistence
+- `AssetManager`: Content-addressable image storage and thumbnails
+- `PythonBridge`: Integration with Python scraping backend
+- `productDataService`: Database operations for products
+- `pdfExportService`: PDF generation for specifications
 
 ### Testing Strategy
 - **Python Backend**: pytest for unit/integration tests
