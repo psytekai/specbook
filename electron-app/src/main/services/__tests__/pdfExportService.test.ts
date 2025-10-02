@@ -50,7 +50,7 @@ describe('PDFExportService', () => {
 
   const createTestConfig = (): PDFExportConfig => ({
     groupBy: 'category',
-    sortBy: 'name',
+    sortBy: 'tagId',
     includeImages: false, // Disable images for testing
     includeHeaders: true,
     pageSize: 'A4',
@@ -143,7 +143,7 @@ describe('ProductDataService', () => {
     it('should validate a correct configuration', () => {
       const config: PDFExportConfig = {
         groupBy: 'category',
-        sortBy: 'name',
+        sortBy: 'tagId',
         includeImages: true,
         includeHeaders: true,
         pageSize: 'A4',
@@ -165,7 +165,7 @@ describe('ProductDataService', () => {
     it('should reject configuration with no visible columns', () => {
       const config: PDFExportConfig = {
         groupBy: 'category',
-        sortBy: 'name',
+        sortBy: 'tagId',
         includeImages: true,
         includeHeaders: true,
         pageSize: 'A4',
@@ -203,7 +203,7 @@ describe('ProductDataService', () => {
 
       const config: PDFExportConfig = {
         groupBy: 'category',
-        sortBy: 'name',
+        sortBy: 'tagId',
         includeImages: true,
         includeHeaders: true,
         pageSize: 'A4',

@@ -464,7 +464,7 @@ const ProductNew: React.FC = () => {
             
             {/* Show scraping errors */}
             {scrapingError && (
-              <div style={{ marginTop: '10px', padding: '8px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', fontSize: '14px', color: '#721c24' }}>
+              <div style={{ overflow: 'auto', marginTop: '10px', padding: '8px', backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '4px', fontSize: '14px', color: '#721c24' }}>
                 {scrapingError}
               </div>
             )}
