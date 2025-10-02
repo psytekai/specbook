@@ -43,7 +43,7 @@
     "icon": "public/icons/icon.ico",
     "extraResources": [
       {
-        "from": "electron_bridge-win-x64",
+        "from": "resources/python/electron_bridge",
         "to": "python/electron_bridge",
         "filter": ["**/*"]
       }
