@@ -161,7 +161,7 @@ export class ExportService {
    */
   prepareExportConfig(
     baseConfig: Partial<PDFExportConfig>,
-    visibleColumns: Array<{ key: string; label: string; visible: boolean }>,
+    visibleColumns: Array<{ key: string; label: string; }>,
     includeHeaders: boolean = true
   ): Partial<PDFExportConfig> {
     const orientation = baseConfig.orientation || 'portrait';
@@ -169,13 +169,10 @@ export class ExportService {
     
     // Get initial column widths
     let columns = visibleColumns
-      .filter(col => col.visible)
       .map(col => ({
         key: col.key,
         label: col.label,
-        width: this.getColumnWidth(col.key),
-        visible: true,
-        essential: this.isEssentialColumn(col.key),
+        width: this.getColumnWidth(col.key)
       }));
 
     // Calculate total width and adjust if necessary
@@ -192,10 +189,10 @@ export class ExportService {
 
     return {
       groupBy: 'category',
-      sortBy: 'name',
+      sortBy: 'tagId',
       includeImages: true,
       includeHeaders,
-      pageSize: 'A4',
+      pageSize: 'Letter',
       orientation: 'portrait',
       scope: 'currentView',
       ...baseConfig,
@@ -221,14 +218,6 @@ export class ExportService {
     };
 
     return widthMap[columnKey] || 80;
-  }
-
-  /**
-   * Check if a column is essential (cannot be hidden)
-   */
-  private isEssentialColumn(columnKey: string): boolean {
-    const essentialColumns = ['productName', 'url', 'tagId'];
-    return essentialColumns.includes(columnKey);
   }
 
   /**

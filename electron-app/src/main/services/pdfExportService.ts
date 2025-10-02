@@ -9,9 +9,8 @@ import {
   GroupedProductData, 
   ProductForExport,
   PDFLayoutConfig,
-  DEFAULT_PDF_LAYOUT 
 } from '../../shared/types/exportTypes';
-import { EXPORT_CONFIG } from '../../shared/config/exportConfig';
+import { EXPORT_CONFIG, DEFAULT_PDF_LAYOUT } from '../../shared/config/exportConfig';
 
 export class PDFExportService {
   private layout: PDFLayoutConfig;
@@ -29,6 +28,10 @@ export class PDFExportService {
     if (this.progressCallback) {
       this.progressCallback({ stage, progress, message, currentItem });
     }
+  }
+
+  private toTitleCase(text: string): string {
+    return text.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
   }
 
   async generateProductPDF(
@@ -101,10 +104,11 @@ export class PDFExportService {
 
       // A product can belong to multiple groups (e.g., multiple categories)
       groupKeys.forEach(groupKey => {
-        if (!groups.has(groupKey)) {
-          groups.set(groupKey, []);
+        const normalizedKey = this.toTitleCase(groupKey);
+        if (!groups.has(normalizedKey)) {
+          groups.set(normalizedKey, []);
         }
-        groups.get(groupKey)!.push(product);
+        groups.get(normalizedKey)!.push(product);
       });
     });
 
@@ -120,8 +124,18 @@ export class PDFExportService {
       });
     }
 
-    // Sort groups alphabetically
-    sortedGroups.sort((a, b) => a.groupName.localeCompare(b.groupName));
+    // Sort groups with 'uncategorized' and 'no location' at the top, then alphabetically
+    sortedGroups.sort((a, b) => {
+      const aIsSpecial = a.groupName.toLowerCase() === 'uncategorized' || a.groupName.toLowerCase() === 'no location';
+      const bIsSpecial = b.groupName.toLowerCase() === 'uncategorized' || b.groupName.toLowerCase() === 'no location';
+      
+      // If one is special and the other isn't, special group comes first
+      if (aIsSpecial && !bIsSpecial) return -1;
+      if (!aIsSpecial && bIsSpecial) return 1;
+      
+      // If both are special or both are regular, sort alphabetically
+      return a.groupName.localeCompare(b.groupName);
+    });
 
     return sortedGroups;
   }
@@ -129,14 +143,8 @@ export class PDFExportService {
   private sortProducts(products: ProductForExport[], sortBy: PDFExportConfig['sortBy']): ProductForExport[] {
     return [...products].sort((a, b) => {
       switch (sortBy) {
-        case 'name':
-          return a.productName.localeCompare(b.productName);
-        case 'type':
-          return (a.type || '').localeCompare(b.type || '');
-        case 'manufacturer':
-          return (a.manufacturer || '').localeCompare(b.manufacturer || '');
-        case 'price':
-          return (a.price || 0) - (b.price || 0);
+        case 'tagId': // We should only and always sort by tag ids
+          return a.tagId?.localeCompare(b.tagId? b.tagId : '') || 0;
         default:
           return a.productName.localeCompare(b.productName);
       }
@@ -156,7 +164,7 @@ export class PDFExportService {
     });
 
     // Add document header
-    this.addDocumentHeader(doc, config, groupedData);
+    this.addDocumentHeader(doc, config);
 
     let currentY = doc.y + this.layout.spacing.sectionGap;
 
@@ -213,23 +221,12 @@ export class PDFExportService {
     return doc;
   }
 
-  private addDocumentHeader(doc: PDFKit.PDFDocument, config: PDFExportConfig, groupedData: GroupedProductData[]): void {
-    const totalProducts = groupedData.reduce((sum, group) => sum + group.totalCount, 0);
-    
+  private addDocumentHeader(doc: PDFKit.PDFDocument, config: PDFExportConfig): void {
     // Title
     doc.fontSize(EXPORT_CONFIG.layout.fonts.title)
        .font(this.layout.fonts.header)
        .fillColor(this.layout.colors.primary)
        .text('Product Export Report', this.layout.margins.left, this.layout.margins.top);
-
-    // Export info
-    doc.fontSize(10)
-       .font(this.layout.fonts.body)
-       .fillColor(this.layout.colors.secondary)
-       .text(`Generated on: ${new Date().toLocaleString()}`, { align: 'right' })
-       .text(`Total Products: ${totalProducts}`, { align: 'right' })
-       .text(`Grouped by: ${config.groupBy}`, { align: 'right' })
-       .text(`Sorted by: ${config.sortBy}`, { align: 'right' });
 
     // Add filters info if present
     if (config.filters && Object.values(config.filters).some(filter => filter)) {
@@ -252,13 +249,12 @@ export class PDFExportService {
     doc.fontSize(14)
        .font(this.layout.fonts.header)
        .fillColor(this.layout.colors.primary)
-       .text(`${group.groupName} (${group.totalCount} products)`, this.layout.margins.left, y);
+       .text(`${group.groupName}`, this.layout.margins.left, y);
 
     return y + 25;
   }
 
   private addTableHeader(doc: PDFKit.PDFDocument, config: PDFExportConfig, y: number): number {
-    const visibleColumns = config.columns.filter(col => col.visible);
     let x = this.layout.margins.left;
 
     // Background for header
@@ -272,7 +268,7 @@ export class PDFExportService {
        .font(this.layout.fonts.header)
        .fillColor(this.layout.colors.text);
 
-    visibleColumns.forEach(column => {
+    config.columns.forEach(column => {
       doc.text(column.label, x + 5, y + 5, { width: column.width - 10, ellipsis: true });
       x += column.width;
     });
@@ -281,7 +277,6 @@ export class PDFExportService {
   }
 
   private async addProductRow(doc: PDFKit.PDFDocument, product: ProductForExport, config: PDFExportConfig, y: number): Promise<number> {
-    const visibleColumns = config.columns.filter(col => col.visible);
     let x = this.layout.margins.left;
     const rowHeight = EXPORT_CONFIG.layout.spacing.rowHeight;
 
@@ -296,7 +291,7 @@ export class PDFExportService {
        .font(this.layout.fonts.body)
        .fillColor(this.layout.colors.text);
 
-    for (const column of visibleColumns) {
+    for (const column of config.columns) {
       const cellValue = this.getCellValue(product, column.key);
       const cellY = y + 5;
 

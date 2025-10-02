@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { ExportSettings as ExportSettingsType, ColumnConfig } from '../types';
 import { 
   PDFExportConfig, 
-  PDF_EXPORT_OPTIONS,
   PDFGenerationResult
 } from '../../../../shared/types/exportTypes';
 import { ExportService } from '../../../services/exportService';
-import { EXPORT_CONFIG, getColumnsForGroupBy } from '../../../../shared/config/exportConfig';
+import { EXPORT_CONFIG, PDF_EXPORT_OPTIONS, getColumnsForGroupBy } from '../../../../shared/config/exportConfig';
 
 interface ExportSettingsProps {
   settings: ExportSettingsType;
@@ -39,8 +38,6 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
         key: col.key,
         label: col.label,
         width: col.width,
-        visible: col.visible,
-        essential: col.essential,
       }));
 
       const fullConfig = exportService.prepareExportConfig(pdfConfig, exportColumns, true);
