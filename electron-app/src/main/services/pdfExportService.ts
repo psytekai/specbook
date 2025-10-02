@@ -163,8 +163,6 @@ export class PDFExportService {
       bufferPages: true,
     });
 
-    // Add document header
-    this.addDocumentHeader(doc, config);
 
     let currentY = doc.y + this.layout.spacing.sectionGap;
 
@@ -219,30 +217,6 @@ export class PDFExportService {
     this.addDocumentFooter(doc);
 
     return doc;
-  }
-
-  private addDocumentHeader(doc: PDFKit.PDFDocument, config: PDFExportConfig): void {
-    // Title
-    doc.fontSize(EXPORT_CONFIG.layout.fonts.title)
-       .font(this.layout.fonts.header)
-       .fillColor(this.layout.colors.primary)
-       .text('Product Export Report', this.layout.margins.left, this.layout.margins.top);
-
-    // Add filters info if present
-    if (config.filters && Object.values(config.filters).some(filter => filter)) {
-      doc.moveDown(0.5)
-         .fontSize(9)
-         .fillColor(this.layout.colors.text)
-         .text('Active Filters:', { align: 'right' });
-      
-      Object.entries(config.filters).forEach(([key, value]) => {
-        if (value) {
-          doc.text(`${key}: ${value}`, { align: 'right' });
-        }
-      });
-    }
-
-    doc.moveDown(1);
   }
 
   private addGroupHeader(doc: PDFKit.PDFDocument, group: GroupedProductData, y: number): number {
