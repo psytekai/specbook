@@ -1,6 +1,6 @@
 {
   "appId": "com.specbook.electronapp",
-  "productName": "SpecBook Manager",
+  "productName": "SpecBook",
   "directories": {
     "output": "dist",
     "buildResources": "public/icons"

@@ -1,5 +1,5 @@
 {
-  "name": "specbook-manager",
+  "name": "specbook",
   "version": "1.0.0",
   "main": "dist/main/index.js",
   "scripts": {
