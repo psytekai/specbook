@@ -90,10 +90,5 @@ export interface PDFLayoutConfig {
     sectionGap: number;
     rowHeight: number;
   };
-  image: {
-    width: number;
-    height: number;
-    placeholder: string;
-  };
 }
 

@@ -13,19 +13,21 @@ export interface ExportColumnDefinition {
   width: number;
 }
 
+const ROW_HEIGHT = 60;
+
 // MASTER EXPORT CONFIGURATION - MODIFY ONLY HERE
 export const EXPORT_CONFIG = {
   // Column definitions in exact export order
   columns: [
-    { key: 'image', label: 'Image', width: 80 },
-    { key: 'tagId', label: 'Tag Id', width: 50 },
-    { key: 'type', label: 'Type', width: 70 },
-    { key: 'manufacturer', label: 'Manufacturer', width: 150 },
-    { key: 'specificationDescription', label: 'Description', width: 150 },
-    // { key: 'modelNo', label: 'Model No', width: 150 }, // TODO: implement model no
-    { key: 'category', label: 'Category', width: 60 },
-    { key: 'location', label: 'Location', width: 60 },
-    { key: 'url', label: 'URL', width: 40 },
+    { key: 'image', label: 'Image', width: 140 },
+    { key: 'tagId', label: 'Tag', width: 40 },
+    { key: 'type', label: 'Type', width: 65 },
+    { key: 'manufacturer', label: 'Manufacturer', width: 80 },
+    { key: 'specificationDescription', label: 'Description', width: 125 },
+    { key: 'modelNo', label: 'Model No', width: 60 }, // TODO: implement model no
+    { key: 'category', label: 'Category', width: 55 },
+    { key: 'location', label: 'Location', width: 55 },
+    { key: 'url', label: 'URL', width: 35 },
   ] as ExportColumnDefinition[],
 
   // Layout settings
@@ -43,15 +45,17 @@ export const EXPORT_CONFIG = {
     spacing: {
       lineHeight: 1.2,
       sectionGap: 15,
-      rowHeight: 50, // Increased to accommodate images properly
+      rowHeight: ROW_HEIGHT, // Increased to accommodate images properly
       headerHeight: 25,
     },
     
     // Image settings
     image: {
-      width: 60,  // Smaller than column width to fit properly
-      height: 40, // Fits within row height
+      maxWidth: 110,  // Smaller than column width to fit properly
+      maxHeight: ROW_HEIGHT, // Fits within row height
       padding: 10, // Space around image
+      align: 'center',
+      valign: 'center',
     },
     
     // Page margins
@@ -118,7 +122,9 @@ export function validateConfiguration(
 }
 
 
+// TODO: Conslidate to use EXPORT_CONFIG.layout, currently using a mix of both
 export const DEFAULT_PDF_LAYOUT: PDFLayoutConfig = {
+  // units are in points, 1 point = 1/72 inch
   margins: {
     top: 50,
     bottom: 50,
@@ -139,13 +145,8 @@ export const DEFAULT_PDF_LAYOUT: PDFLayoutConfig = {
   spacing: {
     lineHeight: 1.2,
     sectionGap: 15,
-    rowHeight: 45,
-  },
-  image: {
-    width: 70,
-    height: 70,
-    placeholder: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzAiIGhlaWdodD0iNzAiIHZpZXdCb3g9IjAgMCA3MCA3MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjcwIiBoZWlnaHQ9IjcwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zNSAyOEMzNi45MzMgMjggMzguNSAyNi40MzMgMzguNSAyNC41QzM4LjUgMjIuNTY3IDM2LjkzMyAyMSAzNSAyMUMzMy4wNjcgMjEgMzEuNSAyMi41NjcgMzEuNSAyNC41QzMxLjUgMjYuNDMzIDMzLjA2NyAyOCAzNSAyOFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTQ5IDQ5SDIxTDI4IDM1TDM1IDQyTDQyIDI4TDQ5IDQ5WiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K',
-  },
+    rowHeight: ROW_HEIGHT,
+  }
 };
 
 // Export format options for the UI

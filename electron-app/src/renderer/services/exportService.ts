@@ -161,20 +161,12 @@ export class ExportService {
    */
   prepareExportConfig(
     baseConfig: Partial<PDFExportConfig>,
-    visibleColumns: Array<{ key: string; label: string; }>,
+    columns: Array<{ key: string; label: string; width: number }>,
     includeHeaders: boolean = true
   ): Partial<PDFExportConfig> {
     const orientation = baseConfig.orientation || 'portrait';
     const maxWidth = orientation === 'landscape' ? 750 : 500;
     
-    // Get initial column widths
-    let columns = visibleColumns
-      .map(col => ({
-        key: col.key,
-        label: col.label,
-        width: this.getColumnWidth(col.key)
-      }));
-
     // Calculate total width and adjust if necessary
     const totalWidth = columns.reduce((sum, col) => sum + col.width, 0);
     
@@ -198,26 +190,6 @@ export class ExportService {
       ...baseConfig,
       columns,
     };
-  }
-
-  /**
-   * Get appropriate column width based on column type
-   */
-  private getColumnWidth(columnKey: string): number {
-    const widthMap: Record<string, number> = {
-      image: 50,
-      productName: 120,
-      type: 80,
-      specificationDescription: 150,
-      url: 40,
-      tagId: 60,
-      manufacturer: 80,
-      price: 60,
-      category: 80,
-      location: 80,
-    };
-
-    return widthMap[columnKey] || 80;
   }
 
   /**

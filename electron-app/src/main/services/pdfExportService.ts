@@ -247,6 +247,16 @@ export class PDFExportService {
       x += column.width;
     });
 
+    // Add vertical column separators
+    x = this.layout.margins.left;
+    for (let i = 0; i < config.columns.length - 1; i++) {
+      x += config.columns[i].width;
+      doc.strokeColor('#D9D9D9')
+         .moveTo(x, y)
+         .lineTo(x, y + 20)
+         .stroke();
+    }
+
     return y + 25;
   }
 
@@ -271,8 +281,8 @@ export class PDFExportService {
 
       if (column.key === 'image' && config.includeImages) {
         // Add image placeholder or actual image - center it in the cell
-        const imageX = x + (column.width - EXPORT_CONFIG.layout.image.width) / 2;
-        const imageY = y + (rowHeight - EXPORT_CONFIG.layout.image.height) / 2;
+        const imageX = x + (column.width - EXPORT_CONFIG.layout.image.maxWidth) / 2;
+        const imageY = y + (rowHeight - EXPORT_CONFIG.layout.image.maxHeight) / 2;
         await this.addProductImage(doc, product, imageX, imageY);
       } else if (column.key === 'url') {
         // Add hyperlink
@@ -297,10 +307,20 @@ export class PDFExportService {
 
     // Add border
     doc.strokeColor(this.layout.colors.border)
-       .rect(this.layout.margins.left, y, 
-             doc.page.width - this.layout.margins.left - this.layout.margins.right, 
+       .rect(this.layout.margins.left, y,
+             doc.page.width - this.layout.margins.left - this.layout.margins.right,
              rowHeight)
        .stroke();
+
+    // Add vertical column separators
+    x = this.layout.margins.left;
+    for (let i = 0; i < config.columns.length - 1; i++) {
+      x += config.columns[i].width;
+      doc.strokeColor('#D9D9D9')
+         .moveTo(x, y)
+         .lineTo(x, y + rowHeight)
+         .stroke();
+    }
 
     return y + rowHeight;
   }
@@ -309,20 +329,20 @@ export class PDFExportService {
     switch (columnKey) {
       case 'productName':
         return product.productName || '';
+      case 'tagId':
+        return product.tagId || '';
       case 'type':
         return product.type || '';
-      case 'specificationDescription':
-        return product.specificationDescription || '';
       case 'manufacturer':
         return product.manufacturer || '';
-      case 'price':
-        return product.price ? `$${product.price.toFixed(2)}` : '';
+      case 'specificationDescription':
+        return product.specificationDescription || '';
+      case 'modelNo':
+        return '<model_no>';
       case 'category':
         return product.category.join(', ');
       case 'location':
         return product.location.join(', ');
-      case 'tagId':
-        return product.tagId || '';
       case 'url':
         return 'Link';
       default:
@@ -350,44 +370,26 @@ export class PDFExportService {
       // Initialize asset manager
       const assetManager = new AssetManager(projectDir);
       
-      
-      // Try multiple image sources in order of preference
-      const imageSources = [
-        { hash: product.primaryThumbnailHash, isThumbnail: true, name: 'thumbnail' },
-        { hash: product.primaryImageHash, isThumbnail: false, name: 'primary image' }
-      ].filter(source => source.hash); // Only include sources that have hashes
+      try {
+        const imagePath = await assetManager.getAssetPath(product.primaryImageHash!, false);
+        
+        // Check if file exists and is readable
+        if (!fs.existsSync(imagePath)) {
+          this.addImagePlaceholder(doc, x, y);
+          return;
+        }
+        // Successfully found an image, embed it
+        doc.image(imagePath, x, y, {
+          fit: [EXPORT_CONFIG.layout.image.maxWidth, EXPORT_CONFIG.layout.image.maxHeight],
+          align: EXPORT_CONFIG.layout.image.align,
+          valign: EXPORT_CONFIG.layout.image.valign
+        });
 
-      if (imageSources.length === 0) {
+        return; // Success! Exit the function
+      } catch (error) {
         this.addImagePlaceholder(doc, x, y);
         return;
       }
-
-      // Try each image source until we find one that works
-      for (const source of imageSources) {
-        try {
-          const imagePath = await assetManager.getAssetPath(source.hash!, source.isThumbnail);
-          
-          // Check if file exists and is readable
-          if (!fs.existsSync(imagePath)) {
-            continue;
-          }
-          // Successfully found an image, embed it
-          doc.image(imagePath, x, y, {
-            width: EXPORT_CONFIG.layout.image.width,
-            height: EXPORT_CONFIG.layout.image.height,
-            fit: [EXPORT_CONFIG.layout.image.width, EXPORT_CONFIG.layout.image.height],
-            align: 'center',
-            valign: 'center'
-          });
-          return; // Success! Exit the function
-
-        } catch (error) {
-          continue; // Try the next source
-        }
-      }
-
-      // If we get here, none of the image sources worked
-      this.addImagePlaceholder(doc, x, y);
 
     } catch (error) {
       console.error('❌ Failed to load product image:', error);
@@ -397,7 +399,7 @@ export class PDFExportService {
 
   private addImagePlaceholder(doc: PDFKit.PDFDocument, x: number, y: number): void {
     // Add placeholder rectangle
-    doc.rect(x, y, EXPORT_CONFIG.layout.image.width, EXPORT_CONFIG.layout.image.height)
+    doc.rect(x, y, EXPORT_CONFIG.layout.image.maxWidth, EXPORT_CONFIG.layout.image.maxHeight)
        .fillColor('#f3f4f6')
        .fill()
        .strokeColor(this.layout.colors.border)
@@ -406,7 +408,7 @@ export class PDFExportService {
     // Add placeholder text
     doc.fontSize(EXPORT_CONFIG.layout.fonts.small)
        .fillColor(this.layout.colors.secondary)
-       .text('IMG', x + EXPORT_CONFIG.layout.image.width/3, y + EXPORT_CONFIG.layout.image.height/2);
+       .text('IMG', x + EXPORT_CONFIG.layout.image.maxWidth/3, y + EXPORT_CONFIG.layout.image.maxHeight/2);
   }
 
   private addDocumentFooter(doc: PDFKit.PDFDocument): void {
