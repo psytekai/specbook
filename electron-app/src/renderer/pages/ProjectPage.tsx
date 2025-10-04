@@ -953,6 +953,8 @@ const ProjectPage: React.FC = () => {
                                 return <th key={column.key} className="tagid-header">Tag ID</th>;
                               case 'productName':
                                 return <th key={column.key} className="product-name-header">Product Name</th>;
+                              case 'modelNo':
+                                return <th key={column.key} className="model-no-header">Model No</th>;
                               case 'type':
                                 return <th key={column.key} className="type-header">Type</th>;
                               case 'manufacturer':
@@ -1029,6 +1031,12 @@ const ProjectPage: React.FC = () => {
                                   return (
                                     <td key={column.key} className="manufacturer-cell">
                                       <span>{product.manufacturer || 'N/A'}</span>
+                                    </td>
+                                  );
+                                case 'modelNo':
+                                  return (
+                                    <td key={column.key} className="model-no-cell">
+                                      <span>{product.modelNo || 'N/A'}</span>
                                     </td>
                                   );
                                 case 'price':

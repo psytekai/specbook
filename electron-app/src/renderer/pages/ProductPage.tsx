@@ -245,16 +245,8 @@ const ProductPage: React.FC = () => {
               >
                 {project.name}
               </span>
-              {' > '}
-              <span>{productName}</span>
             </p>
           </div>
-          <button 
-            className="button button-secondary"
-            onClick={() => navigate('/project')}
-          >
-            Back to Project
-          </button>
         </div>
 
         <div className="product-content">
