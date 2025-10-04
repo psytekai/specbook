@@ -149,7 +149,7 @@ export class PDFExportService {
         case 'tagId': // We should only and always sort by tag ids
           return a.tagId?.localeCompare(b.tagId? b.tagId : '') || 0;
         default:
-          return a.productName.localeCompare(b.productName);
+          throw new Error(`Unsupported sortBy field: ${sortBy}`);
       }
     });
   }
@@ -211,8 +211,8 @@ export class PDFExportService {
           'generating_pdf',
           25 + Math.floor((groupIndex * group.products.length + productIndex + 1) /
             groupedData.reduce((sum, g) => sum + g.products.length, 0) * 60),
-          `Processing ${product.productName}...`,
-          product.productName
+          `Processing ${product.tagId} ${product.type} ${product.manufacturer}...`,
+          product.tagId
         );
       }
 
@@ -333,8 +333,6 @@ export class PDFExportService {
 
   private getCellValue(product: ProductForExport, columnKey: string): string {
     switch (columnKey) {
-      case 'productName':
-        return product.productName || '';
       case 'tagId':
         return product.tagId || '';
       case 'type':
@@ -344,7 +342,7 @@ export class PDFExportService {
       case 'specificationDescription':
         return product.specificationDescription || '';
       case 'modelNo':
-        return '<model_no>';
+        return product.modelNo || '';
       case 'category':
         return product.category.join(', ');
       case 'location':

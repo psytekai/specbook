@@ -105,12 +105,10 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
               </option>
             ))}
           </select>
-          <div className="field-description">
-            {PDF_EXPORT_OPTIONS.groupBy.find(opt => opt.value === pdfConfig.groupBy)?.description}
-          </div>
         </div>
 
-        <div className="form-field">
+        {/* Ask was to always sort by sortId, so option to change this config out*/}
+        {/* <div className="form-field">
           <label className="field-label">Sort by</label>
           <select
             className="field-input"
@@ -128,7 +126,7 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
           <div className="field-description">
             {PDF_EXPORT_OPTIONS.sortBy.find(opt => opt.value === pdfConfig.sortBy)?.description}
           </div>
-        </div>
+        </div> */}
 
         {/* Page Settings */}
         <div className="form-field">

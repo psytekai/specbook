@@ -8,28 +8,6 @@ export interface Project {
   path?: string; // Added to track the project file path
 }
 
-export interface Product {
-  id: string;
-  projectId: string;
-  url: string;
-  tagId?: string;  // Optional to match DB
-  location: string[];  // Always array
-  type?: string;  // Optional to match DB
-  specificationDescription?: string;  // Optional to match DB
-  category: string[];  // Always array, never string
-  productName: string;
-  manufacturer?: string;
-  price?: number;
-  
-  // Asset management fields - camelCase
-  primaryImageHash?: string;
-  primaryThumbnailHash?: string;
-  additionalImagesHashes?: string[];  // Optional array
-  
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface Category {
   id: string;
   name: string;

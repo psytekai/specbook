@@ -9,6 +9,7 @@ export interface Product {
   category: string[];
   productName: string;
   manufacturer?: string;
+  modelNo?: string;
   price?: number;
 
   primaryImageHash?: string;

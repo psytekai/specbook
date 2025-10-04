@@ -29,17 +29,16 @@ export interface GroupedProductData {
 
 export interface ProductForExport {
   id: string;
-  productName: string;
-  type?: string;
-  specificationDescription?: string;
-  url: string;
-  tagId?: string;
-  category: string[];
-  location: string[];
-  manufacturer?: string;
-  price?: number;
   primaryImageHash?: string;
   primaryThumbnailHash?: string;
+  tagId?: string;
+  type?: string;
+  manufacturer?: string;
+  specificationDescription?: string;
+  modelNo?: string;
+  category: string[];
+  location: string[];
+  url: string;
 }
 
 export interface PDFGenerationResult {

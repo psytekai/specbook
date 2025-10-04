@@ -4,9 +4,9 @@ import Database from 'better-sqlite3';
 import { v4 as uuidv4 } from 'uuid';
 import { AssetManager } from './AssetManager';
 import { mapDbRowToInterface, mapInterfaceToDb } from '../../shared/mappings/fieldMappings';
+import { Product } from '../../shared/types';
 import type {
   Project,
-  Product,
   Category,
   Location,
   Manifest,
@@ -84,7 +84,7 @@ export class ProjectFileManager {
       // Apply versioned migrations
       const currentVersion = this.getSchemaVersion(db);
       log.info('Current schema version:', {currentVersion});
-      const targetVersion = 2; // Latest schema version
+      const targetVersion = 3; // TODO: we should run all migrations as default
 
       for (let version = currentVersion + 1; version <= targetVersion; version++) {
         log.info(`Applying migration version ${version}...`);
@@ -365,6 +365,13 @@ export class ProjectFileManager {
         `);
 
         console.log('Successfully updated location and category columns to reference IDs and removed NOT NULL constraints');
+      },
+      3: () => {
+        log.info('Applying migration 3: adding model_no column to products table...');
+
+        db.exec('ALTER TABLE products ADD COLUMN model_no TEXT');
+        
+        log.info('Successfully added model_no column to products table');
       }
     };
 
@@ -474,11 +481,11 @@ export class ProjectFileManager {
       const stmt = this.db.prepare(`
         INSERT INTO products (
           id, project_id, url, tag_id, location,
-          type, specification_description, category, 
-          product_name, manufacturer, price,
+          type, specification_description, category,
+          product_name, manufacturer, model_no, price,
           primary_image_hash, primary_thumbnail_hash, additional_images_hashes,
           created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       stmt.run(
@@ -492,6 +499,7 @@ export class ProjectFileManager {
         productData.category && productData.category.length > 0 ? JSON.stringify(productData.category) : null,
         dbData.product_name, // Required field, validated above
         dbData.manufacturer || null,
+        dbData.model_no || null,
         dbData.price || null,
         dbData.primary_image_hash || null,
         dbData.primary_thumbnail_hash || null,
@@ -570,6 +578,10 @@ export class ProjectFileManager {
       if (updates.manufacturer !== undefined) {
         updateFields.push('manufacturer = ?');
         values.push(updates.manufacturer);
+      }
+      if (updates.modelNo !== undefined) {
+        updateFields.push('model_no = ?');
+        values.push(updates.modelNo);
       }
       if (updates.price !== undefined) {
         updateFields.push('price = ?');
@@ -1099,6 +1111,7 @@ export class ProjectFileManager {
       category: this.parseJsonArray(mappedRow.category),
       productName: mappedRow.productName,
       manufacturer: mappedRow.manufacturer || undefined,
+      modelNo: mappedRow.modelNo || undefined,
       price: mappedRow.price || undefined,
 
       // Asset fields now properly mapped from snake_case

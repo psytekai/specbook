@@ -30,7 +30,8 @@ const ProductNew: React.FC = () => {
     productName: string;
     manufacturer?: string;
     price?: number;
-    
+    modelNo?: string;
+
     // Asset management
     primaryImageHash?: string;
     primaryThumbnailHash?: string;
@@ -47,6 +48,7 @@ const ProductNew: React.FC = () => {
     productName: '',
     manufacturer: '',
     price: undefined,
+    modelNo: '',
     additionalImagesHashes: []
   });
   
@@ -283,7 +285,7 @@ const ProductNew: React.FC = () => {
           productName: data.product_name || '',
           manufacturer: data.manufacturer || '',
           price: data.price || undefined,
-
+          modelNo: data.model_no || '',
           primaryImageHash: imageHash,
           primaryThumbnailHash: thumbnailHash
         }));
@@ -304,11 +306,6 @@ const ProductNew: React.FC = () => {
     
     if (!formData.url) {
       showToast('Product URL is required', 'error');
-      return;
-    }
-    
-    if (!formData.productName || formData.productName.trim() === '') {
-      showToast('Product name is required', 'error');
       return;
     }
     
@@ -499,20 +496,19 @@ const ProductNew: React.FC = () => {
                   {isUploading ? `Uploading... ${uploadProgress}%` : 'Upload Image'}
                 </button>
               </div>
-              
+
               <div className="form-group">
-                <label htmlFor="productName" className="label">
-                  Product Title *
+                <label htmlFor="type" className="label">
+                  Type
                 </label>
                 <input
-                  id="productName"
-                  name="productName"
+                  id="type"
+                  name="type"
                   type="text"
                   className="input"
-                  value={formData.productName || ''}
+                  value={formData.type}
                   onChange={handleInputChange}
-                  placeholder="Enter product title"
-                  required
+                  placeholder="Enter product type"
                 />
               </div>
               
@@ -530,6 +526,37 @@ const ProductNew: React.FC = () => {
                   placeholder="Enter manufacturer"
                 />
               </div>
+
+              <div className="form-group">
+                <label htmlFor="productDescription" className="label">
+                  Description
+                </label>
+                <textarea
+                  id="productDescription"
+                  name="productDescription"
+                  className="input textarea"
+                  value={formData.specificationDescription}
+                  onChange={handleInputChange}
+                  rows={4}
+                  placeholder="Enter product description"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="modelNo" className="label">
+                  Model Number
+                </label>
+                <input
+                  id="modelNo"
+                  name="modelNo"
+                  type="text"
+                  className="input"
+                  value={formData.modelNo || ''}
+                  onChange={handleInputChange}
+                  placeholder="Enter model number"
+                  required
+                />
+              </div>
               
               <div className="form-group">
                 <label htmlFor="price" className="label">
@@ -545,36 +572,6 @@ const ProductNew: React.FC = () => {
                   value={formData.price || ''}
                   onChange={handleInputChange}
                   placeholder="Enter price"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="type" className="label">
-                  Type
-                </label>
-                <input
-                  id="type"
-                  name="type"
-                  type="text"
-                  className="input"
-                  value={formData.type}
-                  onChange={handleInputChange}
-                  placeholder="Enter product type"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="specificationDescription" className="label">
-                  Specifications
-                </label>
-                <textarea
-                  id="specificationDescription"
-                  name="specificationDescription"
-                  className="input textarea"
-                  value={formData.specificationDescription}
-                  onChange={handleInputChange}
-                  rows={4}
-                  placeholder="Enter product specifications"
                 />
               </div>
               

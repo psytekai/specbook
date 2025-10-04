@@ -24,7 +24,7 @@ export const EXPORT_CONFIG = {
     { key: 'type', label: 'Type', width: 65 },
     { key: 'manufacturer', label: 'Manufacturer', width: 80 },
     { key: 'specificationDescription', label: 'Description', width: 125 },
-    { key: 'modelNo', label: 'Model No', width: 60 }, // TODO: implement model no
+    { key: 'modelNo', label: 'Model No', width: 60 },
     { key: 'category', label: 'Category', width: 55 },
     { key: 'location', label: 'Location', width: 55 },
     { key: 'url', label: 'URL', width: 35 },
