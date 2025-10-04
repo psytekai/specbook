@@ -10,6 +10,7 @@ import { usePythonScraper } from '../hooks/usePythonScraper';
 import { LocationMultiSelect } from '../components/LocationMultiSelect';
 import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
 import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
+import { Product } from '../../shared/types';
 import { getAssetUrl } from '../../shared/utils/assetUtils';
 import './ProductNew.css';
 
@@ -60,6 +61,8 @@ const ProductNew: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [existingTagIds, setExistingTagIds] = useState<Set<string>>(new Set());
+  const [tagIdExists, setTagIdExists] = useState(false);
 
   // Python scraper hook
   const { 
@@ -88,15 +91,24 @@ const ProductNew: React.FC = () => {
   }, [currentProject, isInitializing, projectLoading, navigate, showToast]);
 
   useEffect(() => {
-    // Fetch available locations and categories when component mounts
+    // Fetch available locations, categories, and existing tag IDs when component mounts
     const loadData = async () => {
       try {
-        const [locationsResponse, categoriesResponse] = await Promise.all([
+        const [locationsResponse, categoriesResponse, productsResponse] = await Promise.all([
           api.get<Location[]>('/api/locations'),
-          api.get<Category[]>('/api/categories')
+          api.get<Category[]>('/api/categories'),
+          api.get<Product[]>('/api/projects/current/products') // TODO: terrible api, rename endpoint to /api/products
         ]);
         setLocations(locationsResponse.data);
         setCategories(categoriesResponse.data);
+        
+        // Extract tag IDs from products and store in Set
+        const tagIds = new Set<string>(
+          productsResponse.data
+            .map(product => product.tagId?.toLowerCase())
+            .filter((tagId): tagId is string => Boolean(tagId)) // Filter out null/undefined
+        );
+        setExistingTagIds(tagIds);
       } catch (error) {
         console.error('Failed to fetch data:', error);
       }
@@ -387,9 +399,22 @@ const ProductNew: React.FC = () => {
                 className="input"
                 value={formData.tagId}
                 onChange={handleInputChange}
+                onBlur={(e) => {
+                  const value = e.target.value.trim();
+                  setTagIdExists(value ? existingTagIds.has(value.toLowerCase()) : false);
+                }}
                 placeholder="Enter tag ID"
                 required
               />
+              {tagIdExists && (
+                <div style={{
+                  marginTop: '4px',
+                  fontSize: '12px',
+                  color: '#dc3545'
+                }}>
+                  ⚠️ This tag ID already exists
+                </div>
+              )}
             </div>
             
             <div className="form-group">

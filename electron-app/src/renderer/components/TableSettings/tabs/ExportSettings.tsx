@@ -10,10 +10,11 @@ import { EXPORT_CONFIG, PDF_EXPORT_OPTIONS, getColumnsForGroupBy } from '../../.
 interface ExportSettingsProps {
   settings: ExportSettingsType;
   columns: Record<string, ColumnConfig>;
+  tagCounts: Record<string, number>;
   onChange: (settings: ExportSettingsType) => void;
 }
 
-export const ExportSettings: React.FC<ExportSettingsProps> = () => {
+export const ExportSettings: React.FC<ExportSettingsProps> = ({ tagCounts }) => {
   const [pdfConfig, setPdfConfig] = useState<Partial<PDFExportConfig>>(EXPORT_CONFIG.defaults);
   const [isExporting, setIsExporting] = useState(false);
   const [exportResult, setExportResult] = useState<PDFGenerationResult | null>(null);
@@ -80,6 +81,10 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
     if (ms < 1000) return `${ms}ms`;
     return `${(ms / 1000).toFixed(1)}s`;
   };
+
+  // Count duplicate tags
+  console.log('Tag counts:', tagCounts);
+  const duplicateTagCount = Object.values(tagCounts).filter(count => count > 1).length;
 
   return (
     <div className="export-settings">
@@ -172,6 +177,11 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
           >
             {isExporting ? 'Exporting...' : 'Export PDF'}
           </button>
+          {duplicateTagCount > 0 && (
+            <p style={{ color: 'red', fontSize: '12px', marginTop: '8px', marginBottom: 0 }}>
+              ⚠️ {duplicateTagCount} tag{duplicateTagCount !== 1 ? 's are' : ' is'} used more than once
+            </p>
+          )}
         </div>
 
         {/* Export Result */}

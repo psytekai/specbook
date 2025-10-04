@@ -194,6 +194,7 @@ const ProjectPage: React.FC = () => {
     pages: 0
   });
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [tagCounts, setTagCounts] = useState<Record<string, number>>({});
 
   // For the new file-based system, we only have one current project
   const currentProject = project;
@@ -273,10 +274,19 @@ const ProjectPage: React.FC = () => {
             pages: productsResponse.pagination.pages
           });
         }
+
+        // Build tag count map
+        const counts = productsResponse.data.reduce((acc, product) => {
+          if (product.tagId) {
+            acc[product.tagId] = (acc[product.tagId] || 0) + 1;
+          }
+          return acc;
+        }, {} as Record<string, number>);
+        setTagCounts(counts);
       } else {
         throw new Error('Failed to fetch products');
       }
-      
+
       setCategories(categoriesResponse.data);
       setLocations(locationsResponse.data);
     } catch (err) {
@@ -1007,8 +1017,11 @@ const ProjectPage: React.FC = () => {
                                 case 'tagId':
                                   return (
                                     <td key={column.key} className="tagid-cell">
-                                      <span 
-                                        style={{ cursor: 'pointer' }}
+                                      <span
+                                        style={{
+                                          cursor: 'pointer',
+                                          color: product.tagId && tagCounts[product.tagId] > 1 ? 'red' : 'inherit'
+                                        }}
                                         onClick={() => navigate(`/project/products/${product.id}`)}
                                       >
                                         {product.tagId}
@@ -1219,6 +1232,7 @@ const ProjectPage: React.FC = () => {
           onAddCategory={handleAddCategory}
           onUpdateCategory={handleUpdateCategory}
           onDeleteCategory={handleDeleteCategory}
+          tagCounts={tagCounts}
         />
       </div>
     </div>
