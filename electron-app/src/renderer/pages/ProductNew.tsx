@@ -323,10 +323,18 @@ const ProductNew: React.FC = () => {
     
     try {
       setIsSaving(true);
+
+      // when manually entering details, need to create a product name as we remove the option to input one
+      // and I do not want to do a database migration to remove the not null constraint on the product name column
+      let productName = formData.productName;
+      if (formData.productName === '') {
+        productName = `${formData.tagId} - ${formData.manufacturer || '<manufacturer>'} - ${formData.type || '<type>'}`;
+      }
       
       // Submit with internal field names
       await api.post('/api/products', {
         ...formData,
+        productName,
         projectId: 'current'
       });
       
@@ -553,12 +561,12 @@ const ProductNew: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="productDescription" className="label">
+                <label htmlFor="specificationDescription" className="label">
                   Description
                 </label>
                 <textarea
-                  id="productDescription"
-                  name="productDescription"
+                  id="specificationDescription"
+                  name="specificationDescription"
                   className="input textarea"
                   value={formData.specificationDescription}
                   onChange={handleInputChange}

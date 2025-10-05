@@ -19,15 +19,15 @@ const ROW_HEIGHT = 60;
 export const EXPORT_CONFIG = {
   // Column definitions in exact export order
   columns: [
-    { key: 'image', label: 'Image', width: 140 },
+    { key: 'image', label: 'Image', width: 120 },
     { key: 'tagId', label: 'Tag', width: 40 },
     { key: 'type', label: 'Type', width: 65 },
     { key: 'manufacturer', label: 'Manufacturer', width: 80 },
     { key: 'specificationDescription', label: 'Description', width: 125 },
     { key: 'modelNo', label: 'Model No', width: 60 },
-    { key: 'category', label: 'Category', width: 55 },
-    { key: 'location', label: 'Location', width: 55 },
-    { key: 'url', label: 'URL', width: 35 },
+    { key: 'category', label: 'Category', width: 65 },
+    { key: 'location', label: 'Location', width: 65 },
+    { key: 'url', label: 'URL', width: 45 },
   ] as ExportColumnDefinition[],
 
   // Layout settings
@@ -51,7 +51,7 @@ export const EXPORT_CONFIG = {
     
     // Image settings
     image: {
-      maxWidth: 110,  // Smaller than column width to fit properly
+      maxWidth: 90,  // Smaller than column width to fit properly
       maxHeight: ROW_HEIGHT, // Fits within row height
       padding: 10, // Space around image
       align: 'center',
@@ -76,6 +76,9 @@ export const EXPORT_CONFIG = {
     pageSize: 'Letter' as const,
     orientation: 'portrait' as const,
     scope: 'currentView' as const,
+    issuanceName: '',
+    groupPageBreaks: false,
+    showFullUrl: false,
   },
 } as const;
 
@@ -141,6 +144,7 @@ export const DEFAULT_PDF_LAYOUT: PDFLayoutConfig = {
     secondary: '#64748b',
     text: '#1e293b',
     border: '#e2e8f0',
+    default: '#000000'
   },
   spacing: {
     lineHeight: 1.2,

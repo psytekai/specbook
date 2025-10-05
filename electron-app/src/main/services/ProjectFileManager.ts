@@ -2,11 +2,11 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import Database from 'better-sqlite3';
 import { v4 as uuidv4 } from 'uuid';
+import { Mutex } from 'async-mutex';
 import { AssetManager } from './AssetManager';
 import { mapDbRowToInterface, mapInterfaceToDb } from '../../shared/mappings/fieldMappings';
-import { Product } from '../../shared/types';
+import { Product, Project } from '../../shared/types';
 import type {
-  Project,
   Category,
   Location,
   Manifest,
@@ -25,6 +25,8 @@ export class ProjectFileManager {
   private db: Database.Database | null = null;
   private currentProject: Project | null = null;
   private projectPath: string | null = null;
+  private manifestMutex = new Mutex();
+  private appVersion = require('../../../package.json').version;
 
   constructor(_options: ProjectFileManagerOptions = {}) {
     // Options reserved for future use (autoSave, backupOnSave, etc.)
@@ -388,24 +390,35 @@ export class ProjectFileManager {
    * Creates and saves manifest.json
    */
   async createManifest(projectPath: string, projectData: Partial<Project>): Promise<void> {
+    const now = new Date()
     try {
       const manifest: Manifest = {
-        version: '1.0.0',
+        version: this.appVersion,
         format: 'specbook-project',
-        created: new Date().toISOString(),
-        modified: new Date().toISOString(),
         project: {
           id: projectData.id || uuidv4(),
           name: projectData.name || 'Untitled Project',
           description: projectData.description,
-          productCount: 0
+          productCount: 0,
+          createdAt: now,
+          updatedAt: now,
+          subtitle: projectData.subtitle,
+          addressLine1: projectData.addressLine1,
+          addressLine2: projectData.addressLine2,
+          projectPhotoHash: projectData.projectPhotoHash,
+          companyLogoHash: projectData.companyLogoHash,
+          createdByName: projectData.createdByName,
+          createdByEmail: projectData.createdByEmail
         }
       };
 
       const manifestPath = path.join(projectPath, 'manifest.json');
+
+      // Special case: Initial write doesn't need mutex lock since file doesn't exist yet
+      // and there's no concurrent access during project creation
       await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
 
-      console.log(`Created manifest at: ${manifestPath}`);
+      log.info('Created manifest at:', { path: manifestPath });
     } catch (error) {
       throw new Error(`Failed to create manifest: ${error}`);
     }
@@ -1017,9 +1030,16 @@ export class ProjectFileManager {
         name: manifest.project.name,
         description: manifest.project.description,
         productCount: manifest.project.productCount,
-        createdAt: new Date(manifest.created),
-        updatedAt: new Date(manifest.modified),
-        path: projectPath
+        createdAt: new Date(manifest.project.createdAt),
+        updatedAt: new Date(manifest.project.updatedAt),
+        path: projectPath,
+        subtitle: manifest.project.subtitle,
+        addressLine1: manifest.project.addressLine1,
+        addressLine2: manifest.project.addressLine2,
+        projectPhotoHash: manifest.project.projectPhotoHash,
+        companyLogoHash: manifest.project.companyLogoHash,
+        createdByName: manifest.project.createdByName,
+        createdByEmail: manifest.project.createdByEmail
       };
 
       this.currentProject = project;
@@ -1048,19 +1068,48 @@ export class ProjectFileManager {
       if (updates.description !== undefined) {
         this.currentProject.description = updates.description;
       }
+      if (updates.subtitle !== undefined) {
+        this.currentProject.subtitle = updates.subtitle;
+      }
+      if (updates.addressLine1 !== undefined) {
+        this.currentProject.addressLine1 = updates.addressLine1;
+      }
+      if (updates.addressLine2 !== undefined) {
+        this.currentProject.addressLine2 = updates.addressLine2;
+      }
+      if (updates.projectPhotoHash !== undefined) {
+        this.currentProject.projectPhotoHash = updates.projectPhotoHash;
+      }
+      if (updates.companyLogoHash !== undefined) {
+        this.currentProject.companyLogoHash = updates.companyLogoHash;
+      }
+      if (updates.createdByName !== undefined) {
+        this.currentProject.createdByName = updates.createdByName;
+      }
+      if (updates.createdByEmail !== undefined) {
+        this.currentProject.createdByEmail = updates.createdByEmail;
+      }
 
       this.currentProject.updatedAt = new Date();
 
-      // Update manifest
-      const manifestPath = path.join(this.projectPath, 'manifest.json');
-      const manifestData = await fs.readFile(manifestPath, 'utf-8');
-      const manifest: Manifest = JSON.parse(manifestData);
-
-      manifest.modified = this.currentProject.updatedAt.toISOString();
-      manifest.project.name = this.currentProject.name;
-      manifest.project.description = this.currentProject.description;
-
-      await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
+      // Write to manifest using thread-safe method
+      await this.writeManifest({
+        project: {
+          id: this.currentProject.id,
+          name: this.currentProject.name,
+          description: this.currentProject.description,
+          productCount: this.currentProject.productCount,
+          subtitle: this.currentProject.subtitle,
+          addressLine1: this.currentProject.addressLine1,
+          addressLine2: this.currentProject.addressLine2,
+          projectPhotoHash: this.currentProject.projectPhotoHash,
+          companyLogoHash: this.currentProject.companyLogoHash,
+          createdByName: this.currentProject.createdByName,
+          createdByEmail: this.currentProject.createdByEmail,
+          createdAt: this.currentProject.createdAt,
+          updatedAt: this.currentProject.updatedAt
+        }
+      } as Partial<Manifest>);
 
       return true;
     } catch (error) {
@@ -1145,18 +1194,60 @@ export class ProjectFileManager {
       const count = this.db.prepare('SELECT COUNT(*) as count FROM products').get() as any;
       this.currentProject.productCount = count.count;
 
-      // Update manifest
-      const manifestPath = path.join(this.projectPath, 'manifest.json');
-      const manifestData = await fs.readFile(manifestPath, 'utf-8');
-      const manifest: Manifest = JSON.parse(manifestData);
+      // Write to manifest using thread-safe method
+      await this.writeManifest({
+        project: {
+          id: this.currentProject.id,
+          name: this.currentProject.name,
+          description: this.currentProject.description,
+          productCount: count.count
+        }
+      } as Partial<Manifest>);
 
-      manifest.project.productCount = count.count;
-      manifest.modified = new Date().toISOString();
-
-      await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
     } catch (error) {
-      console.error('Failed to update product count:', error);
+      log.error('Failed to update product count:', { error });
     }
+  }
+
+  /**
+   * Thread-safe manifest write - ALL manifest updates must use this method
+   * (except createManifest which does initial write)
+   */
+  private async writeManifest(updates: Partial<Manifest>): Promise<void> {
+    if (!this.projectPath) {
+      throw new Error('No project path set');
+    }
+
+    await this.manifestMutex.runExclusive(async () => {
+      try {
+        const manifestPath = path.join(this.projectPath!, 'manifest.json');
+
+        // Read current manifest
+        const manifestData = await fs.readFile(manifestPath, 'utf-8');
+        const manifest: Manifest = JSON.parse(manifestData);
+        
+        // override the version with the current app version
+        updates.version = this.appVersion;
+
+        // Apply updates
+        const updatedManifest: Manifest = {
+          ...manifest,
+          ...updates,
+          project: {
+            ...manifest.project,
+            ...updates.project
+          },
+        };
+
+        // Write atomically
+        await fs.writeFile(manifestPath, JSON.stringify(updatedManifest, null, 2));
+
+        log.info('Manifest updated', { updates: Object.keys(updates) });
+      } catch (error) {
+        log.error('Failed to write manifest:', { error });
+        throw error;
+      }
+    });
   }
 
 

@@ -247,10 +247,16 @@ class APIRouter {
         const productName = (product.productName || '').toLowerCase();
         const type = (product.type || '').toLowerCase();
         const manufacturer = (product.manufacturer || '').toLowerCase();
+        const modelNo = (product.modelNo || '').toLowerCase();
+        const tagId = (product.tagId || '').toLowerCase();
+        const specificationDescription = (product.specificationDescription || '').toLowerCase();
         
         return productName.includes(searchTerm) || 
                type.includes(searchTerm) || 
-               manufacturer.includes(searchTerm);
+               manufacturer.includes(searchTerm) ||
+               modelNo.includes(searchTerm) ||
+               tagId.includes(searchTerm) ||
+               specificationDescription.includes(searchTerm);
       });
     }
 

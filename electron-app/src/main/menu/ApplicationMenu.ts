@@ -116,6 +116,11 @@ export class ApplicationMenu {
           },
           { type: 'separator' },
           {
+            label: 'Project Info...',
+            click: () => this.handleProjectInfo(),
+            enabled: false // Initially disabled, enabled when project is open
+          },
+          {
             label: 'API Keys...',
             click: () => this.handleApiKeys()
           },
@@ -276,12 +281,16 @@ export class ApplicationMenu {
 
     const saveMenuItem = fileMenu.submenu.items.find(item => item.label === 'Save Project');
     const closeMenuItem = fileMenu.submenu.items.find(item => item.label === 'Close Project');
+    const projectInfoMenuItem = fileMenu.submenu.items.find(item => item.label === 'Project Info...');
 
     if (saveMenuItem) {
       saveMenuItem.enabled = this.projectState.isOpen;
     }
     if (closeMenuItem) {
       closeMenuItem.enabled = this.projectState.isOpen;
+    }
+    if (projectInfoMenuItem) {
+      projectInfoMenuItem.enabled = this.projectState.isOpen;
     }
   }
 
@@ -419,6 +428,22 @@ export class ApplicationMenu {
    */
   clearRecentProjects(): void {
     this.updateRecentProjectsAndBroadcast([]);
+  }
+
+  /**
+   * Handle File > Project Info
+   */
+  private async handleProjectInfo(): Promise<void> {
+    if (!this.mainWindow) return;
+
+    try {
+      // Send navigation command to renderer
+      this.mainWindow.webContents.send('navigate-to', '/project-info');
+      log.info('Navigated to Project Info page');
+    } catch (error) {
+      console.error('Error navigating to project info:', error);
+      dialog.showErrorBox('Error', `Failed to open project info page: ${error}`);
+    }
   }
 
   /**

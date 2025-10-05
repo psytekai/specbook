@@ -275,8 +275,8 @@ monitor.record_metric("scrape", results)
 **Project File Structure**
 ```
 project-name.specbook/
-├── project.json              # Project metadata
-├── data.db                   # SQLite database
+├── manifest.json              # Project metadata
+├── project.db                 # SQLite database
 └── assets/
     ├── [hash].jpg           # Full-size images
     └── thumbnails/

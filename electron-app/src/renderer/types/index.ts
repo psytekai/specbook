@@ -1,15 +1,3 @@
-export interface Project {
-  id: string;
-  name: string;
-  description?: string;
-  status?: string;
-  productCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Product type now lives in shared/types.ts; import from there where needed
-
 export interface ApiError {
   message: string;
   code: string;

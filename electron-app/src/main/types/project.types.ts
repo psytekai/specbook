@@ -1,12 +1,4 @@
-export interface Project {
-  id: string;
-  name: string;
-  description?: string;
-  productCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-  path?: string; // Added to track the project file path
-}
+import { Project } from '../../shared/types';
 
 export interface Category {
   id: string;
@@ -23,14 +15,7 @@ export interface Location {
 export interface Manifest {
   version: string;
   format: string;
-  created: string;
-  modified: string;
-  project: {
-    id: string;
-    name: string;
-    description?: string;
-    productCount: number;
-  };
+  project: Project;
   assets?: {
     totalCount: number;
     totalSize: number;

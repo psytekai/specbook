@@ -7,6 +7,9 @@ export interface PDFExportConfig {
   orientation: 'portrait' | 'landscape';
   columns: PDFColumnConfig[];
   scope: 'currentView' | 'allData';
+  issuanceName?: string; // Optional issuance name for cover page
+  groupPageBreaks?: boolean; // Start each group on a new page
+  showFullUrl?: boolean; // Show full URL instead of "Link" text
   filters?: {
     search?: string;
     category?: string;
@@ -83,6 +86,7 @@ export interface PDFLayoutConfig {
     secondary: string;
     text: string;
     border: string;
+    default: string;
   };
   spacing: {
     lineHeight: number;

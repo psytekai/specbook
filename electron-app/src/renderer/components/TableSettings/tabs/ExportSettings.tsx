@@ -156,7 +156,7 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({ tagCounts }) => 
           <select
             className="field-input"
             value={pdfConfig.orientation || 'portrait'}
-            onChange={(e) => handlePDFConfigChange({ 
+            onChange={(e) => handlePDFConfigChange({
               orientation: e.target.value as 'portrait' | 'landscape'
             })}
           >
@@ -166,6 +166,45 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({ tagCounts }) => 
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="form-field">
+          <label className="field-label">Issuance Name</label>
+          <input
+            type="text"
+            className="field-input"
+            value={pdfConfig.issuanceName || ''}
+            onChange={(e) => handlePDFConfigChange({ issuanceName: e.target.value })}
+            placeholder="e.g., Final Specification, Rev. A, etc."
+          />
+          <div className="field-description">
+            Optional identifier for this export (appears on cover page)
+          </div>
+        </div>
+
+        {/* Advanced Options */}
+        <div className="form-field">
+          <label className="field-label">
+            <input
+              type="checkbox"
+              checked={pdfConfig.groupPageBreaks || false}
+              onChange={(e) => handlePDFConfigChange({ groupPageBreaks: e.target.checked })}
+              style={{ marginRight: '8px' }}
+            />
+            Break Page by Group
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label className="field-label">
+            <input
+              type="checkbox"
+              checked={pdfConfig.showFullUrl || false}
+              onChange={(e) => handlePDFConfigChange({ showFullUrl: e.target.checked })}
+              style={{ marginRight: '8px' }}
+            />
+            Show Full URLs
+          </label>
         </div>
 
         {/* Export Action */}

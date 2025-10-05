@@ -9,6 +9,14 @@ interface ProjectInfo {
   path?: string;
   createdAt?: string;
   updatedAt?: string;
+  // Cover page fields
+  subtitle?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  projectPhotoHash?: string;
+  companyLogoHash?: string;
+  createdByName?: string;
+  createdByEmail?: string;
 }
 
 interface ElectronProjectContextType {
@@ -66,7 +74,14 @@ export const ElectronProjectProvider: React.FC<{ children: ReactNode }> = ({ chi
           name: stateInfo.project.name,
           path: stateInfo.filePath,
           createdAt: stateInfo.project.createdAt,
-          updatedAt: stateInfo.project.updatedAt
+          updatedAt: stateInfo.project.updatedAt,
+          subtitle: stateInfo.project.subtitle,
+          addressLine1: stateInfo.project.addressLine1,
+          addressLine2: stateInfo.project.addressLine2,
+          projectPhotoHash: stateInfo.project.projectPhotoHash,
+          companyLogoHash: stateInfo.project.companyLogoHash,
+          createdByName: stateInfo.project.createdByName,
+          createdByEmail: stateInfo.project.createdByEmail
         } : null;
         
         setProject(projectInfo);
@@ -101,7 +116,7 @@ export const ElectronProjectProvider: React.FC<{ children: ReactNode }> = ({ chi
 
     const handleProjectChanged = (stateInfo: any) => {
       console.log('🔄 ElectronProjectContext: Received project change event:', stateInfo);
-      
+
       // Map the state info from main process to ProjectInfo format
       const projectInfo: ProjectInfo | null = stateInfo.isOpen && stateInfo.project ? {
         isOpen: stateInfo.isOpen,
@@ -109,7 +124,14 @@ export const ElectronProjectProvider: React.FC<{ children: ReactNode }> = ({ chi
         name: stateInfo.project.name,
         path: stateInfo.filePath,
         createdAt: stateInfo.project.createdAt,
-        updatedAt: stateInfo.project.updatedAt
+        updatedAt: stateInfo.project.updatedAt,
+        subtitle: stateInfo.project.subtitle,
+        addressLine1: stateInfo.project.addressLine1,
+        addressLine2: stateInfo.project.addressLine2,
+        projectPhotoHash: stateInfo.project.projectPhotoHash,
+        companyLogoHash: stateInfo.project.companyLogoHash,
+        createdByName: stateInfo.project.createdByName,
+        createdByEmail: stateInfo.project.createdByEmail
       } : null;
       
       // Check if we're transitioning from no project to having a project
@@ -162,16 +184,23 @@ export const ElectronProjectProvider: React.FC<{ children: ReactNode }> = ({ chi
       setError(null);
       
       const stateInfo = await window.electronAPI.getCurrentProject();
-      
+
       const projectInfo: ProjectInfo | null = stateInfo.isOpen && stateInfo.project ? {
         isOpen: stateInfo.isOpen,
         isDirty: stateInfo.hasUnsavedChanges,
         name: stateInfo.project.name,
         path: stateInfo.filePath,
         createdAt: stateInfo.project.createdAt,
-        updatedAt: stateInfo.project.updatedAt
+        updatedAt: stateInfo.project.updatedAt,
+        subtitle: stateInfo.project.subtitle,
+        addressLine1: stateInfo.project.addressLine1,
+        addressLine2: stateInfo.project.addressLine2,
+        projectPhotoHash: stateInfo.project.projectPhotoHash,
+        companyLogoHash: stateInfo.project.companyLogoHash,
+        createdByName: stateInfo.project.createdByName,
+        createdByEmail: stateInfo.project.createdByEmail
       } : null;
-      
+
       setProject(projectInfo);
       
       // Also refresh recent projects
