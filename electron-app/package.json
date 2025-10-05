@@ -63,6 +63,7 @@
   },
   "dependencies": {
     "@types/pdfkit": "^0.17.3",
+    "async-mutex": "^0.5.0",
     "better-sqlite3": "^12.2.0",
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^10.1.0",
