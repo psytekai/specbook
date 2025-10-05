@@ -76,6 +76,7 @@ export const EXPORT_CONFIG = {
     pageSize: 'Letter' as const,
     orientation: 'portrait' as const,
     scope: 'currentView' as const,
+    issuanceName: '',
   },
 } as const;
 
@@ -141,6 +142,7 @@ export const DEFAULT_PDF_LAYOUT: PDFLayoutConfig = {
     secondary: '#64748b',
     text: '#1e293b',
     border: '#e2e8f0',
+    default: '#000000'
   },
   spacing: {
     lineHeight: 1.2,

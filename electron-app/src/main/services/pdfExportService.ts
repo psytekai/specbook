@@ -154,6 +154,178 @@ export class PDFExportService {
     });
   }
 
+  private async addCoverPage(doc: PDFKit.PDFDocument, config: PDFExportConfig): Promise<void> {
+    log.info('🎨 Adding cover page to PDF');
+
+    // Get project info from ProjectState
+    const projectState = ProjectState.getInstance();
+    const state = projectState.getStateInfo();
+
+    log.info('Project state:', {
+      hasProject: !!state.project,
+      projectName: state.project?.name,
+      filePath: state.filePath
+    });
+
+    if (!state.project) {
+      log.warn('⚠️ No project info available for cover page - SKIPPING COVER PAGE');
+      // Add a placeholder message on the first page
+      doc.fontSize(16)
+         .font('Helvetica')
+         .fillColor('#666666')
+         .text('Cover Page Not Available', 100, 300, {
+           width: doc.page.width - 200,
+           align: 'center'
+         });
+      doc.fontSize(12)
+         .text('No project information found', 100, 330, {
+           width: doc.page.width - 200,
+           align: 'center'
+         });
+      return;
+    }
+
+    const project = state.project;
+    log.info('Cover page project info:', {
+      name: project.name,
+      subtitle: project.subtitle,
+      hasPhoto: !!project.projectPhotoHash,
+      hasLogo: !!project.companyLogoHash
+    });
+    const pageWidth = doc.page.width;
+    const centerX = pageWidth / 2;
+
+    let y = 100; // Start position from top
+
+    // Project Name (Large, bold)
+    doc.fontSize(28)
+       .font('Helvetica-Bold')
+       .fillColor(this.layout.colors.default)
+       .text(project.name || 'Untitled Project', this.layout.margins.left, y, {
+         width: pageWidth - this.layout.margins.left - this.layout.margins.right,
+         align: 'center'
+       });
+
+    y += 40;
+
+    // Project Subtitle
+    if (project.subtitle) {
+      doc.fontSize(16)
+         .font('Helvetica')
+         .fillColor(this.layout.colors.default)
+         .text(project.subtitle, this.layout.margins.left, y, {
+           width: pageWidth - this.layout.margins.left - this.layout.margins.right,
+           align: 'center'
+         });
+      y += 30;
+    }
+
+    // Address Lines
+    if (project.addressLine1) {
+      doc.fontSize(12)
+         .font('Helvetica')
+         .fillColor(this.layout.colors.default)
+         .text(project.addressLine1, this.layout.margins.left, y, {
+           width: pageWidth - this.layout.margins.left - this.layout.margins.right,
+           align: 'center'
+         });
+      y += 15;
+    }
+
+    if (project.addressLine2) {
+      doc.fontSize(12)
+         .font('Helvetica')
+         .fillColor(this.layout.colors.default)
+         .text(project.addressLine2, this.layout.margins.left, y, {
+           width: pageWidth - this.layout.margins.left - this.layout.margins.right,
+           align: 'center'
+         });
+      y += 40;
+    } else if (project.addressLine1) {
+      y += 20; // Add space even if no second line
+    }
+
+    // Project Photo (if available)
+    if (project.projectPhotoHash && state.filePath) {
+      try {
+        const assetManager = new AssetManager(state.filePath);
+        const photoPath = await assetManager.getAssetPath(project.projectPhotoHash, false);
+
+        if (fs.existsSync(photoPath)) {
+          const maxPhotoWidth = 400;
+          const maxPhotoHeight = 285;
+
+          doc.image(photoPath, centerX - maxPhotoWidth/2, y, {
+            fit: [maxPhotoWidth, maxPhotoHeight],
+            align: 'center'
+          });
+          y += maxPhotoHeight + 40;
+        }
+      } catch (error) {
+        log.error('Failed to load project photo:', { error });
+      }
+    }
+
+    // Company Logo (if available)
+    if (project.companyLogoHash && state.filePath) {
+      try {
+        const assetManager = new AssetManager(state.filePath);
+        const logoPath = await assetManager.getAssetPath(project.companyLogoHash, false);
+
+        if (fs.existsSync(logoPath)) {
+          const maxLogoWidth = 200;
+          const maxLogoHeight = 65;
+
+          doc.image(logoPath, centerX - maxLogoWidth/2, y, {
+            fit: [maxLogoWidth, maxLogoHeight],
+            align: 'center'
+          });
+          y += maxLogoHeight + 40;
+        }
+      } catch (error) {
+        log.error('Failed to load company logo:', { error });
+      }
+    }
+
+    // Issue Date and Issuance Name
+    const issueDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const issuanceText = config.issuanceName
+      ? `${issueDate} | ${config.issuanceName}`
+      : issueDate;
+
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(this.layout.colors.default)
+       .text(issuanceText, this.layout.margins.left, y, {
+         width: pageWidth - this.layout.margins.left - this.layout.margins.right,
+         align: 'center'
+       });
+
+    y += 25;
+
+    // Created by info
+    if (project.createdByName || project.createdByEmail) {
+      const createdByText = project.createdByName && project.createdByEmail
+        ? `Created by: ${project.createdByName}, ${project.createdByEmail}`
+        : project.createdByName
+          ? `Created by: ${project.createdByName}`
+          : `Created by: ${project.createdByEmail}`;
+
+      doc.fontSize(10)
+         .font('Helvetica')
+         .fillColor(this.layout.colors.default)
+         .text(createdByText, this.layout.margins.left, y, {
+           width: pageWidth - this.layout.margins.left - this.layout.margins.right,
+           align: 'center'
+         });
+    }
+  }
+
   private async createPDFDocument(groupedData: GroupedProductData[], config: PDFExportConfig): Promise<PDFKit.PDFDocument> {
     // Determine page size
     const pageSize = config.pageSize === 'A4' ? 'A4' : 'LETTER';
@@ -164,8 +336,18 @@ export class PDFExportService {
       layout: landscape ? 'landscape' : 'portrait',
       margins: this.layout.margins,
       bufferPages: true,
+      autoFirstPage: true, // PDFKit creates first page automatically
     });
 
+    log.info('📄 Creating PDF document', { pageSize, landscape, groupCount: groupedData.length });
+
+    // Add cover page on the first (auto-created) page
+    await this.addCoverPage(doc, config);
+
+    log.info('✅ Cover page added, adding new page for content');
+
+    // Start content on a new page
+    doc.addPage();
     let currentY = doc.y + this.layout.spacing.sectionGap;
 
     // Add each group
@@ -423,8 +605,17 @@ export class PDFExportService {
 
     log.info(`Adding footer to ${totalPages} pages`);
 
+    // Total pages minus the cover page
+    const totalContentPages = totalPages - 1;
+
     for (let i = 0; i < totalPages; i++) {
       try {
+        // Skip footer on cover page (first page, i=0)
+        if (i === 0) {
+          log.info('Skipping footer on cover page');
+          continue;
+        }
+
         // Switch to page using the range start + offset
         doc.switchToPage(range.start + i);
 
@@ -440,8 +631,9 @@ export class PDFExportService {
            .font(this.layout.fonts.small)
            .fillColor(this.layout.colors.secondary);
 
-        // Use explicit positioning without creating new pages
-        const pageText = `Page ${i + 1} of ${totalPages}`;
+        // Page number: content pages start at 1 (i=1 becomes "Page 1")
+        const pageNumber = i; // i=1 -> Page 1, i=2 -> Page 2, etc.
+        const pageText = `Page ${pageNumber} of ${totalContentPages}`;
         const textWidth = doc.page.width - this.layout.margins.left - this.layout.margins.right;
         const textX = this.layout.margins.left + (textWidth / 2) - (doc.widthOfString(pageText) / 2);
 

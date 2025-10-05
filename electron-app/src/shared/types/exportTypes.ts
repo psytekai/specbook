@@ -7,6 +7,7 @@ export interface PDFExportConfig {
   orientation: 'portrait' | 'landscape';
   columns: PDFColumnConfig[];
   scope: 'currentView' | 'allData';
+  issuanceName?: string; // Optional issuance name for cover page
   filters?: {
     search?: string;
     category?: string;
@@ -83,6 +84,7 @@ export interface PDFLayoutConfig {
     secondary: string;
     text: string;
     border: string;
+    default: string;
   };
   spacing: {
     lineHeight: number;

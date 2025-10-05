@@ -26,7 +26,7 @@ const ProjectInfoPage: React.FC = () => {
   const companyLogoInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize form data when project loads (only once on mount or when project path changes)
-  const projectPathRef = useRef<string | undefined>();
+  const projectPathRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     if (project && project.path !== projectPathRef.current) {

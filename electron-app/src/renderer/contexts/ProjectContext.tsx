@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { Project } from '../types';
-import { Product } from '../../shared/types';
+import { Project, Product } from '../../shared/types';
 import { api } from '../services/apiIPC';
 
 interface ProjectState {
