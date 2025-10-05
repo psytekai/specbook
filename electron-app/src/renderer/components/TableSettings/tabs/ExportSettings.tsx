@@ -182,6 +182,31 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({ tagCounts }) => 
           </div>
         </div>
 
+        {/* Advanced Options */}
+        <div className="form-field">
+          <label className="field-label">
+            <input
+              type="checkbox"
+              checked={pdfConfig.groupPageBreaks || false}
+              onChange={(e) => handlePDFConfigChange({ groupPageBreaks: e.target.checked })}
+              style={{ marginRight: '8px' }}
+            />
+            Break Page by Group
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label className="field-label">
+            <input
+              type="checkbox"
+              checked={pdfConfig.showFullUrl || false}
+              onChange={(e) => handlePDFConfigChange({ showFullUrl: e.target.checked })}
+              style={{ marginRight: '8px' }}
+            />
+            Show Full URLs
+          </label>
+        </div>
+
         {/* Export Action */}
         <div className="export-action">
           <button

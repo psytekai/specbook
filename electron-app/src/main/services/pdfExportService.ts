@@ -354,8 +354,13 @@ export class PDFExportService {
     for (let groupIndex = 0; groupIndex < groupedData.length; groupIndex++) {
       const group = groupedData[groupIndex];
 
-      // Check if we need a new page for the group
-      if (currentY > doc.page.height - 200) {
+      // Start each group on a new page if groupPageBreaks is enabled
+      if (config.groupPageBreaks && groupIndex > 0) {
+        doc.addPage();
+        currentY = this.layout.margins.top;
+      }
+      // Otherwise, check if we need a new page for the group
+      else if (currentY > doc.page.height - 200) {
         doc.addPage();
         currentY = this.layout.margins.top;
       }
@@ -473,16 +478,20 @@ export class PDFExportService {
         const imageY = y + (rowHeight - EXPORT_CONFIG.layout.image.maxHeight) / 2;
         await this.addProductImage(doc, product, imageX, imageY);
       } else if (column.key === 'url') {
-        // Add hyperlink
+        // Add hyperlink - show full URL or "Link" text based on config
+        const linkText = config.showFullUrl ? product.url : 'Link';
         doc.fillColor(this.layout.colors.primary)
-           .text('Link', x + 5, cellY, {
+           .fontSize(config.showFullUrl ? 3 : EXPORT_CONFIG.layout.fonts.body)
+           .text(linkText, x + 5, cellY, {
              width: column.width - 10,
              link: product.url,
-             underline: true
+             underline: true,
+             ellipsis: true
            });
       } else {
         // Regular text
         doc.fillColor(this.layout.colors.text)
+           .font(this.layout.fonts.body)
            .text(cellValue, x + 5, cellY, {
              width: column.width - 10,
              height: rowHeight - 10,

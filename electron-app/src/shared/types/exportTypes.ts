@@ -8,6 +8,8 @@ export interface PDFExportConfig {
   columns: PDFColumnConfig[];
   scope: 'currentView' | 'allData';
   issuanceName?: string; // Optional issuance name for cover page
+  groupPageBreaks?: boolean; // Start each group on a new page
+  showFullUrl?: boolean; // Show full URL instead of "Link" text
   filters?: {
     search?: string;
     category?: string;
