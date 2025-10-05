@@ -24,7 +24,6 @@ describe('PDFExportService', () => {
   const createTestProducts = (): ProductForExport[] => [
     {
       id: '1',
-      productName: 'Test Product 1',
       type: 'Hardware',
       specificationDescription: 'A test product for PDF export',
       url: 'https://example.com/product1',
@@ -32,11 +31,10 @@ describe('PDFExportService', () => {
       category: ['Electronics', 'Hardware'],
       location: ['Warehouse A'],
       manufacturer: 'Test Manufacturer',
-      price: 99.99,
+      modelNo: 'HW-001',
     },
     {
       id: '2',
-      productName: 'Test Product 2',
       type: 'Software',
       specificationDescription: 'Another test product',
       url: 'https://example.com/product2',
@@ -44,19 +42,19 @@ describe('PDFExportService', () => {
       category: ['Software'],
       location: ['Warehouse B'],
       manufacturer: 'Another Manufacturer',
-      price: 149.99,
+      modelNo: 'SW-002',
     },
   ];
 
   const createTestConfig = (): PDFExportConfig => ({
     groupBy: 'category',
-    sortBy: 'name',
+    sortBy: 'tagId',
     includeImages: false, // Disable images for testing
     includeHeaders: true,
     pageSize: 'A4',
     orientation: 'portrait',
-    columns: ProductDataService.getDefaultColumnConfig().filter(col => 
-      ['productName', 'type', 'specificationDescription', 'url', 'tagId'].includes(col.key)
+    columns: ProductDataService.getDefaultColumnConfig().filter(col =>
+      ['type', 'manufacturer', 'specificationDescription', 'modelNo', 'url', 'tagId'].includes(col.key)
     ),
     scope: 'currentView',
   });
@@ -143,7 +141,7 @@ describe('ProductDataService', () => {
     it('should validate a correct configuration', () => {
       const config: PDFExportConfig = {
         groupBy: 'category',
-        sortBy: 'name',
+        sortBy: 'tagId',
         includeImages: true,
         includeHeaders: true,
         pageSize: 'A4',
@@ -165,7 +163,7 @@ describe('ProductDataService', () => {
     it('should reject configuration with no visible columns', () => {
       const config: PDFExportConfig = {
         groupBy: 'category',
-        sortBy: 'name',
+        sortBy: 'tagId',
         includeImages: true,
         includeHeaders: true,
         pageSize: 'A4',
@@ -185,7 +183,6 @@ describe('ProductDataService', () => {
       const products: ProductForExport[] = [
         {
           id: '1',
-          productName: 'Product 1',
           category: ['Electronics'],
           location: ['Warehouse A'],
           url: 'https://example.com/1',
@@ -193,17 +190,16 @@ describe('ProductDataService', () => {
         },
         {
           id: '2',
-          productName: 'Product 2',
           category: ['Electronics'],
           location: ['Warehouse B'],
           url: 'https://example.com/2',
           tagId: 'TAG002',
         },
-      ] as ProductForExport[];
+      ];
 
       const config: PDFExportConfig = {
         groupBy: 'category',
-        sortBy: 'name',
+        sortBy: 'tagId',
         includeImages: true,
         includeHeaders: true,
         pageSize: 'A4',

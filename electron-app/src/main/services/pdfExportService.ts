@@ -2,16 +2,18 @@ import PDFDocument from 'pdfkit';
 import * as fs from 'fs';
 import { AssetManager } from './AssetManager';
 import { ProjectState } from './ProjectState';
-import { 
-  PDFExportConfig, 
-  PDFGenerationResult, 
-  PDFGenerationProgress, 
-  GroupedProductData, 
+import {
+  PDFExportConfig,
+  PDFGenerationResult,
+  PDFGenerationProgress,
+  GroupedProductData,
   ProductForExport,
   PDFLayoutConfig,
-  DEFAULT_PDF_LAYOUT 
 } from '../../shared/types/exportTypes';
-import { EXPORT_CONFIG } from '../../shared/config/exportConfig';
+import { EXPORT_CONFIG, DEFAULT_PDF_LAYOUT } from '../../shared/config/exportConfig';
+import { logger } from '../../shared/logging/Logger';
+
+const log = logger.for('PDFExportService');
 
 export class PDFExportService {
   private layout: PDFLayoutConfig;
@@ -31,29 +33,33 @@ export class PDFExportService {
     }
   }
 
+  private toTitleCase(text: string): string {
+    return text.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
   async generateProductPDF(
     products: ProductForExport[],
     config: PDFExportConfig,
     outputPath: string
   ): Promise<PDFGenerationResult> {
     const startTime = Date.now();
-    
+
     try {
       this.reportProgress('preparing', 0, 'Preparing data for export...');
 
       // Group and sort products
       const groupedData = this.groupAndSortProducts(products, config);
-      
+
       this.reportProgress('generating_pdf', 25, 'Creating PDF document...');
 
       // Create PDF document
       const doc = await this.createPDFDocument(groupedData, config);
-      
+
       this.reportProgress('saving', 90, 'Saving PDF file...');
 
       // Save to file
       await this.savePDFToFile(doc, outputPath);
-      
+
       this.reportProgress('complete', 100, 'Export completed successfully!');
 
       const endTime = Date.now();
@@ -92,7 +98,7 @@ export class PDFExportService {
 
     products.forEach(product => {
       let groupKeys: string[] = [];
-      
+
       if (config.groupBy === 'category') {
         groupKeys = product.category.length > 0 ? product.category : ['Uncategorized'];
       } else if (config.groupBy === 'location') {
@@ -101,16 +107,17 @@ export class PDFExportService {
 
       // A product can belong to multiple groups (e.g., multiple categories)
       groupKeys.forEach(groupKey => {
-        if (!groups.has(groupKey)) {
-          groups.set(groupKey, []);
+        const normalizedKey = this.toTitleCase(groupKey);
+        if (!groups.has(normalizedKey)) {
+          groups.set(normalizedKey, []);
         }
-        groups.get(groupKey)!.push(product);
+        groups.get(normalizedKey)!.push(product);
       });
     });
 
     // Sort products within each group
     const sortedGroups: GroupedProductData[] = [];
-    
+
     for (const [groupName, groupProducts] of groups) {
       const sortedProducts = this.sortProducts(groupProducts, config.sortBy);
       sortedGroups.push({
@@ -120,8 +127,18 @@ export class PDFExportService {
       });
     }
 
-    // Sort groups alphabetically
-    sortedGroups.sort((a, b) => a.groupName.localeCompare(b.groupName));
+    // Sort groups with 'uncategorized' and 'no location' at the top, then alphabetically
+    sortedGroups.sort((a, b) => {
+      const aIsSpecial = a.groupName.toLowerCase() === 'uncategorized' || a.groupName.toLowerCase() === 'no location';
+      const bIsSpecial = b.groupName.toLowerCase() === 'uncategorized' || b.groupName.toLowerCase() === 'no location';
+
+      // If one is special and the other isn't, special group comes first
+      if (aIsSpecial && !bIsSpecial) return -1;
+      if (!aIsSpecial && bIsSpecial) return 1;
+
+      // If both are special or both are regular, sort alphabetically
+      return a.groupName.localeCompare(b.groupName);
+    });
 
     return sortedGroups;
   }
@@ -129,18 +146,184 @@ export class PDFExportService {
   private sortProducts(products: ProductForExport[], sortBy: PDFExportConfig['sortBy']): ProductForExport[] {
     return [...products].sort((a, b) => {
       switch (sortBy) {
-        case 'name':
-          return a.productName.localeCompare(b.productName);
-        case 'type':
-          return (a.type || '').localeCompare(b.type || '');
-        case 'manufacturer':
-          return (a.manufacturer || '').localeCompare(b.manufacturer || '');
-        case 'price':
-          return (a.price || 0) - (b.price || 0);
+        case 'tagId': // We should only and always sort by tag ids
+          return a.tagId?.localeCompare(b.tagId? b.tagId : '') || 0;
         default:
-          return a.productName.localeCompare(b.productName);
+          throw new Error(`Unsupported sortBy field: ${sortBy}`);
       }
     });
+  }
+
+  private async addCoverPage(doc: PDFKit.PDFDocument, config: PDFExportConfig): Promise<void> {
+    log.info('🎨 Adding cover page to PDF');
+
+    // Get project info from ProjectState
+    const projectState = ProjectState.getInstance();
+    const state = projectState.getStateInfo();
+
+    log.info('Project state:', {
+      hasProject: !!state.project,
+      projectName: state.project?.name,
+      filePath: state.filePath
+    });
+
+    if (!state.project) {
+      log.warn('⚠️ No project info available for cover page - SKIPPING COVER PAGE');
+      // Add a placeholder message on the first page
+      doc.fontSize(16)
+         .font('Helvetica')
+         .fillColor('#666666')
+         .text('Cover Page Not Available', 100, 300, {
+           width: doc.page.width - 200,
+           align: 'center'
+         });
+      doc.fontSize(12)
+         .text('No project information found', 100, 330, {
+           width: doc.page.width - 200,
+           align: 'center'
+         });
+      return;
+    }
+
+    const project = state.project;
+    log.info('Cover page project info:', {
+      name: project.name,
+      subtitle: project.subtitle,
+      hasPhoto: !!project.projectPhotoHash,
+      hasLogo: !!project.companyLogoHash
+    });
+    const pageWidth = doc.page.width;
+    const centerX = pageWidth / 2;
+
+    let y = 100; // Start position from top
+
+    // Project Name (Large, bold)
+    doc.fontSize(28)
+       .font('Helvetica-Bold')
+       .fillColor(this.layout.colors.default)
+       .text(project.name || 'Untitled Project', this.layout.margins.left, y, {
+         width: pageWidth - this.layout.margins.left - this.layout.margins.right,
+         align: 'center'
+       });
+
+    y += 40;
+
+    // Project Subtitle
+    if (project.subtitle) {
+      doc.fontSize(16)
+         .font('Helvetica')
+         .fillColor(this.layout.colors.default)
+         .text(project.subtitle, this.layout.margins.left, y, {
+           width: pageWidth - this.layout.margins.left - this.layout.margins.right,
+           align: 'center'
+         });
+      y += 30;
+    }
+
+    // Address Lines
+    if (project.addressLine1) {
+      doc.fontSize(12)
+         .font('Helvetica')
+         .fillColor(this.layout.colors.default)
+         .text(project.addressLine1, this.layout.margins.left, y, {
+           width: pageWidth - this.layout.margins.left - this.layout.margins.right,
+           align: 'center'
+         });
+      y += 15;
+    }
+
+    if (project.addressLine2) {
+      doc.fontSize(12)
+         .font('Helvetica')
+         .fillColor(this.layout.colors.default)
+         .text(project.addressLine2, this.layout.margins.left, y, {
+           width: pageWidth - this.layout.margins.left - this.layout.margins.right,
+           align: 'center'
+         });
+      y += 40;
+    } else if (project.addressLine1) {
+      y += 20; // Add space even if no second line
+    }
+
+    // Project Photo (if available)
+    if (project.projectPhotoHash && state.filePath) {
+      try {
+        const assetManager = new AssetManager(state.filePath);
+        const photoPath = await assetManager.getAssetPath(project.projectPhotoHash, false);
+
+        if (fs.existsSync(photoPath)) {
+          const maxPhotoWidth = 400;
+          const maxPhotoHeight = 285;
+
+          doc.image(photoPath, centerX - maxPhotoWidth/2, y, {
+            fit: [maxPhotoWidth, maxPhotoHeight],
+            align: 'center'
+          });
+          y += maxPhotoHeight + 40;
+        }
+      } catch (error) {
+        log.error('Failed to load project photo:', { error });
+      }
+    }
+
+    // Company Logo (if available)
+    if (project.companyLogoHash && state.filePath) {
+      try {
+        const assetManager = new AssetManager(state.filePath);
+        const logoPath = await assetManager.getAssetPath(project.companyLogoHash, false);
+
+        if (fs.existsSync(logoPath)) {
+          const maxLogoWidth = 200;
+          const maxLogoHeight = 65;
+
+          doc.image(logoPath, centerX - maxLogoWidth/2, y, {
+            fit: [maxLogoWidth, maxLogoHeight],
+            align: 'center'
+          });
+          y += maxLogoHeight + 40;
+        }
+      } catch (error) {
+        log.error('Failed to load company logo:', { error });
+      }
+    }
+
+    // Issue Date and Issuance Name
+    const issueDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const issuanceText = config.issuanceName
+      ? `${issueDate} | ${config.issuanceName}`
+      : issueDate;
+
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(this.layout.colors.default)
+       .text(issuanceText, this.layout.margins.left, y, {
+         width: pageWidth - this.layout.margins.left - this.layout.margins.right,
+         align: 'center'
+       });
+
+    y += 25;
+
+    // Created by info
+    if (project.createdByName || project.createdByEmail) {
+      const createdByText = project.createdByName && project.createdByEmail
+        ? `Created by: ${project.createdByName}, ${project.createdByEmail}`
+        : project.createdByName
+          ? `Created by: ${project.createdByName}`
+          : `Created by: ${project.createdByEmail}`;
+
+      doc.fontSize(10)
+         .font('Helvetica')
+         .fillColor(this.layout.colors.default)
+         .text(createdByText, this.layout.margins.left, y, {
+           width: pageWidth - this.layout.margins.left - this.layout.margins.right,
+           align: 'center'
+         });
+    }
   }
 
   private async createPDFDocument(groupedData: GroupedProductData[], config: PDFExportConfig): Promise<PDFKit.PDFDocument> {
@@ -153,19 +336,31 @@ export class PDFExportService {
       layout: landscape ? 'landscape' : 'portrait',
       margins: this.layout.margins,
       bufferPages: true,
+      autoFirstPage: true, // PDFKit creates first page automatically
     });
 
-    // Add document header
-    this.addDocumentHeader(doc, config, groupedData);
+    log.info('📄 Creating PDF document', { pageSize, landscape, groupCount: groupedData.length });
 
+    // Add cover page on the first (auto-created) page
+    await this.addCoverPage(doc, config);
+
+    log.info('✅ Cover page added, adding new page for content');
+
+    // Start content on a new page
+    doc.addPage();
     let currentY = doc.y + this.layout.spacing.sectionGap;
 
     // Add each group
     for (let groupIndex = 0; groupIndex < groupedData.length; groupIndex++) {
       const group = groupedData[groupIndex];
-      
-      // Check if we need a new page for the group
-      if (currentY > doc.page.height - 200) {
+
+      // Start each group on a new page if groupPageBreaks is enabled
+      if (config.groupPageBreaks && groupIndex > 0) {
+        doc.addPage();
+        currentY = this.layout.margins.top;
+      }
+      // Otherwise, check if we need a new page for the group
+      else if (currentY > doc.page.height - 200) {
         doc.addPage();
         currentY = this.layout.margins.top;
       }
@@ -181,12 +376,16 @@ export class PDFExportService {
       // Add products
       for (let productIndex = 0; productIndex < group.products.length; productIndex++) {
         const product = group.products[productIndex];
-        
-        // Check if we need a new page
-        if (currentY > doc.page.height - this.layout.spacing.rowHeight - this.layout.margins.bottom) {
+
+        // Check if we need a new page - but only if not the last item
+        const isLastProduct = productIndex === group.products.length - 1;
+        const isLastGroup = groupIndex === groupedData.length - 1;
+        const needsSpace = currentY > doc.page.height - this.layout.spacing.rowHeight - this.layout.margins.bottom;
+
+        if (needsSpace && !(isLastProduct && isLastGroup)) {
           doc.addPage();
           currentY = this.layout.margins.top;
-          
+
           // Re-add table header on new page
           if (config.includeHeaders) {
             currentY = this.addTableHeader(doc, config, currentY);
@@ -194,13 +393,13 @@ export class PDFExportService {
         }
 
         currentY = await this.addProductRow(doc, product, config, currentY);
-        
+
         this.reportProgress(
           'generating_pdf',
-          25 + Math.floor((groupIndex * group.products.length + productIndex + 1) / 
+          25 + Math.floor((groupIndex * group.products.length + productIndex + 1) /
             groupedData.reduce((sum, g) => sum + g.products.length, 0) * 60),
-          `Processing ${product.productName}...`,
-          product.productName
+          `Processing ${product.tagId} ${product.type} ${product.manufacturer}...`,
+          product.tagId
         );
       }
 
@@ -213,57 +412,21 @@ export class PDFExportService {
     return doc;
   }
 
-  private addDocumentHeader(doc: PDFKit.PDFDocument, config: PDFExportConfig, groupedData: GroupedProductData[]): void {
-    const totalProducts = groupedData.reduce((sum, group) => sum + group.totalCount, 0);
-    
-    // Title
-    doc.fontSize(EXPORT_CONFIG.layout.fonts.title)
-       .font(this.layout.fonts.header)
-       .fillColor(this.layout.colors.primary)
-       .text('Product Export Report', this.layout.margins.left, this.layout.margins.top);
-
-    // Export info
-    doc.fontSize(10)
-       .font(this.layout.fonts.body)
-       .fillColor(this.layout.colors.secondary)
-       .text(`Generated on: ${new Date().toLocaleString()}`, { align: 'right' })
-       .text(`Total Products: ${totalProducts}`, { align: 'right' })
-       .text(`Grouped by: ${config.groupBy}`, { align: 'right' })
-       .text(`Sorted by: ${config.sortBy}`, { align: 'right' });
-
-    // Add filters info if present
-    if (config.filters && Object.values(config.filters).some(filter => filter)) {
-      doc.moveDown(0.5)
-         .fontSize(9)
-         .fillColor(this.layout.colors.text)
-         .text('Active Filters:', { align: 'right' });
-      
-      Object.entries(config.filters).forEach(([key, value]) => {
-        if (value) {
-          doc.text(`${key}: ${value}`, { align: 'right' });
-        }
-      });
-    }
-
-    doc.moveDown(1);
-  }
-
   private addGroupHeader(doc: PDFKit.PDFDocument, group: GroupedProductData, y: number): number {
     doc.fontSize(14)
        .font(this.layout.fonts.header)
        .fillColor(this.layout.colors.primary)
-       .text(`${group.groupName} (${group.totalCount} products)`, this.layout.margins.left, y);
+       .text(`${group.groupName}`, this.layout.margins.left, y);
 
     return y + 25;
   }
 
   private addTableHeader(doc: PDFKit.PDFDocument, config: PDFExportConfig, y: number): number {
-    const visibleColumns = config.columns.filter(col => col.visible);
     let x = this.layout.margins.left;
 
     // Background for header
-    doc.rect(this.layout.margins.left, y, 
-             doc.page.width - this.layout.margins.left - this.layout.margins.right, 
+    doc.rect(this.layout.margins.left, y,
+             doc.page.width - this.layout.margins.left - this.layout.margins.right,
              20)
        .fillColor('#f8fafc')
        .fill();
@@ -272,22 +435,31 @@ export class PDFExportService {
        .font(this.layout.fonts.header)
        .fillColor(this.layout.colors.text);
 
-    visibleColumns.forEach(column => {
+    config.columns.forEach(column => {
       doc.text(column.label, x + 5, y + 5, { width: column.width - 10, ellipsis: true });
       x += column.width;
     });
+
+    // Add vertical column separators
+    x = this.layout.margins.left;
+    for (let i = 0; i < config.columns.length - 1; i++) {
+      x += config.columns[i].width;
+      doc.strokeColor('#D9D9D9')
+         .moveTo(x, y)
+         .lineTo(x, y + 20)
+         .stroke();
+    }
 
     return y + 25;
   }
 
   private async addProductRow(doc: PDFKit.PDFDocument, product: ProductForExport, config: PDFExportConfig, y: number): Promise<number> {
-    const visibleColumns = config.columns.filter(col => col.visible);
     let x = this.layout.margins.left;
     const rowHeight = EXPORT_CONFIG.layout.spacing.rowHeight;
 
     // Alternating row background
-    doc.rect(this.layout.margins.left, y, 
-             doc.page.width - this.layout.margins.left - this.layout.margins.right, 
+    doc.rect(this.layout.margins.left, y,
+             doc.page.width - this.layout.margins.left - this.layout.margins.right,
              rowHeight)
        .fillColor('#ffffff')
        .fill();
@@ -296,30 +468,34 @@ export class PDFExportService {
        .font(this.layout.fonts.body)
        .fillColor(this.layout.colors.text);
 
-    for (const column of visibleColumns) {
+    for (const column of config.columns) {
       const cellValue = this.getCellValue(product, column.key);
       const cellY = y + 5;
 
       if (column.key === 'image' && config.includeImages) {
         // Add image placeholder or actual image - center it in the cell
-        const imageX = x + (column.width - EXPORT_CONFIG.layout.image.width) / 2;
-        const imageY = y + (rowHeight - EXPORT_CONFIG.layout.image.height) / 2;
+        const imageX = x + (column.width - EXPORT_CONFIG.layout.image.maxWidth) / 2;
+        const imageY = y + (rowHeight - EXPORT_CONFIG.layout.image.maxHeight) / 2;
         await this.addProductImage(doc, product, imageX, imageY);
       } else if (column.key === 'url') {
-        // Add hyperlink
+        // Add hyperlink - show full URL or "Link" text based on config
+        const linkText = config.showFullUrl ? product.url : 'Link';
         doc.fillColor(this.layout.colors.primary)
-           .text('Link', x + 5, cellY, { 
-             width: column.width - 10, 
+           .fontSize(config.showFullUrl ? 3 : EXPORT_CONFIG.layout.fonts.body)
+           .text(linkText, x + 5, cellY, {
+             width: column.width - 10,
              link: product.url,
-             underline: true 
+             underline: true,
+             ellipsis: true
            });
       } else {
         // Regular text
         doc.fillColor(this.layout.colors.text)
-           .text(cellValue, x + 5, cellY, { 
-             width: column.width - 10, 
+           .font(this.layout.fonts.body)
+           .text(cellValue, x + 5, cellY, {
+             width: column.width - 10,
              height: rowHeight - 10,
-             ellipsis: true 
+             ellipsis: true
            });
       }
 
@@ -328,32 +504,40 @@ export class PDFExportService {
 
     // Add border
     doc.strokeColor(this.layout.colors.border)
-       .rect(this.layout.margins.left, y, 
-             doc.page.width - this.layout.margins.left - this.layout.margins.right, 
+       .rect(this.layout.margins.left, y,
+             doc.page.width - this.layout.margins.left - this.layout.margins.right,
              rowHeight)
        .stroke();
+
+    // Add vertical column separators
+    x = this.layout.margins.left;
+    for (let i = 0; i < config.columns.length - 1; i++) {
+      x += config.columns[i].width;
+      doc.strokeColor('#D9D9D9')
+         .moveTo(x, y)
+         .lineTo(x, y + rowHeight)
+         .stroke();
+    }
 
     return y + rowHeight;
   }
 
   private getCellValue(product: ProductForExport, columnKey: string): string {
     switch (columnKey) {
-      case 'productName':
-        return product.productName || '';
+      case 'tagId':
+        return product.tagId || '';
       case 'type':
         return product.type || '';
-      case 'specificationDescription':
-        return product.specificationDescription || '';
       case 'manufacturer':
         return product.manufacturer || '';
-      case 'price':
-        return product.price ? `$${product.price.toFixed(2)}` : '';
+      case 'specificationDescription':
+        return product.specificationDescription || '';
+      case 'modelNo':
+        return product.modelNo || '';
       case 'category':
         return product.category.join(', ');
       case 'location':
         return product.location.join(', ');
-      case 'tagId':
-        return product.tagId || '';
       case 'url':
         return 'Link';
       default:
@@ -364,11 +548,11 @@ export class PDFExportService {
   private async addProductImage(doc: PDFKit.PDFDocument, product: ProductForExport, x: number, y: number): Promise<void> {
     try {
       // console.log(`🖼️ Loading image for product: ${product.productName}`);
-      
+
       // Get the project state to access the asset manager
       const projectState = ProjectState.getInstance();
       const state = projectState.getStateInfo();
-      
+
       if (!state.isOpen || !state.filePath) {
         this.addImagePlaceholder(doc, x, y);
         return;
@@ -377,48 +561,30 @@ export class PDFExportService {
       // Get the project directory from the file path
       // The project directory is the .specbook file itself (it's actually a directory)
       const projectDir = state.filePath;
-      
+
       // Initialize asset manager
       const assetManager = new AssetManager(projectDir);
-      
-      
-      // Try multiple image sources in order of preference
-      const imageSources = [
-        { hash: product.primaryThumbnailHash, isThumbnail: true, name: 'thumbnail' },
-        { hash: product.primaryImageHash, isThumbnail: false, name: 'primary image' }
-      ].filter(source => source.hash); // Only include sources that have hashes
 
-      if (imageSources.length === 0) {
+      try {
+        const imagePath = await assetManager.getAssetPath(product.primaryImageHash!, false);
+
+        // Check if file exists and is readable
+        if (!fs.existsSync(imagePath)) {
+          this.addImagePlaceholder(doc, x, y);
+          return;
+        }
+        // Successfully found an image, embed it
+        doc.image(imagePath, x, y, {
+          fit: [EXPORT_CONFIG.layout.image.maxWidth, EXPORT_CONFIG.layout.image.maxHeight],
+          align: EXPORT_CONFIG.layout.image.align,
+          valign: EXPORT_CONFIG.layout.image.valign
+        });
+
+        return; // Success! Exit the function
+      } catch (error) {
         this.addImagePlaceholder(doc, x, y);
         return;
       }
-
-      // Try each image source until we find one that works
-      for (const source of imageSources) {
-        try {
-          const imagePath = await assetManager.getAssetPath(source.hash!, source.isThumbnail);
-          
-          // Check if file exists and is readable
-          if (!fs.existsSync(imagePath)) {
-            continue;
-          }
-          // Successfully found an image, embed it
-          doc.image(imagePath, x, y, {
-            width: EXPORT_CONFIG.layout.image.width,
-            height: EXPORT_CONFIG.layout.image.height,
-            fit: [EXPORT_CONFIG.layout.image.width, EXPORT_CONFIG.layout.image.height],
-            align: 'center',
-            valign: 'center'
-          });
-          return; // Success! Exit the function
-
-        } catch (error) {
-          continue; // Try the next source
-        }
-      }
-
-      // If we get here, none of the image sources worked
-      this.addImagePlaceholder(doc, x, y);
 
     } catch (error) {
       console.error('❌ Failed to load product image:', error);
@@ -428,7 +594,7 @@ export class PDFExportService {
 
   private addImagePlaceholder(doc: PDFKit.PDFDocument, x: number, y: number): void {
     // Add placeholder rectangle
-    doc.rect(x, y, EXPORT_CONFIG.layout.image.width, EXPORT_CONFIG.layout.image.height)
+    doc.rect(x, y, EXPORT_CONFIG.layout.image.maxWidth, EXPORT_CONFIG.layout.image.maxHeight)
        .fillColor('#f3f4f6')
        .fill()
        .strokeColor(this.layout.colors.border)
@@ -437,34 +603,68 @@ export class PDFExportService {
     // Add placeholder text
     doc.fontSize(EXPORT_CONFIG.layout.fonts.small)
        .fillColor(this.layout.colors.secondary)
-       .text('IMG', x + EXPORT_CONFIG.layout.image.width/3, y + EXPORT_CONFIG.layout.image.height/2);
+       .text('IMG', x + EXPORT_CONFIG.layout.image.maxWidth/3, y + EXPORT_CONFIG.layout.image.maxHeight/2);
   }
 
   private addDocumentFooter(doc: PDFKit.PDFDocument): void {
-    const pages = doc.bufferedPageRange();
-    
-    for (let i = 0; i < pages.count; i++) {
-      doc.switchToPage(i);
-      
-      const footerY = doc.page.height - this.layout.margins.bottom + 10;
-      
-      doc.fontSize(8)
-         .font(this.layout.fonts.small)
-         .fillColor(this.layout.colors.secondary)
-         .text(`Page ${i + 1} of ${pages.count}`, 
-               this.layout.margins.left, 
-               footerY, 
-               { align: 'center', width: doc.page.width - this.layout.margins.left - this.layout.margins.right });
+    log.info('Adding document footer');
+
+    const range = doc.bufferedPageRange();
+    const totalPages = range.count;
+
+    log.info(`Adding footer to ${totalPages} pages`);
+
+    // Total pages minus the cover page
+    const totalContentPages = totalPages - 1;
+
+    for (let i = 0; i < totalPages; i++) {
+      try {
+        // Skip footer on cover page (first page, i=0)
+        if (i === 0) {
+          log.info('Skipping footer on cover page');
+          continue;
+        }
+
+        // Switch to page using the range start + offset
+        doc.switchToPage(range.start + i);
+
+        const footerY = doc.page.height - this.layout.margins.bottom + 10;
+
+        log.info(`Page ${i}: height=${doc.page.height}, footerY=${footerY}`);
+
+        // Save graphics state
+        doc.save();
+
+        // Add footer text
+        doc.fontSize(8)
+           .font(this.layout.fonts.small)
+           .fillColor(this.layout.colors.secondary);
+
+        // Page number: content pages start at 1 (i=1 becomes "Page 1")
+        const pageNumber = i; // i=1 -> Page 1, i=2 -> Page 2, etc.
+        const pageText = `Page ${pageNumber} of ${totalContentPages}`;
+        const textWidth = doc.page.width - this.layout.margins.left - this.layout.margins.right;
+        const textX = this.layout.margins.left + (textWidth / 2) - (doc.widthOfString(pageText) / 2);
+
+        doc.text(pageText, textX, footerY, { lineBreak: false });
+
+        // Restore graphics state
+        doc.restore();
+
+        log.info(`Successfully added footer to page ${i}`);
+      } catch (error) {
+        log.error(`Failed to add footer to page ${i}:`, { error });
+      }
     }
   }
 
   private async savePDFToFile(doc: PDFKit.PDFDocument, outputPath: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const stream = fs.createWriteStream(outputPath);
-      
+
       stream.on('error', reject);
       stream.on('finish', resolve);
-      
+
       doc.pipe(stream);
       doc.end();
     });

@@ -17,17 +17,15 @@ export class ProductDataService {
 
     return products.map(product => ({
       id: product.id,
-      productName: product.productName,
-      type: product.type,
-      specificationDescription: product.specificationDescription,
-      url: product.url,
+      primaryImageHash: product.primaryImageHash,
       tagId: product.tagId,
+      type: product.type,
+      manufacturer: product.manufacturer,
+      specificationDescription: product.specificationDescription,
+      modelNo: product.modelNo,      
       category: this.resolveIdsToNames(product.category, categoryMap),
       location: this.resolveIdsToNames(product.location, locationMap),
-      manufacturer: product.manufacturer,
-      price: product.price,
-      primaryImageHash: product.primaryImageHash,
-      primaryThumbnailHash: product.primaryThumbnailHash,
+      url: product.url
     }));
   }
 
@@ -55,10 +53,10 @@ export class ProductDataService {
       if (config.filters!.search) {
         const searchTerm = config.filters!.search.toLowerCase();
         const searchableText = [
-          product.productName,
           product.type,
           product.specificationDescription,
           product.manufacturer,
+          product.modelNo,
           product.tagId,
           ...product.category,
           ...product.location,
