@@ -195,6 +195,7 @@ const ProjectPage: React.FC = () => {
   });
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [tagCounts, setTagCounts] = useState<Record<string, number>>({});
+  const [searchInput, setSearchInput] = useState(filters.search);
 
   // For the new file-based system, we only have one current project
   const currentProject = project;
@@ -744,8 +745,14 @@ const ProjectPage: React.FC = () => {
                   type="text"
                   className="control-select search-input"
                   placeholder="Search..."
-                  value={filters.search}
-                  onChange={(e) => updateFilters('search', e.target.value)}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onBlur={() => updateFilters('search', searchInput)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      updateFilters('search', searchInput);
+                    }
+                  }}
                 />
               </div>
             </div>
