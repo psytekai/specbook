@@ -1,6 +1,6 @@
 {
   "name": "specbook",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "dist/main/index.js",
   "scripts": {
     "bundle-python": "bash scripts/bundle-python.sh",

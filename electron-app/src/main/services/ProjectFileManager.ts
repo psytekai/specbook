@@ -4,9 +4,8 @@ import Database from 'better-sqlite3';
 import { v4 as uuidv4 } from 'uuid';
 import { AssetManager } from './AssetManager';
 import { mapDbRowToInterface, mapInterfaceToDb } from '../../shared/mappings/fieldMappings';
-import { Product } from '../../shared/types';
+import { Product, Project } from '../../shared/types';
 import type {
-  Project,
   Category,
   Location,
   Manifest,
@@ -388,17 +387,25 @@ export class ProjectFileManager {
    * Creates and saves manifest.json
    */
   async createManifest(projectPath: string, projectData: Partial<Project>): Promise<void> {
+    const now = new Date()
     try {
       const manifest: Manifest = {
-        version: '1.0.0',
+        version: require('../../../package.json').version,
         format: 'specbook-project',
-        created: new Date().toISOString(),
-        modified: new Date().toISOString(),
         project: {
           id: projectData.id || uuidv4(),
           name: projectData.name || 'Untitled Project',
           description: projectData.description,
-          productCount: 0
+          productCount: 0,
+          createdAt: now,
+          updatedAt: now,
+          subtitle: projectData.subtitle,
+          addressLine1: projectData.addressLine1,
+          addressLine2: projectData.addressLine2,
+          projectPhotoHash: projectData.projectPhotoHash,
+          companyLogoHash: projectData.companyLogoHash,
+          createdByName: projectData.createdByName,
+          createdByEmail: projectData.createdByEmail
         }
       };
 
@@ -1017,9 +1024,16 @@ export class ProjectFileManager {
         name: manifest.project.name,
         description: manifest.project.description,
         productCount: manifest.project.productCount,
-        createdAt: new Date(manifest.created),
-        updatedAt: new Date(manifest.modified),
-        path: projectPath
+        createdAt: new Date(manifest.project.createdAt),
+        updatedAt: new Date(manifest.project.updatedAt),
+        path: projectPath,
+        subtitle: manifest.project.subtitle,
+        addressLine1: manifest.project.addressLine1,
+        addressLine2: manifest.project.addressLine2,
+        projectPhotoHash: manifest.project.projectPhotoHash,
+        companyLogoHash: manifest.project.companyLogoHash,
+        createdByName: manifest.project.createdByName,
+        createdByEmail: manifest.project.createdByEmail
       };
 
       this.currentProject = project;
@@ -1048,6 +1062,27 @@ export class ProjectFileManager {
       if (updates.description !== undefined) {
         this.currentProject.description = updates.description;
       }
+      if (updates.subtitle !== undefined) {
+        this.currentProject.subtitle = updates.subtitle;
+      }
+      if (updates.addressLine1 !== undefined) {
+        this.currentProject.addressLine1 = updates.addressLine1;
+      }
+      if (updates.addressLine2 !== undefined) {
+        this.currentProject.addressLine2 = updates.addressLine2;
+      }
+      if (updates.projectPhotoHash !== undefined) {
+        this.currentProject.projectPhotoHash = updates.projectPhotoHash;
+      }
+      if (updates.companyLogoHash !== undefined) {
+        this.currentProject.companyLogoHash = updates.companyLogoHash;
+      }
+      if (updates.createdByName !== undefined) {
+        this.currentProject.createdByName = updates.createdByName;
+      }
+      if (updates.createdByEmail !== undefined) {
+        this.currentProject.createdByEmail = updates.createdByEmail;
+      }
 
       this.currentProject.updatedAt = new Date();
 
@@ -1056,9 +1091,16 @@ export class ProjectFileManager {
       const manifestData = await fs.readFile(manifestPath, 'utf-8');
       const manifest: Manifest = JSON.parse(manifestData);
 
-      manifest.modified = this.currentProject.updatedAt.toISOString();
       manifest.project.name = this.currentProject.name;
       manifest.project.description = this.currentProject.description;
+      manifest.project.subtitle = this.currentProject.subtitle;
+      manifest.project.addressLine1 = this.currentProject.addressLine1;
+      manifest.project.addressLine2 = this.currentProject.addressLine2;
+      manifest.project.projectPhotoHash = this.currentProject.projectPhotoHash;
+      manifest.project.companyLogoHash = this.currentProject.companyLogoHash;
+      manifest.project.createdByName = this.currentProject.createdByName;
+      manifest.project.createdByEmail = this.currentProject.createdByEmail;
+      manifest.project.updatedAt = this.currentProject.updatedAt;
 
       await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
 
@@ -1151,7 +1193,7 @@ export class ProjectFileManager {
       const manifest: Manifest = JSON.parse(manifestData);
 
       manifest.project.productCount = count.count;
-      manifest.modified = new Date().toISOString();
+      manifest.project.updatedAt = new Date()
 
       await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
     } catch (error) {
