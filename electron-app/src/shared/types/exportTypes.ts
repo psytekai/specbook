@@ -7,6 +7,9 @@ export interface PDFExportConfig {
   orientation: 'portrait' | 'landscape';
   columns: PDFColumnConfig[];
   scope: 'currentView' | 'allData';
+  issuanceName?: string; // Optional issuance name for cover page
+  groupPageBreaks?: boolean; // Start each group on a new page
+  showFullUrl?: boolean; // Show full URL instead of "Link" text
   filters?: {
     search?: string;
     category?: string;
@@ -29,17 +32,16 @@ export interface GroupedProductData {
 
 export interface ProductForExport {
   id: string;
-  productName: string;
-  type?: string;
-  specificationDescription?: string;
-  url: string;
-  tagId?: string;
-  category: string[];
-  location: string[];
-  manufacturer?: string;
-  price?: number;
   primaryImageHash?: string;
   primaryThumbnailHash?: string;
+  tagId?: string;
+  type?: string;
+  manufacturer?: string;
+  specificationDescription?: string;
+  modelNo?: string;
+  category: string[];
+  location: string[];
+  url: string;
 }
 
 export interface PDFGenerationResult {
@@ -84,6 +86,7 @@ export interface PDFLayoutConfig {
     secondary: string;
     text: string;
     border: string;
+    default: string;
   };
   spacing: {
     lineHeight: number;

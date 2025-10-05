@@ -10,6 +10,7 @@ import { usePythonScraper } from '../hooks/usePythonScraper';
 import { LocationMultiSelect } from '../components/LocationMultiSelect';
 import { CategoryMultiSelect } from '../components/CategoryMultiSelect';
 import { Location, Category, AddLocationRequest, AddCategoryRequest } from '../types';
+import { Product } from '../../shared/types';
 import { getAssetUrl } from '../../shared/utils/assetUtils';
 import './ProductNew.css';
 
@@ -30,7 +31,8 @@ const ProductNew: React.FC = () => {
     productName: string;
     manufacturer?: string;
     price?: number;
-    
+    modelNo?: string;
+
     // Asset management
     primaryImageHash?: string;
     primaryThumbnailHash?: string;
@@ -47,6 +49,7 @@ const ProductNew: React.FC = () => {
     productName: '',
     manufacturer: '',
     price: undefined,
+    modelNo: '',
     additionalImagesHashes: []
   });
   
@@ -58,6 +61,8 @@ const ProductNew: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [existingTagIds, setExistingTagIds] = useState<Set<string>>(new Set());
+  const [tagIdExists, setTagIdExists] = useState(false);
 
   // Python scraper hook
   const { 
@@ -86,15 +91,24 @@ const ProductNew: React.FC = () => {
   }, [currentProject, isInitializing, projectLoading, navigate, showToast]);
 
   useEffect(() => {
-    // Fetch available locations and categories when component mounts
+    // Fetch available locations, categories, and existing tag IDs when component mounts
     const loadData = async () => {
       try {
-        const [locationsResponse, categoriesResponse] = await Promise.all([
+        const [locationsResponse, categoriesResponse, productsResponse] = await Promise.all([
           api.get<Location[]>('/api/locations'),
-          api.get<Category[]>('/api/categories')
+          api.get<Category[]>('/api/categories'),
+          api.get<Product[]>('/api/projects/current/products') // TODO: terrible api, rename endpoint to /api/products
         ]);
         setLocations(locationsResponse.data);
         setCategories(categoriesResponse.data);
+        
+        // Extract tag IDs from products and store in Set
+        const tagIds = new Set<string>(
+          productsResponse.data
+            .map(product => product.tagId?.toLowerCase())
+            .filter((tagId): tagId is string => Boolean(tagId)) // Filter out null/undefined
+        );
+        setExistingTagIds(tagIds);
       } catch (error) {
         console.error('Failed to fetch data:', error);
       }
@@ -283,7 +297,7 @@ const ProductNew: React.FC = () => {
           productName: data.product_name || '',
           manufacturer: data.manufacturer || '',
           price: data.price || undefined,
-
+          modelNo: data.model_no || '',
           primaryImageHash: imageHash,
           primaryThumbnailHash: thumbnailHash
         }));
@@ -307,17 +321,20 @@ const ProductNew: React.FC = () => {
       return;
     }
     
-    if (!formData.productName || formData.productName.trim() === '') {
-      showToast('Product name is required', 'error');
-      return;
-    }
-    
     try {
       setIsSaving(true);
+
+      // when manually entering details, need to create a product name as we remove the option to input one
+      // and I do not want to do a database migration to remove the not null constraint on the product name column
+      let productName = formData.productName;
+      if (formData.productName === '') {
+        productName = `${formData.tagId} - ${formData.manufacturer || '<manufacturer>'} - ${formData.type || '<type>'}`;
+      }
       
       // Submit with internal field names
       await api.post('/api/products', {
         ...formData,
+        productName,
         projectId: 'current'
       });
       
@@ -390,9 +407,22 @@ const ProductNew: React.FC = () => {
                 className="input"
                 value={formData.tagId}
                 onChange={handleInputChange}
+                onBlur={(e) => {
+                  const value = e.target.value.trim();
+                  setTagIdExists(value ? existingTagIds.has(value.toLowerCase()) : false);
+                }}
                 placeholder="Enter tag ID"
                 required
               />
+              {tagIdExists && (
+                <div style={{
+                  marginTop: '4px',
+                  fontSize: '12px',
+                  color: '#dc3545'
+                }}>
+                  ⚠️ This tag ID already exists
+                </div>
+              )}
             </div>
             
             <div className="form-group">
@@ -499,20 +529,19 @@ const ProductNew: React.FC = () => {
                   {isUploading ? `Uploading... ${uploadProgress}%` : 'Upload Image'}
                 </button>
               </div>
-              
+
               <div className="form-group">
-                <label htmlFor="productName" className="label">
-                  Product Title *
+                <label htmlFor="type" className="label">
+                  Type
                 </label>
                 <input
-                  id="productName"
-                  name="productName"
+                  id="type"
+                  name="type"
                   type="text"
                   className="input"
-                  value={formData.productName || ''}
+                  value={formData.type}
                   onChange={handleInputChange}
-                  placeholder="Enter product title"
-                  required
+                  placeholder="Enter product type"
                 />
               </div>
               
@@ -530,6 +559,37 @@ const ProductNew: React.FC = () => {
                   placeholder="Enter manufacturer"
                 />
               </div>
+
+              <div className="form-group">
+                <label htmlFor="specificationDescription" className="label">
+                  Description
+                </label>
+                <textarea
+                  id="specificationDescription"
+                  name="specificationDescription"
+                  className="input textarea"
+                  value={formData.specificationDescription}
+                  onChange={handleInputChange}
+                  rows={4}
+                  placeholder="Enter product description"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="modelNo" className="label">
+                  Model Number
+                </label>
+                <input
+                  id="modelNo"
+                  name="modelNo"
+                  type="text"
+                  className="input"
+                  value={formData.modelNo || ''}
+                  onChange={handleInputChange}
+                  placeholder="Enter model number"
+                  required
+                />
+              </div>
               
               <div className="form-group">
                 <label htmlFor="price" className="label">
@@ -545,36 +605,6 @@ const ProductNew: React.FC = () => {
                   value={formData.price || ''}
                   onChange={handleInputChange}
                   placeholder="Enter price"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="type" className="label">
-                  Type
-                </label>
-                <input
-                  id="type"
-                  name="type"
-                  type="text"
-                  className="input"
-                  value={formData.type}
-                  onChange={handleInputChange}
-                  placeholder="Enter product type"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="specificationDescription" className="label">
-                  Specifications
-                </label>
-                <textarea
-                  id="specificationDescription"
-                  name="specificationDescription"
-                  className="input textarea"
-                  value={formData.specificationDescription}
-                  onChange={handleInputChange}
-                  rows={4}
-                  placeholder="Enter product specifications"
                 />
               </div>
               

@@ -1,6 +1,6 @@
 import { BrowserWindow } from 'electron';
 import { ProjectFileManager } from './ProjectFileManager';
-import type { Project } from '../types/project.types';
+import type { Project } from '../../shared/types';
 
 /**
  * Centralized project state management for the main process.

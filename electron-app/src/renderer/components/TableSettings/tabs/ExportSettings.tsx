@@ -10,10 +10,11 @@ import { EXPORT_CONFIG, PDF_EXPORT_OPTIONS, getColumnsForGroupBy } from '../../.
 interface ExportSettingsProps {
   settings: ExportSettingsType;
   columns: Record<string, ColumnConfig>;
+  tagCounts: Record<string, number>;
   onChange: (settings: ExportSettingsType) => void;
 }
 
-export const ExportSettings: React.FC<ExportSettingsProps> = () => {
+export const ExportSettings: React.FC<ExportSettingsProps> = ({ tagCounts }) => {
   const [pdfConfig, setPdfConfig] = useState<Partial<PDFExportConfig>>(EXPORT_CONFIG.defaults);
   const [isExporting, setIsExporting] = useState(false);
   const [exportResult, setExportResult] = useState<PDFGenerationResult | null>(null);
@@ -81,6 +82,10 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
     return `${(ms / 1000).toFixed(1)}s`;
   };
 
+  // Count duplicate tags
+  console.log('Tag counts:', tagCounts);
+  const duplicateTagCount = Object.values(tagCounts).filter(count => count > 1).length;
+
   return (
     <div className="export-settings">
       <div className="settings-section">
@@ -105,12 +110,10 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
               </option>
             ))}
           </select>
-          <div className="field-description">
-            {PDF_EXPORT_OPTIONS.groupBy.find(opt => opt.value === pdfConfig.groupBy)?.description}
-          </div>
         </div>
 
-        <div className="form-field">
+        {/* Ask was to always sort by sortId, so option to change this config out*/}
+        {/* <div className="form-field">
           <label className="field-label">Sort by</label>
           <select
             className="field-input"
@@ -128,7 +131,7 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
           <div className="field-description">
             {PDF_EXPORT_OPTIONS.sortBy.find(opt => opt.value === pdfConfig.sortBy)?.description}
           </div>
-        </div>
+        </div> */}
 
         {/* Page Settings */}
         <div className="form-field">
@@ -153,7 +156,7 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
           <select
             className="field-input"
             value={pdfConfig.orientation || 'portrait'}
-            onChange={(e) => handlePDFConfigChange({ 
+            onChange={(e) => handlePDFConfigChange({
               orientation: e.target.value as 'portrait' | 'landscape'
             })}
           >
@@ -165,6 +168,45 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
           </select>
         </div>
 
+        <div className="form-field">
+          <label className="field-label">Issuance Name</label>
+          <input
+            type="text"
+            className="field-input"
+            value={pdfConfig.issuanceName || ''}
+            onChange={(e) => handlePDFConfigChange({ issuanceName: e.target.value })}
+            placeholder="e.g., Final Specification, Rev. A, etc."
+          />
+          <div className="field-description">
+            Optional identifier for this export (appears on cover page)
+          </div>
+        </div>
+
+        {/* Advanced Options */}
+        <div className="form-field">
+          <label className="field-label">
+            <input
+              type="checkbox"
+              checked={pdfConfig.groupPageBreaks || false}
+              onChange={(e) => handlePDFConfigChange({ groupPageBreaks: e.target.checked })}
+              style={{ marginRight: '8px' }}
+            />
+            Break Page by Group
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label className="field-label">
+            <input
+              type="checkbox"
+              checked={pdfConfig.showFullUrl || false}
+              onChange={(e) => handlePDFConfigChange({ showFullUrl: e.target.checked })}
+              style={{ marginRight: '8px' }}
+            />
+            Show Full URLs
+          </label>
+        </div>
+
         {/* Export Action */}
         <div className="export-action">
           <button
@@ -174,6 +216,11 @@ export const ExportSettings: React.FC<ExportSettingsProps> = () => {
           >
             {isExporting ? 'Exporting...' : 'Export PDF'}
           </button>
+          {duplicateTagCount > 0 && (
+            <p style={{ color: 'red', fontSize: '12px', marginTop: '8px', marginBottom: 0 }}>
+              ⚠️ {duplicateTagCount} tag{duplicateTagCount !== 1 ? 's are' : ' is'} used more than once
+            </p>
+          )}
         </div>
 
         {/* Export Result */}
