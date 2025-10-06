@@ -28,42 +28,51 @@ const createDefaultColumns = (): Record<string, ColumnConfig> => ({
     label: 'Tag ID',
     visible: true,
     order: 2,
-    width: 'fixed',
-    minWidth: 100,
+    width: 'auto',
+    // minWidth: 100,
     maxWidth: 120
   },
-  productName: {
-    key: 'productName',
-    label: 'Product Name',
-    visible: true,
-    order: 3,
-    width: 'auto',
-    minWidth: 180,
-    essential: true
-  },
+  // productName: {
+  //   key: 'productName',
+  //   label: 'Product Name',
+  //   visible: true,
+  //   order: 3,
+  //   width: 'auto',
+  //   minWidth: 180,
+  //   essential: false
+  // },
   type: {
     key: 'type',
     label: 'Type',
     visible: true,
-    order: 4,
-    width: 'fixed',
+    order: 3,
+    width: 'auto',
     minWidth: 120,
-    maxWidth: 150
+    // maxWidth: 150
   },
   manufacturer: {
     key: 'manufacturer',
     label: 'Manufacturer',
     visible: true,
-    order: 5,
+    order: 4,
     width: 'auto',
     minWidth: 150
+  },
+  modelNo: {
+    key: 'modelNo',
+    label: 'Model No',
+    visible: false,
+    order: 5,
+    width: 'auto',
+    minWidth: 120,
+    essential: false
   },
   price: {
     key: 'price',
     label: 'Price',
-    visible: true,
+    visible: false,
     order: 6,
-    width: 'fixed',
+    width: 'auto',
     minWidth: 100,
     maxWidth: 120
   },
@@ -83,16 +92,16 @@ const createDefaultColumns = (): Record<string, ColumnConfig> => ({
     width: 'auto',
     minWidth: 120
   },
-  actions: {
-    key: 'actions',
-    label: 'Actions',
-    visible: true,
-    order: 9,
-    width: 'fixed',
-    minWidth: 120,
-    maxWidth: 160,
-    essential: true
-  }
+  // actions: {
+  //   key: 'actions',
+  //   label: 'Actions',
+  //   visible: true,
+  //   order: 9,
+  //   width: 'fixed',
+  //   minWidth: 120,
+  //   maxWidth: 160,
+  //   essential: true
+  // }
 });
 
 

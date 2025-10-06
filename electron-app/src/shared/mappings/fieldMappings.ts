@@ -2,9 +2,9 @@
 export const DB_TO_INTERFACE_MAPPING = {
   // Asset management fields (snake_case -> camelCase)
   'primary_image_hash': 'primaryImageHash',
-  'primary_thumbnail_hash': 'primaryThumbnailHash', 
+  'primary_thumbnail_hash': 'primaryThumbnailHash',
   'additional_images_hashes': 'additionalImagesHashes',
-  
+
   // Core fields (snake_case -> camelCase)
   'project_id': 'projectId',
   'tag_id': 'tagId',
@@ -12,12 +12,13 @@ export const DB_TO_INTERFACE_MAPPING = {
   'created_at': 'createdAt',
   'updated_at': 'updatedAt',
   'product_name': 'productName',
-  
+  'model_no': 'modelNo',
+
   // Fields that stay the same
   'id': 'id',
   'url': 'url',
   'location': 'location',
-  'type': 'type', 
+  'type': 'type',
   'category': 'category',
   'manufacturer': 'manufacturer',
   'price': 'price'

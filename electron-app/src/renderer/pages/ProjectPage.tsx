@@ -194,6 +194,8 @@ const ProjectPage: React.FC = () => {
     pages: 0
   });
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [tagCounts, setTagCounts] = useState<Record<string, number>>({});
+  const [searchInput, setSearchInput] = useState(filters.search);
 
   // For the new file-based system, we only have one current project
   const currentProject = project;
@@ -215,6 +217,21 @@ const ProjectPage: React.FC = () => {
 
   const getLocationNames = (locationIds: string[]): string[] => {
     return locationIds.map(id => getLocationName(id));
+  };
+
+  // Helper function to convert strings to Title Case
+  const toTitleCase = (str: string): string => {
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Helper function to normalize group keys
+  const normalizeGroupKey = (key: string, isNoDataKey: boolean = false): string => {
+    if (isNoDataKey) return key; // Keep "No Location", "No Category", etc. as-is
+    return toTitleCase(key);
   };
 
   // Fetch data with pagination and filters
@@ -258,10 +275,19 @@ const ProjectPage: React.FC = () => {
             pages: productsResponse.pagination.pages
           });
         }
+
+        // Build tag count map
+        const counts = productsResponse.data.reduce((acc, product) => {
+          if (product.tagId) {
+            acc[product.tagId] = (acc[product.tagId] || 0) + 1;
+          }
+          return acc;
+        }, {} as Record<string, number>);
+        setTagCounts(counts);
       } else {
         throw new Error('Failed to fetch products');
       }
-      
+
       setCategories(categoriesResponse.data);
       setLocations(locationsResponse.data);
     } catch (err) {
@@ -429,7 +455,10 @@ const ProjectPage: React.FC = () => {
           if (locations.length === 0) {
             groupKeys = ['No Location'];
           } else {
-            groupKeys = locations.map(locationId => getLocationName(locationId));
+            // Normalize to Title Case and deduplicate
+            groupKeys = [...new Set(locations.map(locationId =>
+              normalizeGroupKey(getLocationName(locationId))
+            ))];
           }
           break;
         case 'category':
@@ -437,11 +466,15 @@ const ProjectPage: React.FC = () => {
           if (categories.length === 0) {
             groupKeys = ['No Category'];
           } else {
-            groupKeys = categories.map(categoryId => getCategoryName(categoryId));
+            // Normalize to Title Case and deduplicate
+            groupKeys = [...new Set(categories.map(categoryId =>
+              normalizeGroupKey(getCategoryName(categoryId))
+            ))];
           }
           break;
         case 'manufacturer':
-          groupKeys = [product.manufacturer || 'No Manufacturer'];
+          const manufacturer = product.manufacturer || 'No Manufacturer';
+          groupKeys = [manufacturer === 'No Manufacturer' ? manufacturer : normalizeGroupKey(manufacturer)];
           break;
         default:
           groupKeys = ['Other'];
@@ -456,8 +489,19 @@ const ProjectPage: React.FC = () => {
       });
     });
 
-    // Sort groups alphabetically and return as sorted object
-    const sortedGroupKeys = Object.keys(groups).sort((a, b) => a.localeCompare(b));
+    // Custom sort: "No X" groups first, then alphabetical (aligned with PDF export service)
+    const sortedGroupKeys = Object.keys(groups).sort((a, b) => {
+      const aIsSpecial = a.toLowerCase() === 'uncategorized' || a.toLowerCase() === 'no location' || a.toLowerCase() === 'no category' || a.toLowerCase() === 'no manufacturer';
+      const bIsSpecial = b.toLowerCase() === 'uncategorized' || b.toLowerCase() === 'no location' || b.toLowerCase() === 'no category' || b.toLowerCase() === 'no manufacturer';
+
+      // If one is special and the other isn't, special group comes first
+      if (aIsSpecial && !bIsSpecial) return -1;
+      if (!aIsSpecial && bIsSpecial) return 1;
+
+      // If both are special or both are regular, sort alphabetically
+      return a.localeCompare(b);
+    });
+
     const sortedGroups: Record<string, Product[]> = {};
     sortedGroupKeys.forEach(key => {
       sortedGroups[key] = groups[key];
@@ -537,24 +581,32 @@ const ProjectPage: React.FC = () => {
     } else {
       // Use frontend grouping and pagination
       const grouped = groupProducts(allProducts, groupBy as 'location' | 'category' | 'manufacturer');
-      
-      // Apply frontend pagination
+
+      // Calculate unique products for accurate pagination
+      const uniqueProductIds = new Set<string>();
+      Object.values(grouped).forEach(groupProducts => {
+        groupProducts.forEach(p => uniqueProductIds.add(p.id));
+      });
+
+      // Frontend pagination based on unique products
       const startIdx = (pagination.page - 1) * pagination.limit;
       const endIdx = startIdx + pagination.limit;
-      
-      // Flatten all grouped products to apply pagination
-      const allGroupedProducts = Object.values(grouped).flat();
-      const paginatedProducts = allGroupedProducts.slice(startIdx, endIdx);
-      
-      // Re-group the paginated products for display
-      const paginatedGrouped = groupProducts(paginatedProducts, groupBy as 'location' | 'category' | 'manufacturer');
-      
-      // Calculate pagination info for grouped data
+
+      // Get unique products within pagination range
+      const uniqueProducts = Array.from(uniqueProductIds)
+        .slice(startIdx, endIdx)
+        .map(id => allProducts.find(p => p.id === id)!)
+        .filter(Boolean);
+
+      // Re-group only the paginated unique products
+      const paginatedGrouped = groupProducts(uniqueProducts, groupBy as 'location' | 'category' | 'manufacturer');
+
+      // Calculate pagination info based on UNIQUE products
       const frontendPaginationInfo = {
-        total: allGroupedProducts.length,
-        pages: Math.ceil(allGroupedProducts.length / pagination.limit)
+        total: uniqueProductIds.size,
+        pages: Math.ceil(uniqueProductIds.size / pagination.limit)
       };
-      
+
       return {
         organizedProducts: paginatedGrouped,
         currentPaginationInfo: frontendPaginationInfo
@@ -693,8 +745,14 @@ const ProjectPage: React.FC = () => {
                   type="text"
                   className="control-select search-input"
                   placeholder="Search..."
-                  value={filters.search}
-                  onChange={(e) => updateFilters('search', e.target.value)}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onBlur={() => updateFilters('search', searchInput)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      updateFilters('search', searchInput);
+                    }
+                  }}
                 />
               </div>
             </div>
@@ -912,6 +970,8 @@ const ProjectPage: React.FC = () => {
                                 return <th key={column.key} className="tagid-header">Tag ID</th>;
                               case 'productName':
                                 return <th key={column.key} className="product-name-header">Product Name</th>;
+                              case 'modelNo':
+                                return <th key={column.key} className="model-no-header">Model No</th>;
                               case 'type':
                                 return <th key={column.key} className="type-header">Type</th>;
                               case 'manufacturer':
@@ -964,8 +1024,11 @@ const ProjectPage: React.FC = () => {
                                 case 'tagId':
                                   return (
                                     <td key={column.key} className="tagid-cell">
-                                      <span 
-                                        style={{ cursor: 'pointer' }}
+                                      <span
+                                        style={{
+                                          cursor: 'pointer',
+                                          color: product.tagId && tagCounts[product.tagId] > 1 ? 'red' : 'inherit'
+                                        }}
                                         onClick={() => navigate(`/project/products/${product.id}`)}
                                       >
                                         {product.tagId}
@@ -988,6 +1051,12 @@ const ProjectPage: React.FC = () => {
                                   return (
                                     <td key={column.key} className="manufacturer-cell">
                                       <span>{product.manufacturer || 'N/A'}</span>
+                                    </td>
+                                  );
+                                case 'modelNo':
+                                  return (
+                                    <td key={column.key} className="model-no-cell">
+                                      <span>{product.modelNo || 'N/A'}</span>
                                     </td>
                                   );
                                 case 'price':
@@ -1170,6 +1239,7 @@ const ProjectPage: React.FC = () => {
           onAddCategory={handleAddCategory}
           onUpdateCategory={handleUpdateCategory}
           onDeleteCategory={handleDeleteCategory}
+          tagCounts={tagCounts}
         />
       </div>
     </div>

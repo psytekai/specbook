@@ -230,12 +230,14 @@ const ProductPage: React.FC = () => {
     );
   }
 
+  const productName = `${product.tagId || "<tag>"} ${product.manufacturer || "<manufacturer>"} ${product.type || "<type>"}`;
+
   return (
     <div className="page-container">
       <div className="product-page">
         <div className="page-header">
           <div>
-            <h1>[{product.tagId}] {product.productName || product.type || "Untitled Product"}</h1>
+            <h1>{productName}</h1>
             <p className="project-breadcrumb">
               <span 
                 className="breadcrumb-link"
@@ -243,16 +245,8 @@ const ProductPage: React.FC = () => {
               >
                 {project.name}
               </span>
-              {' > '}
-              <span>{product.productName}</span>
             </p>
           </div>
-          <button 
-            className="button button-secondary"
-            onClick={() => navigate('/project')}
-          >
-            Back to Project
-          </button>
         </div>
 
         <div className="product-content">
@@ -315,19 +309,47 @@ const ProductPage: React.FC = () => {
               <h2>Product Information</h2>
               <div className="editable-details">
                 <EditableSection
-                  label="Product Name"
-                  value={product.productName}
+                  label="Tag ID"
+                  value={product.tagId}
                   type="text"
-                  placeholder="Enter product name"
-                  onSave={(value) => updateProductField('productName', value as string)}
+                  placeholder="Enter tag ID"
+                  onSave={(value) => updateProductField('tagId', value as string)}
                 />
-                
+
+                <EditableSection
+                  label="Product Type"
+                  value={product.type}
+                  type="textarea"
+                  placeholder="Enter product type"
+                  multiline={true}
+                  onSave={(value) => updateProductField('type', value as string)}
+                  className="full-width"
+                />
+
                 <EditableSection
                   label="Manufacturer"
                   value={product.manufacturer}
                   type="text"
                   placeholder="Enter manufacturer"
                   onSave={(value) => updateProductField('manufacturer', value as string)}
+                />
+
+                <EditableSection
+                  label="Description"
+                  value={product.specificationDescription}
+                  type="textarea"
+                  placeholder="Enter product description"
+                  multiline={true}
+                  onSave={(value) => updateProductField('specificationDescription', value as string)}
+                  className="full-width"
+                />
+                
+                <EditableSection
+                  label="Model Number"
+                  value={product.modelNo}
+                  type="text"
+                  placeholder="Enter model number"
+                  onSave={(value) => updateProductField('modelNo', value as string)}
                 />
                 
                 <EditableSection
@@ -359,45 +381,11 @@ const ProductPage: React.FC = () => {
                   />
                 </div>
 
-                <EditableSection
-                  label="Tag ID"
-                  value={product.tagId}
-                  type="text"
-                  placeholder="Enter tag ID"
-                  onSave={(value) => updateProductField('tagId', value as string)}
-                />
-                
                 <div className="detail-item static">
                   <label>Added:</label>
                   <span>{new Date(product.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
-            </div>
-
-            <div className="detail-section">
-              <h2>Type</h2>
-              <EditableSection
-                label="Product Type"
-                value={product.type}
-                type="textarea"
-                placeholder="Enter product type"
-                multiline={true}
-                onSave={(value) => updateProductField('type', value as string)}
-                className="full-width"
-              />
-            </div>
-
-            <div className="detail-section">
-              <h2>Specifications</h2>
-              <EditableSection
-                label="Specification Details"
-                value={product.specificationDescription}
-                type="textarea"
-                placeholder="Enter specification details"
-                multiline={true}
-                onSave={(value) => updateProductField('specificationDescription', value as string)}
-                className="full-width"
-              />
             </div>
 
             <div className="detail-section">

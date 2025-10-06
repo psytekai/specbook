@@ -66,6 +66,7 @@ export interface TableSettingsModalProps {
   onAddCategory?: (name: string) => Promise<Category>;
   onUpdateCategory?: (id: string, name: string) => Promise<Category>;
   onDeleteCategory?: (id: string) => Promise<boolean>;
+  tagCounts: Record<string, number>;
 }
 
 export type SettingsTab = 'columns' | 'export' | 'locations' | 'categories';

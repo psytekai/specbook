@@ -1,3 +1,20 @@
+export interface Project {
+  id: string;
+  name: string;
+  description?: string;
+  productCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+  path?: string;
+  subtitle?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  projectPhotoHash?: string;
+  companyLogoHash?: string;
+  createdByName?: string;
+  createdByEmail?: string;
+}
+
 export interface Product {
   id: string;
   projectId: string;
@@ -9,6 +26,7 @@ export interface Product {
   category: string[];
   productName: string;
   manufacturer?: string;
+  modelNo?: string;
   price?: number;
 
   primaryImageHash?: string;

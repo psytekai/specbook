@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron';
 import { ProjectState } from '../services/ProjectState';
 import { logger } from '../../shared/logging/Logger';
+import { Product } from '../../shared/types';
 
 var log = logger.for('apiHandlers');
 // Using internal schema end-to-end; no API->internal transforms needed
@@ -19,7 +20,8 @@ class APIRouter {
     // Normalize endpoint by removing /api prefix
     const normalizedEndpoint = endpoint.startsWith('/api') ? endpoint.slice(4) : endpoint;
     
-    log.info(`routeGet: ${normalizedEndpoint}`);
+    log.info(`routeGet`, { normalizedEndpoint });
+    
     try {
       if (normalizedEndpoint === '/projects') {
         return await this.getProjects(params);
@@ -60,6 +62,8 @@ class APIRouter {
   async routePost(endpoint: string, data: any = {}) {
     const normalizedEndpoint = endpoint.startsWith('/api') ? endpoint.slice(4) : endpoint;
     
+    log.info(`routePost`, { normalizedEndpoint, data });
+
     try {
       if (normalizedEndpoint === '/projects') {
         return await this.createProject(data);
@@ -89,6 +93,8 @@ class APIRouter {
   async routePut(endpoint: string, data: any = {}) {
     const normalizedEndpoint = endpoint.startsWith('/api') ? endpoint.slice(4) : endpoint;
     
+    log.info(`routePut`, { normalizedEndpoint, data });
+
     try {
       if (normalizedEndpoint.match(/^\/projects\/([^/]+)$/)) {
         const projectId = normalizedEndpoint.split('/')[2];
@@ -199,11 +205,11 @@ class APIRouter {
     }
 
     const project = {
-      id: 'current',
+      id: state.project.id || 'current',
       name: state.project.name || 'Untitled Project',
       description: state.project.description || '',
       status: 'active',
-      productCount: 0, // TODO: Calculate from database
+      productCount: 0,
       createdAt: state.project.createdAt || new Date(),
       updatedAt: state.project.updatedAt || new Date()
     };
@@ -241,10 +247,16 @@ class APIRouter {
         const productName = (product.productName || '').toLowerCase();
         const type = (product.type || '').toLowerCase();
         const manufacturer = (product.manufacturer || '').toLowerCase();
+        const modelNo = (product.modelNo || '').toLowerCase();
+        const tagId = (product.tagId || '').toLowerCase();
+        const specificationDescription = (product.specificationDescription || '').toLowerCase();
         
         return productName.includes(searchTerm) || 
                type.includes(searchTerm) || 
-               manufacturer.includes(searchTerm);
+               manufacturer.includes(searchTerm) ||
+               modelNo.includes(searchTerm) ||
+               tagId.includes(searchTerm) ||
+               specificationDescription.includes(searchTerm);
       });
     }
 
@@ -376,33 +388,35 @@ class APIRouter {
   }
 
   // TODO: use a shared type object for product data
-  private async createProduct(data: any) {
+  private async createProduct(data: Product) {
     const state = this.projectState.getStateInfo();
     const manager = this.projectState.getManager();
+
+    data.projectId = state.project?.id || 'current';
     
     if (!state.isOpen || !manager) {
       throw new Error('No project open');
     }
 
     try {
-      // Accept internal fields directly
-      const productData = {
-        projectId: 'current',
-        url: data.url || '',
-        tagId: data.tagId,
-        location: data.location || [],
-        type: data.type,
-        specificationDescription: data.specificationDescription,
-        category: data.category || [],
-        productName: data.productName || '',
-        manufacturer: data.manufacturer,
-        price: data.price,
-        primaryImageHash: data.primaryImageHash,
-        primaryThumbnailHash: data.primaryThumbnailHash,
-        additionalImagesHashes: data.additionalImagesHashes || []
-      };
-      
-      const product = await manager.createProduct(productData);
+      // // Accept internal fields directly
+      // const productData = {
+      //   projectId: 'current',
+      //   url: data.url || '',
+      //   tagId: data.tagId,
+      //   location: data.location || [],
+      //   type: data.type,
+      //   specificationDescription: data.specificationDescription,
+      //   category: data.category || [],
+      //   productName: data.productName || '',
+      //   manufacturer: data.manufacturer,
+      //   price: data.price,
+      //   primaryImageHash: data.primaryImageHash,
+      //   primaryThumbnailHash: data.primaryThumbnailHash,
+      //   additionalImagesHashes: data.additionalImagesHashes || []
+      // };
+      log.info(`Creating product`, { data });
+      const product = await manager.createProduct(data);
       this.projectState.markDirty();
       
       // Return internal shape for renderer consumption
@@ -411,7 +425,7 @@ class APIRouter {
         data: product
       };
     } catch (error) {
-      console.error('Failed to create product:', error);
+      log.error('Failed to create product:', { error });
       return { 
         success: false, 
         error: error instanceof Error ? error.message : 'Failed to create product'

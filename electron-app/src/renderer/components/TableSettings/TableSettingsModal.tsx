@@ -20,7 +20,8 @@ export const TableSettingsModal: React.FC<TableSettingsModalProps> = ({
   onDeleteLocation,
   onAddCategory,
   onUpdateCategory,
-  onDeleteCategory
+  onDeleteCategory,
+  tagCounts
 }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('columns');
   const [localSettings, setLocalSettings] = useState<TableSettings>(settings);
@@ -146,6 +147,7 @@ export const TableSettingsModal: React.FC<TableSettingsModalProps> = ({
             <ExportSettings 
               settings={localSettings.export}
               columns={localSettings.columns}
+              tagCounts={tagCounts}
               onChange={(exportSettings) => 
                 handleSettingsChange({ export: exportSettings })
               }
