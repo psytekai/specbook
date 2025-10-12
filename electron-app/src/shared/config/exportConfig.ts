@@ -74,11 +74,12 @@ export const EXPORT_CONFIG = {
     includeImages: true,
     includeHeaders: true,
     pageSize: 'Letter' as const,
-    orientation: 'portrait' as const,
+    orientation: 'landscape' as const,
     scope: 'currentView' as const,
     issuanceName: '',
     groupPageBreaks: false,
     showFullUrl: false,
+    hidePageNumbers: false,
   },
 } as const;
 
