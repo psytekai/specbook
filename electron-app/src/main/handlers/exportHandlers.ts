@@ -21,7 +21,8 @@ const activeExports = new Map<string, { service: PDFExportService; cancelled: bo
  * Format: [export date] - [project name]_specBook - [issuance name].pdf
  */
 function generateExportFilename(config: PDFExportConfig): string {
-  const exportDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  const now = new Date();
+  const exportDate = `${now.getFullYear().toString().slice(-2)}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}`; // yyMMDD format
   const projectState = ProjectState.getInstance();
   const state = projectState.getStateInfo();
   const projectName = state.project?.name || 'Untitled Project';
@@ -42,7 +43,7 @@ function generateExportFilename(config: PDFExportConfig): string {
   if (config.issuanceName && config.issuanceName.trim()) {
     const cleanIssuanceName = config.issuanceName
       .replace(/[<>:"/\\|?*]/g, '') // Remove invalid filename characters
-      .replace(/\s+/g, '_') // Replace spaces with underscores
+      // .replace(/\s+/g, '_') // Replace spaces with underscores
       .trim();
     parts.push(cleanIssuanceName);
   }

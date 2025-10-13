@@ -505,13 +505,20 @@ export class PDFExportService {
       } else if (column.key === 'url') {
         // Add hyperlink - show full URL or "Link" text based on config
         const linkText = config.showFullUrl ? product.url : 'Link';
+        // Use minimal padding for URL column to maximize content space
+        const urlPadding = 5;
+        // I'm over this problem. I don't know why there is so much right padding/margin being added to the url column.
+        // So  I'm forcing it the text to be a bit wider.
+        const urlWidth = column.width + (config.orientation === 'landscape' ? 30 : 10); 
+        const urlFontSize = config.showFullUrl ? 5 : EXPORT_CONFIG.layout.fonts.body;
+        
         doc.fillColor(this.layout.colors.primary)
-           .fontSize(config.showFullUrl ? 3 : EXPORT_CONFIG.layout.fonts.body)
-           .text(linkText, x + 5, cellY, {
-             width: column.width - 10,
+           .fontSize(urlFontSize)
+           .text(linkText, x + urlPadding, cellY, {
+             width: urlWidth,
              link: product.url,
              underline: true,
-             ellipsis: true
+             lineBreak: true,
            });
       } else {
         // Regular text
