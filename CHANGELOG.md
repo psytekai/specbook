@@ -7,6 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-10-12
+
+### Updated
+
+- [P1] add export configuration to remove pagination
+- [P2] export default file save as name: [export date] - [project name]_specBook - [issuance name]
+- [P3] default to landscape for exporting
+
+### Fixed
+
+- [P1] bug: landscape view breaks cover page rendering
+- [P2] bug: url column padding not allowing url to take up more space
+
+## [1.1.0] - 2025-10-05
+
+### Updated
+- [P1] sort by tag id (in pdf export)
+- [P1] add cover page to pdf export
+- [P1] add project info page via application menu and updated project manifest with inputted information
+- [P1] add option to pdf export with full link (ideally as jpeg)
+- [P2] add vertical lines to separate columns
+- [P2] default to “Letter” page format
+- [P3] add option to page break between groups on export
+
+### Removed
+- [P1] re-order/fix column priority in export: image, tag, type, manufacturer, description, model_no, location, url
+- [P1] remove metadata from pdf export [in the top right corner]
+- [P2] remove pdf export title
+- [P2] remove grouping count in export
+- [P2] remove ending blank pages and fix page numbers
+
+### Fixed
+- [P1] [bug] images are exceeded column width
+- [P1] [bug] not using full quality images (using thumbnails)
+- [P1] [bug] group by category or location should be case insensitive
+
+## Product Enhancements
+
+### Updated
+- [P1] add model_no field to new product workflow, product page, product table (hidden by default), and to export
+- [P1] update project page header to the product title, where product title = `<tag> <manufacturer> <type>`
+- [P1] notify/warn/alert/message for duplicate tags (warning on new product/export, red text styling on product table)
+- [P2] rename specification to description on product page
+- [P2] UI updated: centered product new/project page action buttons and centered bread crumbs on product page
+
+### Removed
+- [P2] remove product name product page
+- [P2] remove product name from product table
+
+## Other Bug Fixes
+
+### Fixes
+
+- [P1] [bug] bulk delete if corrupting manifest file - manifest file writes not concurrency-safe
+- [P2] filter search removes focus after each key
+
+
 ## [1.0.0] - 2025-09-29
 
 ### Added
