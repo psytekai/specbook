@@ -16,6 +16,41 @@ import { logger } from '../../shared/logging/Logger';
 // Store active export operations
 const activeExports = new Map<string, { service: PDFExportService; cancelled: boolean }>();
 
+/**
+ * Generate a custom filename for PDF exports
+ * Format: [export date] - [project name]_specBook - [issuance name].pdf
+ */
+function generateExportFilename(config: PDFExportConfig): string {
+  const now = new Date();
+  const exportDate = `${now.getFullYear().toString().slice(-2)}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}`; // yyMMDD format
+  const projectState = ProjectState.getInstance();
+  const state = projectState.getStateInfo();
+  const projectName = state.project?.name || 'Untitled Project';
+  
+  // Clean project name for filename (remove invalid characters)
+  const cleanProjectName = projectName
+    .replace(/[<>:"/\\|?*]/g, '') // Remove invalid filename characters
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .substring(0, 50); // Limit length
+  
+  // Build filename parts
+  const parts = [
+    exportDate,
+    `${cleanProjectName}_specBook`
+  ];
+  
+  // Add issuance name if provided
+  if (config.issuanceName && config.issuanceName.trim()) {
+    const cleanIssuanceName = config.issuanceName
+      .replace(/[<>:"/\\|?*]/g, '') // Remove invalid filename characters
+      // .replace(/\s+/g, '_') // Replace spaces with underscores
+      .trim();
+    parts.push(cleanIssuanceName);
+  }
+  
+  return `${parts.join(' - ')}.pdf`;
+}
+
 export function setupExportHandlers() {
   // Main PDF export handler
   ipcMain.handle('export:pdf', async (event, request: PDFExportRequest): Promise<PDFGenerationResult> => {
@@ -41,9 +76,12 @@ export function setupExportHandlers() {
       // Get output path
       let outputPath = request.outputPath;
       if (!outputPath) {
+        // Generate custom filename based on project info and config
+        const customFilename = generateExportFilename(request.config);
+        
         const result = await dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, {
           title: 'Save PDF Export',
-          defaultPath: path.join(os.homedir(), 'Downloads', `product-export-${new Date().toISOString().split('T')[0]}.pdf`),
+          defaultPath: path.join(os.homedir(), 'Downloads', customFilename),
           filters: [
             { name: 'PDF Files', extensions: ['pdf'] },
             { name: 'All Files', extensions: ['*'] },

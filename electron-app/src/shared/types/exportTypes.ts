@@ -10,6 +10,7 @@ export interface PDFExportConfig {
   issuanceName?: string; // Optional issuance name for cover page
   groupPageBreaks?: boolean; // Start each group on a new page
   showFullUrl?: boolean; // Show full URL instead of "Link" text
+  hidePageNumbers?: boolean; // Hide page numbers in footer
   filters?: {
     search?: string;
     category?: string;

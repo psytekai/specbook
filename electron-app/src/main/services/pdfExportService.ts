@@ -193,12 +193,21 @@ export class PDFExportService {
       hasLogo: !!project.companyLogoHash
     });
     const pageWidth = doc.page.width;
+    const pageHeight = doc.page.height;
     const centerX = pageWidth / 2;
+    const isLandscape = config.orientation === 'landscape';
 
-    let y = 100; // Start position from top
+    // Adaptive spacing based on orientation and page size
+    const baseSpacing = isLandscape ? 20 : 30;
+    const largeSpacing = isLandscape ? 30 : 40;
+    const imageSpacing = isLandscape ? 30 : 40;
+    
+    // Start position - closer to top in landscape to fit more content
+    let y = isLandscape ? 60 : 100;
 
-    // Project Name (Large, bold)
-    doc.fontSize(28)
+    // Project Name (Large, bold) - smaller font in landscape
+    const titleFontSize = isLandscape ? 24 : 28;
+    doc.fontSize(titleFontSize)
        .font('Helvetica-Bold')
        .fillColor(this.layout.colors.default)
        .text(project.name || 'Untitled Project', this.layout.margins.left, y, {
@@ -206,85 +215,98 @@ export class PDFExportService {
          align: 'center'
        });
 
-    y += 40;
+    y += largeSpacing;
 
     // Project Subtitle
     if (project.subtitle) {
-      doc.fontSize(16)
+      const subtitleFontSize = isLandscape ? 14 : 16;
+      doc.fontSize(subtitleFontSize)
          .font('Helvetica')
          .fillColor(this.layout.colors.default)
          .text(project.subtitle, this.layout.margins.left, y, {
            width: pageWidth - this.layout.margins.left - this.layout.margins.right,
            align: 'center'
          });
-      y += 30;
+      y += baseSpacing;
     }
 
     // Address Lines
     if (project.addressLine1) {
-      doc.fontSize(12)
+      const addressFontSize = isLandscape ? 10 : 12;
+      doc.fontSize(addressFontSize)
          .font('Helvetica')
          .fillColor(this.layout.colors.default)
          .text(project.addressLine1, this.layout.margins.left, y, {
            width: pageWidth - this.layout.margins.left - this.layout.margins.right,
            align: 'center'
          });
-      y += 15;
+      y += isLandscape ? 12 : 15;
     }
 
     if (project.addressLine2) {
-      doc.fontSize(12)
+      const addressFontSize = isLandscape ? 10 : 12;
+      doc.fontSize(addressFontSize)
          .font('Helvetica')
          .fillColor(this.layout.colors.default)
          .text(project.addressLine2, this.layout.margins.left, y, {
            width: pageWidth - this.layout.margins.left - this.layout.margins.right,
            align: 'center'
          });
-      y += 40;
+      y += largeSpacing;
     } else if (project.addressLine1) {
-      y += 20; // Add space even if no second line
+      y += isLandscape ? 15 : 20; // Add space even if no second line
     }
 
-    // Project Photo (if available)
+    // Project Photo (if available) - smaller in landscape
     if (project.projectPhotoHash && state.filePath) {
       try {
         const assetManager = new AssetManager(state.filePath);
         const photoPath = await assetManager.getAssetPath(project.projectPhotoHash, false);
 
         if (fs.existsSync(photoPath)) {
-          const maxPhotoWidth = 400;
-          const maxPhotoHeight = 285;
+          const maxPhotoWidth = isLandscape ? 300 : 400;
+          const maxPhotoHeight = isLandscape ? 200 : 285;
 
           doc.image(photoPath, centerX - maxPhotoWidth/2, y, {
             fit: [maxPhotoWidth, maxPhotoHeight],
             align: 'center'
           });
-          y += maxPhotoHeight + 40;
+          y += maxPhotoHeight + imageSpacing;
         }
       } catch (error) {
         log.error('Failed to load project photo:', { error });
       }
     }
 
-    // Company Logo (if available)
+    // Company Logo (if available) - smaller in landscape
     if (project.companyLogoHash && state.filePath) {
       try {
         const assetManager = new AssetManager(state.filePath);
         const logoPath = await assetManager.getAssetPath(project.companyLogoHash, false);
 
         if (fs.existsSync(logoPath)) {
-          const maxLogoWidth = 200;
-          const maxLogoHeight = 65;
+          const maxLogoWidth = isLandscape ? 150 : 200;
+          const maxLogoHeight = isLandscape ? 50 : 65;
 
           doc.image(logoPath, centerX - maxLogoWidth/2, y, {
             fit: [maxLogoWidth, maxLogoHeight],
             align: 'center'
           });
-          y += maxLogoHeight + 40;
+          y += maxLogoHeight + imageSpacing;
         }
       } catch (error) {
         log.error('Failed to load company logo:', { error });
       }
+    }
+
+    // Check if we have enough space for remaining elements
+    const remainingSpace = pageHeight - y - this.layout.margins.bottom;
+    const minRequiredSpace = isLandscape ? 60 : 80; // Space needed for date and created by
+    
+    if (remainingSpace < minRequiredSpace) {
+      log.warn(`Insufficient space for cover page elements. Remaining: ${remainingSpace}, Required: ${minRequiredSpace}`);
+      // Reduce spacing to fit content
+      y -= imageSpacing / 2;
     }
 
     // Issue Date and Issuance Name
@@ -298,7 +320,8 @@ export class PDFExportService {
       ? `${issueDate} | ${config.issuanceName}`
       : issueDate;
 
-    doc.fontSize(10)
+    const footerFontSize = isLandscape ? 9 : 10;
+    doc.fontSize(footerFontSize)
        .font('Helvetica')
        .fillColor(this.layout.colors.default)
        .text(issuanceText, this.layout.margins.left, y, {
@@ -306,7 +329,7 @@ export class PDFExportService {
          align: 'center'
        });
 
-    y += 25;
+    y += isLandscape ? 20 : 25;
 
     // Created by info
     if (project.createdByName || project.createdByEmail) {
@@ -316,7 +339,7 @@ export class PDFExportService {
           ? `Created by: ${project.createdByName}`
           : `Created by: ${project.createdByEmail}`;
 
-      doc.fontSize(10)
+      doc.fontSize(footerFontSize)
          .font('Helvetica')
          .fillColor(this.layout.colors.default)
          .text(createdByText, this.layout.margins.left, y, {
@@ -406,8 +429,10 @@ export class PDFExportService {
       currentY += this.layout.spacing.sectionGap;
     }
 
-    // Add footer to all pages
-    this.addDocumentFooter(doc);
+    // Add footer to all pages (conditionally)
+    if (!config.hidePageNumbers) {
+      this.addDocumentFooter(doc);
+    }
 
     return doc;
   }
@@ -480,13 +505,20 @@ export class PDFExportService {
       } else if (column.key === 'url') {
         // Add hyperlink - show full URL or "Link" text based on config
         const linkText = config.showFullUrl ? product.url : 'Link';
+        // Use minimal padding for URL column to maximize content space
+        const urlPadding = 5;
+        // I'm over this problem. I don't know why there is so much right padding/margin being added to the url column.
+        // So  I'm forcing it the text to be a bit wider.
+        const urlWidth = column.width + (config.orientation === 'landscape' ? 30 : 10); 
+        const urlFontSize = config.showFullUrl ? 5 : EXPORT_CONFIG.layout.fonts.body;
+        
         doc.fillColor(this.layout.colors.primary)
-           .fontSize(config.showFullUrl ? 3 : EXPORT_CONFIG.layout.fonts.body)
-           .text(linkText, x + 5, cellY, {
-             width: column.width - 10,
+           .fontSize(urlFontSize)
+           .text(linkText, x + urlPadding, cellY, {
+             width: urlWidth,
              link: product.url,
              underline: true,
-             ellipsis: true
+             lineBreak: true,
            });
       } else {
         // Regular text
