@@ -83,7 +83,6 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({ tagCounts }) => 
   };
 
   // Count duplicate tags
-  console.log('Tag counts:', tagCounts);
   const duplicateTagCount = Object.values(tagCounts).filter(count => count > 1).length;
 
   return (
@@ -204,6 +203,18 @@ export const ExportSettings: React.FC<ExportSettingsProps> = ({ tagCounts }) => 
               style={{ marginRight: '8px' }}
             />
             Show Full URLs
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label className="field-label">
+            <input
+              type="checkbox"
+              checked={pdfConfig.hidePageNumbers || false}
+              onChange={(e) => handlePDFConfigChange({ hidePageNumbers: e.target.checked })}
+              style={{ marginRight: '8px' }}
+            />
+            Hide Page Numbers
           </label>
         </div>
 
