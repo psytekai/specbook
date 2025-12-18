@@ -97,7 +97,7 @@ const ProductNew: React.FC = () => {
         const [locationsResponse, categoriesResponse, productsResponse] = await Promise.all([
           api.get<Location[]>('/api/locations'),
           api.get<Category[]>('/api/categories'),
-          api.get<Product[]>('/api/projects/current/products') // TODO: terrible api, rename endpoint to /api/products
+          api.get<Product[]>('/api/projects/current/products', { fetchAll: true }) // Fetch all to check for duplicate tag IDs
         ]);
         setLocations(locationsResponse.data);
         setCategories(categoriesResponse.data);

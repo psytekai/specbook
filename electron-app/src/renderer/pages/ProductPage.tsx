@@ -75,15 +75,13 @@ const ProductPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        // First get all products for the current project, then find the specific one
-        const response = await api.get<Product[]>(`/api/projects/current/products`);
-        const foundProduct = response.data.find(p => p.id === productId);
+        // Fetch the specific product directly by ID
+        const response = await api.get<Product>(`/api/products/${productId}`);
         
-        if (!foundProduct) {
+        if (!response.success || !response.data) {
           setError('Product not found');
         } else {
-          console.log('Product loaded:', foundProduct);
-          setProduct(foundProduct);
+          setProduct(response.data);
         }
       } catch (err) {
         setError('Failed to load product');
